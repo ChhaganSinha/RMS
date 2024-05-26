@@ -1,5 +1,6 @@
 ﻿
 using Microsoft.JSInterop;
+using RMS.UI.Blazor;
 
 namespace RMS.Client
 { 
