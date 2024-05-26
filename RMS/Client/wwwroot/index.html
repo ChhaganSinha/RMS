@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <title> Home | RMS </title>
+    <base href="/" />
+    <link href="css/app.css" rel="stylesheet" />
+    <meta name="theme-color" content="#ffffff">
+
+    <!-- If you add any scoped CSS files, uncomment the following to load them
+    <link href="RMS.Client.styles.css" rel="stylesheet" /> -->
+    <link href="css/bootstrap/bootstrap.min.css" rel="stylesheet" />
+    <link href="_content/GridBlazor/css/gridblazor.min.css" rel="stylesheet" />
+
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/font-awesome/css/font-awesome.min.css">
+    <!-- Summernote Editor -->
+    <link href="./_content/BlazingComponents.Summernote/summernote/summernote-lite.min.css" rel="stylesheet" />
+    <style>
+        @media only screen and (max-width: 1000px) {
+            .full-screen {
+                display: none !important;
+            }
+        }
+
+        .menu-styler {
+            display: none !important;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <div class="loader-clone"></div>
+        <div class="loading-message">Please wait...</div>
+        <!--<div class="loader-progress"></div> -->
+    </div>
+
+    <div id="blazor-error-ui">
+        An unhandled error has occurred.
+        <a href="" class="reload">Reload</a>
+        <a class="dismiss">🗙</a>
+    </div>
+    <script src="_framework/blazor.webassembly.js"></script>
+    <script src="_content/GridBlazor/js/gridblazor.js"></script>
+
+    <!--UI Template-->
+    <script src="assets/js/vendor-all.min.js"></script>
+    <script src="assets/js/plugins/bootstrap.min.js"></script>
+    <script src="assets/js/pcoded.min.js"></script>
+    <script src="assets/js/menu-setting.min.js"></script>
+    <script src="assets/js/theme.js"></script>
+
+    <!-- Chart JS -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script type="text/javascript" src="js/my-chart-js.js"></script>
+
+    <!-- Summernote Editor -->
+    <script src="./_content/BlazingComponents.Summernote/summernote/jquery-3.4.1.slim.min.js"></script>
+    <script src="./_content/BlazingComponents.Summernote/summernote/summernote-lite.min.js"></script>
+    <script src="js/SummerEditorHack.js"></script>
+
+</body>
+
+</html>

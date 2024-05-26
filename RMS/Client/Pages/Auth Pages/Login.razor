@@ -1,0 +1,111 @@
+﻿@page "/login"
+@layout LoginLayout
+@inject NavigationManager navigationManager
+@inject IdentityAuthenticationStateProvider authStateProvider
+@using Microsoft.AspNetCore.Components.Forms
+@using RMS.Client.Shared
+@using RMS.Client.States
+@using RMS.Dto.Auth
+
+<div class="auth-wrapper align-items-stretch aut-bg-img">
+    <div class="flex-grow-1">
+        <div class="h-100 d-md-flex align-items-center auth-side-img">
+            <div class="col-sm-10 auth-content w-auto">
+                <img src="assets/images/auth/auth-logo.png" alt="" class="img-fluid">
+                <h1 class="text-white my-4">Welcome Back!</h1>
+                <h4 class="text-white font-weight-normal">
+                    Sign in to your account and explore the features and amenities of our resort management system.
+                    <br /> <br />
+                    Don't forget to manage bookings, track guest preferences, and optimize your resort operations.
+                </h4>
+            </div>
+        </div>
+        <div class="auth-side-form">
+            <div class=" auth-content">
+                <img src="assets/images/auth/auth-logo-dark.png" alt=""
+                     class="img-fluid mb-4 d-block d-xl-none d-lg-none">
+                <h3 class="mb-4 f-w-400">Signin</h3>
+                <EditForm class="form-signin" OnValidSubmit="OnSubmit" Model="loginParameters">
+                    <DataAnnotationsValidator />
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="feather icon-mail"></i></span>
+                        </div>
+                        <input type="email" @bind="loginParameters.UserEmail" class="form-control" placeholder="Email address">
+                    </div>
+                    <ValidationMessage style="margin-top:-12px" For="@(() => loginParameters.UserEmail)" />
+
+                    <div class="input-group mb-4">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="feather icon-lock"></i></span>
+                        </div>
+                        <input type="password" @bind="loginParameters.Password" class="form-control" placeholder="Password">
+                    </div>
+                    <ValidationMessage style="margin-top:-16px" For="@(() => loginParameters.Password)" />
+
+                    <div class="form-group text-left mt-2">
+                        <div class="checkbox checkbox-primary d-inline">
+                            <input type="checkbox" name="checkbox-p-1" id="checkbox-p-1" @bind="@loginParameters.RememberMe">
+                            <label for="checkbox-p-1" class="cr">Remember Me</label>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-block btn-primary mb-0">Signin</button>
+                    <label class="text-danger">@error</label>
+
+                    @if (userCount == 0)
+                    {
+                        <NavLink href="register">
+                            <h6 class="font-weight-normal text-center">Create account</h6>
+                        </NavLink>
+                    }
+
+                    <div class="text-center">
+                        <div class="saprator my-4"><span>OR</span></div>
+                        <button class="btn text-white bg-facebook mb-2 mr-2  wid-40 px-0 hei-40 rounded-circle">
+                            <i class="fab fa-facebook-f"></i>
+                        </button>
+                        <button class="btn text-white bg-googleplus mb-2 mr-2 wid-40 px-0 hei-40 rounded-circle">
+                            <i class="fab fa-google-plus-g"></i>
+                        </button>
+                        <button class="btn text-white bg-twitter mb-2  wid-40 px-0 hei-40 rounded-circle">
+                            <i class="fab fa-twitter"></i>
+                        </button>
+                        <p class="mb-2 mt-4 text-muted">
+                            Forgot password? <a href="forgetpassword"
+                                                class="f-w-400">Reset</a>
+                        </p>
+                        <p class="mb-0 text-muted">
+                            Don’t have an account? <a href="auth-signup-img-side.html"
+                                                      class="f-w-400">Signup</a>
+                        </p>
+                    </div>
+                </EditForm>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@code {
+    LoginParameters loginParameters { get; set; } = new LoginParameters();
+    string error { get; set; }
+    int userCount = 1;
+
+    async Task OnSubmit()
+    {
+        error = null;
+        try
+        {
+            await authStateProvider.Login(loginParameters);
+            navigationManager.NavigateTo("");
+        }
+        catch (Exception ex)
+        {
+            error = ex.Message;
+        }
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        userCount = await authStateProvider.GetUserCount();
+    }
+}

@@ -1,0 +1,35 @@
+﻿@inherits LayoutComponentBase
+@inject NavigationManager navigationManager
+@inject IdentityAuthenticationStateProvider authStateProvider
+<div class="page">
+    <AuthorizeView>
+        <Authorized>
+            <main>
+                <SideNavManu IsCollapsedChanged="HandleIsCollapsedChanged" />
+                <article class="content">
+                    <CascadingValue TValue="AlertModel" Value="alerts">
+                        <div class="pcoded-main-container mt-4" style="@($"margin-left: {(IsCollapsed ? "70px" : "235px")};")">
+                            <div class="pcoded-content">
+                                @Body
+                            </div>
+                        </div>
+                    </CascadingValue>
+                </article>
+            </main>
+        </Authorized>
+        <NotAuthorized>
+            @Body
+        </NotAuthorized>
+    </AuthorizeView>
+</div>
+
+@code {
+    private AlertModel alerts = new AlertModel();
+
+    private bool IsCollapsed = false;
+
+    private void HandleIsCollapsedChanged(bool newValue)
+    {
+        IsCollapsed = newValue;
+    }
+}
