@@ -1,0 +1,99 @@
+﻿@using GridShared
+@using GridShared.Columns
+@using GridShared.Utility
+@using Microsoft.Extensions.Primitives
+@using RMS.Client.Pages.GridComponent
+@using RMS.Client.Shared.Popup
+@using RMS.Client.Client
+@inject AppClient client
+@implements ICustomGridComponent<RoomFacilities>
+@inject NavigationManager NavigationManager
+
+<button class='btn btn-sm btn-warning' style="border-radius:15px" @onclick="MyClickHandler" title="Edit"><i class="fa fa-pencil-square-o"></i></button>
+<SimpleDailog Title="@Title" Show="@show" OnCloseDialog="ResetForm">
+    @if (show)
+    {
+
+        <UiAlert Model="alert"></UiAlert>
+        <EditForm Model="model" OnValidSubmit="OnSave">
+            <DataAnnotationsValidator />
+            <div>
+                <input type="text" placeholder="Enter Category" @bind-value="model.Name" class="form-control mb-2" />
+                <ValidationMessage For="() => model.Name" />
+            </div>
+            @if (process || model == null)
+            {
+                <div style="text-align:center">
+                    <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
+                </div>
+            }
+            <hr />
+            <button type="submit" class="btn btn-primary float-right col-md-4">Add</button>
+        </EditForm>
+        <br />
+    }
+</SimpleDailog>
+@code {
+    [Parameter]
+    public RoomFacilities Item { get; set; }
+
+    [Parameter]
+    public CGrid<RoomFacilities> Grid { get; set; }
+
+    [CascadingParameter]
+    protected AlertModel? alert { get; set; }
+
+    private Timer _timer;
+    private int _delay = 2500;
+    bool show = false;
+    bool process = false;
+    string Title = "Update Room Facilities";
+
+    RoomFacilities model = new();
+
+    private async Task MyClickHandler(MouseEventArgs e)
+    {
+        show = true;
+        model = await client.GetRoomFacilityById(Item.Id);
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        alert?.Clear();
+    }
+
+    public async Task OnSave()
+    {
+        process = true;
+        alert?.Clear();
+
+        var response = await client.UpsertRoomFacilityAsync(model);
+        if (response.IsSuccess)
+        {
+            // model = response.Result;
+            alert?.SetSuccess(response.Message);
+            await RoomCategoryGrid.RefreshGridAsync();
+        }
+        else
+            alert?.SetError(response.Message);
+
+        process = false;
+        StateHasChanged();
+        _timer = new Timer(TimerCallback, null, _delay, Timeout.Infinite);
+    }
+
+    private void TimerCallback(Object o)
+    {
+        alert?.Clear();
+        _timer.Dispose();
+        StateHasChanged();
+    }
+
+    private void ResetForm()
+    {
+        model = new();
+        show = false;
+        process = false;
+    }
+
+}

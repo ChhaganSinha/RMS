@@ -14,6 +14,7 @@
         }
     }
 </style>
+
 <div>
     <nav class="pcoded-navbar menupos-fixed @(layout) @(IsSidebarCollapsed ? "navbar-collapsed" : "")">
         <div class="navbar-wrapper non-selectable">
@@ -31,28 +32,42 @@
                     </li>
 
                     <li class="nav-item pcoded-hasmenu @(IsRoomExpanded ? "pcoded-trigger" : "")">
-                        <a class="nav-link" @onclick="ToggleTemplate"  style="cursor:pointer">
+                        <a class="nav-link" @onclick="ToggleRoom" style="cursor:pointer">
                             <span class="pcoded-micon">
                                 <i class="feather icon-layout"></i>
                             </span>
                             <span class="pcoded-mtext">Room</span>
                         </a>
                         <ul class="pcoded-submenu @(IsRoomExpanded ? "d-block" : "d-none")">
-                            <li><a href="Categories">Categories</a></li>
-                            <li><a href="Facilities">Facilities</a></li>
-                            <li><a href="Add-room">Add Room</a></li>
+                            <li><a href="room-categories">Categories</a></li>
+                            <li><a href="room-facilities">Facilities</a></li>
+                            <li><a href="rooms">Rooms</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item pcoded-hasmenu @(IsHallExpanded ? "pcoded-trigger" : "")">
+                        <a class="nav-link" @onclick="ToggleHall" style="cursor:pointer">
+                            <span class="pcoded-micon">
+                                <i class="feather icon-layout"></i>
+                            </span>
+                            <span class="pcoded-mtext">Hall</span>
+                        </a>
+                        <ul class="pcoded-submenu @(IsHallExpanded ? "d-block" : "d-none")">
+                            <li><a href="hall-categories">Categories</a></li>
+                            <li><a href="hall-facilities">Facilities</a></li>
+                            <li><a href="hall">Hall</a></li>
                         </ul>
                     </li>
 
                     <li class="nav-item pcoded-hasmenu @(IsHumanResourceExpanded ? "pcoded-trigger" : "")">
-                        <a class="nav-link " @onclick="ToggleCampaign" style="cursor:pointer">
+                        <a class="nav-link " @onclick="ToggleHR" style="cursor:pointer">
                             <span class="pcoded-micon">
                                 <i class="feather icon-layers"></i>
                             </span><span class="pcoded-mtext">Human Resource</span>
                         </a>
                         <ul class="pcoded-submenu @(IsHumanResourceExpanded ? "d-block" : "d-none")">
-                            <li><a href="tenant-campaigns">Designations</a></li>
-                            <li><a href="tenant-campaign-config">Departments</a></li>
+                            <li><a href="designations">Designations</a></li>
+                            <li><a href="departments">Departments</a></li>
+                            <li><a href="employees">Employees</a></li>
 
                         </ul>
                     </li>
@@ -61,7 +76,7 @@
                         <label>Reservation</label>
                     </li>
                     <li class="nav-item pcoded-hasmenu @(IsTrainingExpanded ? "pcoded-trigger" : "")">
-                        <a class="nav-link " @onclick="ToggleTraining" style="cursor:pointer">
+                        <a class="nav-link " @onclick="ToggleHR" style="cursor:pointer">
                             <span class="pcoded-micon">
                                 <i class="feather icon-box"></i>
                             </span><span class="pcoded-mtext">Training</span>
@@ -300,7 +315,7 @@
                 </a>
             </li>
         </ul>
-        
+
     </section>
 </div>
 
@@ -320,6 +335,7 @@
     }
 
     private bool IsRoomExpanded = false;
+    private bool IsHallExpanded = false;
     private bool IsHumanResourceExpanded = false;
     private bool IsTrainingExpanded = false;
     private bool IsReportExpanded = false;
@@ -337,6 +353,7 @@
     private void ToggleDashboard(MouseEventArgs e)
     {
         IsRoomExpanded = false;
+        IsHallExpanded = false;
         IsHumanResourceExpanded = false;
         IsTrainingExpanded = false;
         IsReportExpanded = false;
@@ -347,9 +364,10 @@
         IsPhishTrainExpand = false;
         IsRiskScoreExpand = false;
     }
-    private void ToggleTemplate(MouseEventArgs e)
+    private void ToggleRoom(MouseEventArgs e)
     {
         IsRoomExpanded = !IsRoomExpanded;
+        IsHallExpanded = false;
         IsHumanResourceExpanded = false;
         IsTrainingExpanded = false;
         IsReportExpanded = false;
@@ -358,9 +376,9 @@
         IsGetStartedExpand = false;
 
     }
-    private void ToggleCampaign(MouseEventArgs e)
+    private void ToggleHall(MouseEventArgs e)
     {
-        IsHumanResourceExpanded = !IsHumanResourceExpanded;
+        IsHallExpanded = !IsHallExpanded;
         IsRoomExpanded = false;
         IsTrainingExpanded = false;
         IsReportExpanded = false;
@@ -371,11 +389,11 @@
         IsPhishTrainExpand = false;
         IsRiskScoreExpand = false;
     }
-    private void ToggleTraining(MouseEventArgs e)
+    private void ToggleHR(MouseEventArgs e)
     {
-        IsTrainingExpanded = !IsTrainingExpanded;
+        IsHumanResourceExpanded = !IsHumanResourceExpanded;
         IsRoomExpanded = false;
-        IsHumanResourceExpanded = false;
+        IsHallExpanded = false;
         IsReportExpanded = false;
         IsSettingExpanded = false;
         IsFaqExpanded = false;

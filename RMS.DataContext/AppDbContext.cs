@@ -18,6 +18,16 @@ namespace RMS.DataContext
         }
 
         public DbSet<Details> Details { get; set; }
+        public DbSet<RoomCategories> RoomCategories { get; set; }
+        public DbSet<RoomFacilities> RoomFacilities { get; set; }
+        public DbSet<Room> Room { get; set; }
 
+        public DbSet<HallCategories> HallCategories { get; set; }
+        public DbSet<HallFacilities> HallFacilities { get; set; }
+        public DbSet<Hall> Halls { get; set; }
+
+        public DbSet<EmployeeDesignation> EmployeeDesignation { get; set; }
+        //public DbSet<EmployeeDepartment> EmployeeDepartment { get; set; }
+        public DbSet<Employee> Employee { get; set; }
     }
 }

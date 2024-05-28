@@ -30,6 +30,9 @@ namespace RMS.Server.Intrastructure
         {
             ODataConventionModelBuilder builder = new ODataConventionModelBuilder();
             builder.EntitySet<Details>("Details");
+            builder.EntitySet<RoomCategories>("RoomCategories");
+            builder.EntitySet<RoomFacilities>("RoomFacilities");
+            builder.EntitySet<Room>("Room");
 
             return builder.GetEdmModel();
         }

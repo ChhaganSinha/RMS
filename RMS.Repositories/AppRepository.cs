@@ -67,5 +67,173 @@ namespace RMS.Repositories
         }
         #endregion
 
+        #region Room Section
+        public async Task<RoomCategories> GetRoomCategoryById(int id)
+        {
+            RoomCategories result = null;
+
+#pragma warning disable CS8600
+             result =  AppDbCxt.RoomCategories.FirstOrDefault(o => o.Id == id);
+#pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
+
+            return await Task.FromResult(result);
+        }
+
+        public async Task<IEnumerable<RoomCategories>> GetAllRoomCategory()
+        {
+            IEnumerable<RoomCategories> result = null;
+
+            result = AppDbCxt.RoomCategories.ToList();
+            return result;
+        }
+        public async Task<ApiResponse<RoomCategories>> UpsertRoomCategory(RoomCategories data)
+        {
+            var result = new ApiResponse<RoomCategories>();
+            try
+            {
+
+                if (data == null)
+                {
+                    result.IsSuccess = true;
+                    result.Message = "Invalid Room Categories data!";
+                    return result;
+                }
+
+                if (data.Id > 0)
+                {
+                    AppDbCxt.RoomCategories.Update(data);
+                    result.Message = "Data Successfully Updated.";
+                }
+                else
+                {
+                    AppDbCxt.RoomCategories.Add(data);
+                    result.Message = "Data Successfully Inserted.";
+                }
+
+                AppDbCxt.SaveChanges();
+                result.IsSuccess = true;
+                result.Result = data;
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+
+        public async Task<ApiResponse<RoomCategories>> DeleteRoomCategory(int id)
+        {
+            var result = new ApiResponse<RoomCategories>();
+            try
+            {
+                var existing = AppDbCxt.RoomCategories.First(x => x.Id == id);
+                result.Result = existing;
+                if (existing == null)
+                {
+                    result.IsSuccess = true;
+                    result.Message = "Room Category not found!";
+                    return result;
+                }
+
+                AppDbCxt.RoomCategories.Remove(existing);
+                await AppDbCxt.SaveChangesAsync();
+                result.IsSuccess = true;
+                result.Message = "Successfully Deleted!";
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess= false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+
+        public async Task<RoomFacilities> GetRoomFacilityById(int id)
+        {
+            RoomFacilities result = null;
+
+#pragma warning disable CS8600
+            result = AppDbCxt.RoomFacilities.FirstOrDefault(o => o.Id == id);
+#pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
+
+            return await Task.FromResult(result);
+        }
+
+        public async Task<IEnumerable<RoomFacilities>> GetAllRoomFacility()
+        {
+            IEnumerable<RoomFacilities> result = null;
+
+            result = AppDbCxt.RoomFacilities.ToList();
+            return result;
+        }
+        public async Task<ApiResponse<RoomFacilities>> UpsertRoomFacility(RoomFacilities data)
+        {
+            var result = new ApiResponse<RoomFacilities>();
+            try
+            {
+
+                if (data == null)
+                {
+                    result.IsSuccess = true;
+                    result.Message = "Invalid Room Facility data!";
+                    return result;
+                }
+
+                if (data.Id > 0)
+                {
+                    AppDbCxt.RoomFacilities.Update(data);
+                    result.Message = "Data Successfully Updated.";
+                }
+                else
+                {
+                    AppDbCxt.RoomFacilities.Add(data);
+                    result.Message = "Data Successfully Inserted.";
+                }
+
+                AppDbCxt.SaveChanges();
+                result.IsSuccess = true;
+                result.Result = data;
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+
+        public async Task<ApiResponse<RoomFacilities>> DeleteRoomFacility(int id)
+        {
+            var result = new ApiResponse<RoomFacilities>();
+            try
+            {
+                var existing = AppDbCxt.RoomFacilities.First(x => x.Id == id);
+                result.Result = existing;
+                if (existing == null)
+                {
+                    result.IsSuccess = true;
+                    result.Message = "Room Facility not found!";
+                    return result;
+                }
+
+                AppDbCxt.RoomFacilities.Remove(existing);
+                await AppDbCxt.SaveChangesAsync();
+                result.IsSuccess = true;
+                result.Message = "Successfully Deleted!";
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+        #endregion
+
     }
 }

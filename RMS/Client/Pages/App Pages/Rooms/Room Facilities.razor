@@ -1,0 +1,89 @@
+﻿@page "/room-facilities"
+
+<div class="page-header breadcumb-sticky">
+    <div class="page-block">
+        <div class="row align-items-center">
+            <div class="col-md-12">
+                <div class="page-header-title">
+                    <h5 class="m-b-10">
+                        Room Facilities
+                    </h5>
+                </div>
+                <ul class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a href="/"><i class="feather icon-home"></i></a>
+                    </li>
+                    <li class="breadcrumb-item"><a>Room</a></li>
+                    <li class="breadcrumb-item"><a>Facilities</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-sm-12 p-0">
+        <div class="card-body p-2 mt-n3">
+            <div class="row">
+                <div class="col-md-4">
+                     <UiAlert Model="alert"></UiAlert>
+                    <div class="card inputs">
+                        <div class="card-body">
+                            <input type="text" placeholder="Enter Facilities" id="inp" class="form-control mb-2">
+                            <button onclick="Add()" class="btn btn-dark">Add</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-8">
+                    <div class="card text">
+                        <div class="card-body">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+@code {
+
+    [CascadingParameter]
+    protected AlertModel? alert { get; set; }
+
+    private Timer _timer;
+    private int _delay = 2500;
+    public string Message = "aaaaaaaa";
+
+    protected override async Task OnInitializedAsync()
+    {
+        alert?.Clear();
+    }
+    protected async Task OnSave()
+    {
+        alert?.Clear();
+        //if (trainingQuiz.Any(o => o.Name == null) || trainingQuiz.Count() == 0)
+        {
+            alert?.SetError("Empty Quiz!");
+            _timer = new Timer(TimerCallback, null, _delay, Timeout.Infinite);
+            return;
+        }
+        //trainingQuiz = await client.UpsertTrainingQuizTitle(trainingQuiz);
+        alert?.SetSuccess("Successfully Saved!");
+
+        StateHasChanged();
+        _timer = new Timer(TimerCallback, null, _delay, Timeout.Infinite);
+
+    }
+
+    private void TimerCallback(Object o)
+    {
+        alert?.Clear();
+        _timer.Dispose();
+        StateHasChanged();
+
+    }
+
+
+
+}

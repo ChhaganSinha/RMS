@@ -90,5 +90,170 @@ namespace RMS.Client.Client
         }
         #endregion
 
+        #region Room Section
+
+        public async Task<RoomCategories> GetRoomCategoryById(int id)
+        {
+            RoomCategories data = null;
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/App/RoomCategory/{id}");
+
+                res.EnsureSuccessStatusCode();
+
+                data = await res.Content.ReadFromJsonAsync<RoomCategories>();
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return data;
+        }
+        public async Task<IEnumerable<RoomCategories>> GetAllRoomCategory()
+        {
+            IEnumerable<RoomCategories> details = null;
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/App/all-room-category");
+
+                res.EnsureSuccessStatusCode();
+
+                details = await res.Content.ReadFromJsonAsync<IEnumerable<RoomCategories>>();
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return details;
+        }
+
+        public async Task<ApiResponse<RoomCategories>> UpsertRoomCategoryAsync(RoomCategories data)
+        {
+            var result = new ApiResponse<RoomCategories>();
+
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/App/UpsertRoomCategory", data);
+                res.EnsureSuccessStatusCode();
+                var json = await res.Content.ReadFromJsonAsync<ApiResponse<RoomCategories>>();
+                return json;
+
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+
+
+        }
+        public async Task<ApiResponse<RoomCategories>> DeleteRoomCategory(int id)
+        {
+            var result = new ApiResponse<RoomCategories>();
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/App/DeleteRoomCategory/{id}", new { });
+                res.EnsureSuccessStatusCode();
+                var json = await res.Content.ReadFromJsonAsync<ApiResponse<RoomCategories>>();
+                return json;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+
+
+
+
+        public async Task<RoomFacilities> GetRoomFacilityById(int id)
+        {
+            RoomFacilities data = null;
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/App/RoomFacility/{id}");
+
+                res.EnsureSuccessStatusCode();
+
+                data = await res.Content.ReadFromJsonAsync<RoomFacilities>();
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return data;
+        }
+        public async Task<IEnumerable<RoomFacilities>> GetAllRoomFacility()
+        {
+            IEnumerable<RoomFacilities> details = null;
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/App/all-room-facility");
+
+                res.EnsureSuccessStatusCode();
+
+                details = await res.Content.ReadFromJsonAsync<IEnumerable<RoomFacilities>>();
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return details;
+        }
+
+        public async Task<ApiResponse<RoomFacilities>> UpsertRoomFacilityAsync(RoomFacilities data)
+        {
+            var result = new ApiResponse<RoomFacilities>();
+
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/App/UpsertRoomFacility", data);
+                res.EnsureSuccessStatusCode();
+                var json = await res.Content.ReadFromJsonAsync<ApiResponse<RoomFacilities>>();
+                return json;
+
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+
+
+        }
+        public async Task<ApiResponse<RoomFacilities>> DeleteRoomFacility(int id)
+        {
+            var result = new ApiResponse<RoomFacilities>();
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/App/DeleteRoomFacility/{id}", new { });
+                res.EnsureSuccessStatusCode();
+                var json = await res.Content.ReadFromJsonAsync<ApiResponse<RoomFacilities>>();
+                return json;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+        #endregion
     }
 }

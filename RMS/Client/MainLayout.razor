@@ -5,7 +5,7 @@
     <AuthorizeView>
         <Authorized>
             <main>
-                <SideNavManu IsCollapsedChanged="HandleIsCollapsedChanged" />
+                <SideNavBar IsCollapsedChanged="HandleIsCollapsedChanged" />
                 <article class="content">
                     <CascadingValue TValue="AlertModel" Value="alerts">
                         <div class="pcoded-main-container mt-4" style="@($"margin-left: {(IsCollapsed ? "70px" : "235px")};")">
