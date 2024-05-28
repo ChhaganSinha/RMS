@@ -254,6 +254,87 @@ namespace RMS.Client.Client
                 return result;
             }
         }
+
+
+        public async Task<Room> GetRoomById(int id)
+        {
+            Room data = null;
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/App/Room/{id}");
+
+                res.EnsureSuccessStatusCode();
+
+                data = await res.Content.ReadFromJsonAsync<Room>();
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return data;
+        }
+        public async Task<IEnumerable<Room>> GetAllRoom()
+        {
+            IEnumerable<Room> details = null;
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/App/all-room");
+
+                res.EnsureSuccessStatusCode();
+
+                details = await res.Content.ReadFromJsonAsync<IEnumerable<Room>>();
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return details;
+        }
+
+        public async Task<ApiResponse<Room>> UpsertRoomAsync(Room data)
+        {
+            var result = new ApiResponse<Room>();
+
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/App/UpsertRoom", data);
+                res.EnsureSuccessStatusCode();
+                var json = await res.Content.ReadFromJsonAsync<ApiResponse<Room>>();
+                return json;
+
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+
+
+        }
+        public async Task<ApiResponse<Room>> DeleteRoom(int id)
+        {
+            var result = new ApiResponse<Room>();
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/App/DeleteRoom/{id}", new { });
+                res.EnsureSuccessStatusCode();
+                var json = await res.Content.ReadFromJsonAsync<ApiResponse<Room>>();
+                return json;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
         #endregion
     }
 }

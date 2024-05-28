@@ -27,7 +27,7 @@ namespace RMS.DataContext
         public DbSet<Hall> Halls { get; set; }
 
         public DbSet<EmployeeDesignation> EmployeeDesignation { get; set; }
-        //public DbSet<EmployeeDepartment> EmployeeDepartment { get; set; }
+        public DbSet<EmployeeDepartment> EmployeeDepartment { get; set; }
         public DbSet<Employee> Employee { get; set; }
     }
 }

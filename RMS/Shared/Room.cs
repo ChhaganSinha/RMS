@@ -18,6 +18,7 @@ namespace RMS.Dto
         public string PersonCharge { get; set; } = string.Empty;
         public string Capacity { get; set; } = string.Empty;
         public bool ExtraCapacity { get; set; } 
+        public bool IsActive { get; set; } 
         public string ImageName {  get; set; } = string.Empty;
     }
 }

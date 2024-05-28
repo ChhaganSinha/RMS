@@ -233,6 +233,91 @@ namespace RMS.Repositories
                 return result;
             }
         }
+
+
+
+        public async Task<Room> GetRoomById(int id)
+        {
+            Room result = null;
+
+#pragma warning disable CS8600
+            result = AppDbCxt.Room.FirstOrDefault(o => o.Id == id);
+#pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
+
+            return await Task.FromResult(result);
+        }
+
+        public async Task<IEnumerable<Room>> GetAllRoom()
+        {
+            IEnumerable<Room> result = null;
+
+            result = AppDbCxt.Room.ToList();
+            return result;
+        }
+        public async Task<ApiResponse<Room>> UpsertRoom(Room data)
+        {
+            var result = new ApiResponse<Room>();
+            try
+            {
+
+                if (data == null)
+                {
+                    result.IsSuccess = true;
+                    result.Message = "Invalid Room data!";
+                    return result;
+                }
+
+                if (data.Id > 0)
+                {
+                    AppDbCxt.Room.Update(data);
+                    result.Message = "Data Successfully Updated.";
+                }
+                else
+                {
+                    AppDbCxt.Room.Add(data);
+                    result.Message = "Data Successfully Inserted.";
+                }
+
+                AppDbCxt.SaveChanges();
+                result.IsSuccess = true;
+                result.Result = data;
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+
+        public async Task<ApiResponse<Room>> DeleteRoom(int id)
+        {
+            var result = new ApiResponse<Room>();
+            try
+            {
+                var existing = AppDbCxt.Room.First(x => x.Id == id);
+                result.Result = existing;
+                if (existing == null)
+                {
+                    result.IsSuccess = true;
+                    result.Message = "Room not found!";
+                    return result;
+                }
+
+                AppDbCxt.Room.Remove(existing);
+                await AppDbCxt.SaveChangesAsync();
+                result.IsSuccess = true;
+                result.Message = "Successfully Deleted!";
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
         #endregion
 
     }

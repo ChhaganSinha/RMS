@@ -77,7 +77,6 @@ namespace RMS.Server.Controllers.Api
 
         [HttpGet]
         [Route("all-room-category")]
-        [AllowAnonymous]
         public async Task<IEnumerable<RoomCategories>> GetAllRoomCategory()
         {
             return await _appRepository.GetAllRoomCategory();
@@ -107,23 +106,51 @@ namespace RMS.Server.Controllers.Api
 
         [HttpGet]
         [Route("all-room-facility")]
-        [AllowAnonymous]
         public async Task<IEnumerable<RoomFacilities>> GetAllRoomFacility()
         {
             return await _appRepository.GetAllRoomFacility();
         }
 
         [HttpPost]
-        [Route("UpsertRoomCategory")]
+        [Route("UpsertRoomFacility")]
         public async Task<ApiResponse<RoomFacilities>> UpsertRoomFacility(RoomFacilities data)
         {
             return await _appRepository.UpsertRoomFacility(data);
         }
         [HttpPost]
-        [Route("DeleteRoomCategory/{id}")]
+        [Route("DeleteRoomFacility/{id}")]
         public async Task<ApiResponse<RoomFacilities>> DeleteRoomFacility(int id)
         {
             return await _appRepository.DeleteRoomFacility(id);
+        }
+
+
+
+        [HttpGet]
+        [Route("Room/{id}")]
+        public async Task<Room> GetRoomById(int id)
+        {
+            return await _appRepository.GetRoomById(id);
+        }
+
+        [HttpGet]
+        [Route("all-room")]
+        public async Task<IEnumerable<Room>> GetAllRoom()
+        {
+            return await _appRepository.GetAllRoom();
+        }
+
+        [HttpPost]
+        [Route("UpsertRoom")]
+        public async Task<ApiResponse<Room>> UpsertRoom(Room data)
+        {
+            return await _appRepository.UpsertRoom(data);
+        }
+        [HttpPost]
+        [Route("DeleteRoom/{id}")]
+        public async Task<ApiResponse<Room>> DeleteRoom(int id)
+        {
+            return await _appRepository.DeleteRoom(id);
         }
         #endregion
 

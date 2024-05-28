@@ -34,6 +34,10 @@ namespace RMS.Server.Intrastructure
             builder.EntitySet<RoomFacilities>("RoomFacilities");
             builder.EntitySet<Room>("Room");
 
+            builder.EntitySet<EmployeeDesignation>("EmployeeDesignation");
+            builder.EntitySet<EmployeeDepartment>("EmployeeDepartment");
+            builder.EntitySet<Employee>("Employee");
+
             return builder.GetEdmModel();
         }
     }
