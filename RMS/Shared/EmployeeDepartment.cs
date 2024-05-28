@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace RMS.Dto
 {
-    public class EmployeeDepartment
+    public class EmployeeDepartment : BaseEntity
     {
         public string Name { get; set; } = string.Empty;
     }
