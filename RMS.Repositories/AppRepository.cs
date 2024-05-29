@@ -320,5 +320,175 @@ namespace RMS.Repositories
         }
         #endregion
 
+
+        #region Hall Section
+        public async Task<HallCategories> GetHallCategoryById(int id)
+        {
+            HallCategories result = null;
+
+#pragma warning disable CS8600
+            result = AppDbCxt.HallCategories.FirstOrDefault(o => o.Id == id);
+#pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
+
+            return await Task.FromResult(result);
+        }
+
+        public async Task<IEnumerable<HallCategories>> GetAllHallCategory()
+        {
+            IEnumerable<HallCategories> result = null;
+
+            result = AppDbCxt.HallCategories.ToList();
+            return result;
+        }
+        public async Task<ApiResponse<HallCategories>> UpsertHallCategory(HallCategories data)
+        {
+            var result = new ApiResponse<HallCategories>();
+            try
+            {
+
+                if (data == null)
+                {
+                    result.IsSuccess = true;
+                    result.Message = "Invalid Hall Categories data!";
+                    return result;
+                }
+
+                if (data.Id > 0)
+                {
+                    AppDbCxt.HallCategories.Update(data);
+                    result.Message = "Data Successfully Updated.";
+                }
+                else
+                {
+                    AppDbCxt.HallCategories.Add(data);
+                    result.Message = "Data Successfully Inserted.";
+                }
+
+                AppDbCxt.SaveChanges();
+                result.IsSuccess = true;
+                result.Result = data;
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+
+        public async Task<ApiResponse<HallCategories>> DeleteHallCategory(int id)
+        {
+            var result = new ApiResponse<HallCategories>();
+            try
+            {
+                var existing = AppDbCxt.HallCategories.First(x => x.Id == id);
+                result.Result = existing;
+                if (existing == null)
+                {
+                    result.IsSuccess = true;
+                    result.Message = "Hall Category not found!";
+                    return result;
+                }
+
+                AppDbCxt.HallCategories.Remove(existing);
+                await AppDbCxt.SaveChangesAsync();
+                result.IsSuccess = true;
+                result.Message = "Successfully Deleted!";
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+
+        public async Task<HallFacilities> GetHallFacilityById(int id)
+        {
+            HallFacilities result = null;
+
+#pragma warning disable CS8600
+            result = AppDbCxt.HallFacilities.FirstOrDefault(o => o.Id == id);
+#pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
+
+            return await Task.FromResult(result);
+        }
+
+        public async Task<IEnumerable<HallFacilities>> GetAllHallFacility()
+        {
+            IEnumerable<HallFacilities> result = null;
+
+            result = AppDbCxt.HallFacilities.ToList();
+            return result;
+        }
+        public async Task<ApiResponse<HallFacilities>> UpsertHallFacility(HallFacilities data)
+        {
+            var result = new ApiResponse<HallFacilities>();
+            try
+            {
+
+                if (data == null)
+                {
+                    result.IsSuccess = true;
+                    result.Message = "Invalid Hall Facility data!";
+                    return result;
+                }
+
+                if (data.Id > 0)
+                {
+                    AppDbCxt.HallFacilities.Update(data);
+                    result.Message = "Data Successfully Updated.";
+                }
+                else
+                {
+                    AppDbCxt.HallFacilities.Add(data);
+                    result.Message = "Data Successfully Inserted.";
+                }
+
+                AppDbCxt.SaveChanges();
+                result.IsSuccess = true;
+                result.Result = data;
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+
+        public async Task<ApiResponse<HallFacilities>> DeleteHallFacility(int id)
+        {
+            var result = new ApiResponse<HallFacilities>();
+            try
+            {
+                var existing = AppDbCxt.HallFacilities.First(x => x.Id == id);
+                result.Result = existing;
+                if (existing == null)
+                {
+                    result.IsSuccess = true;
+                    result.Message = "Hall Facility not found!";
+                    return result;
+                }
+
+                AppDbCxt.HallFacilities.Remove(existing);
+                await AppDbCxt.SaveChangesAsync();
+                result.IsSuccess = true;
+                result.Message = "Successfully Deleted!";
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+
+        #endregion
+
     }
 }

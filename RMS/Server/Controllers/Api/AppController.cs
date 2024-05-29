@@ -117,6 +117,7 @@ namespace RMS.Server.Controllers.Api
         {
             return await _appRepository.UpsertRoomFacility(data);
         }
+
         [HttpPost]
         [Route("DeleteRoomFacility/{id}")]
         public async Task<ApiResponse<RoomFacilities>> DeleteRoomFacility(int id)
@@ -151,6 +152,70 @@ namespace RMS.Server.Controllers.Api
         public async Task<ApiResponse<Room>> DeleteRoom(int id)
         {
             return await _appRepository.DeleteRoom(id);
+        }
+        #endregion
+
+
+
+
+
+
+
+        #region Hall Setion
+        [HttpGet]
+        [Route("HallCategory/{id}")]
+        public async Task<HallCategories> GetHallCategoryById(int id)
+        {
+            return await _appRepository.GetHallCategoryById(id);
+        }
+
+        [HttpGet]
+        [Route("all-hall-category")]
+        public async Task<IEnumerable<HallCategories>> GetAllHallCategory()
+        {
+            return await _appRepository.GetAllHallCategory();
+        }
+
+        [HttpPost]
+        [Route("UpsertHallCategory")]
+        public async Task<ApiResponse<HallCategories>> UpsertHallCategory(HallCategories data)
+        {
+            return await _appRepository.UpsertHallCategory(data);
+        }
+        [HttpPost]
+        [Route("DeleteHallCategory/{id}")]
+        public async Task<ApiResponse<HallCategories>> DeleteHallCategory(int id)
+        {
+            return await _appRepository.DeleteHallCategory(id);
+        }
+
+
+
+        [HttpGet]
+        [Route("HallFacility/{id}")]
+        public async Task<HallFacilities> GetHallFacilityById(int id)
+        {
+            return await _appRepository.GetHallFacilityById(id);
+        }
+
+        [HttpGet]
+        [Route("all-hall-facility")]
+        public async Task<IEnumerable<HallFacilities>> GetAllHallFacility()
+        {
+            return await _appRepository.GetAllHallFacility();
+        }
+
+        [HttpPost]
+        [Route("UpsertRoomFacility")]
+        public async Task<ApiResponse<HallFacilities>> UpsertHallFacility(HallFacilities data)
+        {
+            return await _appRepository.UpsertHallFacility(data);
+        }
+        [HttpPost]
+        [Route("DeleteRoomFacility/{id}")]
+        public async Task<ApiResponse<HallFacilities>> DeleteHallFacility(int id)
+        {
+            return await _appRepository.DeleteHallFacility(id);
         }
         #endregion
 

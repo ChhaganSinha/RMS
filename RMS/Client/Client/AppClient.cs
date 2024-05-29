@@ -152,6 +152,7 @@ namespace RMS.Client.Client
                 return result;
             }
 
+           
 
         }
         public async Task<ApiResponse<RoomCategories>> DeleteRoomCategory(int id)
@@ -326,6 +327,175 @@ namespace RMS.Client.Client
                 var res = await HttpClient.PostAsJsonAsync($"api/App/DeleteRoom/{id}", new { });
                 res.EnsureSuccessStatusCode();
                 var json = await res.Content.ReadFromJsonAsync<ApiResponse<Room>>();
+                return json;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+        #endregion
+
+
+
+
+        #region Hall Section
+
+        public async Task<HallCategories> GetHallCategoryById(int id)
+        {
+            HallCategories data = null;
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/App/HallCategory/{id}");
+
+                res.EnsureSuccessStatusCode();
+
+                data = await res.Content.ReadFromJsonAsync<HallCategories>();
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return data;
+        }
+        public async Task<IEnumerable<HallCategories>> GetAllHallCategory()
+        {
+            IEnumerable<HallCategories> details = null;
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/App/all-hall-category");
+
+                res.EnsureSuccessStatusCode();
+
+                details = await res.Content.ReadFromJsonAsync<IEnumerable<HallCategories>>();
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return details;
+        }
+
+        public async Task<ApiResponse<HallCategories>> UpsertHallCategoryAsync(HallCategories data)
+        {
+            var result = new ApiResponse<HallCategories>();
+
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/App/UpsertHallCategory", data);
+                res.EnsureSuccessStatusCode();
+                var json = await res.Content.ReadFromJsonAsync<ApiResponse<HallCategories>>();
+                return json;
+
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+
+
+        }
+        public async Task<ApiResponse<HallCategories>> DeleteHallCategory(int id)
+        {
+            var result = new ApiResponse<HallCategories>();
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/App/DeleteHallCategory/{id}", new { });
+                res.EnsureSuccessStatusCode();
+                var json = await res.Content.ReadFromJsonAsync<ApiResponse<HallCategories>>();
+                return json;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+
+
+
+
+        public async Task<HallFacilities> GetHallFacilityById(int id)
+        {
+            HallFacilities data = null;
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/App/HallFacility/{id}");
+
+                res.EnsureSuccessStatusCode();
+
+                data = await res.Content.ReadFromJsonAsync<HallFacilities>();
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return data;
+        }
+        public async Task<IEnumerable<HallFacilities>> GetAllHallFacility()
+        {
+            IEnumerable<HallFacilities> details = null;
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/App/all-hall-facility");
+
+                res.EnsureSuccessStatusCode();
+
+                details = await res.Content.ReadFromJsonAsync<IEnumerable<HallFacilities>>();
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return details;
+        }
+
+        public async Task<ApiResponse<HallFacilities>> UpsertHallFacilityAsync(HallFacilities data)
+        {
+            var result = new ApiResponse<HallFacilities>();
+
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/App/UpsertHallFacility", data);
+                res.EnsureSuccessStatusCode();
+                var json = await res.Content.ReadFromJsonAsync<ApiResponse<HallFacilities>>();
+                return json;
+
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+
+
+        }
+        public async Task<ApiResponse<HallFacilities>> DeleteHallFacility(int id)
+        {
+            var result = new ApiResponse<HallFacilities>();
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/App/DeleteHallFacility/{id}", new { });
+                res.EnsureSuccessStatusCode();
+                var json = await res.Content.ReadFromJsonAsync<ApiResponse<HallFacilities>>();
                 return json;
             }
             catch (Exception ex)
