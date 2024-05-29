@@ -234,7 +234,51 @@ namespace RMS.Repositories
             }
         }
 
+        public async Task<bool> UpsertRoomFacilitiesMapping(Dictionary<int, List<int>> dict)
+        {
+            foreach (var kvp in dict)
+            {
+                var roomId = kvp.Key;
+                var facilityId = kvp.Value;
 
+                var existingfacilityIds = await AppDbCxt.RoomFacilitiesMapping
+                    .Where(o => o.RoomId == roomId)
+                    .Select(o => o.FacilityId)
+                    .ToListAsync();
+
+                var facilityIdsToAdd = facilityId.Except(existingfacilityIds);
+                var facilityIdsToRemove = existingfacilityIds.Except(facilityId);
+                var facilityIdsToKeep = facilityId.Intersect(existingfacilityIds);
+
+                if (facilityIdsToRemove.Any())
+                {
+                    var mappingsToRemove = await AppDbCxt.RoomFacilitiesMapping
+                        .Where(tcm => tcm.RoomId == roomId && facilityIdsToRemove.Contains(tcm.FacilityId))
+                        .ToListAsync();
+                    AppDbCxt.RemoveRange(mappingsToRemove);
+                }
+
+                if (facilityIdsToAdd.Any())
+                {
+                    var mappingsToAdd = facilityIdsToAdd.Select(c => new RoomFacilitiesMapping
+                    {
+                        RoomId = roomId,
+                        FacilityId = c
+                    });
+                    AppDbCxt.AddRange(mappingsToAdd);
+                }
+
+                await AppDbCxt.SaveChangesAsync();
+            }
+
+            return true;
+        }
+
+        public async Task<List<RoomFacilitiesMapping>> GetFacilitiesMappingByRoomId(int id)
+        {
+            var dataMapping = AppDbCxt.RoomFacilitiesMapping.Where(o => o.RoomId == id);
+            return dataMapping.ToList();
+        }
 
         public async Task<Room> GetRoomById(int id)
         {

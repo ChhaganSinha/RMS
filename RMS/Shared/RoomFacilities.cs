@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace RMS.Dto
 {
-    public class RoomFacilities : Auditable
+    public class RoomFacilities : BaseEntity
     {
         [Required]
         public string Name { get; set; } = string.Empty;

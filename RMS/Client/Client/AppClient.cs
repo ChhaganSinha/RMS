@@ -216,6 +216,44 @@ namespace RMS.Client.Client
             return details;
         }
 
+        public async Task<bool> UpsertRoomFacilitiesMapping(Dictionary<int, List<int>> dict)
+        {
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/App/UpsertRoomFacilitiesMapping", dict);
+                res.EnsureSuccessStatusCode();
+
+                return res.IsSuccessStatusCode;
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+        }
+
+        public async Task<List<RoomFacilitiesMapping>> GetFacilitiesMappingByRoomId(int id)
+        {
+            List<RoomFacilitiesMapping> Trainingcampaign = new();
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/App/GetFacilitiesMappingByRoomId/{id}");
+
+                res.EnsureSuccessStatusCode();
+
+                Trainingcampaign = await res.Content.ReadFromJsonAsync<List<RoomFacilitiesMapping>>();
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+            return Trainingcampaign;
+        }
+
+
         public async Task<ApiResponse<RoomFacilities>> UpsertRoomFacilityAsync(RoomFacilities data)
         {
             var result = new ApiResponse<RoomFacilities>();

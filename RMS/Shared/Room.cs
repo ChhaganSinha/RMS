@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,5 +21,7 @@ namespace RMS.Dto
         public bool ExtraCapacity { get; set; } 
         public bool IsActive { get; set; } 
         public string ImageName {  get; set; } = string.Empty;
+        [NotMapped]
+        public byte[] ImageFile { get; set; }
     }
 }

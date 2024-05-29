@@ -156,6 +156,7 @@ table.grid-table .grid-header {
 /*hx Deopdown span max height set*/
 .dropdown-menu[b-kjzuko47a2] {
     height: 200px !important;
+    width: 100%;
 }
 
 

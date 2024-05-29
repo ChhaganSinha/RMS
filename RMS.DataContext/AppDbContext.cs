@@ -20,10 +20,12 @@ namespace RMS.DataContext
         public DbSet<Details> Details { get; set; }
         public DbSet<RoomCategories> RoomCategories { get; set; }
         public DbSet<RoomFacilities> RoomFacilities { get; set; }
+        public DbSet<RoomFacilitiesMapping> RoomFacilitiesMapping { get; set; }
         public DbSet<Room> Room { get; set; }
 
         public DbSet<HallCategories> HallCategories { get; set; }
         public DbSet<HallFacilities> HallFacilities { get; set; }
+        public DbSet<HallFacilitiesMapping> HallFacilitiesMapping { get; set; }
         public DbSet<Hall> Halls { get; set; }
 
         public DbSet<EmployeeDesignation> EmployeeDesignation { get; set; }

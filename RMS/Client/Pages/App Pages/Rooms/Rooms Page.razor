@@ -5,6 +5,9 @@
 @inject AppClient client
 @inject IJSRuntime JSRuntime
 @inject NavigationManager NavigationManager
+@using Havit.Blazor.Components.Web
+@using Havit.Blazor.Components.Web.Bootstrap
+@using System.ComponentModel.DataAnnotations;
 @attribute [Authorize]
 
 <div class="page-header breadcumb-sticky">
@@ -14,7 +17,7 @@
                 <div class="page-header-title">
                     <h5 class="m-b-10">
                         Room
-                        <a><i class="fa fa-plus-circle fa-lg text-primary" aria-hidden="true" title="Add Room"></i></a>
+                        <a @onclick="()=>show=true" style="cursor:pointer"><i class="fa fa-plus-circle fa-lg text-primary" aria-hidden="true" title="Add Room"></i></a>
                     </h5>
                 </div>
                 <ul class="breadcrumb">
@@ -30,34 +33,126 @@
 <div class="row">
     <div class="col-sm-12 p-0">
         <div class="card-body p-2 mt-n3">
-           <RoomGrid/>
+            <RoomGrid />
         </div>
     </div>
 </div>
 
-<SimpleDailog Title="@Title" Show="@show" OnCloseDialog="ResetForm">
+<PageDialog Title="@Title" Show="@show" ClosePageDialog="ResetForm">
     @if (show)
     {
 
         <UiAlert Model="alert"></UiAlert>
         <EditForm Model="model" OnValidSubmit="OnSave">
             <DataAnnotationsValidator />
-            <div>
-                <input type="text" placeholder="Enter Category" @bind-value="model.Category" class="form-control mb-2" />
-                <ValidationMessage For="() => model.Category" />
+            <div class="form-group row">
+                <div class="col-md-6">
+                    <label class="col-form-label bold-font required-field">Room Number</label>
+                    <InputText @bind-Value="@model.RoomNumber" id="RoomNumber" class="form-control"></InputText>
+                    <ValidationMessage For="() => model.RoomNumber" />
+                </div>
+                <div class="col-md-6">
+                    <label class="col-form-label bold-font">Price</label>
+                    <InputNumber @bind-Value="@model.Price" id="Price" class="form-control"></InputNumber>
+                    <ValidationMessage For="() => model.Price" />
+                </div>
             </div>
-                @if (process)
-                {
+            <div class="form-group row">
+                <div class="col-md-6">
+                    <label class="col-form-label bold-font">Select Category</label>
+                    <select @bind="model.Category" class="form-control" id="Category">
+                        <option>- Select -</option>
+                        @foreach (var val in Categories)
+                        {
+                            <option value="@val.Id">@val.Name</option>
+                        }
+                    </select>
+                    <ValidationMessage For="() => model.Category" />
+                </div>
+                <div class="col-md-6">
+                    <label class="col-form-label bold-font">Select Facilities</label>
+                    <HxMultiSelect TItem="RoomFacilities"
+                                   AutoSort="false"
+                                   TValue="int"
+                                   Data="@Facilities"
+                                   @bind-Value="@SelectedFacilities"
+                                   TextSelector="@(p => p.Name)"
+                                   ValueSelector="@(p => p.Id)"
+                                   EmptyText="- Select -"
+                                   NullDataText="Loading..." />
+
+                    @if (SelectedFacilities.Count() == 0 && IsError)
+                    {
+                        <span style="color:red">Please select at least one Facility</span>
+                    }
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <div class="col-md-4">
+                    <label class="col-form-label bold-font" style="padding-right: 0;">No. of Beds</label>
+                    <InputNumber @bind-Value="@model.NumberOfBed" id="NumberOfBed" class="form-control"></InputNumber>
+                    <ValidationMessage For="() => model.NumberOfBed" />
+                </div>
+                <div class="col-md-4">
+                    <label class="col-form-label bold-font" style="padding-right: 0;">Capacity</label>
+                    <InputText @bind-Value="@model.Capacity" id="Capacity" class="form-control"></InputText>
+                    <ValidationMessage For="() => model.Capacity" />
+                </div>
+                <div class="col-md-4">
+                    <label class="col-form-label bold-font" style="padding-right: 0;">Extra Capacity</label>
+                    <InputCheckbox @bind-Value="@model.ExtraCapacity" id="ExtraCapacity" class="form-control"></InputCheckbox>
+                    <ValidationMessage For="() => model.ExtraCapacity" />
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="col-md-6">
+                    <label class="col-form-label bold-font" style="padding-right: 0;">Bed Charge</label>
+                    <InputText @bind-Value="@model.BedCharge" id="BedCharge" class="form-control"></InputText>
+                    <ValidationMessage For="() => model.BedCharge" />
+                </div>
+                <div class="col-md-6">
+                    <label class="col-form-label bold-font" style="padding-right: 0;">Person Charge</label>
+                    <InputText @bind-Value="@model.PersonCharge" id="PersonCharge" class="form-control"></InputText>
+                    <ValidationMessage For="() => model.PersonCharge" />
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="col-md-3">
+                    <label class="col-form-label bold-font" style="padding-right: 0;">IsActive</label>
+                    <InputCheckbox @bind-Value="model.IsActive" class="form-check-input" style="font-size: x-large;margin-top: 42px; margin-left: -56px;" />
+                    <ValidationMessage For="() => model.IsActive" />
+                </div>
+
+                <div class="col-md-9">
+                    <label class="col-form-label bold-font">Upload Image</label>
+                    <InputFile OnChange="HandleFileSelected" class="form-control" />
+                    <br />
+                    <img id="imgPreview" src="@imageDataUrl" style="max-width: 200px; max-height: 200px; display: @(imageDataUrl == null ? "none" : "block");" />
+                    <ValidationMessage For="() => model.ImageFile" />
+                    
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="col-md-12">
+                    <label class="col-form-label bold-font" style="padding-right: 0;">Descriptions</label>
+                    <InputTextArea @bind-Value="@model.Descriptions" id="Descriptions" class="form-control"></InputTextArea>
+                    <ValidationMessage For="() => model.Descriptions" />
+                </div>
+            </div>
+
+            @if (process)
+            {
                 <div style="text-align:center">
                     <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
                 </div>
-                }
-            <hr />
+            }
+            <hr style="margin-bottom: 2px;" />
             <button type="submit" class="btn btn-primary float-right col-md-4">Add</button>
         </EditForm>
         <br />
     }
-</SimpleDailog>
+</PageDialog>
 
 @code {
     [Parameter]
@@ -67,26 +162,73 @@
     protected AlertModel? alert { get; set; }
 
     Room model = new();
-    public string Title = "Add Room Category";
+    public string Title = "Add Room";
     bool show = false;
     bool process = false;
     private Timer _timer;
     private int _delay = 2500;
-   
+
+    [Required]
+    private List<int> SelectedFacilities { get; set; } = new();
+    private bool IsError = false;
+    List<RoomCategories> Categories = new();
+    private List<RoomFacilities> Facilities = new();
+    Dictionary<int, List<int>> RoomFacilitiesMap = new Dictionary<int, List<int>>();
+
+    private string imageDataUrl;
+
+    private async Task HandleFileSelected(InputFileChangeEventArgs e)
+    {
+        var file = e.File;
+
+        if (file != null)
+        {
+            var buffer = new byte[file.Size];
+            await file.OpenReadStream().ReadAsync(buffer);
+
+            // Convert the image to a data URL
+            imageDataUrl = $"data:image/png;base64,{Convert.ToBase64String(buffer)}";
+
+            model.ImageFile = buffer;
+        }
+    }
 
     protected override async Task OnInitializedAsync()
     {
         alert?.Clear();
+        //model = await client.GetRoomById();
+        Categories = (await client.GetAllRoomCategory()).ToList();
+        Facilities = (await client.GetAllRoomFacility()).ToList();
+        var roomFacilitiesMap = await client.GetFacilitiesMappingByRoomId(model.Id);
+        SelectedFacilities.AddRange(roomFacilitiesMap.Select(o => o.FacilityId));
     }
 
     public async Task OnSave()
     {
+        if (SelectedFacilities.Count() == 0)
+        {
+            IsError = true;
+            return;
+        }
         process = true;
         alert?.Clear();
 
         var response = await client.UpsertRoomAsync(model);
         if (response.IsSuccess)
         {
+            if (model.Id > 0)
+            {
+                if (RoomFacilitiesMap.ContainsKey(model.Id))
+                {
+                    RoomFacilitiesMap[model.Id] = SelectedFacilities.Select(id => id).ToList();
+                }
+                else
+                {
+                    RoomFacilitiesMap.Add(model.Id, SelectedFacilities.Select(id => id).ToList());
+                }
+
+                var result = await client.UpsertRoomFacilitiesMapping(RoomFacilitiesMap);
+            }
             // model = response.Result;
             alert?.SetSuccess(response.Message);
             model = new();

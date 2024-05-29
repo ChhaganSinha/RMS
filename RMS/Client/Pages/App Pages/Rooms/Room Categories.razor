@@ -94,9 +94,9 @@
         if (response.IsSuccess)
         {
             // model = response.Result;
+            await RoomCategoryGrid.RefreshGridAsync();
             alert?.SetSuccess(response.Message);
             model = new();
-            await RoomCategoryGrid.RefreshGridAsync();
         }
         else
             alert?.SetError(response.Message);

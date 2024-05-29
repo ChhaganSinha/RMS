@@ -17,6 +17,7 @@ using iText.Layout.Properties;
 using iText.Kernel.Colors;
 using iText.Kernel.Font;
 using iText.IO.Font.Constants;
+using Serilog.Core;
 
 
 
@@ -117,6 +118,33 @@ namespace RMS.Server.Controllers.Api
         {
             return await _appRepository.UpsertRoomFacility(data);
         }
+
+        [HttpGet]
+        [Route("GetFacilitiesMappingByRoomId/{RoomId}")]
+        public async Task<List<RoomFacilitiesMapping>> GetFacilitiesMappingByRoomId(int RoomId)
+        {
+            var data = await _appRepository.GetFacilitiesMappingByRoomId(RoomId);
+            return data;
+        }
+
+        [HttpPost]
+        [Route("UpsertRoomFacilitiesMapping")]
+        public async Task<ApiResponse<string>> UpsertRoomFacilitiesMapping(Dictionary<int, List<int>> dict)
+        {
+            var result = new ApiResponse<string>();
+            try
+            {
+                var outcome = await _appRepository.UpsertRoomFacilitiesMapping(dict);
+                result.Message = "Success";
+            }
+            catch (Exception ex)
+            {
+               // Logger.LogError(ex, "Error while uploading data to TrainingCampIdMapping");
+            }
+
+            return result;
+        }
+
         [HttpPost]
         [Route("DeleteRoomFacility/{id}")]
         public async Task<ApiResponse<RoomFacilities>> DeleteRoomFacility(int id)
