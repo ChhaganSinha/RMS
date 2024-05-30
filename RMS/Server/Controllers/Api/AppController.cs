@@ -355,6 +355,35 @@ namespace RMS.Server.Controllers.Api
         {
             return await _appRepository.DeleteProductCategory(id);
         }
+
+
+
+        [HttpGet]
+        [Route("UnitNames/{id}")]
+        public async Task<UnitNames> GetUnitNamesById(int id)
+        {
+            return await _appRepository.GetUnitNamesById(id);
+        }
+
+        [HttpGet]
+        [Route("all-unit-names")]
+        public async Task<IEnumerable<UnitNames>> GetAllUnitNames()
+        {
+            return await _appRepository.GetAllUnitNames();
+        }
+
+        [HttpPost]
+        [Route("UpsertUnitNames")]
+        public async Task<ApiResponse<UnitNames>> UpsertUnitNames(UnitNames data)
+        {
+            return await _appRepository.UpsertUnitNames(data);
+        }
+        [HttpPost]
+        [Route("DeleteUnitNames/{id}")]
+        public async Task<ApiResponse<UnitNames>> DeleteUnitNames(int id)
+        {
+            return await _appRepository.DeleteUnitNames(id);
+        }
         #endregion
     }
 

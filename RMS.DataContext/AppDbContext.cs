@@ -29,6 +29,7 @@ namespace RMS.DataContext
         public DbSet<Hall> Halls { get; set; }
 
         public DbSet<ProductCategories> ProductCategories { get; set; }
+        public DbSet<UnitNames> UnitNames { get; set; }
 
         public DbSet<EmployeeDesignation> EmployeeDesignation { get; set; }
         public DbSet<EmployeeDepartment> EmployeeDepartment { get; set; }

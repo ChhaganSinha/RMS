@@ -879,6 +879,92 @@ namespace RMS.Repositories
             }
         }
 
+
+
+
+        public async Task<UnitNames> GetUnitNamesById(int id)
+        {
+            UnitNames result = null;
+
+#pragma warning disable CS8600
+            result = AppDbCxt.UnitNames.FirstOrDefault(o => o.Id == id);
+#pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
+
+            return await Task.FromResult(result);
+        }
+
+        public async Task<IEnumerable<UnitNames>> GetAllUnitNames()
+        {
+            IEnumerable<UnitNames> result = null;
+
+            result = AppDbCxt.UnitNames.ToList();
+            return result;
+        }
+        public async Task<ApiResponse<UnitNames>> UpsertUnitNames(UnitNames data)
+        {
+            var result = new ApiResponse<UnitNames>();
+            try
+            {
+
+                if (data == null)
+                {
+                    result.IsSuccess = true;
+                    result.Message = "Invalid Unit Names data!";
+                    return result;
+                }
+
+                if (data.Id > 0)
+                {
+                    AppDbCxt.UnitNames.Update(data);
+                    result.Message = "Data Successfully Updated.";
+                }
+                else
+                {
+                    AppDbCxt.UnitNames.Add(data);
+                    result.Message = "Data Successfully Inserted.";
+                }
+
+                AppDbCxt.SaveChanges();
+                result.IsSuccess = true;
+                result.Result = data;
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+
+        public async Task<ApiResponse<UnitNames>> DeleteUnitNames(int id)
+        {
+            var result = new ApiResponse<UnitNames>();
+            try
+            {
+                var existing = AppDbCxt.UnitNames.First(x => x.Id == id);
+                result.Result = existing;
+                if (existing == null)
+                {
+                    result.IsSuccess = true;
+                    result.Message = "Unit Names not found!";
+                    return result;
+                }
+
+                AppDbCxt.UnitNames.Remove(existing);
+                await AppDbCxt.SaveChangesAsync();
+                result.IsSuccess = true;
+                result.Message = "Successfully Deleted!";
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+
         #endregion
     }
 }
