@@ -206,13 +206,13 @@ namespace RMS.Server.Controllers.Api
         }
 
         [HttpPost]
-        [Route("UpsertRoomFacility")]
+        [Route("UpsertHallFacility")]
         public async Task<ApiResponse<HallFacilities>> UpsertHallFacility(HallFacilities data)
         {
             return await _appRepository.UpsertHallFacility(data);
         }
         [HttpPost]
-        [Route("DeleteRoomFacility/{id}")]
+        [Route("DeleteHallFacility/{id}")]
         public async Task<ApiResponse<HallFacilities>> DeleteHallFacility(int id)
         {
             return await _appRepository.DeleteHallFacility(id);
