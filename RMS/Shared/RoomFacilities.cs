@@ -1,13 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace RMS.Dto
 {
     public class RoomFacilities : BaseEntity
     {
         [Required]
-        public string Name { get; set; } = string.Empty;
+        public string Name { get; set; }
     }
 }
