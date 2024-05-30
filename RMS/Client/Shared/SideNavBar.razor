@@ -29,8 +29,7 @@
                                 <i class="feather icon-home"></i>
                             </span><span class="pcoded-mtext">Dashboard</span>
                         </a>
-                    </li>
-
+                    </li>       
                     <li class="nav-item pcoded-hasmenu @(IsRoomExpanded ? "pcoded-trigger" : "")">
                         <a class="nav-link" @onclick="ToggleRoom" style="cursor:pointer">
                             <span class="pcoded-micon">
@@ -57,201 +56,102 @@
                             <li><a href="hall">Hall</a></li>
                         </ul>
                     </li>
-
-                    <li class="nav-item pcoded-hasmenu @(IsHumanResourceExpanded ? "pcoded-trigger" : "")">
-                        <a class="nav-link " @onclick="ToggleHR" style="cursor:pointer">
+                    <li class="nav-item pcoded-menu-caption">
+                        <label>Human Resource</label>
+                    </li> 
+                    <li class="nav-item pcoded-hasmenu @(IsEmployeeExpanded ? "pcoded-trigger" : "")">
+                        <a class="nav-link " @onclick="ToggleEmployee" style="cursor:pointer">
                             <span class="pcoded-micon">
                                 <i class="feather icon-layers"></i>
-                            </span><span class="pcoded-mtext">Human Resource</span>
+                            </span><span class="pcoded-mtext">Employees</span>
                         </a>
-                        <ul class="pcoded-submenu @(IsHumanResourceExpanded ? "d-block" : "d-none")">
-                            <li><a href="designations">Designations</a></li>
-                            <li><a href="departments">Departments</a></li>
+                        <ul class="pcoded-submenu @(IsEmployeeExpanded ? "d-block" : "d-none")">
+                            <li><a href="emp-designations">Designations</a></li>
+                            <li><a href="emp-departments">Departments</a></li>
                             <li><a href="employees">Employees</a></li>
 
                         </ul>
                     </li>
+                    <li class="nav-item pcoded-hasmenu @(IsAttendanceExpanded ? "pcoded-trigger" : "")">
+                        <a class="nav-link " @onclick="ToggleAttendance" style="cursor:pointer">
+                            <span class="pcoded-micon">
+                                <i class="feather icon-layers"></i>
+                            </span><span class="pcoded-mtext">Attendance</span>
+                        </a>
+                        <ul class="pcoded-submenu @(IsAttendanceExpanded ? "d-block" : "d-none")">
+                            <li><a href="attendance-list">Attendance List</a></li>
+                            <li><a href="attendance-report">Report </a></li>
+                            <li><a href="leave">Leave</a></li>
+                            <li><a href="leave-form">Leave Form</a></li>
+
+                        </ul>
+                    </li>
+                    <li class="nav-item pcoded-hasmenu @(IsPayrollExpanded ? "pcoded-trigger" : "")">
+                        <a class="nav-link " @onclick="TogglePayroll" style="cursor:pointer">
+                            <span class="pcoded-micon">
+                                <i class="feather icon-layers"></i>
+                            </span><span class="pcoded-mtext">Payroll</span>
+                        </a>
+                        <ul class="pcoded-submenu @(IsPayrollExpanded ? "d-block" : "d-none")">
+                            <li><a href="salary-type">Salary Type</a></li>
+                            <li><a href="salary-setup">Salary Setup </a></li>
+                            <li><a href="salary-generate">Salary Generate</a></li>
+                        </ul>
+                    </li>
 
                     <li class="nav-item pcoded-menu-caption">
-                        <label>Reservation</label>
+                        <label>Store Management</label>
                     </li>
-                    <li class="nav-item pcoded-hasmenu @(IsTrainingExpanded ? "pcoded-trigger" : "")">
-                        <a class="nav-link " @onclick="ToggleHR" style="cursor:pointer">
+                    <li class="nav-item pcoded-hasmenu @(IsProductExpanded ? "pcoded-trigger" : "")">
+                        <a class="nav-link " @onclick="ToggleProduct" style="cursor:pointer">
                             <span class="pcoded-micon">
-                                <i class="feather icon-box"></i>
-                            </span><span class="pcoded-mtext">Training</span>
+                                <i class="feather icon-layers"></i>
+                            </span><span class="pcoded-mtext">Product</span>
                         </a>
-                        <ul class="pcoded-submenu @(IsTrainingExpanded ? "d-block" : "d-none")">
-                            <li><a href="training">All Training</a></li>
-                            <li><a href="tenant-training-config">New Training</a></li>
-                            <li><a href="training-video-upload">Training Video</a></li>
-                            <li><a href="training-Quizzes">Training Quiz</a></li>
+                        <ul class="pcoded-submenu @(IsProductExpanded ? "d-block" : "d-none")">
+                            <li><a href="product-category">Product Category</a></li>
+                            <li><a href="Unit-Names">Unit Names</a></li>
+                            <li><a href="Products">Product List</a></li>
 
+                        </ul>
+                    </li>
+                    <li class="nav-item pcoded-hasmenu @(IsSupplierExpanded ? "pcoded-trigger" : "")">
+                        <a class="nav-link " @onclick="ToggleSupplier" style="cursor:pointer">
+                            <span class="pcoded-micon">
+                                <i class="feather icon-layers"></i>
+                            </span><span class="pcoded-mtext">Supplier</span>
+                        </a>
+                        <ul class="pcoded-submenu @(IsSupplierExpanded ? "d-block" : "d-none")">
+                            <li><a href="Suppliers">Supplier List</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item pcoded-hasmenu @(IsPurchaseExpanded ? "pcoded-trigger" : "")">
+                        <a class="nav-link " @onclick="TogglePurchase" style="cursor:pointer">
+                            <span class="pcoded-micon">
+                                <i class="feather icon-layers"></i>
+                            </span><span class="pcoded-mtext">Purchase</span>
+                        </a>
+                        <ul class="pcoded-submenu @(IsPurchaseExpanded ? "d-block" : "d-none")">
+                            <li><a href="Purchase">Purchase List</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item pcoded-hasmenu @(IsDestroyedExpanded ? "pcoded-trigger" : "")">
+                        <a class="nav-link " @onclick="ToggleDestroyed" style="cursor:pointer">
+                            <span class="pcoded-micon">
+                                <i class="feather icon-layers"></i>
+                            </span><span class="pcoded-mtext">Destroy Products</span>
+                        </a>
+                        <ul class="pcoded-submenu @(IsDestroyedExpanded ? "d-block" : "d-none")">
+                            <li><a href="Destroye-Products">Destroy Product</a></li>
                         </ul>
                     </li>
                     <li class="nav-item">
-                        <a href="training/my-trainings" class="nav-link " @onclick="ToggleMyTraining" style="cursor:pointer">
+                        <a href="Sale-Products" class="nav-link" @onclick="ToggleSaleProducts" style="cursor:pointer">
                             <span class="pcoded-micon">
-                                <i class="feather icon-book"></i>
-                            </span><span class="pcoded-mtext">My Training</span>
+                                <i class="feather icon-home"></i>
+                            </span><span class="pcoded-mtext">Sale Products</span>
                         </a>
                     </li>
-
-                    <li class="nav-item pcoded-hasmenu @(IsReportExpanded ? "pcoded-trigger" : "")">
-                        <a class="nav-link " @onclick="ToggleReport" style="cursor:pointer">
-                            <span class="pcoded-micon">
-                                <i class="feather icon-pie-chart"></i>
-                            </span><span class="pcoded-mtext">Report</span>
-                        </a>
-                        <ul class="pcoded-submenu @(IsReportExpanded ? "d-block" : "d-none")">
-                            <li><a href="report">Campaign Report</a></li>
-                            <li><a href="tenant-training-report">Training Report</a></li>
-
-
-                        </ul>
-                    </li>
-
-
-                    <li class="nav-item pcoded-menu-caption">
-                        <label>Front Desk</label>
-                    </li>
-                    <li class="nav-item pcoded-hasmenu @(IsSettingExpanded ? "pcoded-trigger" : "")">
-                        <a class="nav-link " @onclick="ToggleSetting" style="cursor:pointer">
-                            <span class="pcoded-micon">
-                                <i class="feather icon-settings"></i>
-                            </span><span class="pcoded-mtext">Settings</span>
-                        </a>
-                        <ul class="pcoded-submenu @(IsSettingExpanded ? "d-block" : "d-none")">
-                            <li><a href="az-config">Azure App Configurations</a></li>
-                            <li><a href="onprem-ad-config">AD Configurations</a></li>
-                            <li><a href="tenant-domains">Domain Configurations</a></li>
-                            <li><a href="redirect-urls">Return Url Configurations</a></li>
-                        </ul>
-                    </li>
-                    <li class="nav-item pcoded-menu-caption">
-                        <label>Housekeeping</label>
-                    </li>
-                    <li class="nav-item pcoded-hasmenu @(IsFaqExpanded ? "pcoded-trigger" : "")">
-                        <a class="nav-link " @onclick="ToggleFaq" style="cursor:pointer">
-                            <span class="pcoded-micon">
-                                <i class="feather icon-help-circle"></i>
-                            </span><span class="pcoded-mtext">
-                                FAQ
-                            </span>
-                        </a>
-                    </li>
-                    <li class="nav-item pcoded-menu-caption">
-                        <label>Food and Beverage</label>
-                    </li>
-                    <li class="nav-item pcoded-hasmenu @(IsFaqExpanded ? "pcoded-trigger" : "")">
-                        <a class="nav-link " @onclick="ToggleFaq" style="cursor:pointer">
-                            <span class="pcoded-micon">
-                                <i class="feather icon-help-circle"></i>
-                            </span><span class="pcoded-mtext">
-                                FAQ
-                            </span>
-                        </a>
-                    </li>
-                    <li class="nav-item pcoded-menu-caption">
-                        <label>Activities</label>
-                    </li>
-                    <li class="nav-item pcoded-hasmenu @(IsFaqExpanded ? "pcoded-trigger" : "")">
-                        <a class="nav-link " @onclick="ToggleFaq" style="cursor:pointer">
-                            <span class="pcoded-micon">
-                                <i class="feather icon-help-circle"></i>
-                            </span><span class="pcoded-mtext">
-                                FAQ
-                            </span>
-                        </a>
-                    </li>
-                    <li class="nav-item pcoded-menu-caption">
-                        <label>Billings</label>
-                    </li>
-                    <li class="nav-item pcoded-hasmenu @(IsFaqExpanded ? "pcoded-trigger" : "")">
-                        <a class="nav-link " @onclick="ToggleFaq" style="cursor:pointer">
-                            <span class="pcoded-micon">
-                                <i class="feather icon-help-circle"></i>
-                            </span><span class="pcoded-mtext">
-                                FAQ
-                            </span>
-                        </a>
-                    </li>
-                    <li class="nav-item pcoded-menu-caption">
-                        <label>Customer</label>
-                    </li>
-                    <li class="nav-item pcoded-hasmenu @(IsFaqExpanded ? "pcoded-trigger" : "")">
-                        <a class="nav-link " @onclick="ToggleFaq" style="cursor:pointer">
-                            <span class="pcoded-micon">
-                                <i class="feather icon-help-circle"></i>
-                            </span><span class="pcoded-mtext">
-                                FAQ
-                            </span>
-                        </a>
-                    </li>
-                    <li class="nav-item pcoded-menu-caption">
-                        <label>Staff</label>
-                    </li>
-                    <li class="nav-item pcoded-hasmenu @(IsFaqExpanded ? "pcoded-trigger" : "")">
-                        <a class="nav-link " @onclick="ToggleFaq" style="cursor:pointer">
-                            <span class="pcoded-micon">
-                                <i class="feather icon-help-circle"></i>
-                            </span><span class="pcoded-mtext">
-                                FAQ
-                            </span>
-                        </a>
-                    </li>
-                    <li class="nav-item pcoded-menu-caption">
-                        <label>Securities</label>
-                    </li>
-                    <li class="nav-item pcoded-hasmenu @(IsFaqExpanded ? "pcoded-trigger" : "")">
-                        <a class="nav-link " @onclick="ToggleFaq" style="cursor:pointer">
-                            <span class="pcoded-micon">
-                                <i class="feather icon-help-circle"></i>
-                            </span><span class="pcoded-mtext">
-                                FAQ
-                            </span>
-                        </a>
-                    </li>
-
-                    <li class="nav-item pcoded-menu-caption">
-                        <label>Analytics</label>
-                    </li>
-                    <li class="nav-item pcoded-hasmenu @(IsFaqExpanded ? "pcoded-trigger" : "")">
-                        <a class="nav-link " @onclick="ToggleFaq" style="cursor:pointer">
-                            <span class="pcoded-micon">
-                                <i class="feather icon-help-circle"></i>
-                            </span><span class="pcoded-mtext">
-                                FAQ
-                            </span>
-                        </a>
-                    </li>
-                    <li class="nav-item pcoded-menu-caption">
-                        <label>Integrations</label>
-                    </li>
-                    <li class="nav-item pcoded-hasmenu @(IsFaqExpanded ? "pcoded-trigger" : "")">
-                        <a class="nav-link " @onclick="ToggleFaq" style="cursor:pointer">
-                            <span class="pcoded-micon">
-                                <i class="feather icon-help-circle"></i>
-                            </span><span class="pcoded-mtext">
-                                FAQ
-                            </span>
-                        </a>
-                    </li>
-                    <li class="nav-item pcoded-menu-caption">
-                        <label>Compliances</label>
-                    </li>
-                    <li class="nav-item pcoded-hasmenu @(IsFaqExpanded ? "pcoded-trigger" : "")">
-                        <a class="nav-link " @onclick="ToggleFaq" style="cursor:pointer">
-                            <span class="pcoded-micon">
-                                <i class="feather icon-help-circle"></i>
-                            </span><span class="pcoded-mtext">
-                                FAQ
-                            </span>
-                        </a>
-                    </li>
-
-
-
                 </ul>
             </div>
         </div>
@@ -336,14 +236,14 @@
 
     private bool IsRoomExpanded = false;
     private bool IsHallExpanded = false;
-    private bool IsHumanResourceExpanded = false;
-    private bool IsTrainingExpanded = false;
-    private bool IsReportExpanded = false;
-    private bool IsSettingExpanded = false;
-    private bool IsFaqExpanded = false;
-    private bool IsGetStartedExpand = false;
-    private bool IsReportHubExpand = false;
-    private bool IsPhishTrainExpand = false;
+    private bool IsEmployeeExpanded = false;
+    private bool IsAttendanceExpanded = false;
+    private bool IsProductExpanded = false;
+    private bool IsPayrollExpanded = false;
+    private bool IsSupplierExpanded = false;
+    private bool IsPurchaseExpanded = false;
+    private bool IsDestroyedExpanded = false;
+    private bool IsSaleProductsExpand = false;
     private bool IsRiskScoreExpand = false;
 
     private bool MobileToggle = false;
@@ -354,157 +254,157 @@
     {
         IsRoomExpanded = false;
         IsHallExpanded = false;
-        IsHumanResourceExpanded = false;
-        IsTrainingExpanded = false;
-        IsReportExpanded = false;
-        IsSettingExpanded = false;
-        IsFaqExpanded = false;
-        IsGetStartedExpand = false;
-        IsReportHubExpand = false;
-        IsPhishTrainExpand = false;
+        IsEmployeeExpanded = false;
+        IsAttendanceExpanded = false;
+        IsProductExpanded = false;
+        IsPayrollExpanded = false;
+        IsSupplierExpanded = false;
+        IsPurchaseExpanded = false;
+        IsDestroyedExpanded = false;
+        IsSaleProductsExpand = false;
         IsRiskScoreExpand = false;
     }
     private void ToggleRoom(MouseEventArgs e)
     {
         IsRoomExpanded = !IsRoomExpanded;
         IsHallExpanded = false;
-        IsHumanResourceExpanded = false;
-        IsTrainingExpanded = false;
-        IsReportExpanded = false;
-        IsSettingExpanded = false;
-        IsFaqExpanded = false;
-        IsGetStartedExpand = false;
+        IsEmployeeExpanded = false;
+        IsAttendanceExpanded = false;
+        IsProductExpanded = false;
+        IsPayrollExpanded = false;
+        IsSupplierExpanded = false;
+        IsPurchaseExpanded = false;
 
     }
     private void ToggleHall(MouseEventArgs e)
     {
         IsHallExpanded = !IsHallExpanded;
         IsRoomExpanded = false;
-        IsTrainingExpanded = false;
-        IsReportExpanded = false;
-        IsSettingExpanded = false;
-        IsFaqExpanded = false;
-        IsGetStartedExpand = false;
-        IsReportHubExpand = false;
-        IsPhishTrainExpand = false;
+        IsAttendanceExpanded = false;
+        IsProductExpanded = false;
+        IsPayrollExpanded = false;
+        IsSupplierExpanded = false;
+        IsPurchaseExpanded = false;
+        IsDestroyedExpanded = false;
+        IsSaleProductsExpand = false;
         IsRiskScoreExpand = false;
     }
-    private void ToggleHR(MouseEventArgs e)
+    private void ToggleEmployee(MouseEventArgs e)
     {
-        IsHumanResourceExpanded = !IsHumanResourceExpanded;
+        IsEmployeeExpanded = !IsEmployeeExpanded;
         IsRoomExpanded = false;
         IsHallExpanded = false;
-        IsReportExpanded = false;
-        IsSettingExpanded = false;
-        IsFaqExpanded = false;
-        IsGetStartedExpand = false;
-        IsReportHubExpand = false;
-        IsPhishTrainExpand = false;
+        IsAttendanceExpanded = false;
+        IsProductExpanded = false;
+        IsPayrollExpanded = false;
+        IsSupplierExpanded = false;
+        IsPurchaseExpanded = false;
+        IsDestroyedExpanded = false;
+        IsSaleProductsExpand = false;
         IsRiskScoreExpand = false;
     }
-    private void ToggleMyTraining(MouseEventArgs e)
+    private void ToggleAttendance(MouseEventArgs e)
     {
+        IsAttendanceExpanded = !IsAttendanceExpanded;
         IsRoomExpanded = false;
-        IsHumanResourceExpanded = false;
-        IsTrainingExpanded = false;
-        IsReportExpanded = false;
-        IsSettingExpanded = false;
-        IsFaqExpanded = false;
-        IsGetStartedExpand = false;
-        IsReportHubExpand = false;
-        IsPhishTrainExpand = false;
+        IsEmployeeExpanded = false;
+        IsProductExpanded = false;
+        IsPayrollExpanded = false;
+        IsSupplierExpanded = false;
+        IsPurchaseExpanded = false;
+        IsDestroyedExpanded = false;
+        IsSaleProductsExpand = false;
         IsRiskScoreExpand = false;
     }
-    private void ToggleReport(MouseEventArgs e)
+    private void TogglePayroll(MouseEventArgs e)
     {
-        IsReportExpanded = !IsReportExpanded;
+        IsPayrollExpanded = !IsPayrollExpanded;
         IsRoomExpanded = false;
-        IsHumanResourceExpanded = false;
-        IsTrainingExpanded = false;
-        IsSettingExpanded = false;
-        IsFaqExpanded = false;
-        IsGetStartedExpand = false;
-        IsReportHubExpand = false;
-        IsPhishTrainExpand = false;
+        IsEmployeeExpanded = false;
+        IsAttendanceExpanded = false;
+        IsProductExpanded = false;
+        IsSupplierExpanded = false;
+        IsPurchaseExpanded = false;
+        IsDestroyedExpanded = false;
+        IsSaleProductsExpand = false;
         IsRiskScoreExpand = false;
     }
-    private void ToggleSetting(MouseEventArgs e)
+    private void ToggleProduct(MouseEventArgs e)
     {
-        IsSettingExpanded = !IsSettingExpanded;
+        IsProductExpanded = !IsProductExpanded;
         IsRoomExpanded = false;
-        IsHumanResourceExpanded = false;
-        IsTrainingExpanded = false;
-        IsReportExpanded = false;
-        IsFaqExpanded = false;
-        IsGetStartedExpand = false;
-        IsReportHubExpand = false;
-        IsPhishTrainExpand = false;
+        IsEmployeeExpanded = false;
+        IsAttendanceExpanded = false;
+        IsSupplierExpanded = false;
+        IsPurchaseExpanded = false;
+        IsDestroyedExpanded = false;
+        IsSaleProductsExpand = false;
         IsRiskScoreExpand = false;
     }
-    private void ToggleFaq(MouseEventArgs e)
+    private void ToggleSupplier(MouseEventArgs e)
     {
-        IsFaqExpanded = !IsFaqExpanded;
+        IsSupplierExpanded = !IsSupplierExpanded;
         IsRoomExpanded = false;
-        IsHumanResourceExpanded = false;
-        IsTrainingExpanded = false;
-        IsReportExpanded = false;
-        IsSettingExpanded = false;
-        IsGetStartedExpand = false;
-        IsReportHubExpand = false;
-        IsPhishTrainExpand = false;
+        IsEmployeeExpanded = false;
+        IsAttendanceExpanded = false;
+        IsProductExpanded = false;
+        IsPayrollExpanded = false;
+        IsPurchaseExpanded = false;
+        IsDestroyedExpanded = false;
+        IsSaleProductsExpand = false;
         IsRiskScoreExpand = false;
     }
-    private void ToggleGetStarted(MouseEventArgs e)
+    private void TogglePurchase(MouseEventArgs e)
     {
-        IsGetStartedExpand = !IsGetStartedExpand;
-
+        IsPurchaseExpanded = !IsPurchaseExpanded;
         IsRoomExpanded = false;
-        IsHumanResourceExpanded = false;
-        IsTrainingExpanded = false;
-        IsReportExpanded = false;
-        IsSettingExpanded = false;
-        IsReportHubExpand = false;
-        IsPhishTrainExpand = false;
+        IsEmployeeExpanded = false;
+        IsAttendanceExpanded = false;
+        IsProductExpanded = false;
+        IsSupplierExpanded = false;
+        IsPayrollExpanded = false;
+        IsDestroyedExpanded = false;
+        IsSaleProductsExpand = false;
         IsRiskScoreExpand = false;
     }
-    private void ToggleReportHub(MouseEventArgs e)
+    private void ToggleDestroyed(MouseEventArgs e)
     {
-        IsReportHubExpand = !IsReportHubExpand;
-
+        IsDestroyedExpanded = !IsDestroyedExpanded;
         IsRoomExpanded = false;
-        IsHumanResourceExpanded = false;
-        IsTrainingExpanded = false;
-        IsReportExpanded = false;
-        IsSettingExpanded = false;
-        IsGetStartedExpand = false;
-
-        IsPhishTrainExpand = false;
+        IsEmployeeExpanded = false;
+        IsAttendanceExpanded = false;
+        IsProductExpanded = false;
+        IsSupplierExpanded = false;
+        IsPayrollExpanded = false;
+        IsPurchaseExpanded = false;
+        IsSaleProductsExpand = false;
         IsRiskScoreExpand = false;
     }
-    private void TogglePhishTrain(MouseEventArgs e)
+    private void ToggleSaleProducts(MouseEventArgs e)
     {
-        IsPhishTrainExpand = !IsPhishTrainExpand;
+        IsSaleProductsExpand = !IsSaleProductsExpand;
         IsRoomExpanded = false;
-        IsHumanResourceExpanded = false;
-        IsTrainingExpanded = false;
-        IsReportExpanded = false;
-        IsSettingExpanded = false;
-        IsGetStartedExpand = false;
-        IsReportHubExpand = false;
-
+        IsEmployeeExpanded = false;
+        IsAttendanceExpanded = false;
+        IsProductExpanded = false;
+        IsSupplierExpanded = false;
+        IsPayrollExpanded = false;
+        IsPurchaseExpanded = false;
+        IsDestroyedExpanded = false;
         IsRiskScoreExpand = false;
     }
     private void ToggleRiskScore(MouseEventArgs e)
     {
         IsRiskScoreExpand = !IsRiskScoreExpand;
         IsRoomExpanded = false;
-        IsHumanResourceExpanded = false;
-        IsTrainingExpanded = false;
-        IsReportExpanded = false;
-        IsSettingExpanded = false;
-        IsGetStartedExpand = false;
-        IsReportHubExpand = false;
-        IsPhishTrainExpand = false;
+        IsEmployeeExpanded = false;
+        IsAttendanceExpanded = false;
+        IsProductExpanded = false;
+        IsSupplierExpanded = false;
+        IsPayrollExpanded = false;
+        IsPurchaseExpanded = false;
+        IsDestroyedExpanded = false;
+        IsSaleProductsExpand = false;
 
     }
 

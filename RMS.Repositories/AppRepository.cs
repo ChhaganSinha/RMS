@@ -364,5 +364,263 @@ namespace RMS.Repositories
         }
         #endregion
 
+        #region Employee Section
+        public async Task<EmployeeDesignation> GetEmployeeDesignationById(int id)
+        {
+            EmployeeDesignation result = null;
+
+#pragma warning disable CS8600
+            result = AppDbCxt.EmployeeDesignation.FirstOrDefault(o => o.Id == id);
+#pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
+
+            return await Task.FromResult(result);
+        }
+
+        public async Task<IEnumerable<EmployeeDesignation>> GetAllEmployeeDesignation()
+        {
+            IEnumerable<EmployeeDesignation> result = null;
+
+            result = AppDbCxt.EmployeeDesignation.ToList();
+            return result;
+        }
+        public async Task<ApiResponse<EmployeeDesignation>> UpsertEmployeeDesignation(EmployeeDesignation data)
+        {
+            var result = new ApiResponse<EmployeeDesignation>();
+            try
+            {
+
+                if (data == null)
+                {
+                    result.IsSuccess = true;
+                    result.Message = "Invalid Room Categories data!";
+                    return result;
+                }
+
+                if (data.Id > 0)
+                {
+                    AppDbCxt.EmployeeDesignation.Update(data);
+                    result.Message = "Data Successfully Updated.";
+                }
+                else
+                {
+                    AppDbCxt.EmployeeDesignation.Add(data);
+                    result.Message = "Data Successfully Inserted.";
+                }
+
+                AppDbCxt.SaveChanges();
+                result.IsSuccess = true;
+                result.Result = data;
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+
+        public async Task<ApiResponse<EmployeeDesignation>> DeleteEmployeeDesignation(int id)
+        {
+            var result = new ApiResponse<EmployeeDesignation>();
+            try
+            {
+                var existing = AppDbCxt.EmployeeDesignation.First(x => x.Id == id);
+                result.Result = existing;
+                if (existing == null)
+                {
+                    result.IsSuccess = true;
+                    result.Message = "Room Category not found!";
+                    return result;
+                }
+
+                AppDbCxt.EmployeeDesignation.Remove(existing);
+                await AppDbCxt.SaveChangesAsync();
+                result.IsSuccess = true;
+                result.Message = "Successfully Deleted!";
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+
+
+
+        public async Task<EmployeeDepartment> GetEmployeeDepartmentById(int id)
+        {
+            EmployeeDepartment result = null;
+
+#pragma warning disable CS8600
+            result = AppDbCxt.EmployeeDepartment.FirstOrDefault(o => o.Id == id);
+#pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
+
+            return await Task.FromResult(result);
+        }
+
+        public async Task<IEnumerable<EmployeeDepartment>> GetAllEmployeeDepartment()
+        {
+            IEnumerable<EmployeeDepartment> result = null;
+
+            result = AppDbCxt.EmployeeDepartment.ToList();
+            return result;
+        }
+        public async Task<ApiResponse<EmployeeDepartment>> UpsertEmployeeDepartment(EmployeeDepartment data)
+        {
+            var result = new ApiResponse<EmployeeDepartment>();
+            try
+            {
+
+                if (data == null)
+                {
+                    result.IsSuccess = true;
+                    result.Message = "Invalid Employee Department data!";
+                    return result;
+                }
+
+                if (data.Id > 0)
+                {
+                    AppDbCxt.EmployeeDepartment.Update(data);
+                    result.Message = "Data Successfully Updated.";
+                }
+                else
+                {
+                    AppDbCxt.EmployeeDepartment.Add(data);
+                    result.Message = "Data Successfully Inserted.";
+                }
+
+                AppDbCxt.SaveChanges();
+                result.IsSuccess = true;
+                result.Result = data;
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+
+        public async Task<ApiResponse<EmployeeDepartment>> DeleteEmployeeDepartment(int id)
+        {
+            var result = new ApiResponse<EmployeeDepartment>();
+            try
+            {
+                var existing = AppDbCxt.EmployeeDepartment.First(x => x.Id == id);
+                result.Result = existing;
+                if (existing == null)
+                {
+                    result.IsSuccess = true;
+                    result.Message = "Room Category not found!";
+                    return result;
+                }
+
+                AppDbCxt.EmployeeDepartment.Remove(existing);
+                await AppDbCxt.SaveChangesAsync();
+                result.IsSuccess = true;
+                result.Message = "Successfully Deleted!";
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+
+
+
+        public async Task<Employee> GetEmployeeById(int id)
+        {
+            Employee result = null;
+
+#pragma warning disable CS8600
+            result = AppDbCxt.Employee.FirstOrDefault(o => o.Id == id);
+#pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
+
+            return await Task.FromResult(result);
+        }
+
+        public async Task<IEnumerable<Employee>> GetAllEmployee()
+        {
+            IEnumerable<Employee> result = null;
+
+            result = AppDbCxt.Employee.ToList();
+            return result;
+        }
+        public async Task<ApiResponse<Employee>> UpsertEmployee(Employee data)
+        {
+            var result = new ApiResponse<Employee>();
+            try
+            {
+
+                if (data == null)
+                {
+                    result.IsSuccess = true;
+                    result.Message = "Invalid Employee data!";
+                    return result;
+                }
+
+                if (data.Id > 0)
+                {
+                    AppDbCxt.Employee.Update(data);
+                    result.Message = "Data Successfully Updated.";
+                }
+                else
+                {
+                    AppDbCxt.Employee.Add(data);
+                    result.Message = "Data Successfully Inserted.";
+                }
+
+                AppDbCxt.SaveChanges();
+                result.IsSuccess = true;
+                result.Result = data;
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+
+        public async Task<ApiResponse<Employee>> DeleteEmployee(int id)
+        {
+            var result = new ApiResponse<Employee>();
+            try
+            {
+                var existing = AppDbCxt.Employee.First(x => x.Id == id);
+                result.Result = existing;
+                if (existing == null)
+                {
+                    result.IsSuccess = true;
+                    result.Message = "Employee not found!";
+                    return result;
+                }
+
+                AppDbCxt.Employee.Remove(existing);
+                await AppDbCxt.SaveChangesAsync();
+                result.IsSuccess = true;
+                result.Message = "Successfully Deleted!";
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+        #endregion
+
+        #region Attendence  Section
+
+        #endregion
     }
 }

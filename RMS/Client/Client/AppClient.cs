@@ -374,5 +374,250 @@ namespace RMS.Client.Client
             }
         }
         #endregion
+
+        #region Employee Section
+        public async Task<EmployeeDesignation> GetEmployeeDesignationById(int id)
+        {
+            EmployeeDesignation data = null;
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/App/EmployeeDesignation/{id}");
+
+                res.EnsureSuccessStatusCode();
+
+                data = await res.Content.ReadFromJsonAsync<EmployeeDesignation>();
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return data;
+        }
+        public async Task<IEnumerable<EmployeeDesignation>> GetAllEmployeeDesignation()
+        {
+            IEnumerable<EmployeeDesignation> details = null;
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/App/all-EmployeeDesignation");
+
+                res.EnsureSuccessStatusCode();
+
+                details = await res.Content.ReadFromJsonAsync<IEnumerable<EmployeeDesignation>>();
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return details;
+        }
+
+        public async Task<ApiResponse<EmployeeDesignation>> UpsertEmployeeDesignationAsync(EmployeeDesignation data)
+        {
+            var result = new ApiResponse<EmployeeDesignation>();
+
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/App/UpsertEmployeeDesignation", data);
+                res.EnsureSuccessStatusCode();
+                var json = await res.Content.ReadFromJsonAsync<ApiResponse<EmployeeDesignation>>();
+                return json;
+
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+
+
+        }
+        public async Task<ApiResponse<EmployeeDesignation>> DeleteEmployeeDesignation(int id)
+        {
+            var result = new ApiResponse<EmployeeDesignation>();
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/App/DeleteEmployeeDesignation/{id}", new { });
+                res.EnsureSuccessStatusCode();
+                var json = await res.Content.ReadFromJsonAsync<ApiResponse<EmployeeDesignation>>();
+                return json;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+
+
+
+        public async Task<EmployeeDepartment> GetEmployeeDepartmentById(int id)
+        {
+            EmployeeDepartment data = null;
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/App/EmployeeDepartment/{id}");
+
+                res.EnsureSuccessStatusCode();
+
+                data = await res.Content.ReadFromJsonAsync<EmployeeDepartment>();
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return data;
+        }
+        public async Task<IEnumerable<EmployeeDepartment>> GetAllEmployeeDepartment()
+        {
+            IEnumerable<EmployeeDepartment> details = null;
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/App/all-EmployeeDepartment");
+
+                res.EnsureSuccessStatusCode();
+
+                details = await res.Content.ReadFromJsonAsync<IEnumerable<EmployeeDepartment>>();
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return details;
+        }
+
+        public async Task<ApiResponse<EmployeeDepartment>> UpsertEmployeeDepartmentAsync(EmployeeDepartment data)
+        {
+            var result = new ApiResponse<EmployeeDepartment>();
+
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/App/UpsertEmployeeDepartment", data);
+                res.EnsureSuccessStatusCode();
+                var json = await res.Content.ReadFromJsonAsync<ApiResponse<EmployeeDepartment>>();
+                return json;
+
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+
+
+        }
+        public async Task<ApiResponse<EmployeeDepartment>> DeleteEmployeeDepartment(int id)
+        {
+            var result = new ApiResponse<EmployeeDepartment>();
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/App/DeleteEmployeeDepartment/{id}", new { });
+                res.EnsureSuccessStatusCode();
+                var json = await res.Content.ReadFromJsonAsync<ApiResponse<EmployeeDepartment>>();
+                return json;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+
+
+        public async Task<Employee> GetEmployeeById(int id)
+        {
+            Employee data = null;
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/App/Employee/{id}");
+
+                res.EnsureSuccessStatusCode();
+
+                data = await res.Content.ReadFromJsonAsync<Employee>();
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return data;
+        }
+        public async Task<IEnumerable<Employee>> GetAllEmployee()
+        {
+            IEnumerable<Employee> details = null;
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/App/all-Employee");
+
+                res.EnsureSuccessStatusCode();
+
+                details = await res.Content.ReadFromJsonAsync<IEnumerable<Employee>>();
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return details;
+        }
+
+        public async Task<ApiResponse<Employee>> UpsertEmployeeAsync(Employee data)
+        {
+            var result = new ApiResponse<Employee>();
+
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/App/UpsertEmployee", data);
+                res.EnsureSuccessStatusCode();
+                var json = await res.Content.ReadFromJsonAsync<ApiResponse<Employee>>();
+                return json;
+
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+
+
+        }
+        public async Task<ApiResponse<Employee>> DeleteEmployee(int id)
+        {
+            var result = new ApiResponse<Employee>();
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/App/DeleteEmployee/{id}", new { });
+                res.EnsureSuccessStatusCode();
+                var json = await res.Content.ReadFromJsonAsync<ApiResponse<Employee>>();
+                return json;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+        #endregion
     }
 }

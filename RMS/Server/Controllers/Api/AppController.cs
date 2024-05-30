@@ -182,5 +182,89 @@ namespace RMS.Server.Controllers.Api
         }
         #endregion
 
+        #region Employee Setion
+        [HttpGet]
+        [Route("EmployeeDesignation/{id}")]
+        public async Task<EmployeeDesignation> GetEmployeeDesignationById(int id)
+        {
+            return await _appRepository.GetEmployeeDesignationById(id);
+        }
+
+        [HttpGet]
+        [Route("all-EmployeeDesignation")]
+        public async Task<IEnumerable<EmployeeDesignation>> GetAllEmployeeDesignation()
+        {
+            return await _appRepository.GetAllEmployeeDesignation();
+        }
+
+        [HttpPost]
+        [Route("UpsertEmployeeDesignation")]
+        public async Task<ApiResponse<EmployeeDesignation>> UpsertEmployeeDesignation(EmployeeDesignation data)
+        {
+            return await _appRepository.UpsertEmployeeDesignation(data);
+        }
+        [HttpPost]
+        [Route("DeleteEmployeeDesignation/{id}")]
+        public async Task<ApiResponse<EmployeeDesignation>> DeleteEmployeeDesignation(int id)
+        {
+            return await _appRepository.DeleteEmployeeDesignation(id);
+        }
+
+
+        [HttpGet]
+        [Route("EmployeeDepartment/{id}")]
+        public async Task<EmployeeDepartment> GetEmployeeDepartmentById(int id)
+        {
+            return await _appRepository.GetEmployeeDepartmentById(id);
+        }
+
+        [HttpGet]
+        [Route("all-EmployeeDepartment")]
+        public async Task<IEnumerable<EmployeeDepartment>> GetAllEmployeeDepartment()
+        {
+            return await _appRepository.GetAllEmployeeDepartment();
+        }
+
+        [HttpPost]
+        [Route("UpsertEmployeeDepartment")]
+        public async Task<ApiResponse<EmployeeDepartment>> UpsertEmployeeDepartment(EmployeeDepartment data)
+        {
+            return await _appRepository.UpsertEmployeeDepartment(data);
+        }
+        [HttpPost]
+        [Route("DeleteEmployeeDepartment/{id}")]
+        public async Task<ApiResponse<EmployeeDepartment>> DeleteEmployeeDepartment(int id)
+        {
+            return await _appRepository.DeleteEmployeeDepartment(id);
+        }
+
+
+        [HttpGet]
+        [Route("Employee/{id}")]
+        public async Task<Employee> GetEmployeeById(int id)
+        {
+            return await _appRepository.GetEmployeeById(id);
+        }
+
+        [HttpGet]
+        [Route("all-Employee")]
+        public async Task<IEnumerable<Employee>> GetAllEmployee()
+        {
+            return await _appRepository.GetAllEmployee();
+        }
+
+        [HttpPost]
+        [Route("UpsertEmployee")]
+        public async Task<ApiResponse<Employee>> UpsertEmployee(Employee data)
+        {
+            return await _appRepository.UpsertEmployee(data);
+        }
+        [HttpPost]
+        [Route("DeleteEmployee/{id}")]
+        public async Task<ApiResponse<Employee>> DeleteEmployee(int id)
+        {
+            return await _appRepository.DeleteEmployee(id);
+        }
+        #endregion
     }
 }
