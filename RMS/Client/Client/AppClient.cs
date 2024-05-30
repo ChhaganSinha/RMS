@@ -154,7 +154,7 @@ namespace RMS.Client.Client
                 return result;
             }
 
-           
+
 
         }
         public async Task<ApiResponse<RoomCategories>> DeleteRoomCategory(int id)
@@ -786,5 +786,97 @@ namespace RMS.Client.Client
             }
         }
         #endregion
+
+
+        #region Product Section
+
+        public async Task<ProductCategories> GetProductCategoryById(int id)
+        {
+            ProductCategories data = null;
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/App/ProductCategory/{id}");
+
+                res.EnsureSuccessStatusCode();
+
+                data = await res.Content.ReadFromJsonAsync<ProductCategories>();
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return data;
+        }
+        public async Task<IEnumerable<ProductCategories>> GetAllProductCategory()
+        {
+            IEnumerable<ProductCategories> details = null;
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/App/all-product-category");
+
+                res.EnsureSuccessStatusCode();
+
+                details = await res.Content.ReadFromJsonAsync<IEnumerable<ProductCategories>>();
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return details;
+        }
+
+        public async Task<ApiResponse<ProductCategories>> UpsertProductCategoryAsync(ProductCategories data)
+        {
+            var result = new ApiResponse<ProductCategories>();
+
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/App/UpsertProductCategory", data);
+                res.EnsureSuccessStatusCode();
+                var json = await res.Content.ReadFromJsonAsync<ApiResponse<ProductCategories>>();
+                return json;
+
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+
+
+
+        }
+        public async Task<ApiResponse<ProductCategories>> DeleteProductCategory(int id)
+        {
+            var result = new ApiResponse<ProductCategories>();
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/App/DeleteProductCategory/{id}", new { });
+                res.EnsureSuccessStatusCode();
+                var json = await res.Content.ReadFromJsonAsync<ApiResponse<ProductCategories>>();
+                return json;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+
+        }
+        #endregion
+
+
+
     }
+
+
+
 }

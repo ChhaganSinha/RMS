@@ -1,47 +1,15 @@
-﻿@page "/product-category"
-
-@using RMS.Client.Client
+﻿@using GridShared
+@using GridShared.Columns
+@using GridShared.Utility
+@using Microsoft.Extensions.Primitives
 @using RMS.Client.Pages.GridComponent
 @using RMS.Client.Shared.Popup
+@using RMS.Client.Client
 @inject AppClient client
-@inject IJSRuntime JSRuntime
+@implements ICustomGridComponent<ProductCategories>
 @inject NavigationManager NavigationManager
-@attribute [Authorize]
 
-<div class="page-header breadcumb-sticky">
-    <div class="page-block">
-        <div class="row align-items-center">
-            <div class="col-md-12">
-                <div class="page-header-title">
-                    <h5 class="m-b-10">
-                        Product Categories
-                        <a @onclick="()=>show=true" style="cursor:pointer"><i class="fa fa-plus-circle fa-lg text-primary" aria-hidden="true" title="Add Product"></i></a>
-                    </h5>
-                </div>
-                <ul class="breadcrumb">
-                    <li class="breadcrumb-item">
-                        <a href="/"><i class="feather icon-home"></i></a>
-                    </li>
-                    <li class="breadcrumb-item"><a>Product</a></li>
-                    <li class="breadcrumb-item"><a>Categories</a></li>
-                </ul>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="row">
-    <div class="col-sm-12 p-0">
-        <div class="card-body p-2 mt-n3">
-            <div class="card text">
-                <div class="card-body">
-                    <ProductCategoryGrid />
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
+<button class='btn btn-sm btn-warning' style="border-radius:15px" @onclick="MyClickHandler" title="Edit"><i class="fa fa-pencil-square-o"></i></button>
 <SimpleDailog Title="@Title" Show="@show" OnCloseDialog="ResetForm">
     @if (show)
     {
@@ -53,7 +21,7 @@
                 <input type="text" placeholder="Enter Category" @bind-value="model.Name" class="form-control mb-2" />
                 <ValidationMessage For="() => model.Name" />
             </div>
-            @if (process)
+            @if (process || model == null)
             {
                 <div style="text-align:center">
                     <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
@@ -65,21 +33,29 @@
         <br />
     }
 </SimpleDailog>
-
 @code {
     [Parameter]
-    public int Id { get; set; }
+    public ProductCategories Item { get; set; }
+
+    [Parameter]
+    public CGrid<ProductCategories> Grid { get; set; }
 
     [CascadingParameter]
     protected AlertModel? alert { get; set; }
 
-    ProductCategories model = new();
-    public string Title = "Add Product Category";
-    bool show = false;
-    bool process = false;
     private Timer _timer;
     private int _delay = 2500;
+    bool show = false;
+    bool process = false;
+    string Title = "Update Category";
 
+    ProductCategories model = new();
+
+    private async Task MyClickHandler(MouseEventArgs e)
+    {
+        show = true;
+        model = await client.GetProductCategoryById(Item.Id);
+    }
 
     protected override async Task OnInitializedAsync()
     {
@@ -95,9 +71,8 @@
         if (response.IsSuccess)
         {
             // model = response.Result;
-            await ProductCategoryGrid.RefreshGridAsync();
             alert?.SetSuccess(response.Message);
-            model = new();
+            await ProductCategoryGrid.RefreshGridAsync();
         }
         else
             alert?.SetError(response.Message);
@@ -121,8 +96,4 @@
         process = false;
     }
 
-    public void OnClose()
-    {
-        model = new();
-    }
 }

@@ -792,5 +792,93 @@ namespace RMS.Repositories
         #region Attendence  Section
 
         #endregion
+
+
+
+        #region Product Section
+        public async Task<ProductCategories> GetProductCategoryById(int id)
+        {
+            ProductCategories result = null;
+
+#pragma warning disable CS8600
+            result = AppDbCxt.ProductCategories.FirstOrDefault(o => o.Id == id);
+#pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
+
+            return await Task.FromResult(result);
+        }
+
+        public async Task<IEnumerable<ProductCategories>> GetAllProductCategory()
+        {
+            IEnumerable<ProductCategories> result = null;
+
+            result = AppDbCxt.ProductCategories.ToList();
+            return result;
+        }
+        public async Task<ApiResponse<ProductCategories>> UpsertProductCategory(ProductCategories data)
+        {
+            var result = new ApiResponse<ProductCategories>();
+            try
+            {
+
+                if (data == null)
+                {
+                    result.IsSuccess = true;
+                    result.Message = "Invalid Product Categories data!";
+                    return result;
+                }
+
+                if (data.Id > 0)
+                {
+                    AppDbCxt.ProductCategories.Update(data);
+                    result.Message = "Data Successfully Updated.";
+                }
+                else
+                {
+                    AppDbCxt.ProductCategories.Add(data);
+                    result.Message = "Data Successfully Inserted.";
+                }
+
+                AppDbCxt.SaveChanges();
+                result.IsSuccess = true;
+                result.Result = data;
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+
+        public async Task<ApiResponse<ProductCategories>> DeleteProductCategory(int id)
+        {
+            var result = new ApiResponse<ProductCategories>();
+            try
+            {
+                var existing = AppDbCxt.ProductCategories.First(x => x.Id == id);
+                result.Result = existing;
+                if (existing == null)
+                {
+                    result.IsSuccess = true;
+                    result.Message = "Product Category not found!";
+                    return result;
+                }
+
+                AppDbCxt.ProductCategories.Remove(existing);
+                await AppDbCxt.SaveChangesAsync();
+                result.IsSuccess = true;
+                result.Message = "Successfully Deleted!";
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+
+        #endregion
     }
 }

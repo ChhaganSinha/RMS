@@ -36,7 +36,7 @@ namespace RMS.Server.Intrastructure
             builder.EntitySet<HallCategories>("HallCategories");
             builder.EntitySet<HallFacilities>("HallFacilities");
             builder.EntitySet<Hall>("Hall");
-
+            builder.EntitySet<ProductCategories>("ProductCategories");
             builder.EntitySet<EmployeeDesignation>("EmployeeDesignation");
             builder.EntitySet<EmployeeDepartment>("EmployeeDepartment");
             builder.EntitySet<Employee>("Employee");

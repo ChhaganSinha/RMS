@@ -327,5 +327,36 @@ namespace RMS.Server.Controllers.Api
         }
         #endregion
 
+
+        #region Product Section
+        [HttpGet]
+        [Route("ProductCategory/{id}")]
+        public async Task<ProductCategories> GetProductCategoryById(int id)
+        {
+            return await _appRepository.GetProductCategoryById(id);
+        }
+
+        [HttpGet]
+        [Route("all-product-category")]
+        public async Task<IEnumerable<ProductCategories>> GetAllProductCategory()
+        {
+            return await _appRepository.GetAllProductCategory();
+        }
+
+        [HttpPost]
+        [Route("UpsertProductCategory")]
+        public async Task<ApiResponse<ProductCategories>> UpsertProductCategory(ProductCategories data)
+        {
+            return await _appRepository.UpsertProductCategory(data);
+        }
+        [HttpPost]
+        [Route("DeleteProductCategory/{id}")]
+        public async Task<ApiResponse<ProductCategories>> DeleteProductCategory(int id)
+        {
+            return await _appRepository.DeleteProductCategory(id);
+        }
+        #endregion
     }
+
+
 }
