@@ -1,5 +1,202 @@
 ﻿@page "/leave-form"
 
-@code {
+@using RMS.Client.Client
+@using RMS.Client.Pages.GridComponent
+@using RMS.Client.Shared.Popup
+@inject AppClient client
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
+@using Havit.Blazor.Components.Web
+@using Havit.Blazor.Components.Web.Bootstrap
+@using System.ComponentModel.DataAnnotations;
+@attribute [Authorize]
 
+<div class="page-header breadcumb-sticky">
+    <div class="page-block">
+        <div class="row align-items-center">
+            <div class="col-md-12">
+                <div class="page-header-title">
+                    <h5 class="m-b-10">
+                        Room
+                        <a @onclick="()=>show=true" style="cursor:pointer"><i class="fa fa-plus-circle fa-lg text-primary" aria-hidden="true" title="Add Room"></i></a>
+                    </h5>
+                </div>
+                <ul class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a href="/"><i class="feather icon-home"></i></a>
+                    </li>
+                    <li class="breadcrumb-item"><a>Leave</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-sm-12 p-0">
+        <div class="card-body p-2 mt-n3">
+            <LeaveGrid />
+        </div>
+    </div>
+</div>
+
+<PageDialog Title="@Title" Show="@show" ClosePageDialog="ResetForm">
+    @if (show)
+    {
+
+        <UiAlert Model="alert"></UiAlert>
+        <EditForm Model="model" OnValidSubmit="OnSave">
+            <DataAnnotationsValidator />
+           
+            <div class="form-group row">
+                <div class="col-md-6">
+                    <label class="col-form-label bold-font">Select Employee</label>
+                    <select @bind="model.EmployeeName" class="form-control" id="name">
+                        <option>- Select -</option>
+                        @foreach (var val in Employees)
+                        {
+                            <option value="@val.Id">@val.Name</option>
+                        }
+                    </select>
+                    <ValidationMessage For="() => model.EmployeeName" />
+                </div>
+                <div class="col-md-6">
+                    <label class="col-form-label bold-font">Select LeaveType</label>
+                    <select @bind="model.LeaveType" class="form-control" id="LeaveType">
+                        <option>- Select -</option>
+                        @foreach (var val in LeaveTypes)
+                        {
+                            <option value="@val.Id">@val.TypeName</option>
+                        }
+                    </select>
+                    <ValidationMessage For="() => model.LeaveType" />
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="col-md-6">
+                    <label class="col-form-label bold-font required-field">Application Start Date</label>
+                    <InputDate @bind-Value="@model.ApplicationStartDate" id="ApplicationStartDate" class="form-control"></InputDate>
+                    <ValidationMessage For="() => model.ApplicationStartDate" />
+                </div>
+                <div class="col-md-6">
+                    <label class="col-form-label bold-font">Application End Date</label>
+                    <InputDate @bind-Value="@model.ApplicationEndDate" id="ApplicationEndDate" class="form-control"></InputDate>
+                    <ValidationMessage For="() => model.ApplicationEndDate" />
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="col-md-6">
+                    <label class="col-form-label bold-font required-field">Apply Days</label>
+                    <InputNumber @bind-Value="@model.ApplyDaysCount" id="ApplyDaysCount" class="form-control" disabled></InputNumber>
+                    <ValidationMessage For="() => model.ApplyDaysCount" />
+                </div>
+                <div class="col-md-6">
+                    <label class="col-form-label bold-font">Application Hard Copy</label>
+                    <InputDate @bind-Value="@model.ApplicationEndDate" id="ApplicationEndDate" class="form-control"></InputDate>
+                    <ValidationMessage For="() => model.ApplicationEndDate" />
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <div class="col-md-6">
+                    <label class="col-form-label bold-font required-field">Approve Start Date</label>
+                    <InputDate @bind-Value="@model.ApproveStartDate" id="ApproveStartDate" class="form-control"></InputDate>
+                    <ValidationMessage For="() => model.ApproveStartDate" />
+                </div>
+                <div class="col-md-6">
+                    <label class="col-form-label bold-font">Approve End Date</label>
+                    <InputDate @bind-Value="@model.ApproveEndDate" id="ApproveEndDate" class="form-control"></InputDate>
+                    <ValidationMessage For="() => model.ApproveEndDate" />
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="col-md-6">
+                    <label class="col-form-label bold-font required-field">Approve Days</label>
+                    <InputNumber @bind-Value="@model.ApproveDaysCount" id="ApproveDaysCount" class="form-control" disabled></InputNumber>
+                    <ValidationMessage For="() => model.ApproveDaysCount" />
+                </div>
+                <div class="col-md-6">
+                    <label class="col-form-label bold-font">Approved By</label>
+                    <InputText @bind-Value="@model.ApprovedBy" id="ApprovedBy" class="form-control" disabled></InputText>
+                    <ValidationMessage For="() => model.ApprovedBy" />
+                </div>
+            </div>
+
+            @if (process)
+            {
+                <div style="text-align:center">
+                    <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
+                </div>
+            }
+            <hr style="margin-bottom: 2px;" />
+            <button type="submit" class="btn btn-primary float-right col-md-4">Add</button>
+        </EditForm>
+        <br />
+    }
+</PageDialog>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    [CascadingParameter]
+    protected AlertModel? alert { get; set; }
+
+    Leave model = new();
+    public string Title = "Add Leave";
+    bool show = false;
+    bool process = false;
+    private Timer _timer;
+    private int _delay = 2500;
+
+    private List<LeaveType> LeaveTypes = new();
+    private List<Employee> Employees = new();
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        alert?.Clear();
+        LeaveTypes = (await client.GetAllLeaveType()).ToList();
+        Employees = (await client.GetAllEmployee()).ToList();
+    }
+
+    public async Task OnSave()
+    {
+        process = true;
+        alert?.Clear();
+
+        var response = await client.UpsertLeaveAsync(model);
+        if (response.IsSuccess)
+        {
+
+            // model = response.Result;
+            alert?.SetSuccess(response.Message);
+            model = new();
+            await RoomGrid.RefreshGridAsync();
+        }
+        else
+            alert?.SetError(response.Message);
+
+        process = false;
+        StateHasChanged();
+        _timer = new Timer(TimerCallback, null, _delay, Timeout.Infinite);
+    }
+
+    private void TimerCallback(Object o)
+    {
+        alert?.Clear();
+        _timer.Dispose();
+        StateHasChanged();
+    }
+
+    private void ResetForm()
+    {
+        model = new();
+        show = false;
+        process = false;
+    }
+
+    public void OnClose()
+    {
+        model = new();
+    }
 }

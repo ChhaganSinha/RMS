@@ -15,6 +15,7 @@ using RMS.Dto.Auth;
 using Microsoft.JSInterop;
 using System.Threading.Tasks;
 using System;
+using RMS.Client.Pages.App_Pages.Human_Resource;
 
 namespace RMS.Client.Client
 {
@@ -377,6 +378,7 @@ namespace RMS.Client.Client
             }
         }
         #endregion
+
         #region Hall Section
 
         public async Task<HallCategories> GetHallCategoryById(int id)
@@ -542,6 +544,7 @@ namespace RMS.Client.Client
             }
         }
         #endregion
+
         #region Employee Section
         public async Task<EmployeeDesignation> GetEmployeeDesignationById(int id)
         {
@@ -785,6 +788,270 @@ namespace RMS.Client.Client
                 return result;
             }
         }
+        #endregion
+
+        #region Attendance Section
+        public async Task<ApiResponse<EmployeeAttendance>> EmployeeCheckInAsync(EmployeeAttendance data)
+        {
+            var result = new ApiResponse<EmployeeAttendance>();
+
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/App/EmployeeCheckIn", data);
+                res.EnsureSuccessStatusCode();
+                var json = await res.Content.ReadFromJsonAsync<ApiResponse<EmployeeAttendance>>();
+                return json;
+
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+        public async Task<ApiResponse<EmployeeAttendance>> EmployeeCheckOutAsync(EmployeeAttendance data)
+        {
+            var result = new ApiResponse<EmployeeAttendance>();
+
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/App/EmployeeCheckOut", data);
+                res.EnsureSuccessStatusCode();
+                var json = await res.Content.ReadFromJsonAsync<ApiResponse<EmployeeAttendance>>();
+                return json;
+
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+
+        public async Task<ApiResponse<EmployeeAttendance>> UpdateEmployeeAttendance(EmployeeAttendance data)
+        {
+            var result = new ApiResponse<EmployeeAttendance>();
+
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/App/UpdateEmployeeAttendance", data);
+                res.EnsureSuccessStatusCode();
+                var json = await res.Content.ReadFromJsonAsync<ApiResponse<EmployeeAttendance>>();
+                return json;
+
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+        public async Task<IEnumerable<EmployeeAttendance>> GetAllEmployeeAttendance()
+        {
+            IEnumerable<EmployeeAttendance> details = null;
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/App/all-EmployeeAttendance");
+
+                res.EnsureSuccessStatusCode();
+
+                details = await res.Content.ReadFromJsonAsync<IEnumerable<EmployeeAttendance>>();
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return details;
+        }
+        #endregion
+
+        #region Leave Section
+        public async Task<LeaveType> GetLeaveTypeById(int id)
+        {
+            LeaveType data = null;
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/App/LeaveType/{id}");
+
+                res.EnsureSuccessStatusCode();
+
+                data = await res.Content.ReadFromJsonAsync<LeaveType>();
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return data;
+        }
+        public async Task<IEnumerable<LeaveType>> GetAllLeaveType()
+        {
+            IEnumerable<LeaveType> details = null;
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/App/all-LeaveType");
+
+                res.EnsureSuccessStatusCode();
+
+                details = await res.Content.ReadFromJsonAsync<IEnumerable<LeaveType>>();
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return details;
+        }
+
+        public async Task<ApiResponse<LeaveType>> UpsertLeaveTypeAsync(LeaveType data)
+        {
+            var result = new ApiResponse<LeaveType>();
+
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/App/UpsertLeaveType", data);
+                res.EnsureSuccessStatusCode();
+                var json = await res.Content.ReadFromJsonAsync<ApiResponse<LeaveType>>();
+                return json;
+
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+
+        }
+        public async Task<ApiResponse<LeaveType>> DeleteLeaveType(int id)
+        {
+            var result = new ApiResponse<LeaveType>();
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/App/DeleteLeaveType/{id}", new { });
+                res.EnsureSuccessStatusCode();
+                var json = await res.Content.ReadFromJsonAsync<ApiResponse<LeaveType>>();
+                return json;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+
+        public async Task<Leave> GetLeaveById(int id)
+        {
+            Leave data = null;
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/App/Leave/{id}");
+
+                res.EnsureSuccessStatusCode();
+
+                data = await res.Content.ReadFromJsonAsync<Leave>();
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return data;
+        }
+        public async Task<IEnumerable<Leave>> GetAllLeave()
+        {
+            IEnumerable<Leave> details = null;
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/App/all-Leave");
+
+                res.EnsureSuccessStatusCode();
+
+                details = await res.Content.ReadFromJsonAsync<IEnumerable<Leave>>();
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return details;
+        }
+
+        public async Task<ApiResponse<Leave>> UpsertLeaveAsync(Leave data)
+        {
+            var result = new ApiResponse<Leave>();
+
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/App/UpsertLeave", data);
+                res.EnsureSuccessStatusCode();
+                var json = await res.Content.ReadFromJsonAsync<ApiResponse<Leave>>();
+                return json;
+
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+
+
+        }
+        public async Task<ApiResponse<Leave>> ApproveLeaveAsync(Leave data)
+        {
+            var result = new ApiResponse<Leave>();
+
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/App/ApproveLeave", data);
+                res.EnsureSuccessStatusCode();
+                var json = await res.Content.ReadFromJsonAsync<ApiResponse<Leave>>();
+                return json;
+
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+
+
+        }
+        public async Task<ApiResponse<Leave>> DeleteLeave(int id)
+        {
+            var result = new ApiResponse<Leave>();
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/App/DeleteLeave/{id}", new { });
+                res.EnsureSuccessStatusCode();
+                var json = await res.Content.ReadFromJsonAsync<ApiResponse<Leave>>();
+                return json;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+
         #endregion
     }
 }

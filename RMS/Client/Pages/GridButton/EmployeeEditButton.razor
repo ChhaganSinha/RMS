@@ -10,29 +10,124 @@
 @inject NavigationManager NavigationManager
 
 <button class='btn btn-sm btn-warning' style="border-radius:15px" @onclick="MyClickHandler" title="Edit"><i class="fa fa-pencil-square-o"></i></button>
-<SimpleDailog Title="@Title" Show="@show" OnCloseDialog="ResetForm">
+<PageDialog Title="@Title" Show="@show" ClosePageDialog="ResetForm">
     @if (show)
     {
+        @if (show)
+        {
 
-        <UiAlert Model="alert"></UiAlert>
-        <EditForm Model="model" OnValidSubmit="OnSave">
-            <DataAnnotationsValidator />
-            <div>
-                <input type="text" placeholder="Enter Category" @bind-value="model.Name" class="form-control mb-2" />
-                <ValidationMessage For="() => model.Name" />
-            </div>
-            @if (process || model == null)
-            {
-                <div style="text-align:center">
-                    <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
+            <UiAlert Model="alert"></UiAlert>
+            <EditForm Model="model" OnValidSubmit="OnSave">
+                <DataAnnotationsValidator />
+                <div class="form-group row">
+                    <div class="col-md-6">
+                        <label class="col-form-label bold-font required-field">Employee Name</label>
+                        <InputText @bind-Value="@model.Name" id="name" class="form-control"></InputText>
+                        <ValidationMessage For="() => model.Name" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="col-form-label bold-font">Employee Id</label>
+                        <InputText @bind-Value="@model.EmpId" id="Price" class="form-control"></InputText>
+                        <ValidationMessage For="() => model.EmpId" />
+                    </div>
                 </div>
-            }
-            <hr />
-            <button type="submit" class="btn btn-primary float-right col-md-4">Add</button>
-        </EditForm>
-        <br />
+                <div class="form-group row">
+                    <div class="col-md-6">
+                        <label class="col-form-label bold-font">Select Designation</label>
+                        <HxSelect TItem="EmployeeDesignation"
+                                  TValue="int?"
+                                  Data="Designations"
+                                  @bind-Value="designationId"
+                                  TextSelector="@(e => e.Name)"
+                                  ValueSelector="@(e => e.Id)"
+                                  Nullable="true"
+                                  NullText="-select-"
+                                  NullDataText="Loading..." />
+                        <ValidationMessage For="() => model.EmployeeDesignation" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="col-form-label bold-font">Select Department</label>
+                        <HxSelect TItem="EmployeeDepartment"
+                                  TValue="int?"
+                                  Data="Departments"
+                                  @bind-Value="departmentId"
+                                  TextSelector="@(e => e.Name)"
+                                  ValueSelector="@(e => e.Id)"
+                                  Nullable="true"
+                                  NullText="-select-"
+                                  NullDataText="Loading..." />
+                        <ValidationMessage For="() => model.EmployeeDepartment" />
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-md-6">
+                        <label class="col-form-label bold-font required-field">Phone No.</label>
+                        <InputText @bind-Value="@model.PhoneNumber" id="PhoneNumber" class="form-control"></InputText>
+                        <ValidationMessage For="() => model.PhoneNumber" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="col-form-label bold-font">Email</label>
+                        <InputText @bind-Value="@model.Email" id="Email" class="form-control"></InputText>
+                        <ValidationMessage For="() => model.Email" />
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-md-12">
+                        <label class="col-form-label bold-font required-field">Address</label>
+                        <InputTextArea @bind-Value="@model.Address" id="Address" class="form-control"></InputTextArea>
+                        <ValidationMessage For="() => model.Address" />
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-md-4">
+                        <label class="col-form-label bold-font required-field">City</label>
+                        <InputText @bind-Value="@model.City" id="City" class="form-control"></InputText>
+                        <ValidationMessage For="() => model.City" />
+                    </div>
+                    <div class="col-md-4">
+                        <label class="col-form-label bold-font required-field">State</label>
+                        <InputText @bind-Value="@model.State" id="State" class="form-control"></InputText>
+                        <ValidationMessage For="() => model.State" />
+                    </div>
+                    <div class="col-md-4">
+                        <label class="col-form-label bold-font">Pincode</label>
+                        <InputNumber @bind-Value="@model.Pincode" id="Pincode" class="form-control"></InputNumber>
+                        <ValidationMessage For="() => model.Pincode" />
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-md-6">
+                        <label class="col-form-label bold-font required-field">Aadhar No.</label>
+                        <InputText @bind-Value="@model.AadharNumber" id="AadharNumber" class="form-control"></InputText>
+                        <ValidationMessage For="() => model.AadharNumber" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="col-form-label bold-font">Salary</label>
+                        <InputText @bind-Value="@model.Salary" id="Salary" class="form-control"></InputText>
+                        <ValidationMessage For="() => model.Salary" />
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-md-6">
+                        <label class="col-form-label bold-font required-field">joining Date</label>
+                        <InputDate @bind-Value="@model.joiningDate" id="joiningDate" class="form-control"></InputDate>
+                        <ValidationMessage For="() => model.joiningDate" />
+                    </div>
+                </div>
+
+                @if (process)
+                {
+                    <div style="text-align:center">
+                        <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
+                    </div>
+                }
+                <hr style="margin-bottom: 2px;" />
+                <button type="submit" class="btn btn-primary float-right col-md-4">Add</button>
+            </EditForm>
+            <br />
+        }
     }
-</SimpleDailog>
+</PageDialog>
 @code {
     [Parameter]
     public Employee Item { get; set; }
@@ -50,23 +145,34 @@
     string Title = "Update Employee Details";
 
     Employee model = new();
+    private int? designationId;
+    private int? departmentId;
+
+    private List<EmployeeDepartment> Departments = new();
+    private List<EmployeeDesignation> Designations = new();
+
 
     private async Task MyClickHandler(MouseEventArgs e)
     {
         show = true;
+        alert?.Clear();
+        Departments = (await client.GetAllEmployeeDepartment()).ToList();
+        Designations = (await client.GetAllEmployeeDesignation()).ToList();
         model = await client.GetEmployeeById(Item.Id);
+        designationId = model.DesignationId > 0 ? model.DesignationId : null;
+        departmentId = model.DepartmentId > 0 ? model.DepartmentId : null;
+
     }
 
-    protected override async Task OnInitializedAsync()
-    {
-        alert?.Clear();
-    }
 
     public async Task OnSave()
     {
         process = true;
         alert?.Clear();
-
+        model.DepartmentId = departmentId;
+        model.EmployeeDesignation = Departments.Where(x => x.Id == departmentId).Select(x => x.Name).First();
+        model.DesignationId = designationId;
+        model.EmployeeDesignation = Designations.Where(x => x.Id == designationId).Select(x => x.Name).First();
         var response = await client.UpsertEmployeeAsync(model);
         if (response.IsSuccess)
         {

@@ -17,7 +17,7 @@
                 <div class="page-header-title">
                     <h5 class="m-b-10">
                         Room
-                        <a @onclick="()=>show=true" style="cursor:pointer"><i class="fa fa-plus-circle fa-lg text-primary" aria-hidden="true" title="Add Room"></i></a>
+                        <a @onclick="OnAdd" style="cursor:pointer"><i class="fa fa-plus-circle fa-lg text-primary" aria-hidden="true" title="Add Room"></i></a>
                     </h5>
                 </div>
                 <ul class="breadcrumb">
@@ -41,7 +41,6 @@
 <PageDialog Title="@Title" Show="@show" ClosePageDialog="ResetForm">
     @if (show)
     {
-
         <UiAlert Model="alert"></UiAlert>
         <EditForm Model="model" OnValidSubmit="OnSave">
             <DataAnnotationsValidator />
@@ -60,13 +59,16 @@
             <div class="form-group row">
                 <div class="col-md-6">
                     <label class="col-form-label bold-font">Select Category</label>
-                    <select @bind="model.Category" class="form-control" id="Category">
-                        <option>- Select -</option>
-                        @foreach (var val in Categories)
-                        {
-                            <option value="@val.Id">@val.Name</option>
-                        }
-                    </select>
+                    <HxSelect TItem="RoomCategories"
+                              TValue="int?"
+                             
+                              Data="Categories"
+                              @bind-Value="categoriesId"
+                              TextSelector="@(Categories => Categories.Name)"
+                              ValueSelector="@(Categories => Categories.Id)"
+                              Nullable="true"
+                              NullText="-select-"
+                              NullDataText="Loading categories..." />
                     <ValidationMessage For="() => model.Category" />
                 </div>
                 <div class="col-md-6">
@@ -80,14 +82,12 @@
                                    ValueSelector="@(p => p.Id)"
                                    EmptyText="- Select -"
                                    NullDataText="Loading..." />
-
                     @if (SelectedFacilities.Count() == 0 && IsError)
                     {
                         <span style="color:red">Please select at least one Facility</span>
                     }
                 </div>
             </div>
-
             <div class="form-group row">
                 <div class="col-md-4">
                     <label class="col-form-label bold-font" style="padding-right: 0;">No. of Beds</label>
@@ -101,7 +101,7 @@
                 </div>
                 <div class="col-md-4">
                     <label class="col-form-label bold-font" style="padding-right: 0;">Extra Capacity</label>
-                    <InputCheckbox @bind-Value="@model.ExtraCapacity" id="ExtraCapacity" class="form-control"></InputCheckbox>
+                    <InputCheckbox @bind-Value="model.ExtraCapacity" id="ExtraCapacity" class="form-check-input" style="margin-left: -100px;margin-top: 45px; font-size: x-large;margin-top: 42px;" />
                     <ValidationMessage For="() => model.ExtraCapacity" />
                 </div>
             </div>
@@ -123,14 +123,12 @@
                     <InputCheckbox @bind-Value="model.IsActive" class="form-check-input" style="font-size: x-large;margin-top: 42px; margin-left: -56px;" />
                     <ValidationMessage For="() => model.IsActive" />
                 </div>
-
                 <div class="col-md-9">
                     <label class="col-form-label bold-font">Upload Image</label>
                     <InputFile OnChange="HandleFileSelected" class="form-control" />
                     <br />
                     <img id="imgPreview" src="@imageDataUrl" style="max-width: 200px; max-height: 200px; display: @(imageDataUrl == null ? "none" : "block");" />
                     <ValidationMessage For="() => model.ImageFile" />
-                    
                 </div>
             </div>
             <div class="form-group row">
@@ -140,7 +138,6 @@
                     <ValidationMessage For="() => model.Descriptions" />
                 </div>
             </div>
-
             @if (process)
             {
                 <div style="text-align:center">
@@ -161,6 +158,8 @@
     [CascadingParameter]
     protected AlertModel? alert { get; set; }
 
+    private int? categoriesId;
+
     Room model = new();
     public string Title = "Add Room";
     bool show = false;
@@ -180,27 +179,41 @@
     private async Task HandleFileSelected(InputFileChangeEventArgs e)
     {
         var file = e.File;
-
         if (file != null)
         {
             var buffer = new byte[file.Size];
             await file.OpenReadStream().ReadAsync(buffer);
 
-            // Convert the image to a data URL
-            imageDataUrl = $"data:image/png;base64,{Convert.ToBase64String(buffer)}";
-
+            // Store the image data in the model
             model.ImageFile = buffer;
+
+            // Convert the image to a data URL for preview
+            imageDataUrl = $"data:image/png;base64,{Convert.ToBase64String(buffer)}";
         }
     }
 
     protected override async Task OnInitializedAsync()
     {
         alert?.Clear();
-        //model = await client.GetRoomById();
+
+        // Load room categories and facilities
         Categories = (await client.GetAllRoomCategory()).ToList();
         Facilities = (await client.GetAllRoomFacility()).ToList();
-        var roomFacilitiesMap = await client.GetFacilitiesMappingByRoomId(model.Id);
-        SelectedFacilities.AddRange(roomFacilitiesMap.Select(o => o.FacilityId));
+
+        // If Id is provided, load room details and populate form
+        if (Id > 0)
+        {
+            model = await client.GetRoomById(Id);
+
+            // Convert existing image data to base64 string for preview
+            if (model.ImageFile != null && model.ImageFile.Length > 0)
+            {
+                imageDataUrl = $"data:image/png;base64,{Convert.ToBase64String(model.ImageFile)}";
+            }
+
+            var roomFacilitiesMap = await client.GetFacilitiesMappingByRoomId(model.Id);
+            SelectedFacilities.AddRange(roomFacilitiesMap.Select(o => o.FacilityId));
+        }
     }
 
     public async Task OnSave()
@@ -213,10 +226,14 @@
         process = true;
         alert?.Clear();
 
+        model.CategoryId = categoriesId;
+        if (categoriesId != null)
+            model.Category = Categories.Where(x => x.Id == categoriesId).Select(x => x.Name).First();
+        // Ensure the model includes the selected facilities
         var response = await client.UpsertRoomAsync(model);
         if (response.IsSuccess)
         {
-            if (model.Id > 0)
+            if (response.Result.Id > 0)
             {
                 if (RoomFacilitiesMap.ContainsKey(model.Id))
                 {
@@ -229,13 +246,17 @@
 
                 var result = await client.UpsertRoomFacilitiesMapping(RoomFacilitiesMap);
             }
-            // model = response.Result;
             alert?.SetSuccess(response.Message);
-            model = new();
+            model = new Room(); // Reset model after saving
+            categoriesId = null;
+            SelectedFacilities = new();
+            imageDataUrl = string.Empty;
             await RoomGrid.RefreshGridAsync();
         }
         else
+        {
             alert?.SetError(response.Message);
+        }
 
         process = false;
         StateHasChanged();
@@ -251,13 +272,23 @@
 
     private void ResetForm()
     {
-        model = new();
+        model = new Room();
         show = false;
         process = false;
     }
 
     public void OnClose()
     {
-        model = new();
+        model = new Room();
+        categoriesId = null;
+    }
+
+    public void OnAdd()
+    {
+        model = new Room();
+        categoriesId = null;
+        SelectedFacilities = new();
+        show = true;
     }
 }
+

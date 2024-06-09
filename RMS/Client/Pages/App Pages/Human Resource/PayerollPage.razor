@@ -1,0 +1,197 @@
+﻿@page "/salary-setup"
+
+@using RMS.Client.Client
+@using RMS.Client.Pages.GridComponent
+@using RMS.Client.Shared.Popup
+@inject AppClient client
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
+@using Havit.Blazor.Components.Web
+@using Havit.Blazor.Components.Web.Bootstrap
+@using System.ComponentModel.DataAnnotations;
+@attribute [Authorize]
+
+<div class="page-header breadcumb-sticky">
+    <div class="page-block">
+        <div class="row align-items-center">
+            <div class="col-md-12">
+                <div class="page-header-title">
+                    <h5 class="m-b-10">
+                        Payrolls
+                        <a @onclick="()=>show=true" style="cursor:pointer"><i class="fa fa-plus-circle fa-lg text-primary" aria-hidden="true" title="Payroll Setup"></i></a>
+                    </h5>
+                </div>
+                <ul class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a href="/"><i class="feather icon-home"></i></a>
+                    </li>
+                    <li class="breadcrumb-item"><a>Salary Setup</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-sm-12 p-0">
+        <div class="card-body p-2 mt-n3">
+            <EmployeePayrollGrid />
+        </div>
+    </div>
+</div>
+
+<PageDialog Title="@Title" Show="@show" ClosePageDialog="ResetForm">
+    @if (show)
+    {
+
+        <UiAlert Model="alert"></UiAlert>
+        <EditForm Model="model" OnValidSubmit="OnSave">
+            <DataAnnotationsValidator />
+
+            <div class="form-group row">
+                <div class="col-md-6">
+                    <label class="col-form-label bold-font">Select Employee</label>
+                    <select @bind="model.EmployeeId" class="form-control" id="EmployeeId">
+                        <option>- Select -</option>
+                        @foreach (var employee in Employees)
+                        {
+                            <option value="@employee.Id">@employee.Name</option>
+                        }
+                    </select>
+                    <ValidationMessage For="() => model.EmployeeId" />
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="col-md-6">
+                    <label class="col-form-label bold-font">Basic Salary</label>
+                    <InputNumber @bind-Value="model.BasicSalary" id="BasicSalary" class="form-control"></InputNumber>
+                    <ValidationMessage For="() => model.BasicSalary" />
+                </div>
+                <div class="col-md-6">
+                    <label class="col-form-label bold-font">TA</label>
+                    <InputNumber @bind-Value="model.TA" id="TA" class="form-control"></InputNumber>
+                    <ValidationMessage For="() => model.TA" />
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="col-md-6">
+                    <label class="col-form-label bold-font">DA</label>
+                    <InputNumber @bind-Value="model.DA" id="DA" class="form-control"></InputNumber>
+                    <ValidationMessage For="() => model.DA" />
+                </div>
+                <div class="col-md-6">
+                    <label class="col-form-label bold-font">HRA</label>
+                    <InputNumber @bind-Value="model.HRA" id="HRA" class="form-control"></InputNumber>
+                    <ValidationMessage For="() => model.HRA" />
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="col-md-6">
+                    <label class="col-form-label bold-font">Other Allowances</label>
+                    <InputNumber @bind-Value="model.OtherAllowances" id="OtherAllowances" class="form-control"></InputNumber>
+                    <ValidationMessage For="() => model.OtherAllowances" />
+                </div>
+                <div class="col-md-6">
+                    <label class="col-form-label bold-font">Gross Salary</label>
+                    <InputNumber Value="model.GrossSalary" id="GrossSalary" class="form-control" disabled></InputNumber>
+                    <ValidationMessage For="() => model.GrossSalary" />
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="col-md-6">
+                    <label class="col-form-label bold-font">Tax (%)</label>
+                    <InputNumber @bind-Value="model.TaxPercentage" id="TaxPercentage" class="form-control"></InputNumber>
+                    <ValidationMessage For="() => model.TaxPercentage" />
+                </div>
+                <div class="col-md-6">
+                    <label class="col-form-label bold-font">PF (%)</label>
+                    <InputNumber @bind-Value="model.PFPercentage" id="PFPercentage" class="form-control"></InputNumber>
+                    <ValidationMessage For="() => model.PFPercentage" />
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="col-md-6">
+                    <label class="col-form-label bold-font">Income Tax (%)</label>
+                    <InputNumber @bind-Value="model.IncomeTaxPercentage" id="IncomeTaxPercentage" class="form-control"></InputNumber>
+                    <ValidationMessage For="() => model.IncomeTaxPercentage" />
+                </div>
+                <div class="col-md-6">
+                    <label class="col-form-label bold-font">Net Salary</label>
+                    <InputNumber Value="model.NetSalary" id="NetSalary" class="form-control" disabled></InputNumber>
+                    <ValidationMessage For="() => model.NetSalary" />
+                </div>
+            </div>
+
+            @if (process)
+            {
+                <div style="text-align:center">
+                    <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
+                </div>
+            }
+            <hr style="margin-bottom: 2px;" />
+            <button type="submit" class="btn btn-primary float-right col-md-4">Add</button>
+        </EditForm>
+        <br />
+    }
+</PageDialog>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    [CascadingParameter]
+    protected AlertModel? alert { get; set; }
+
+    EmployeePayroll model = new();
+    public string Title = "Salary Setup";
+    bool show = false;
+    bool process = false;
+    private Timer _timer;
+    private int _delay = 2500;
+
+    private List<Employee> Employees = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        alert?.Clear();
+        Employees = (await client.GetAllEmployee()).ToList();
+    }
+
+    public async Task OnSave()
+    {
+        process = true;
+        alert?.Clear();
+
+        // var response = await client.UpsertSalaryAsync(model);
+        // if (response.IsSuccess)
+        // {
+        //     alert?.SetSuccess(response.Message);
+        //     model = new();
+        //     await EmployeePayrollGrid.RefreshGridAsync();
+        // }
+        // else
+        //     alert?.SetError(response.Message);
+
+        process = false;
+        StateHasChanged();
+        _timer = new Timer(TimerCallback, null, _delay, Timeout.Infinite);
+    }
+
+    private void TimerCallback(Object o)
+    {
+        alert?.Clear();
+        _timer.Dispose();
+        StateHasChanged();
+    }
+
+    private void ResetForm()
+    {
+        model = new();
+        show = false;
+        process = false;
+    }
+
+    public void OnClose()
+    {
+        model = new();
+    }
+}

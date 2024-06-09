@@ -1,5 +1,129 @@
 ﻿@page "/attendance-list"
 
-@code {
+@using RMS.Client.Client
+@using RMS.Client.Pages.GridComponent
+@using RMS.Client.Shared.Popup
+@inject AppClient client
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
+@attribute [Authorize]
 
+<div class="page-header breadcumb-sticky">
+    <div class="page-block">
+        <div class="row align-items-center">
+            <div class="col-md-12">
+                <div class="page-header-title">
+                    <h5 class="m-b-10">
+                        Attendance List
+                        <a class="btn btn-success" @onclick="()=>show=true" style="cursor:pointer">Single CheckIn</a>
+                    </h5>
+                </div>
+                <ul class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a href="/"><i class="feather icon-home"></i></a>
+                    </li>
+                    <li class="breadcrumb-item"><a>Attendance List </a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-sm-12 p-0">
+        <div class="card-body p-2 mt-n3">
+            <div class="card text">
+                <div class="card-body">
+                    <AttendanceGrid />
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<SimpleDailog Title="@Title" Show="@show" OnCloseDialog="ResetForm">
+    @if (show)
+    {
+
+        <UiAlert Model="alert"></UiAlert>
+        <EditForm Model="model" OnValidSubmit="OnSave">
+            <DataAnnotationsValidator />
+            <div>
+                
+            </div>
+            @if (process)
+            {
+                <div style="text-align:center">
+                    <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
+                </div>
+            }
+            <hr />
+            <button type="submit" class="btn btn-primary float-right col-md-4">Add</button>
+        </EditForm>
+        <br />
+    }
+</SimpleDailog>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    [CascadingParameter]
+    protected AlertModel? alert { get; set; }
+
+    EmployeeAttendance model = new();
+    public string Title = "Check In";
+    bool show = false;
+    bool process = false;
+    private Timer _timer;
+    private int _delay = 2500;
+
+    public List<Employee> employees = new();
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        alert?.Clear();
+        employees = (await client.GetAllEmployee()).ToList();
+    }
+
+    public async Task OnSave()
+    {
+        process = true;
+        alert?.Clear();
+
+        var response = await client.EmployeeCheckInAsync(model);
+        if (response.IsSuccess)
+        {
+            // model = response.Result;
+            await AttendanceGrid.RefreshGridAsync();
+            alert?.SetSuccess(response.Message);
+            model = new();
+        }
+        else
+            alert?.SetError(response.Message);
+
+        process = false;
+        StateHasChanged();
+        _timer = new Timer(TimerCallback, null, _delay, Timeout.Infinite);
+    }
+
+    private void TimerCallback(Object o)
+    {
+        alert?.Clear();
+        _timer.Dispose();
+        StateHasChanged();
+    }
+
+    private void ResetForm()
+    {
+        model = new();
+        show = false;
+        process = false;
+    }
+
+    public void OnClose()
+    {
+        model = new();
+    }
 }

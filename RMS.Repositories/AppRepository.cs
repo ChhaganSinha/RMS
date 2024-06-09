@@ -619,7 +619,6 @@ namespace RMS.Repositories
         }
         #endregion
 
-
         #region Hall Section
         public async Task<HallCategories> GetHallCategoryById(int id)
         {
@@ -790,7 +789,331 @@ namespace RMS.Repositories
         #endregion
 
         #region Attendence  Section
+        public async Task<ApiResponse<EmployeeAttendance>> EmployeeCheckInAsync(EmployeeAttendance data)
+        {
+            var result = new ApiResponse<EmployeeAttendance>();
+            try
+            {
+                if (data == null)
+                {
+                    result.IsSuccess = false;
+                    result.Message = "Invalid Employee data!";
+                    return result;
+                }
 
+                var today = DateOnly.FromDateTime(DateTime.Now);
+                var existingAttendance = AppDbCxt.EmployeeAttendance
+                    .FirstOrDefault(o => o.EmployeeId == data.EmployeeId && o.Date == today);
+
+                if (existingAttendance != null)
+                {
+                    result.IsSuccess = false;
+                    result.Message = "Employee has already checked in today.";
+                    return result;
+                }
+
+                data.Date = today;
+                data.CheckIn = TimeOnly.FromDateTime(DateTime.Now);
+                AppDbCxt.EmployeeAttendance.Update(data);
+                AppDbCxt.SaveChanges();
+
+                result.IsSuccess = true;
+                result.Message = "Successfully Checked In.";
+                result.Result = data;
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+
+        public async Task<ApiResponse<EmployeeAttendance>> EmployeeCheckOutAsync(EmployeeAttendance data)
+        {
+            var result = new ApiResponse<EmployeeAttendance>();
+            try
+            {
+                if (data == null)
+                {
+                    result.IsSuccess = false;
+                    result.Message = "Invalid Employee data!";
+                    return result;
+                }
+
+                var today = DateOnly.FromDateTime(DateTime.Now);
+                var existingAttendance = AppDbCxt.EmployeeAttendance
+                    .FirstOrDefault(o => o.EmployeeId == data.EmployeeId && o.Date == today);
+
+                if (existingAttendance == null)
+                {
+                    result.IsSuccess = false;
+                    result.Message = "No check-in record found for today.";
+                    return result;
+                }
+
+                existingAttendance.CheckOut = TimeOnly.FromDateTime(DateTime.Now);
+                existingAttendance.StayTime = existingAttendance.CheckOut.ToTimeSpan() - existingAttendance.CheckIn.ToTimeSpan();
+                AppDbCxt.Update(existingAttendance);
+                AppDbCxt.SaveChanges();
+
+                result.IsSuccess = true;
+                result.Message = "Successfully Checked Out.";
+                result.Result = existingAttendance;
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+
+        public async Task<ApiResponse<EmployeeAttendance>> UpdateEmployeeAttendance(EmployeeAttendance data)
+        {
+            var result = new ApiResponse<EmployeeAttendance>();
+            try
+            {
+                if (data == null)
+                {
+                    result.IsSuccess = true;
+                    result.Message = "Invalid Employee data!";
+                    return result;
+                }
+
+                var checkAttendance = AppDbCxt.EmployeeAttendance.Where(o => o.EmployeeId == data.EmployeeId).FirstOrDefault();
+                if (checkAttendance != null)
+                {
+                    AppDbCxt.EmployeeAttendance.Update(data);
+                    result.Message = "Data Successfully Updated.";
+                    AppDbCxt.SaveChanges();
+                    result.IsSuccess = true;
+                    result.Result = data;
+                }
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+
+        public async Task<IEnumerable<EmployeeAttendance>> GetAllEmployeeAttendance()
+        {
+            IEnumerable<EmployeeAttendance> result = null;
+
+            result = AppDbCxt.EmployeeAttendance.ToList();
+            return result;
+        }
+        #endregion
+
+        #region Leave Section
+        public async Task<LeaveType> GetLeaveTypeById(int id)
+        {
+            LeaveType result = null;
+
+#pragma warning disable CS8600
+            result = AppDbCxt.LeaveType.FirstOrDefault(o => o.Id == id);
+#pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
+
+            return await Task.FromResult(result);
+        }
+
+        public async Task<IEnumerable<LeaveType>> GetAllLeaveType()
+        {
+            IEnumerable<LeaveType> result = null;
+
+            result = AppDbCxt.LeaveType.ToList();
+            return result;
+        }
+        public async Task<ApiResponse<LeaveType>> UpsertLeaveTypeAsync(LeaveType data)
+        {
+            var result = new ApiResponse<LeaveType>();
+            try
+            {
+
+                if (data == null)
+                {
+                    result.IsSuccess = true;
+                    result.Message = "Invalid Room Categories data!";
+                    return result;
+                }
+
+                if (data.Id > 0)
+                {
+                    AppDbCxt.LeaveType.Update(data);
+                    result.Message = "Data Successfully Updated.";
+                }
+                else
+                {
+                    AppDbCxt.LeaveType.Add(data);
+                    result.Message = "Data Successfully Inserted.";
+                }
+
+                AppDbCxt.SaveChanges();
+                result.IsSuccess = true;
+                result.Result = data;
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+
+        public async Task<ApiResponse<LeaveType>> DeleteLeaveType(int id)
+        {
+            var result = new ApiResponse<LeaveType>();
+            try
+            {
+                var existing = AppDbCxt.LeaveType.First(x => x.Id == id);
+                result.Result = existing;
+                if (existing == null)
+                {
+                    result.IsSuccess = true;
+                    result.Message = "Leave Type not found!";
+                    return result;
+                }
+
+                AppDbCxt.LeaveType.Remove(existing);
+                await AppDbCxt.SaveChangesAsync();
+                result.IsSuccess = true;
+                result.Message = "Successfully Deleted!";
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+
+        public async Task<Leave> GetLeaveById(int id)
+        {
+            Leave result = null;
+
+#pragma warning disable CS8600
+            result = AppDbCxt.Leave.FirstOrDefault(o => o.Id == id);
+#pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
+
+            return await Task.FromResult(result);
+        }
+
+        public async Task<IEnumerable<Leave>> GetAllLeave()
+        {
+            IEnumerable<Leave> result = null;
+
+            result = AppDbCxt.Leave.ToList();
+            return result;
+        }
+        public async Task<ApiResponse<Leave>> UpsertLeaveAsync(Leave data)
+        {
+            var result = new ApiResponse<Leave>();
+            try
+            {
+
+                if (data == null)
+                {
+                    result.IsSuccess = true;
+                    result.Message = "Invalid Room Categories data!";
+                    return result;
+                }
+
+                if (data.Id > 0)
+                {
+                    AppDbCxt.Leave.Update(data);
+                    result.Message = "Data Successfully Updated.";
+                }
+                else
+                {
+                    AppDbCxt.Leave.Add(data);
+                    result.Message = "Data Successfully Inserted.";
+                }
+
+                AppDbCxt.SaveChanges();
+                result.IsSuccess = true;
+                result.Result = data;
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+
+        public async Task<ApiResponse<Leave>> DeleteLeave(int id)
+        {
+            var result = new ApiResponse<Leave>();
+            try
+            {
+                var existing = AppDbCxt.Leave.First(x => x.Id == id);
+                result.Result = existing;
+                if (existing == null)
+                {
+                    result.IsSuccess = true;
+                    result.Message = "Leave Type not found!";
+                    return result;
+                }
+
+                AppDbCxt.Leave.Remove(existing);
+                await AppDbCxt.SaveChangesAsync();
+                result.IsSuccess = true;
+                result.Message = "Successfully Deleted!";
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+
+        public async Task<ApiResponse<Leave>> ApproveLeaveAsync(Leave data)
+        {
+            var result = new ApiResponse<Leave>();
+            try
+            {
+
+                if (data == null)
+                {
+                    result.IsSuccess = true;
+                    result.Message = "Invalid data!";
+                    return result;
+                }
+
+                if (data.Id > 0)
+                {
+                    AppDbCxt.Leave.Update(data);
+                    result.Message = "Successfully Approved.";
+                }
+                else
+                {
+                    AppDbCxt.Leave.Add(data);
+                    result.Message = "Successfully Approved.";
+                }
+
+                AppDbCxt.SaveChanges();
+                result.IsSuccess = true;
+                result.Result = data;
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
         #endregion
     }
 }

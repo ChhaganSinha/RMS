@@ -1,4 +1,4 @@
-﻿@page "/salary-type"
+﻿@page "/leave"
 
 @using RMS.Client.Client
 @using RMS.Client.Pages.GridComponent
@@ -14,16 +14,16 @@
             <div class="col-md-12">
                 <div class="page-header-title">
                     <h5 class="m-b-10">
-                        Salary Type
-                        <a @onclick="()=>show=true" style="cursor:pointer"><i class="fa fa-plus-circle fa-lg text-primary" aria-hidden="true" title="Add Department"></i></a>
+                        Leave Types
+                        <a @onclick="()=>show=true" style="cursor:pointer"><i class="fa fa-plus-circle fa-lg text-primary" aria-hidden="true" title="Add Hall"></i></a>
                     </h5>
                 </div>
                 <ul class="breadcrumb">
                     <li class="breadcrumb-item">
                         <a href="/"><i class="feather icon-home"></i></a>
                     </li>
-                    <li class="breadcrumb-item"><a>Payroll</a></li>
-                    <li class="breadcrumb-item"><a>Salary Type</a></li>
+                    <li class="breadcrumb-item"><a>Leave</a></li>
+                    <li class="breadcrumb-item"><a>Leave Types</a></li>
                 </ul>
             </div>
         </div>
@@ -35,7 +35,7 @@
         <div class="card-body p-2 mt-n3">
             <div class="card text">
                 <div class="card-body">
-                    < />
+                    <LeaveTypeGrid />
                 </div>
             </div>
         </div>
@@ -50,8 +50,16 @@
         <EditForm Model="model" OnValidSubmit="OnSave">
             <DataAnnotationsValidator />
             <div>
-                <input type="text" placeholder="Enter Department" @bind-value="model.Name" class="form-control mb-2" />
-                <ValidationMessage For="() => model.Name" />
+                <div class="col-md-12">
+                    <label class="col-form-label bold-font required-field">Type Name</label>
+                    <InputText @bind-Value="@model.TypeName" id="TypeName" class="form-control"></InputText>
+                    <ValidationMessage For="() => model.TypeName" />
+                </div>
+                <div class="col-md-12">
+                    <label class="col-form-label bold-font required-field">Leave Days</label>
+                    <InputNumber @bind-Value="@model.LeaveDays" id="LeaveDays" class="form-control"></InputNumber>
+                    <ValidationMessage For="() => model.LeaveDays" />
+                </div>
             </div>
             @if (process)
             {
@@ -73,8 +81,8 @@
     [CascadingParameter]
     protected AlertModel? alert { get; set; }
 
-    EmployeeDepartment model = new();
-    public string Title = "Add Employee Department";
+    LeaveType model = new();
+    public string Title = "Add Leave Type";
     bool show = false;
     bool process = false;
     private Timer _timer;
@@ -91,13 +99,13 @@
         process = true;
         alert?.Clear();
 
-        var response = await client.UpsertEmployeeDepartmentAsync(model);
+        var response = await client.UpsertLeaveTypeAsync(model);
         if (response.IsSuccess)
         {
             // model = response.Result;
-            await EmployeeDepartmentGrid.RefreshGridAsync();
             alert?.SetSuccess(response.Message);
             model = new();
+            await LeaveTypeGrid.RefreshGridAsync();
         }
         else
             alert?.SetError(response.Message);

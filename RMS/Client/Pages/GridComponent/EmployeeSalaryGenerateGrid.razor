@@ -12,7 +12,7 @@
 {
     <div class="row">
         <div class="col-sm-12">
-            <GridComponent @ref="Component" T="Employee" Grid="@_grid"></GridComponent>
+            <GridComponent @ref="Component" T="EmployeePayroll" Grid="@_grid"></GridComponent>
         </div>
     </div>
 }
@@ -25,41 +25,47 @@ else
 
 @code
 {
-    private CGrid<Employee> _grid;
+    private CGrid<EmployeePayroll> _grid;
     private Task _task;
-    private static GridComponent<Employee> Component;
+    private static GridComponent<EmployeePayroll> Component;
     static bool filter = true;
     static AuthenticationState authState;
 
-    Action<IGridColumnCollection<Employee>> columns = c =>
+    Action<IGridColumnCollection<EmployeePayroll>> columns = c =>
     {
 
         c.Add(o => o.Id).SetWidth("10%").Css("table-bordered").Titled("SN.").Filterable(filter);
-        c.Add(o => o.Name).Css("table-bordered").Filterable(filter);
-        c.Add(o => o.EmployeeDesignation).Css("table-bordered").Titled("Designation").Filterable(filter);
-        c.Add(o => o.EmployeeDepartment).Css("table-bordered").Titled("Department").Filterable(filter);
-        c.Add(o => o.PhoneNumber).Css("table-bordered").Titled("Phone").Filterable(filter);
-        c.Add(o => o.City).Css("table-bordered").Titled("City").Filterable(filter);
+        c.Add(o => o.EmployeeName).Css("table-bordered").Filterable(filter);
+        c.Add(o => o.BasicSalary).Css("table-bordered").Filterable(filter);
+        c.Add(o => o.TA).Css("table-bordered").Filterable(filter);
+        c.Add(o => o.DA).Css("table-bordered").Filterable(filter);
+        c.Add(o => o.HRA).Css("table-bordered").Filterable(filter);
+        c.Add(o => o.OtherAllowances).Css("table-bordered").Filterable(filter);
+        c.Add(o => o.GrossSalary).Css("table-bordered").Filterable(filter);
+        c.Add(o => o.Tax).Css("table-bordered").Filterable(filter);
+        c.Add(o => o.PF).Css("table-bordered").Filterable(filter);
+        c.Add(o => o.IncomeTax).Css("table-bordered").Filterable(filter);
+        c.Add(o => o.NetSalary).Css("table-bordered").Filterable(filter);
 
-        c.Add().Encoded(false).Sanitized(false).RenderComponentAs<EmployeeEditButton>().SetWidth("10px").Titled("Edit");
-        c.Add().Encoded(false).Sanitized(false).RenderComponentAs<EmployeeDeleteButton>(new List<Action<object>> { RefreshGrid }).SetWidth("10px").Titled("Delete");
+        // c.Add().Encoded(false).Sanitized(false).RenderComponentAs<EmployeePayrollEditButton>().SetWidth("10px").Titled("Edit");
+        c.Add().Encoded(false).Sanitized(false).RenderComponentAs<SalaryGenerateButton>(new List<Action<object>> { RefreshGrid }).SetWidth("10px").Titled("Salary Generate");
     };
 
     protected override async Task OnParametersSetAsync()
     {
         authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        string url = $"odata/Employee";
+        string url = $"odata/EmployeePayroll";
         var query = new QueryDictionary<StringValues>();
         query.Add("grid-sorting", "Id__1__1");
 
-        var client = new GridODataClient<Employee>(HttpClient, url, query, false, "ordersGrid", columns, 5)
+        var client = new GridODataClient<EmployeePayroll>(HttpClient, url, query, false, "ordersGrid", columns, 5)
             .Sortable(true)
             // .Filterable(true)
             // .ClearFiltersButton(true)
             .SetStriped(true)
             .WithMultipleFilters()
             .WithGridItemsCount()
-            // .SetExcelExport(true, true, "Employee.xlsx")
+            // .SetExcelExport(true, true, "EmployeePayroll.xlsx")
             .ChangePageSize(true)
             .EmptyText("No data available")
             .SetKeyboard(true)

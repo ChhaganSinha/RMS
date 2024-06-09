@@ -327,5 +327,94 @@ namespace RMS.Server.Controllers.Api
         }
         #endregion
 
+        #region Employee Attendance
+        [HttpPost]
+        [Route("EmployeeCheckIn")]
+        public async Task<ApiResponse<EmployeeAttendance>> EmployeeCheckInAsync(EmployeeAttendance data)
+        {
+            return await _appRepository.EmployeeCheckInAsync(data);
+        }
+        [HttpPost]
+        [Route("EmployeeCheckOut")]
+        public async Task<ApiResponse<EmployeeAttendance>> EmployeeCheckOutAsync(EmployeeAttendance data)
+        {
+            return await _appRepository.EmployeeCheckOutAsync(data);
+        }
+        [HttpPost]
+        [Route("UpdateEmployeeAttendance")]
+        public async Task<ApiResponse<EmployeeAttendance>> UpdateEmployeeAttendance(EmployeeAttendance data)
+        {
+            return await _appRepository.UpdateEmployeeAttendance(data);
+        }
+        [HttpGet]
+        [Route("all-EmployeeAttendance")]
+        public async Task<IEnumerable<EmployeeAttendance>> GetAllEmployeeAttendance()
+        {
+            return await _appRepository.GetAllEmployeeAttendance();
+        }
+        #endregion
+
+        #region Leave Section
+        [HttpGet]
+        [Route("LeaveType/{id}")]
+        public async Task<LeaveType> GetLeaveTypeById(int id)
+        {
+            return await _appRepository.GetLeaveTypeById(id);
+        }
+
+        [HttpGet]
+        [Route("all-LeaveType")]
+        public async Task<IEnumerable<LeaveType>> GetAllLeaveType()
+        {
+            return await _appRepository.GetAllLeaveType();
+        }
+
+        [HttpPost]
+        [Route("UpsertLeaveType")]
+        public async Task<ApiResponse<LeaveType>> UpsertLeaveTypeAsync(LeaveType data)
+        {
+            return await _appRepository.UpsertLeaveTypeAsync(data);
+        }
+        [HttpPost]
+        [Route("DeleteLeaveType/{id}")]
+        public async Task<ApiResponse<LeaveType>> DeleteLeaveType(int id)
+        {
+            return await _appRepository.DeleteLeaveType(id);
+        }
+
+
+
+        [HttpGet]
+        [Route("Leave/{id}")]
+        public async Task<Leave> GetLeaveById(int id)
+        {
+            return await _appRepository.GetLeaveById(id);
+        }
+        [HttpPost]
+        [Route("UpsertLeave")]
+        public async Task<ApiResponse<Leave>> UpsertLeaveAsync(Leave data)
+        {
+            return await _appRepository.UpsertLeaveAsync(data);
+        }
+        [HttpGet]
+        [Route("all-Leave")]
+        public async Task<IEnumerable<Leave>> GetAllLeave()
+        {
+            return await _appRepository.GetAllLeave();
+        }
+        [HttpPost]
+        [Route("DeleteLeave/{id}")]
+        public async Task<ApiResponse<Leave>> DeleteLeave(int id)
+        {
+            return await _appRepository.DeleteLeave(id);
+        }
+        [HttpPost]
+        [Route("ApproveLeave")]
+        public async Task<ApiResponse<Leave>> ApproveLeaveAsync(Leave data)
+        {
+            return await _appRepository.ApproveLeaveAsync(data);
+        }
+
+        #endregion
     }
 }

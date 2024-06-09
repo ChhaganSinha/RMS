@@ -9,8 +9,9 @@ namespace RMS.Dto
     public class Employee : Auditable
     {
         public string EmployeeDesignation { get; set; } = string.Empty;
-
+        public int ? DesignationId { get; set; }
         public string EmployeeDepartment { get; set; } = string.Empty;
+        public int ? DepartmentId { get; set; }
         public string Name { get; set; } = string.Empty;
         public string EmpId { get; set; } = string.Empty;
         public string PhoneNumber { get; set; } = string.Empty;

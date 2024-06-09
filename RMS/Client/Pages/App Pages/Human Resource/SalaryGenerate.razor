@@ -1,5 +1,103 @@
 ﻿@page "/salary-generate"
 
-@code {
+@using RMS.Client.Client
+@using RMS.Client.Pages.GridComponent
+@using RMS.Client.Shared.Popup
+@inject AppClient client
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
+@using Havit.Blazor.Components.Web
+@using Havit.Blazor.Components.Web.Bootstrap
+@using System.ComponentModel.DataAnnotations;
+@attribute [Authorize]
 
+<div class="page-header breadcumb-sticky">
+    <div class="page-block">
+        <div class="row align-items-center">
+            <div class="col-md-12">
+                <div class="page-header-title">
+                    <h5 class="m-b-10">
+                        Salary Generate
+                    </h5>
+                </div>
+                <ul class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a href="/"><i class="feather icon-home"></i></a>
+                    </li>
+                    <li class="breadcrumb-item"><a>Payroll</a></li>
+                    <li class="breadcrumb-item"><a>Salary Generate</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-sm-12 p-0">
+        <div class="card-body p-2 mt-n3">
+            <EmployeeSalaryGenerateGrid />
+        </div>
+    </div>
+</div>
+
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    [CascadingParameter]
+    protected AlertModel? alert { get; set; }
+
+    EmployeePayroll model = new();
+    public string Title = "Salary Setup";
+    bool show = false;
+    bool process = false;
+    private Timer _timer;
+    private int _delay = 2500;
+
+    private List<Employee> Employees = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        alert?.Clear();
+        Employees = (await client.GetAllEmployee()).ToList();
+    }
+
+    public async Task OnSave()
+    {
+        process = true;
+        alert?.Clear();
+
+        // var response = await client.UpsertSalaryAsync(model);
+        // if (response.IsSuccess)
+        // {
+        //     alert?.SetSuccess(response.Message);
+        //     model = new();
+        //     await EmployeePayrollGrid.RefreshGridAsync();
+        // }
+        // else
+        //     alert?.SetError(response.Message);
+
+        process = false;
+        StateHasChanged();
+        _timer = new Timer(TimerCallback, null, _delay, Timeout.Infinite);
+    }
+
+    private void TimerCallback(Object o)
+    {
+        alert?.Clear();
+        _timer.Dispose();
+        StateHasChanged();
+    }
+
+    private void ResetForm()
+    {
+        model = new();
+        show = false;
+        process = false;
+    }
+
+    public void OnClose()
+    {
+        model = new();
+    }
 }

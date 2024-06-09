@@ -5,34 +5,123 @@
 @using RMS.Client.Pages.GridComponent
 @using RMS.Client.Shared.Popup
 @using RMS.Client.Client
+@using System.ComponentModel.DataAnnotations
 @inject AppClient client
 @implements ICustomGridComponent<Room>
 @inject NavigationManager NavigationManager
 
 <button class='btn btn-sm btn-warning' style="border-radius:15px" @onclick="MyClickHandler" title="Edit"><i class="fa fa-pencil-square-o"></i></button>
-<SimpleDailog Title="@Title" Show="@show" OnCloseDialog="ResetForm">
+<PageDialog Title="@Title" Show="@show" ClosePageDialog="ResetForm">
     @if (show)
     {
-
         <UiAlert Model="alert"></UiAlert>
         <EditForm Model="model" OnValidSubmit="OnSave">
             <DataAnnotationsValidator />
-            <div>
-                <input type="text" placeholder="Enter Category" @bind-value="model.Category" class="form-control mb-2" />
-                <ValidationMessage For="() => model.Category" />
+            <div class="form-group row">
+                <div class="col-md-6">
+                    <label class="col-form-label bold-font required-field">Room Number</label>
+                    <InputText @bind-Value="@model.RoomNumber" id="RoomNumber" class="form-control"></InputText>
+                    <ValidationMessage For="() => model.RoomNumber" />
+                </div>
+                <div class="col-md-6">
+                    <label class="col-form-label bold-font">Price</label>
+                    <InputNumber @bind-Value="@model.Price" id="Price" class="form-control"></InputNumber>
+                    <ValidationMessage For="() => model.Price" />
+                </div>
             </div>
-            @if (process || model == null)
+            <div class="form-group row">
+                <div class="col-md-6">
+                    <label class="col-form-label bold-font">Select Category</label>
+                    <HxSelect TItem="RoomCategories"
+                              TValue="int?"
+                              Data="Categories"
+                              @bind-Value="categoriesId"
+                              TextSelector="@(Categories => Categories.Name)"
+                              ValueSelector="@(Categories => Categories.Id)"
+                              Nullable="true"
+                              NullText="-select-"
+                              NullDataText="Loading categories..." />
+                    <ValidationMessage For="() => model.Category" />
+                </div>
+                <div class="col-md-6">
+                    <label class="col-form-label bold-font">Select Facilities</label>
+                    <HxMultiSelect TItem="RoomFacilities"
+                                   AutoSort="false"
+                                   TValue="int"
+                                   Data="@Facilities"
+                                   @bind-Value="@SelectedFacilities"
+                                   TextSelector="@(p => p.Name)"
+                                   ValueSelector="@(p => p.Id)"
+                                   EmptyText="- Select -"
+                                   NullDataText="Loading..." />
+                    @if (SelectedFacilities.Count() == 0 && IsError)
+                    {
+                        <span style="color:red">Please select at least one Facility</span>
+                    }
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="col-md-4">
+                    <label class="col-form-label bold-font" style="padding-right: 0;">No. of Beds</label>
+                    <InputNumber @bind-Value="@model.NumberOfBed" id="NumberOfBed" class="form-control"></InputNumber>
+                    <ValidationMessage For="() => model.NumberOfBed" />
+                </div>
+                <div class="col-md-4">
+                    <label class="col-form-label bold-font" style="padding-right: 0;">Capacity</label>
+                    <InputText @bind-Value="@model.Capacity" id="Capacity" class="form-control"></InputText>
+                    <ValidationMessage For="() => model.Capacity" />
+                </div>
+                <div class="col-md-4">
+                    <label class="col-form-label bold-font" style="padding-right: 0;">Extra Capacity</label>
+                    <InputCheckbox @bind-Value="model.ExtraCapacity" id="ExtraCapacity" class="form-check-input" style="margin-left: -100px;margin-top: 45px; font-size: x-large;margin-top: 42px;" />
+                    <ValidationMessage For="() => model.ExtraCapacity" />
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="col-md-6">
+                    <label class="col-form-label bold-font" style="padding-right: 0;">Bed Charge</label>
+                    <InputText @bind-Value="@model.BedCharge" id="BedCharge" class="form-control"></InputText>
+                    <ValidationMessage For="() => model.BedCharge" />
+                </div>
+                <div class="col-md-6">
+                    <label class="col-form-label bold-font" style="padding-right: 0;">Person Charge</label>
+                    <InputText @bind-Value="@model.PersonCharge" id="PersonCharge" class="form-control"></InputText>
+                    <ValidationMessage For="() => model.PersonCharge" />
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="col-md-3">
+                    <label class="col-form-label bold-font" style="padding-right: 0;">IsActive</label>
+                    <InputCheckbox @bind-Value="model.IsActive" class="form-check-input" style="font-size: x-large;margin-top: 42px; margin-left: -56px;" />
+                    <ValidationMessage For="() => model.IsActive" />
+                </div>
+                <div class="col-md-9">
+                    <label class="col-form-label bold-font">Upload Image</label>
+                    <InputFile OnChange="HandleFileSelected" class="form-control" />
+                    <br />
+                    <img id="imgPreview" src="@imageDataUrl" style="max-width: 200px; max-height: 200px; display: @(imageDataUrl == null ? "none" : "block");" />
+                    <ValidationMessage For="() => model.ImageFile" />
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="col-md-12">
+                    <label class="col-form-label bold-font" style="padding-right: 0;">Descriptions</label>
+                    <InputTextArea @bind-Value="@model.Descriptions" id="Descriptions" class="form-control"></InputTextArea>
+                    <ValidationMessage For="() => model.Descriptions" />
+                </div>
+            </div>
+            @if (process)
             {
                 <div style="text-align:center">
                     <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
                 </div>
             }
-            <hr />
+            <hr style="margin-bottom: 2px;" />
             <button type="submit" class="btn btn-primary float-right col-md-4">Add</button>
         </EditForm>
         <br />
     }
-</SimpleDailog>
+</PageDialog>
 @code {
     [Parameter]
     public Room Item { get; set; }
@@ -49,27 +138,60 @@
     bool process = false;
     string Title = "Update Room Details";
 
+    private int? categoriesId;
+    [Required]
+    private List<int> SelectedFacilities { get; set; } = new();
+    private bool IsError = false;
+    List<RoomCategories> Categories = new();
+    private List<RoomFacilities> Facilities = new();
+    Dictionary<int, List<int>> RoomFacilitiesMap = new Dictionary<int, List<int>>();
+
+    private string imageDataUrl;
+
     Room model = new();
 
     private async Task MyClickHandler(MouseEventArgs e)
     {
         show = true;
         model = await client.GetRoomById(Item.Id);
-    }
-
-    protected override async Task OnInitializedAsync()
-    {
         alert?.Clear();
+        // Load room categories and facilities
+        Categories = (await client.GetAllRoomCategory()).ToList();
+        Facilities = (await client.GetAllRoomFacility()).ToList();
+        categoriesId = model.CategoryId > 0 ? model.CategoryId : null;
+
+        // Convert existing image data to base64 string for preview
+        if (model.ImageFile != null && model.ImageFile.Length > 0)
+        {
+            imageDataUrl = $"data:image/png;base64,{Convert.ToBase64String(model.ImageFile)}";
+        }
+
+        var roomFacilitiesMap = await client.GetFacilitiesMappingByRoomId(model.Id);
+        SelectedFacilities.AddRange(roomFacilitiesMap.Select(o => o.FacilityId));
     }
 
     public async Task OnSave()
     {
         process = true;
         alert?.Clear();
-
+        model.CategoryId = categoriesId;
+        model.Category = Categories.Where(x => x.Id == categoriesId).Select(x => x.Name).First();
         var response = await client.UpsertRoomAsync(model);
         if (response.IsSuccess)
         {
+            if (response.Result.Id > 0)
+            {
+                if (RoomFacilitiesMap.ContainsKey(model.Id))
+                {
+                    RoomFacilitiesMap[model.Id] = SelectedFacilities.Select(id => id).ToList();
+                }
+                else
+                {
+                    RoomFacilitiesMap.Add(model.Id, SelectedFacilities.Select(id => id).ToList());
+                }
+
+                var result = await client.UpsertRoomFacilitiesMapping(RoomFacilitiesMap);
+            }
             // model = response.Result;
             alert?.SetSuccess(response.Message);
             await RoomGrid.RefreshGridAsync();
@@ -95,5 +217,20 @@
         show = false;
         process = false;
     }
+    private async Task HandleFileSelected(InputFileChangeEventArgs e)
+    {
+        var file = e.File;
+        if (file != null)
+        {
+            var buffer = new byte[file.Size];
+            await file.OpenReadStream().ReadAsync(buffer);
 
+            // Store the image data in the model
+            model.ImageFile = buffer;
+
+            // Convert the image to a data URL for preview
+            imageDataUrl = $"data:image/png;base64,{Convert.ToBase64String(buffer)}";
+        }
+    }
 }
+

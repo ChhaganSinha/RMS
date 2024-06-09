@@ -9,7 +9,8 @@ namespace RMS.Dto
 {
     public class Room : Auditable
     {
-        public string Category { get; set; } = string.Empty;
+        public int ? CategoryId { get; set; }
+        public string  Category { get; set; } = string.Empty;
         public string RoomNumber { get; set; } = string.Empty;
         public int NumberOfBed { get; set; }
         public string Facilities { get; set; } = string.Empty;
@@ -21,7 +22,7 @@ namespace RMS.Dto
         public bool ExtraCapacity { get; set; } 
         public bool IsActive { get; set; } 
         public string ImageName {  get; set; } = string.Empty;
-        [NotMapped]
-        public byte[] ImageFile { get; set; }
+      
+        public byte[] ? ImageFile { get; set; }
     }
 }
