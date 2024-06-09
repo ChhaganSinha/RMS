@@ -505,6 +505,43 @@ namespace RMS.Client.Client
             return details;
         }
 
+
+        public async Task<bool> UpsertHallFacilitiesMapping(Dictionary<int, List<int>> dict)
+        {
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/App/UpsertHallFacilitiesMapping", dict);
+                res.EnsureSuccessStatusCode();
+
+                return res.IsSuccessStatusCode;
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+        }
+
+        public async Task<List<HallFacilitiesMapping>> GetFacilitiesMappingByHallId(int id)
+        {
+            List<HallFacilitiesMapping> Trainingcampaign = new();
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/App/GetFacilitiesMappingByHallId/{id}");
+
+                res.EnsureSuccessStatusCode();
+
+                Trainingcampaign = await res.Content.ReadFromJsonAsync<List<HallFacilitiesMapping>>();
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+            return Trainingcampaign;
+        }
         public async Task<ApiResponse<HallFacilities>> UpsertHallFacilityAsync(HallFacilities data)
         {
             var result = new ApiResponse<HallFacilities>();
@@ -534,6 +571,88 @@ namespace RMS.Client.Client
                 var res = await HttpClient.PostAsJsonAsync($"api/App/DeleteHallFacility/{id}", new { });
                 res.EnsureSuccessStatusCode();
                 var json = await res.Content.ReadFromJsonAsync<ApiResponse<HallFacilities>>();
+                return json;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+
+
+
+        public async Task<Hall> GetHallById(int id)
+        {
+            Hall data = null;
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/App/Hall/{id}");
+
+                res.EnsureSuccessStatusCode();
+
+                data = await res.Content.ReadFromJsonAsync<Hall>();
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return data;
+        }
+        public async Task<IEnumerable<Hall>> GetAllHall()
+        {
+            IEnumerable<Hall> details = null;
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/App/all-hall");
+
+                res.EnsureSuccessStatusCode();
+
+                details = await res.Content.ReadFromJsonAsync<IEnumerable<Hall>>();
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return details;
+        }
+
+        public async Task<ApiResponse<Hall>> UpsertHallAsync(Hall data)
+        {
+            var result = new ApiResponse<Hall>();
+
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/App/UpsertHall", data);
+                res.EnsureSuccessStatusCode();
+                var json = await res.Content.ReadFromJsonAsync<ApiResponse<Hall>>();
+                return json;
+
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+
+
+        }
+        public async Task<ApiResponse<Hall>> DeleteHall(int id)
+        {
+            var result = new ApiResponse<Hall>();
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/App/DeleteHall/{id}", new { });
+                res.EnsureSuccessStatusCode();
+                var json = await res.Content.ReadFromJsonAsync<ApiResponse<Hall>>();
                 return json;
             }
             catch (Exception ex)
