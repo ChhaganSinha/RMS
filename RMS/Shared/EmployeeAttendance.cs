@@ -9,9 +9,11 @@ namespace RMS.Dto
 {
     public class EmployeeAttendance :BaseEntity
     {
-        [ForeignKey("Employee")]
+        //[ForeignKey("Employee")]
         public int EmployeeId { get; set; }
-        public virtual Employee Employee { get; set; }
+        public string EmployeeName { get; set; } = string.Empty;
+        public string EmpId { get; set; } = string.Empty;
+        //public virtual Employee Employee { get; set; }
         public DateOnly Date { get; set; }
         public TimeOnly CheckIn { get; set; }
         public TimeOnly CheckOut { get; set; }

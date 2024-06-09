@@ -805,16 +805,16 @@ namespace RMS.Repositories
                 var existingAttendance = AppDbCxt.EmployeeAttendance
                     .FirstOrDefault(o => o.EmployeeId == data.EmployeeId && o.Date == today);
 
-                if (existingAttendance != null)
+                if (existingAttendance.CheckIn != TimeOnly.MinValue)
                 {
                     result.IsSuccess = false;
                     result.Message = "Employee has already checked in today.";
                     return result;
                 }
 
-                data.Date = today;
-                data.CheckIn = TimeOnly.FromDateTime(DateTime.Now);
-                AppDbCxt.EmployeeAttendance.Update(data);
+                existingAttendance.Date = today;
+                existingAttendance.CheckIn = TimeOnly.FromDateTime(DateTime.Now);
+                AppDbCxt.EmployeeAttendance.Update(existingAttendance);
                 AppDbCxt.SaveChanges();
 
                 result.IsSuccess = true;

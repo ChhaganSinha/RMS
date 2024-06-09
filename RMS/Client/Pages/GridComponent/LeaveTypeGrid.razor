@@ -35,8 +35,8 @@ else
     {
 
         c.Add(o => o.Id).SetWidth("10%").Css("table-bordered").Titled("SN.").Filterable(filter);
-        c.Add(o => o.TypeName).SetWidth("80%").Css("table-bordered").Titled("Type Name").Filterable(filter);
-        c.Add(o => o.LeaveDays).SetWidth("80%").Css("table-bordered").Titled("Leave Days").Filterable(filter);
+        c.Add(o => o.TypeName).Css("table-bordered").Titled("Type Name").Filterable(filter);
+        c.Add(o => o.LeaveDays).Css("table-bordered").Titled("Leave Days").Filterable(filter);
 
         c.Add().Encoded(false).Sanitized(false).RenderComponentAs<LeaveTypeEditButton>().SetWidth("10px").Titled("Edit");
         c.Add().Encoded(false).Sanitized(false).RenderComponentAs<LeaveTypeDeleteButton>(new List<Action<object>> { RefreshGrid }).SetWidth("10px").Titled("Delete");

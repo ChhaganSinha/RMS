@@ -8,7 +8,9 @@
 @implements ICustomGridComponent<EmployeeAttendance>
 @inject NavigationManager NavigationManager
 
-<button class='btn btn-sm btn-danger' style="border-radius:15px" @onclick="MyClickHandler" title="Delete"><i class="fa fa-trash"></i></button>
+@if (Item.CheckOut == null)
+{
+<button class='btn btn-sm btn-danger' style="border-radius:15px" @onclick="MyClickHandler" title="Check Out"><i class="fa fa-sign-out"></i></button>
 <SimpleDailog Title="@Title" Show="@show" OnCloseDialog="ResetForm">
     @if (show)
     {
@@ -36,8 +38,12 @@
         }
         <br />
     }
-</SimpleDailog>
-
+    </SimpleDailog>
+}
+else
+{
+    <h6 class="text-danger">Checked Out</h6>
+}
 @code {
     [Parameter]
     public EmployeeAttendance Item { get; set; }

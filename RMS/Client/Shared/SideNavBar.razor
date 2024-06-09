@@ -26,7 +26,7 @@
                     <li class="nav-item">
                         <a href="/" class="nav-link" @onclick="ToggleDashboard" style="cursor:pointer">
                             <span class="pcoded-micon">
-                                <i class="feather icon-home"></i>
+                                <i class="fa fa-bar-chart"></i>
                             </span><span class="pcoded-mtext">Dashboard</span>
                         </a>
                     </li>       
@@ -46,7 +46,7 @@
                     <li class="nav-item pcoded-hasmenu @(IsHallExpanded ? "pcoded-trigger" : "")">
                         <a class="nav-link" @onclick="ToggleHall" style="cursor:pointer">
                             <span class="pcoded-micon">
-                                <i class="feather icon-layout"></i>
+                                <i class="fa fa-building"></i>
                             </span>
                             <span class="pcoded-mtext">Hall</span>
                         </a>
@@ -62,7 +62,7 @@
                     <li class="nav-item pcoded-hasmenu @(IsEmployeeExpanded ? "pcoded-trigger" : "")">
                         <a class="nav-link " @onclick="ToggleEmployee" style="cursor:pointer">
                             <span class="pcoded-micon">
-                                <i class="feather icon-layers"></i>
+                                <i class="fa fa-users"></i>
                             </span><span class="pcoded-mtext">Employees</span>
                         </a>
                         <ul class="pcoded-submenu @(IsEmployeeExpanded ? "d-block" : "d-none")">
@@ -75,21 +75,21 @@
                     <li class="nav-item pcoded-hasmenu @(IsAttendanceExpanded ? "pcoded-trigger" : "")">
                         <a class="nav-link " @onclick="ToggleAttendance" style="cursor:pointer">
                             <span class="pcoded-micon">
-                                <i class="feather icon-layers"></i>
+                                <i class="fa fa-address-card-o"></i>
                             </span><span class="pcoded-mtext">Attendance</span>
                         </a>
                         <ul class="pcoded-submenu @(IsAttendanceExpanded ? "d-block" : "d-none")">
                             <li><a href="attendance-list">Attendance List</a></li>
                             <li><a href="attendance-report">Report </a></li>
-                            <li><a href="leave">Leave</a></li>
-                            <li><a href="leave-form">Leave Form</a></li>
+                            <li><a href="leave">Leave Types</a></li>
+                            <li><a href="leave-form">Leave</a></li>
 
                         </ul>
                     </li>
                     <li class="nav-item pcoded-hasmenu @(IsPayrollExpanded ? "pcoded-trigger" : "")">
                         <a class="nav-link " @onclick="TogglePayroll" style="cursor:pointer">
                             <span class="pcoded-micon">
-                                <i class="feather icon-layers"></i>
+                                <i class="fa fa-usd"></i>
                             </span><span class="pcoded-mtext">Payroll</span>
                         </a>
                         <ul class="pcoded-submenu @(IsPayrollExpanded ? "d-block" : "d-none")">
@@ -105,7 +105,7 @@
                     <li class="nav-item pcoded-hasmenu @(IsProductExpanded ? "pcoded-trigger" : "")">
                         <a class="nav-link " @onclick="ToggleProduct" style="cursor:pointer">
                             <span class="pcoded-micon">
-                                <i class="feather icon-layers"></i>
+                                <i class="fa fa-cubes"></i>
                             </span><span class="pcoded-mtext">Product</span>
                         </a>
                         <ul class="pcoded-submenu @(IsProductExpanded ? "d-block" : "d-none")">
@@ -115,40 +115,33 @@
 
                         </ul>
                     </li>
-                    <li class="nav-item pcoded-hasmenu @(IsSupplierExpanded ? "pcoded-trigger" : "")">
-                        <a class="nav-link " @onclick="ToggleSupplier" style="cursor:pointer">
+
+                    <li class="nav-item">
+                        <a href="Suppliers" class="nav-link" @onclick="ToggleSupplier" style="cursor:pointer">
                             <span class="pcoded-micon">
-                                <i class="feather icon-layers"></i>
+                                <i class="fa fa-car"></i>
                             </span><span class="pcoded-mtext">Supplier</span>
                         </a>
-                        <ul class="pcoded-submenu @(IsSupplierExpanded ? "d-block" : "d-none")">
-                            <li><a href="Suppliers">Supplier List</a></li>
-                        </ul>
                     </li>
-                    <li class="nav-item pcoded-hasmenu @(IsPurchaseExpanded ? "pcoded-trigger" : "")">
-                        <a class="nav-link " @onclick="TogglePurchase" style="cursor:pointer">
+                    <li class="nav-item">
+                        <a href="Purchase" class="nav-link" @onclick="TogglePurchase" style="cursor:pointer">
                             <span class="pcoded-micon">
-                                <i class="feather icon-layers"></i>
+                                <i class="fa fa-shopping-cart"></i>
                             </span><span class="pcoded-mtext">Purchase</span>
                         </a>
-                        <ul class="pcoded-submenu @(IsPurchaseExpanded ? "d-block" : "d-none")">
-                            <li><a href="Purchase">Purchase List</a></li>
-                        </ul>
                     </li>
-                    <li class="nav-item pcoded-hasmenu @(IsDestroyedExpanded ? "pcoded-trigger" : "")">
-                        <a class="nav-link " @onclick="ToggleDestroyed" style="cursor:pointer">
+                    <li class="nav-item">
+                        <a href="Destroye-Products" class="nav-link" @onclick="ToggleDestroyed" style="cursor:pointer">
                             <span class="pcoded-micon">
-                                <i class="feather icon-layers"></i>
+                                <i class="fa fa-recycle"></i>
                             </span><span class="pcoded-mtext">Destroy Products</span>
                         </a>
-                        <ul class="pcoded-submenu @(IsDestroyedExpanded ? "d-block" : "d-none")">
-                            <li><a href="Destroye-Products">Destroy Product</a></li>
-                        </ul>
                     </li>
+          
                     <li class="nav-item">
                         <a href="Sale-Products" class="nav-link" @onclick="ToggleSaleProducts" style="cursor:pointer">
                             <span class="pcoded-micon">
-                                <i class="feather icon-home"></i>
+                                <i class="fa fa-life-ring"></i>
                             </span><span class="pcoded-mtext">Sale Products</span>
                         </a>
                     </li>

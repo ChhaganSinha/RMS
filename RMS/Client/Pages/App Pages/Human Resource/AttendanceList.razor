@@ -49,7 +49,19 @@
         <EditForm Model="model" OnValidSubmit="OnSave">
             <DataAnnotationsValidator />
             <div>
-                
+                <HxSelect TItem="Employee"
+                          TValue="int?"
+                          Data="employees"
+                          @bind-Value="employeeId"
+                          TextSelector="@(employee => employee.Name)"
+                          ValueSelector="@(employee => employee.Id)"
+                          Nullable="true"
+                          NullText="-select employee-"
+                          NullDataText="Loading employees..." />
+                @if (employeeId == null && submit)
+                {
+                    <p class="text-danger">Please select employee</p>
+                }
             </div>
             @if (process)
             {
@@ -58,7 +70,7 @@
                 </div>
             }
             <hr />
-            <button type="submit" class="btn btn-primary float-right col-md-4">Add</button>
+            <button type="submit" class="btn btn-primary float-right col-md-4">CheckIn</button>
         </EditForm>
         <br />
     }
@@ -74,12 +86,13 @@
     EmployeeAttendance model = new();
     public string Title = "Check In";
     bool show = false;
+    bool submit = false;
     bool process = false;
     private Timer _timer;
     private int _delay = 2500;
 
     public List<Employee> employees = new();
-
+    private int? employeeId;
 
     protected override async Task OnInitializedAsync()
     {
@@ -89,9 +102,14 @@
 
     public async Task OnSave()
     {
+        submit = true;
+        if (employeeId == null)
+            return;
+
+        submit = false;
         process = true;
         alert?.Clear();
-
+        model.EmployeeId = employeeId ?? 0;
         var response = await client.EmployeeCheckInAsync(model);
         if (response.IsSuccess)
         {

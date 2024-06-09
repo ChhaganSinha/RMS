@@ -1,15 +1,13 @@
 ﻿@page "/leave-form"
+@attribute [Authorize]
 
 @using RMS.Client.Client
 @using RMS.Client.Pages.GridComponent
 @using RMS.Client.Shared.Popup
+@using RMS.Dto
 @inject AppClient client
 @inject IJSRuntime JSRuntime
-@inject NavigationManager NavigationManager
-@using Havit.Blazor.Components.Web
-@using Havit.Blazor.Components.Web.Bootstrap
 @using System.ComponentModel.DataAnnotations;
-@attribute [Authorize]
 
 <div class="page-header breadcumb-sticky">
     <div class="page-block">
@@ -17,8 +15,8 @@
             <div class="col-md-12">
                 <div class="page-header-title">
                     <h5 class="m-b-10">
-                        Room
-                        <a @onclick="()=>show=true" style="cursor:pointer"><i class="fa fa-plus-circle fa-lg text-primary" aria-hidden="true" title="Add Room"></i></a>
+                        Leave
+                        <a @onclick="()=>show=true" style="cursor:pointer"><i class="fa fa-plus-circle fa-lg text-primary" aria-hidden="true" title="Add Leave"></i></a>
                     </h5>
                 </div>
                 <ul class="breadcrumb">
@@ -31,6 +29,7 @@
         </div>
     </div>
 </div>
+
 <div class="row">
     <div class="col-sm-12 p-0">
         <div class="card-body p-2 mt-n3">
@@ -42,47 +41,48 @@
 <PageDialog Title="@Title" Show="@show" ClosePageDialog="ResetForm">
     @if (show)
     {
-
         <UiAlert Model="alert"></UiAlert>
         <EditForm Model="model" OnValidSubmit="OnSave">
             <DataAnnotationsValidator />
-           
+
             <div class="form-group row">
                 <div class="col-md-6">
                     <label class="col-form-label bold-font">Select Employee</label>
                     <select @bind="model.EmployeeName" class="form-control" id="name">
-                        <option>- Select -</option>
-                        @foreach (var val in Employees)
+                        <option value="">- Select -</option>
+                        @foreach (var emp in Employees)
                         {
-                            <option value="@val.Id">@val.Name</option>
+                            <option value="@emp.Id">@emp.Name</option>
                         }
                     </select>
                     <ValidationMessage For="() => model.EmployeeName" />
                 </div>
                 <div class="col-md-6">
-                    <label class="col-form-label bold-font">Select LeaveType</label>
+                    <label class="col-form-label bold-font">Select Leave Type</label>
                     <select @bind="model.LeaveType" class="form-control" id="LeaveType">
-                        <option>- Select -</option>
-                        @foreach (var val in LeaveTypes)
+                        <option value="">- Select -</option>
+                        @foreach (var leaveType in LeaveTypes)
                         {
-                            <option value="@val.Id">@val.TypeName</option>
+                            <option value="@leaveType.Id">@leaveType.TypeName</option>
                         }
                     </select>
                     <ValidationMessage For="() => model.LeaveType" />
                 </div>
             </div>
+
             <div class="form-group row">
                 <div class="col-md-6">
                     <label class="col-form-label bold-font required-field">Application Start Date</label>
-                    <InputDate @bind-Value="@model.ApplicationStartDate" id="ApplicationStartDate" class="form-control"></InputDate>
+                    <InputDate @bind-Value="@model.ApplicationStartDate" id="ApplicationStartDate" class="form-control" @oninput="CalculateApplyDays"></InputDate>
                     <ValidationMessage For="() => model.ApplicationStartDate" />
                 </div>
                 <div class="col-md-6">
                     <label class="col-form-label bold-font">Application End Date</label>
-                    <InputDate @bind-Value="@model.ApplicationEndDate" id="ApplicationEndDate" class="form-control"></InputDate>
+                    <InputDate @bind-Value="@model.ApplicationEndDate" id="ApplicationEndDate" class="form-control" @oninput="CalculateApplyDays"></InputDate>
                     <ValidationMessage For="() => model.ApplicationEndDate" />
                 </div>
             </div>
+
             <div class="form-group row">
                 <div class="col-md-6">
                     <label class="col-form-label bold-font required-field">Apply Days</label>
@@ -91,23 +91,28 @@
                 </div>
                 <div class="col-md-6">
                     <label class="col-form-label bold-font">Application Hard Copy</label>
-                    <InputDate @bind-Value="@model.ApplicationEndDate" id="ApplicationEndDate" class="form-control"></InputDate>
-                    <ValidationMessage For="() => model.ApplicationEndDate" />
+                    <InputFile OnChange="HandleFileSelection" />
+                    <ValidationMessage For="() => model.ApplicationHardCopy" />
+                    @if (!string.IsNullOrWhiteSpace(model.ApplicationHardCopy))
+                    {
+                        <img src="data:image;base64,@(Convert.ToBase64String(model.ApplicationHardCopyByteData))" style="max-width: 100%; max-height: 200px;" />
+                    }
                 </div>
             </div>
 
             <div class="form-group row">
                 <div class="col-md-6">
                     <label class="col-form-label bold-font required-field">Approve Start Date</label>
-                    <InputDate @bind-Value="@model.ApproveStartDate" id="ApproveStartDate" class="form-control"></InputDate>
+                    <InputDate @bind-Value="@model.ApproveStartDate" id="ApproveStartDate" class="form-control" @oninput="CalculateApproveDays"></InputDate>
                     <ValidationMessage For="() => model.ApproveStartDate" />
                 </div>
                 <div class="col-md-6">
                     <label class="col-form-label bold-font">Approve End Date</label>
-                    <InputDate @bind-Value="@model.ApproveEndDate" id="ApproveEndDate" class="form-control"></InputDate>
+                    <InputDate @bind-Value="@model.ApproveEndDate" id="ApproveEndDate" class="form-control" @oninput="CalculateApproveDays"></InputDate>
                     <ValidationMessage For="() => model.ApproveEndDate" />
                 </div>
             </div>
+
             <div class="form-group row">
                 <div class="col-md-6">
                     <label class="col-form-label bold-font required-field">Approve Days</label>
@@ -127,6 +132,7 @@
                     <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
                 </div>
             }
+
             <hr style="margin-bottom: 2px;" />
             <button type="submit" class="btn btn-primary float-right col-md-4">Add</button>
         </EditForm>
@@ -151,12 +157,61 @@
     private List<LeaveType> LeaveTypes = new();
     private List<Employee> Employees = new();
 
-
     protected override async Task OnInitializedAsync()
     {
         alert?.Clear();
         LeaveTypes = (await client.GetAllLeaveType()).ToList();
         Employees = (await client.GetAllEmployee()).ToList();
+    }
+
+    private void CalculateApplyDays()
+    {
+        if (model.ApplicationStartDate != default && model.ApplicationEndDate != default)
+        {
+            if (model.ApplicationStartDate <= model.ApplicationEndDate)
+            {
+                model.ApplyDaysCount = (model.ApplicationEndDate - model.ApplicationStartDate).Days + 1;
+            }
+            else
+            {
+                model.ApplyDaysCount = 0;
+            }
+        }
+        else
+        {
+            model.ApplyDaysCount = 0;
+        }
+    }
+
+    private void CalculateApproveDays()
+    {
+        if (model.ApproveStartDate != default && model.ApproveEndDate != default)
+        {
+            if (model.ApproveStartDate <= model.ApproveEndDate)
+            {
+                model.ApproveDaysCount = (model.ApproveEndDate - model.ApproveStartDate).Days + 1;
+            }
+            else
+            {
+                model.ApproveDaysCount = 0;
+            }
+        }
+        else
+        {
+            model.ApproveDaysCount = 0;
+        }
+    }
+
+    private async Task HandleFileSelection(InputFileChangeEventArgs e)
+    {
+        var file = e.File;
+        if (file != null)
+        {
+            using var memoryStream = new MemoryStream();
+            await file.OpenReadStream().CopyToAsync(memoryStream);
+            model.ApplicationHardCopyByteData = memoryStream.ToArray();
+            model.ApplicationHardCopy = file.Name;
+        }
     }
 
     public async Task OnSave()
@@ -167,14 +222,14 @@
         var response = await client.UpsertLeaveAsync(model);
         if (response.IsSuccess)
         {
-
-            // model = response.Result;
             alert?.SetSuccess(response.Message);
-            model = new();
-            await RoomGrid.RefreshGridAsync();
+            model = new Leave(); // Reset form after successful save
+            await LeaveGrid.RefreshGridAsync(); // Refresh the grid where necessary
         }
         else
+        {
             alert?.SetError(response.Message);
+        }
 
         process = false;
         StateHasChanged();
@@ -190,13 +245,7 @@
 
     private void ResetForm()
     {
-        model = new();
+        model = new Leave();
         show = false;
-        process = false;
-    }
-
-    public void OnClose()
-    {
-        model = new();
     }
 }

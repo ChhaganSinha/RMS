@@ -16,8 +16,8 @@
             <div class="col-md-12">
                 <div class="page-header-title">
                     <h5 class="m-b-10">
-                        Room
-                        <a @onclick="()=>show=true" style="cursor:pointer"><i class="fa fa-plus-circle fa-lg text-primary" aria-hidden="true" title="Add Room"></i></a>
+                        Employee
+                        <a @onclick="()=>show=true" style="cursor:pointer"><i class="fa fa-plus-circle fa-lg text-primary" aria-hidden="true" title="Add Employee"></i></a>
                     </h5>
                 </div>
                 <ul class="breadcrumb">
@@ -202,7 +202,7 @@
             model = new();
             departmentId = null;
             designationId = null;
-            await RoomGrid.RefreshGridAsync();
+            await EmployeesGrid.RefreshGridAsync();
         }
         else
             alert?.SetError(response.Message);

@@ -797,11 +797,25 @@ namespace RMS.Client.Client
 
             try
             {
-                var res = await HttpClient.PostAsJsonAsync($"api/App/EmployeeCheckIn", data);
-                res.EnsureSuccessStatusCode();
-                var json = await res.Content.ReadFromJsonAsync<ApiResponse<EmployeeAttendance>>();
-                return json;
+                var jsonOptions = new JsonSerializerOptions
+                {
+                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                    Converters =
+            {
+                new DateOnlyJsonConverter(),
+                new TimeOnlyJsonConverter()
+            }
+                };
 
+                var jsonContent = JsonSerializer.Serialize(data, jsonOptions);
+                var content = new StringContent(jsonContent, System.Text.Encoding.UTF8, "application/json");
+
+                var res = await HttpClient.PostAsync("api/App/EmployeeCheckIn", content);
+                res.EnsureSuccessStatusCode();
+
+                var jsonResponse = await res.Content.ReadAsStringAsync();
+                var json = JsonSerializer.Deserialize<ApiResponse<EmployeeAttendance>>(jsonResponse, jsonOptions);
+                return json;
             }
             catch (Exception ex)
             {
@@ -810,17 +824,32 @@ namespace RMS.Client.Client
                 return result;
             }
         }
+
         public async Task<ApiResponse<EmployeeAttendance>> EmployeeCheckOutAsync(EmployeeAttendance data)
         {
             var result = new ApiResponse<EmployeeAttendance>();
 
             try
             {
-                var res = await HttpClient.PostAsJsonAsync($"api/App/EmployeeCheckOut", data);
-                res.EnsureSuccessStatusCode();
-                var json = await res.Content.ReadFromJsonAsync<ApiResponse<EmployeeAttendance>>();
-                return json;
+                var jsonOptions = new JsonSerializerOptions
+                {
+                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                    Converters =
+            {
+                new DateOnlyJsonConverter(),
+                new TimeOnlyJsonConverter()
+            }
+                };
 
+                var jsonContent = JsonSerializer.Serialize(data, jsonOptions);
+                var content = new StringContent(jsonContent, System.Text.Encoding.UTF8, "application/json");
+
+                var res = await HttpClient.PostAsync("api/App/EmployeeCheckOut", content);
+                res.EnsureSuccessStatusCode();
+
+                var jsonResponse = await res.Content.ReadAsStringAsync();
+                var json = JsonSerializer.Deserialize<ApiResponse<EmployeeAttendance>>(jsonResponse, jsonOptions);
+                return json;
             }
             catch (Exception ex)
             {
@@ -829,6 +858,7 @@ namespace RMS.Client.Client
                 return result;
             }
         }
+
 
         public async Task<ApiResponse<EmployeeAttendance>> UpdateEmployeeAttendance(EmployeeAttendance data)
         {

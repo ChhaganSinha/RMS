@@ -390,12 +390,15 @@ namespace RMS.Server.Controllers.Api
         {
             return await _appRepository.GetLeaveById(id);
         }
+
+
         [HttpPost]
         [Route("UpsertLeave")]
         public async Task<ApiResponse<Leave>> UpsertLeaveAsync(Leave data)
         {
             return await _appRepository.UpsertLeaveAsync(data);
         }
+
         [HttpGet]
         [Route("all-Leave")]
         public async Task<IEnumerable<Leave>> GetAllLeave()

@@ -6,7 +6,7 @@
 @using RMS.Client.Client
 @using RMS.Client.Shared.Popup
 @inject AppClient client
-@implements ICustomGridComponent<Room>
+@implements ICustomGridComponent<Employee>
 @inject NavigationManager NavigationManager
 
 <button class='btn btn-sm btn-danger' style="border-radius:15px" @onclick="MyClickHandler" title="Delete"><i class="fa fa-trash"></i></button>
@@ -40,10 +40,10 @@
 
 @code {
     [Parameter]
-    public Room Item { get; set; }
+    public Employee Item { get; set; }
 
     [Parameter]
-    public CGrid<Room> Grid { get; set; }
+    public CGrid<Employee> Grid { get; set; }
 
     [Parameter]
     public IList<Action<object>> Actions { get; set; }
@@ -52,12 +52,12 @@
     bool process = false;
     bool TaskCompleted = false;
     string MessageBody = string.Empty;
-    string Title = "Delete Room";
+    string Title = "Delete Employee";
 
     private async void Delete()
     {
         process = true;
-        var responce = await client.DeleteRoom(Item.Id);
+        var responce = await client.DeleteEmployee(Item.Id);
         if (responce.IsSuccess == true)
         {
             MessageBody = responce.Message;

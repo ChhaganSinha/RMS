@@ -37,10 +37,10 @@ namespace RMS.DataContext
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Entity<EmployeeAttendance>()
-                .HasOne(ea => ea.Employee)
-                .WithMany()
-                .HasForeignKey(ea => ea.EmployeeId);
+            //modelBuilder.Entity<EmployeeAttendance>()
+            //    .HasOne(ea => ea.Employee)
+            //    .WithMany()
+            //    .HasForeignKey(ea => ea.EmployeeId);
         }
     }
 }

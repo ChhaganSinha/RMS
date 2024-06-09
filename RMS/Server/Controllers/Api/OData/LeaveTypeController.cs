@@ -9,11 +9,11 @@ using RMS.Server.Intrastructure.ActionFilters;
 
 namespace RMS.Server.Controllers.Api.OData
 {
-    public class EmployeesController : ODataController
+    public class LeaveTypeController : ODataController
     {
-        public ILogger<EmployeesController> Logger { get; }
+        public ILogger<LeaveTypeController> Logger { get; }
         public AppDbContext DbContext { get; }
-        public EmployeesController(ILogger<EmployeesController> logger, AppDbContext dbContext)
+        public LeaveTypeController(ILogger<LeaveTypeController> logger, AppDbContext dbContext)
         {
             Logger = logger;
             DbContext = dbContext;
@@ -21,9 +21,9 @@ namespace RMS.Server.Controllers.Api.OData
 
         [EnableQuery]
         [ODataAuthorize]
-        public IQueryable<Employee> Get()
+        public IQueryable<LeaveType> Get()
         {
-            var data = DbContext.Employee.AsQueryable();
+            var data = DbContext.LeaveType.AsQueryable();
             return data;
         }
     }

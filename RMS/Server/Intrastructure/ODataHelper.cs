@@ -40,7 +40,10 @@ namespace RMS.Server.Intrastructure
             builder.EntitySet<EmployeeDesignation>("EmployeeDesignation");
             builder.EntitySet<EmployeeDepartment>("EmployeeDepartment");
             builder.EntitySet<Employee>("Employee");
+            builder.EntitySet<EmployeeAttendance>("EmployeeAttendance");
             builder.EntitySet<EmployeePayroll>("EmployeePayroll");
+            builder.EntitySet<Leave>("Leave");
+            builder.EntitySet<LeaveType>("LeaveType");
 
             return builder.GetEdmModel();
         }
