@@ -8,6 +8,7 @@
 @inject AppClient client
 @inject IJSRuntime JSRuntime
 @using System.ComponentModel.DataAnnotations;
+@inject AuthenticationStateProvider AuthenticationStateProvider
 
 <div class="page-header breadcumb-sticky">
     <div class="page-block">
@@ -73,7 +74,7 @@
             <div class="form-group row">
                 <div class="col-md-6">
                     <label class="col-form-label bold-font required-field">Application Start Date</label>
-                    <InputDate @bind-Value="@model.ApplicationStartDate" id="ApplicationStartDate" class="form-control" @oninput="CalculateApplyDays"></InputDate>
+                    <InputDate @bind-Value="@model.ApplicationStartDate" id="ApplicationStartDate" class="form-control" @onchange="CalculateApplyDays"></InputDate>
                     <ValidationMessage For="() => model.ApplicationStartDate" />
                 </div>
                 <div class="col-md-6">
@@ -157,20 +158,26 @@
     private List<LeaveType> LeaveTypes = new();
     private List<Employee> Employees = new();
 
+    private AuthenticationState authState;
+
     protected override async Task OnInitializedAsync()
     {
         alert?.Clear();
         LeaveTypes = (await client.GetAllLeaveType()).ToList();
         Employees = (await client.GetAllEmployee()).ToList();
+        authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        if (Id == 0)
+            model.ApprovedBy = authState.User.Identity.Name;
     }
 
     private void CalculateApplyDays()
     {
+       
         if (model.ApplicationStartDate != default && model.ApplicationEndDate != default)
         {
             if (model.ApplicationStartDate <= model.ApplicationEndDate)
             {
-                model.ApplyDaysCount = (model.ApplicationEndDate - model.ApplicationStartDate).Days + 1;
+                model.ApplyDaysCount = (model.ApplicationEndDate - model.ApplicationStartDate).Days+1;
             }
             else
             {
@@ -181,6 +188,7 @@
         {
             model.ApplyDaysCount = 0;
         }
+        StateHasChanged();
     }
 
     private void CalculateApproveDays()
@@ -200,6 +208,7 @@
         {
             model.ApproveDaysCount = 0;
         }
+        StateHasChanged();
     }
 
     private async Task HandleFileSelection(InputFileChangeEventArgs e)
