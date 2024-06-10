@@ -503,11 +503,15 @@ namespace RMS.Server.Controllers.Api
 
 
 
-        [HttpGet]
-        [Route("DestroyedProducts/{id}")]
-        public async Task<DestroyedProducts> GetDestroyedProductsById(int id)
+        [HttpGet("DestroyedProducts/{id}")]
+        public async Task<ActionResult<DestroyedProducts>> GetDestroyedProductsById(int id)
         {
-            return await _appRepository.GetDestroyedProductsById(id);
+            var destroyedProduct = await _appRepository.GetDestroyedProductsById(id);
+            if (destroyedProduct == null)
+            {
+                return NotFound();
+            }
+            return Ok(destroyedProduct);
         }
 
         [HttpGet]

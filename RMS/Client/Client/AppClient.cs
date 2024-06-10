@@ -1552,7 +1552,6 @@ namespace RMS.Client.Client
                 res.EnsureSuccessStatusCode();
 
                 data = await res.Content.ReadFromJsonAsync<DestroyedProducts>();
-
             }
             catch (Exception ex)
             {

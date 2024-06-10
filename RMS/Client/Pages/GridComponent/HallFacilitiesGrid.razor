@@ -35,7 +35,7 @@ else
     {
 
         c.Add(o => o.Id).SetWidth("10%").Css("table-bordered").Titled("SN.").Filterable(filter);
-        c.Add(o => o.Name).SetWidth("80%").Css("table-bordered").Titled("HallCategories Name").Filterable(filter);
+        c.Add(o => o.Name).SetWidth("80%").Css("table-bordered").Titled("Hall Facility Name").Filterable(filter);
 
         c.Add().Encoded(false).Sanitized(false).RenderComponentAs<HallFacilitiesEditButton>().SetWidth("10px").Titled("Edit");
         c.Add().Encoded(false).Sanitized(false).RenderComponentAs<HallFacilitiesDeleteButton>(new List<Action<object>> { RefreshGrid }).SetWidth("10px").Titled("Delete");
