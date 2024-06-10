@@ -1244,5 +1244,795 @@ namespace RMS.Repositories
             }
         }
         #endregion
+
+
+
+        #region Product Section
+        public async Task<ProductCategories> GetProductCategoryById(int id)
+        {
+            ProductCategories result = null;
+
+#pragma warning disable CS8600
+            result = AppDbCxt.ProductCategories.FirstOrDefault(o => o.Id == id);
+#pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
+
+            return await Task.FromResult(result);
+        }
+
+        public async Task<IEnumerable<ProductCategories>> GetAllProductCategory()
+        {
+            IEnumerable<ProductCategories> result = null;
+
+            result = AppDbCxt.ProductCategories.ToList();
+            return result;
+        }
+        public async Task<ApiResponse<ProductCategories>> UpsertProductCategory(ProductCategories data)
+        {
+            var result = new ApiResponse<ProductCategories>();
+            try
+            {
+
+                if (data == null)
+                {
+                    result.IsSuccess = true;
+                    result.Message = "Invalid Product Categories data!";
+                    return result;
+                }
+
+                if (data.Id > 0)
+                {
+                    AppDbCxt.ProductCategories.Update(data);
+                    result.Message = "Data Successfully Updated.";
+                }
+                else
+                {
+                    AppDbCxt.ProductCategories.Add(data);
+                    result.Message = "Data Successfully Inserted.";
+                }
+
+                AppDbCxt.SaveChanges();
+                result.IsSuccess = true;
+                result.Result = data;
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+
+        public async Task<ApiResponse<ProductCategories>> DeleteProductCategory(int id)
+        {
+            var result = new ApiResponse<ProductCategories>();
+            try
+            {
+                var existing = AppDbCxt.ProductCategories.First(x => x.Id == id);
+                result.Result = existing;
+                if (existing == null)
+                {
+                    result.IsSuccess = true;
+                    result.Message = "Product Category not found!";
+                    return result;
+                }
+
+                AppDbCxt.ProductCategories.Remove(existing);
+                await AppDbCxt.SaveChangesAsync();
+                result.IsSuccess = true;
+                result.Message = "Successfully Deleted!";
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+
+
+
+
+        public async Task<UnitNames> GetUnitNamesById(int id)
+        {
+            UnitNames result = null;
+
+#pragma warning disable CS8600
+            result = AppDbCxt.UnitNames.FirstOrDefault(o => o.Id == id);
+#pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
+
+            return await Task.FromResult(result);
+        }
+
+        public async Task<IEnumerable<UnitNames>> GetAllUnitNames()
+        {
+            IEnumerable<UnitNames> result = null;
+
+            result = AppDbCxt.UnitNames.ToList();
+            return result;
+        }
+        public async Task<ApiResponse<UnitNames>> UpsertUnitNames(UnitNames data)
+        {
+            var result = new ApiResponse<UnitNames>();
+            try
+            {
+
+                if (data == null)
+                {
+                    result.IsSuccess = true;
+                    result.Message = "Invalid Unit Names data!";
+                    return result;
+                }
+
+                if (data.Id > 0)
+                {
+                    AppDbCxt.UnitNames.Update(data);
+                    result.Message = "Data Successfully Updated.";
+                }
+                else
+                {
+                    AppDbCxt.UnitNames.Add(data);
+                    result.Message = "Data Successfully Inserted.";
+                }
+
+                AppDbCxt.SaveChanges();
+                result.IsSuccess = true;
+                result.Result = data;
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+
+        public async Task<ApiResponse<UnitNames>> DeleteUnitNames(int id)
+        {
+            var result = new ApiResponse<UnitNames>();
+            try
+            {
+                var existing = AppDbCxt.UnitNames.First(x => x.Id == id);
+                result.Result = existing;
+                if (existing == null)
+                {
+                    result.IsSuccess = true;
+                    result.Message = "Unit Names not found!";
+                    return result;
+                }
+
+                AppDbCxt.UnitNames.Remove(existing);
+                await AppDbCxt.SaveChangesAsync();
+                result.IsSuccess = true;
+                result.Message = "Successfully Deleted!";
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+
+
+
+        public async Task<ProductList> GetProductListById(int id)
+        {
+            ProductList result = null;
+
+#pragma warning disable CS8600
+            result = AppDbCxt.ProductList.FirstOrDefault(o => o.Id == id);
+#pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
+
+            return await Task.FromResult(result);
+        }
+
+        public async Task<IEnumerable<ProductList>> GetAllProductList()
+        {
+            IEnumerable<ProductList> result = null;
+
+            result = AppDbCxt.ProductList.ToList();
+            return result;
+        }
+        public async Task<ApiResponse<ProductList>> UpsertProductList(ProductList data)
+        {
+            var result = new ApiResponse<ProductList>();
+            try
+            {
+
+                if (data == null)
+                {
+                    result.IsSuccess = true;
+                    result.Message = "Invalid Product List data!";
+                    return result;
+                }
+
+                if (data.Id > 0)
+                {
+                    AppDbCxt.ProductList.Update(data);
+                    result.Message = "Data Successfully Updated.";
+                }
+                else
+                {
+                    AppDbCxt.ProductList.Add(data);
+                    result.Message = "Data Successfully Inserted.";
+                }
+
+                AppDbCxt.SaveChanges();
+                result.IsSuccess = true;
+                result.Result = data;
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+
+        public async Task<ApiResponse<ProductList>> DeleteProductList(int id)
+        {
+            var result = new ApiResponse<ProductList>();
+            try
+            {
+                var existing = AppDbCxt.ProductList.First(x => x.Id == id);
+                result.Result = existing;
+                if (existing == null)
+                {
+                    result.IsSuccess = true;
+                    result.Message = "Produc tList not found!";
+                    return result;
+                }
+
+                AppDbCxt.ProductList.Remove(existing);
+                await AppDbCxt.SaveChangesAsync();
+                result.IsSuccess = true;
+                result.Message = "Successfully Deleted!";
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+
+
+
+
+        public async Task<SupplierList> GetSupplierListById(int id)
+        {
+            SupplierList result = null;
+
+#pragma warning disable CS8600
+            result = AppDbCxt.SupplierList.FirstOrDefault(o => o.Id == id);
+#pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
+
+            return await Task.FromResult(result);
+        }
+
+        public async Task<IEnumerable<SupplierList>> GetAllSupplierList()
+        {
+            IEnumerable<SupplierList> result = null;
+
+            result = AppDbCxt.SupplierList.ToList();
+            return result;
+        }
+        public async Task<ApiResponse<SupplierList>> UpsertSupplierList(SupplierList data)
+        {
+            var result = new ApiResponse<SupplierList>();
+            try
+            {
+
+                if (data == null)
+                {
+                    result.IsSuccess = true;
+                    result.Message = "Invalid Supplier List data!";
+                    return result;
+                }
+
+                if (data.Id > 0)
+                {
+                    AppDbCxt.SupplierList.Update(data);
+                    result.Message = "Data Successfully Updated.";
+                }
+                else
+                {
+                    AppDbCxt.SupplierList.Add(data);
+                    result.Message = "Data Successfully Inserted.";
+                }
+
+                AppDbCxt.SaveChanges();
+                result.IsSuccess = true;
+                result.Result = data;
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+
+        public async Task<ApiResponse<SupplierList>> DeleteSupplierList(int id)
+        {
+            var result = new ApiResponse<SupplierList>();
+            try
+            {
+                var existing = AppDbCxt.SupplierList.First(x => x.Id == id);
+                result.Result = existing;
+                if (existing == null)
+                {
+                    result.IsSuccess = true;
+                    result.Message = "Supplier List not found!";
+                    return result;
+                }
+
+                AppDbCxt.SupplierList.Remove(existing);
+                await AppDbCxt.SaveChangesAsync();
+                result.IsSuccess = true;
+                result.Message = "Successfully Deleted!";
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+
+
+
+
+
+
+
+        public async Task<DestroyedProducts> GetDestroyedProductsById(int id)
+        {
+            DestroyedProducts result = null;
+
+#pragma warning disable CS8600
+            result = AppDbCxt.DestroyedProducts.FirstOrDefault(o => o.Id == id);
+#pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
+
+            return await Task.FromResult(result);
+        }
+
+        public async Task<IEnumerable<DestroyedProducts>> GetAllDestroyedProducts()
+        {
+            IEnumerable<DestroyedProducts> result = null;
+
+            result = AppDbCxt.DestroyedProducts.ToList();
+            return result;
+        }
+        public async Task<ApiResponse<DestroyedProducts>> UpsertDestroyedProducts(DestroyedProducts data)
+        {
+            var result = new ApiResponse<DestroyedProducts>();
+            try
+            {
+
+                if (data == null)
+                {
+                    result.IsSuccess = true;
+                    result.Message = "Invalid Destroyed Products data!";
+                    return result;
+                }
+
+                if (data.Id > 0)
+                {
+                    AppDbCxt.DestroyedProducts.Update(data);
+                    result.Message = "Data Successfully Updated.";
+                }
+                else
+                {
+                    AppDbCxt.DestroyedProducts.Add(data);
+                    result.Message = "Data Successfully Inserted.";
+                }
+
+                AppDbCxt.SaveChanges();
+                result.IsSuccess = true;
+                result.Result = data;
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+
+        public async Task<ApiResponse<DestroyedProducts>> DeleteDestroyedProducts(int id)
+        {
+            var result = new ApiResponse<DestroyedProducts>();
+            try
+            {
+                var existing = AppDbCxt.DestroyedProducts.First(x => x.Id == id);
+                result.Result = existing;
+                if (existing == null)
+                {
+                    result.IsSuccess = true;
+                    result.Message = "DestroyedProducts not found!";
+                    return result;
+                }
+
+                AppDbCxt.DestroyedProducts.Remove(existing);
+                await AppDbCxt.SaveChangesAsync();
+                result.IsSuccess = true;
+                result.Message = "Successfully Deleted!";
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+
+
+
+
+        public async Task<SaleProducts> GetSaleProductsById(int id)
+        {
+            SaleProducts result = null;
+
+#pragma warning disable CS8600
+            result = AppDbCxt.SaleProducts.FirstOrDefault(o => o.Id == id);
+#pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
+
+            return await Task.FromResult(result);
+        }
+
+        public async Task<IEnumerable<SaleProducts>> GetAllSaleProducts()
+        {
+            IEnumerable<SaleProducts> result = null;
+
+            result = AppDbCxt.SaleProducts.ToList();
+            return result;
+        }
+        public async Task<ApiResponse<SaleProducts>> UpsertSaleProducts(SaleProducts data)
+        {
+            var result = new ApiResponse<SaleProducts>();
+            try
+            {
+
+                if (data == null)
+                {
+                    result.IsSuccess = true;
+                    result.Message = "Invalid Sale Products data!";
+                    return result;
+                }
+
+                if (data.Id > 0)
+                {
+                    AppDbCxt.SaleProducts.Update(data);
+                    result.Message = "Data Successfully Updated.";
+                }
+                else
+                {
+                    AppDbCxt.SaleProducts.Add(data);
+                    result.Message = "Data Successfully Inserted.";
+                }
+
+                AppDbCxt.SaveChanges();
+                result.IsSuccess = true;
+                result.Result = data;
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+
+        public async Task<ApiResponse<SaleProducts>> DeleteSaleProducts(int id)
+        {
+            var result = new ApiResponse<SaleProducts>();
+            try
+            {
+                var existing = AppDbCxt.SaleProducts.First(x => x.Id == id);
+                result.Result = existing;
+                if (existing == null)
+                {
+                    result.IsSuccess = true;
+                    result.Message = "Sale Products not found!";
+                    return result;
+                }
+
+                AppDbCxt.SaleProducts.Remove(existing);
+                await AppDbCxt.SaveChangesAsync();
+                result.IsSuccess = true;
+                result.Message = "Successfully Deleted!";
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+
+
+
+
+
+        public async Task<PurchaseItem> GetPurchaseItemById(int id)
+        {
+            PurchaseItem result = null;
+
+#pragma warning disable CS8600
+            result = AppDbCxt.PurchaseItem.Include(o=>o.Items).FirstOrDefault(o => o.Id == id);
+#pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
+
+            return await Task.FromResult(result);
+        }
+
+        public async Task<IEnumerable<PurchaseItem>> GetAllPurchaseItem()
+        {
+            IEnumerable<PurchaseItem> result = null;
+
+            result = AppDbCxt.PurchaseItem.ToList();
+            return result;
+        }
+        public async Task<ApiResponse<PurchaseItem>> UpsertPurchaseItem(PurchaseItem data)
+        {
+            var result = new ApiResponse<PurchaseItem>();
+            try
+            {
+
+                if (data == null)
+                {
+                    result.IsSuccess = true;
+                    result.Message = "Invalid PurchaseItem data!";
+                    return result;
+                }
+
+                if (data.Id > 0)
+                {
+                    AppDbCxt.PurchaseItem.Update(data);
+                    result.Message = "Data Successfully Updated.";
+                }
+                else
+                {
+                    AppDbCxt.PurchaseItem.Add(data);
+                    result.Message = "Data Successfully Inserted.";
+                }
+
+                AppDbCxt.SaveChanges();
+                result.IsSuccess = true;
+                result.Result = data;
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+
+        public async Task<ApiResponse<PurchaseItem>> DeletePurchaseItem(int id)
+        {
+            var result = new ApiResponse<PurchaseItem>();
+            try
+            {
+                var existing = AppDbCxt.PurchaseItem.First(x => x.Id == id);
+                result.Result = existing;
+                if (existing == null)
+                {
+                    result.IsSuccess = true;
+                    result.Message = "PurchaseItem not found!";
+                    return result;
+                }
+
+                AppDbCxt.PurchaseItem.Remove(existing);
+                await AppDbCxt.SaveChangesAsync();
+                result.IsSuccess = true;
+                result.Message = "Successfully Deleted!";
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+
+        #endregion
+
+
+        #region HouseKeeping
+        public async Task<CheckList> GetCheckListById(int id)
+        {
+            CheckList result = null;
+
+#pragma warning disable CS8600
+            result = AppDbCxt.CheckList.FirstOrDefault(o => o.Id == id);
+#pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
+
+            return await Task.FromResult(result);
+        }
+
+        public async Task<IEnumerable<CheckList>> GetAllCheckList()
+        {
+            IEnumerable<CheckList> result = null;
+
+            result = AppDbCxt.CheckList.ToList();
+            return result;
+        }
+        public async Task<ApiResponse<CheckList>> UpsertCheckList(CheckList data)
+        {
+            var result = new ApiResponse<CheckList>();
+            try
+            {
+
+                if (data == null)
+                {
+                    result.IsSuccess = true;
+                    result.Message = "Invalid CheckList data!";
+                    return result;
+                }
+
+                if (data.Id > 0)
+                {
+                    AppDbCxt.CheckList.Update(data);
+                    result.Message = "Data Successfully Updated.";
+                }
+                else
+                {
+                    AppDbCxt.CheckList.Add(data);
+                    result.Message = "Data Successfully Inserted.";
+                }
+
+                AppDbCxt.SaveChanges();
+                result.IsSuccess = true;
+                result.Result = data;
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+
+        public async Task<ApiResponse<CheckList>> DeleteCheckList(int id)
+        {
+            var result = new ApiResponse<CheckList>();
+            try
+            {
+                var existing = AppDbCxt.CheckList.First(x => x.Id == id);
+                result.Result = existing;
+                if (existing == null)
+                {
+                    result.IsSuccess = true;
+                    result.Message = "CheckList not found!";
+                    return result;
+                }
+
+                AppDbCxt.CheckList.Remove(existing);
+                await AppDbCxt.SaveChangesAsync();
+                result.IsSuccess = true;
+                result.Message = "Successfully Deleted!";
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+
+
+
+        public async Task<RoomCleaning> GetRoomCleaningById(int id)
+        {
+            RoomCleaning result = null;
+
+#pragma warning disable CS8600
+            result = AppDbCxt.RoomCleaning.FirstOrDefault(o => o.Id == id);
+#pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
+
+            return await Task.FromResult(result);
+        }
+
+        public async Task<IEnumerable<RoomCleaning>> GetAllRoomCleaning()
+        {
+            IEnumerable<RoomCleaning> result = null;
+
+            result = AppDbCxt.RoomCleaning.ToList();
+            return result;
+        }
+        public async Task<ApiResponse<RoomCleaning>> UpsertRoomCleaning(RoomCleaning data)
+        {
+            var result = new ApiResponse<RoomCleaning>();
+            try
+            {
+
+                if (data == null)
+                {
+                    result.IsSuccess = true;
+                    result.Message = "Invalid RoomCleaning data!";
+                    return result;
+                }
+
+                if (data.Id > 0)
+                {
+                    AppDbCxt.RoomCleaning.Update(data);
+                    result.Message = "Data Successfully Updated.";
+                }
+                else
+                {
+                    AppDbCxt.RoomCleaning.Add(data);
+                    result.Message = "Data Successfully Inserted.";
+                }
+
+                AppDbCxt.SaveChanges();
+                result.IsSuccess = true;
+                result.Result = data;
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+
+        public async Task<ApiResponse<RoomCleaning>> DeleteRoomCleaning(int id)
+        {
+            var result = new ApiResponse<RoomCleaning>();
+            try
+            {
+                var existing = AppDbCxt.RoomCleaning.First(x => x.Id == id);
+                result.Result = existing;
+                if (existing == null)
+                {
+                    result.IsSuccess = true;
+                    result.Message = "RoomCleaning not found!";
+                    return result;
+                }
+
+                AppDbCxt.RoomCleaning.Remove(existing);
+                await AppDbCxt.SaveChangesAsync();
+                result.IsSuccess = true;
+                result.Message = "Successfully Deleted!";
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+
+
+        public async Task<List<ItemDto>> GetPurchaseItemListById(int id)
+        {
+            List<ItemDto> result = new();
+
+#pragma warning disable CS8600
+            result = AppDbCxt.ItemDto.Where(o => o.PurchaseItemId == id).ToList();
+#pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
+
+            return await Task.FromResult(result);
+        }
+        #endregion
     }
 }

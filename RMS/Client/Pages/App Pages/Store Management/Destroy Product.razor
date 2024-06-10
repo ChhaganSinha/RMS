@@ -1,5 +1,168 @@
 ﻿@page "/Destroye-Products"
 
-@code {
+@using RMS.Client.Client
+@using RMS.Client.Pages.GridComponent
+@using RMS.Client.Shared.Popup
+@inject AppClient client
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
+@using Havit.Blazor.Components.Web
+@using Havit.Blazor.Components.Web.Bootstrap
+@using System.ComponentModel.DataAnnotations;
+@attribute [Authorize]
 
+<div class="page-header breadcumb-sticky">
+    <div class="page-block">
+        <div class="row align-items-center">
+            <div class="col-md-12">
+                <div class="page-header-title">
+                    <h5 class="m-b-10">
+                        Destroyed Products
+                        <a @onclick="()=>show=true" style="cursor:pointer"><i class="fa fa-plus-circle fa-lg text-primary" aria-hidden="true" title="Add DestroyedProducts"></i></a>
+                    </h5>
+                </div>
+                <ul class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a href="/"><i class="feather icon-home"></i></a>
+                    </li>
+                    <li class="breadcrumb-item"><a>Destroyed Products</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-sm-12 p-0">
+        <div class="card-body p-2 mt-n3">
+            <DestroyedProductsGrid />
+        </div>
+    </div>
+</div>
+
+<PageDialog Title="@Title" Show="@show" ClosePageDialog="ResetForm">
+    @if (show)
+    {
+
+        <UiAlert Model="alert"></UiAlert>
+        <EditForm Model="model" OnValidSubmit="OnSave">
+            <DataAnnotationsValidator />
+            <div class="form-group row">
+                <div class="col-md-6">
+                    <label class="col-form-label bold-font required-field">Product Name</label>
+                    <InputText @bind-Value="@model.ProductName" id="name" class="form-control"></InputText>
+                    <ValidationMessage For="() => model.ProductName" />
+                </div>
+
+            </div>
+            <div class="form-group row">
+                <div class="col-md-6">
+                    <label class="col-form-label bold-font required-field">Select Product Category</label>
+                    <select @bind="model.ProductCategory" class="form-control" id="Category">
+                        <option>- Select -</option>
+                        @foreach (var val in ProductCategories)
+                        {
+                            <option value="@val.Id">@val.Name</option>
+                        }
+                    </select>
+                    <ValidationMessage For="() => model.ProductCategory" />
+                </div>
+                
+                
+            </div>
+
+            
+                <div class="col-md-4">
+                    <label class="col-form-label bold-font required-field">Quantity</label>
+                    <InputNumber @bind-Value="@model.Quantity" id="available" class="form-control"></InputNumber>
+                    <ValidationMessage For="() => model.Quantity" />
+                </div>
+
+            <div class="form-group row">
+                <div class="col-md-6">
+                    <label class="col-form-label bold-font required-field">Comments</label>
+                    <InputTextArea @bind-Value="@model.Comments" id="comments" class="form-control" rows="5"></InputTextArea>
+                    <ValidationMessage For="() => model.Comments" />
+                </div>
+            </div>
+           
+            
+
+            @if (process)
+            {
+                <div style="text-align:center">
+                    <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
+                </div>
+            }
+            <hr style="margin-bottom: 2px;" />
+            <button type="submit" class="btn btn-primary float-right col-md-4">Add</button>
+        </EditForm>
+        <br />
+    }
+</PageDialog>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    [CascadingParameter]
+    protected AlertModel? alert { get; set; }
+
+    DestroyedProducts model = new();
+    public string Title = "Add Destroyed Products";
+    bool show = false;
+    bool process = false;
+    private Timer _timer;
+    private int _delay = 2500;
+
+    private List<ProductCategories> ProductCategories = new();
+   
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        alert?.Clear();
+        ProductCategories = (await client.GetAllProductCategory()).ToList();
+      
+    }
+
+    public async Task OnSave()
+    {
+        process = true;
+        alert?.Clear();
+
+        var response = await client.UpsertDestroyedProductsAsync(model);
+        if (response.IsSuccess)
+        {
+
+            // model = response.Result;
+            alert?.SetSuccess(response.Message);
+            model = new();
+            await DestroyedProductsGrid.RefreshGridAsync();
+        }
+        else
+            alert?.SetError(response.Message);
+
+        process = false;
+        StateHasChanged();
+        _timer = new Timer(TimerCallback, null, _delay, Timeout.Infinite);
+    }
+
+    private void TimerCallback(Object o)
+    {
+        alert?.Clear();
+        _timer.Dispose();
+        StateHasChanged();
+    }
+
+    private void ResetForm()
+    {
+        model = new();
+        show = false;
+        process = false;
+    }
+
+    public void OnClose()
+    {
+        model = new();
+    }
 }

@@ -155,7 +155,7 @@ namespace RMS.Client.Client
                 return result;
             }
 
-           
+
 
         }
         public async Task<ApiResponse<RoomCategories>> DeleteRoomCategory(int id)
@@ -1202,5 +1202,810 @@ namespace RMS.Client.Client
         }
 
         #endregion
+
+
+        #region Product Section
+
+        public async Task<ProductCategories> GetProductCategoryById(int id)
+        {
+            ProductCategories data = null;
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/App/ProductCategory/{id}");
+
+                res.EnsureSuccessStatusCode();
+
+                data = await res.Content.ReadFromJsonAsync<ProductCategories>();
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return data;
+        }
+        public async Task<IEnumerable<ProductCategories>> GetAllProductCategory()
+        {
+            IEnumerable<ProductCategories> details = null;
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/App/all-product-category");
+
+                res.EnsureSuccessStatusCode();
+
+                details = await res.Content.ReadFromJsonAsync<IEnumerable<ProductCategories>>();
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return details;
+        }
+
+        public async Task<ApiResponse<ProductCategories>> UpsertProductCategoryAsync(ProductCategories data)
+        {
+            var result = new ApiResponse<ProductCategories>();
+
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/App/UpsertProductCategory", data);
+                res.EnsureSuccessStatusCode();
+                var json = await res.Content.ReadFromJsonAsync<ApiResponse<ProductCategories>>();
+                return json;
+
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+
+
+
+        }
+        public async Task<ApiResponse<ProductCategories>> DeleteProductCategory(int id)
+        {
+            var result = new ApiResponse<ProductCategories>();
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/App/DeleteProductCategory/{id}", new { });
+                res.EnsureSuccessStatusCode();
+                var json = await res.Content.ReadFromJsonAsync<ApiResponse<ProductCategories>>();
+                return json;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+
+        }
+
+
+
+
+        public async Task<UnitNames> GetUnitNamesById(int id)
+        {
+            UnitNames data = null;
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/App/UnitNames/{id}");
+
+                res.EnsureSuccessStatusCode();
+
+                data = await res.Content.ReadFromJsonAsync<UnitNames>();
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return data;
+        }
+        public async Task<IEnumerable<UnitNames>> GetAllUnitNames()
+        {
+            IEnumerable<UnitNames> details = null;
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/App/all-unit-names");
+
+                res.EnsureSuccessStatusCode();
+
+                details = await res.Content.ReadFromJsonAsync<IEnumerable<UnitNames>>();
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return details;
+        }
+
+        public async Task<ApiResponse<UnitNames>> UpsertUnitNamesAsync(UnitNames data)
+        {
+            var result = new ApiResponse<UnitNames>();
+
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/App/UpsertUnitNames", data);
+                res.EnsureSuccessStatusCode();
+                var json = await res.Content.ReadFromJsonAsync<ApiResponse<UnitNames>>();
+                return json;
+
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+
+
+
+        }
+        public async Task<ApiResponse<UnitNames>> DeleteUnitNames(int id)
+        {
+            var result = new ApiResponse<UnitNames>();
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/App/DeleteUnitNames/{id}", new { });
+                res.EnsureSuccessStatusCode();
+                var json = await res.Content.ReadFromJsonAsync<ApiResponse<UnitNames>>();
+                return json;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+
+        }
+
+
+
+        public async Task<ProductList> GetProductListById(int id)
+        {
+            ProductList data = null;
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/App/ProductList/{id}");
+
+                res.EnsureSuccessStatusCode();
+
+                data = await res.Content.ReadFromJsonAsync<ProductList>();
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return data;
+        }
+        public async Task<IEnumerable<ProductList>> GetAllProductList()
+        {
+            IEnumerable<ProductList> details = null;
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/App/all-ProductList");
+
+                res.EnsureSuccessStatusCode();
+
+                details = await res.Content.ReadFromJsonAsync<IEnumerable<ProductList>>();
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return details;
+        }
+
+        public async Task<ApiResponse<ProductList>> UpsertProductListAsync(ProductList data)
+        {
+            var result = new ApiResponse<ProductList>();
+
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/App/UpsertProductList", data);
+                res.EnsureSuccessStatusCode();
+                var json = await res.Content.ReadFromJsonAsync<ApiResponse<ProductList>>();
+                return json;
+
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+
+
+        }
+        public async Task<ApiResponse<ProductList>> DeleteProductList(int id)
+        {
+            var result = new ApiResponse<ProductList>();
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/App/DeleteProductList/{id}", new { });
+                res.EnsureSuccessStatusCode();
+                var json = await res.Content.ReadFromJsonAsync<ApiResponse<ProductList>>();
+                return json;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+
+
+
+        public async Task<SupplierList> GetSupplierListById(int id)
+        {
+            SupplierList data = null;
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/App/SupplierList/{id}");
+
+                res.EnsureSuccessStatusCode();
+
+                data = await res.Content.ReadFromJsonAsync<SupplierList>();
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return data;
+        }
+        public async Task<IEnumerable<SupplierList>> GetAllSupplierList()
+        {
+            IEnumerable<SupplierList> details = null;
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/App/all-supplier-list");
+
+                res.EnsureSuccessStatusCode();
+
+                details = await res.Content.ReadFromJsonAsync<IEnumerable<SupplierList>>();
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return details;
+        }
+
+        public async Task<ApiResponse<SupplierList>> UpsertSupplierListAsync(SupplierList data)
+        {
+            var result = new ApiResponse<SupplierList>();
+
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/App/UpsertSupplierList", data);
+                res.EnsureSuccessStatusCode();
+                var json = await res.Content.ReadFromJsonAsync<ApiResponse<SupplierList>>();
+                return json;
+
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+
+
+
+        }
+        public async Task<ApiResponse<SupplierList>> DeleteSupplierList(int id)
+        {
+            var result = new ApiResponse<SupplierList>();
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/App/DeleteSupplierList/{id}", new { });
+                res.EnsureSuccessStatusCode();
+                var json = await res.Content.ReadFromJsonAsync<ApiResponse<SupplierList>>();
+                return json;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+
+        }
+
+
+
+
+        public async Task<DestroyedProducts> GetDestroyedProductsById(int id)
+        {
+            DestroyedProducts data = null;
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/App/DestroyedProducts/{id}");
+
+                res.EnsureSuccessStatusCode();
+
+                data = await res.Content.ReadFromJsonAsync<DestroyedProducts>();
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return data;
+        }
+        public async Task<IEnumerable<DestroyedProducts>> GetAllDestroyedProducts()
+        {
+            IEnumerable<DestroyedProducts> details = null;
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/App/all-DestroyedProducts");
+
+                res.EnsureSuccessStatusCode();
+
+                details = await res.Content.ReadFromJsonAsync<IEnumerable<DestroyedProducts>>();
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return details;
+        }
+
+        public async Task<ApiResponse<DestroyedProducts>> UpsertDestroyedProductsAsync(DestroyedProducts data)
+        {
+            var result = new ApiResponse<DestroyedProducts>();
+
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/App/UpsertDestroyedProducts", data);
+                res.EnsureSuccessStatusCode();
+                var json = await res.Content.ReadFromJsonAsync<ApiResponse<DestroyedProducts>>();
+                return json;
+
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+
+
+        }
+        public async Task<ApiResponse<DestroyedProducts>> DeleteDestroyedProducts(int id)
+        {
+            var result = new ApiResponse<DestroyedProducts>();
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/App/DeleteDestroyedProducts/{id}", new { });
+                res.EnsureSuccessStatusCode();
+                var json = await res.Content.ReadFromJsonAsync<ApiResponse<DestroyedProducts>>();
+                return json;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+
+
+
+
+
+        /* public async Task<SaleProducts> GetSaleProductsById(int id)
+         {
+             SaleProducts data = null;
+             try
+             {
+                 var res = await HttpClient.GetAsync($"api/App/SaleProducts/{id}");
+
+                 res.EnsureSuccessStatusCode();
+
+                 data = await res.Content.ReadFromJsonAsync<SaleProducts>();
+
+             }
+             catch (Exception ex)
+             {
+                 Logger.LogCritical(ex, ex.Message);
+                 throw;
+             }
+
+             return data;
+         }*/
+
+        public async Task<SaleProducts> GetSaleProductsById(int id)
+        {
+            SaleProducts data = null;
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/App/SaleProducts/{id}");
+                res.EnsureSuccessStatusCode();
+
+                // Log the raw response content
+                var rawContent = await res.Content.ReadAsStringAsync();
+                Logger.LogInformation($"Response Content: {rawContent}");
+
+                // Deserialize the content
+                data = JsonSerializer.Deserialize<SaleProducts>(rawContent, new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                });
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return data;
+        }
+
+        public async Task<IEnumerable<SaleProducts>> GetAllSaleProducts()
+        {
+            IEnumerable<SaleProducts> details = null;
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/App/all-SaleProducts");
+
+                res.EnsureSuccessStatusCode();
+
+                details = await res.Content.ReadFromJsonAsync<IEnumerable<SaleProducts>>();
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return details;
+        }
+
+        public async Task<ApiResponse<SaleProducts>> UpsertSaleProductsAsync(SaleProducts data)
+        {
+            var result = new ApiResponse<SaleProducts>();
+
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/App/UpsertSaleProducts", data);
+                res.EnsureSuccessStatusCode();
+                var json = await res.Content.ReadFromJsonAsync<ApiResponse<SaleProducts>>();
+                return json;
+
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+
+
+        }
+        public async Task<ApiResponse<SaleProducts>> DeleteSaleProducts(int id)
+        {
+            var result = new ApiResponse<SaleProducts>();
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/App/DeleteSaleProducts/{id}", new { });
+                res.EnsureSuccessStatusCode();
+                var json = await res.Content.ReadFromJsonAsync<ApiResponse<SaleProducts>>();
+                return json;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+
+
+
+
+        public async Task<PurchaseItem> GetPurchaseItemById(int id)
+        {
+            PurchaseItem data = null;
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/App/PurchaseItem/{id}");
+
+                res.EnsureSuccessStatusCode();
+
+                data = await res.Content.ReadFromJsonAsync<PurchaseItem>();
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return data;
+        }
+        public async Task<IEnumerable<PurchaseItem>> GetAllPurchaseItem()
+        {
+            IEnumerable<PurchaseItem> details = null;
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/App/all-PurchaseItem");
+
+                res.EnsureSuccessStatusCode();
+
+                details = await res.Content.ReadFromJsonAsync<IEnumerable<PurchaseItem>>();
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return details;
+        }
+
+        public async Task<ApiResponse<PurchaseItem>> UpsertPurchaseItemAsync(PurchaseItem data)
+        {
+            var result = new ApiResponse<PurchaseItem>();
+
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/App/UpsertPurchaseItem", data);
+                res.EnsureSuccessStatusCode();
+                var json = await res.Content.ReadFromJsonAsync<ApiResponse<PurchaseItem>>();
+                return json;
+
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+
+
+        }
+        public async Task<ApiResponse<PurchaseItem>> DeletePurchaseItem(int id)
+        {
+            var result = new ApiResponse<PurchaseItem>();
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/App/DeletePurchaseItem/{id}", new { });
+                res.EnsureSuccessStatusCode();
+                var json = await res.Content.ReadFromJsonAsync<ApiResponse<PurchaseItem>>();
+                return json;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+        #endregion
+
+
+        #region HouseKeeping
+
+
+        public async Task<CheckList> GetCheckListById(int id)
+        {
+            CheckList data = null;
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/App/CheckList/{id}");
+
+                res.EnsureSuccessStatusCode();
+
+                data = await res.Content.ReadFromJsonAsync<CheckList>();
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return data;
+        }
+        public async Task<IEnumerable<CheckList>> GetAllCheckList()
+        {
+            IEnumerable<CheckList> details = null;
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/App/all-CheckList");
+
+                res.EnsureSuccessStatusCode();
+
+                details = await res.Content.ReadFromJsonAsync<IEnumerable<CheckList>>();
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return details;
+        }
+
+        public async Task<ApiResponse<CheckList>> UpsertCheckListAsync(CheckList data)
+        {
+            var result = new ApiResponse<CheckList>();
+
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/App/UpsertCheckList", data);
+                res.EnsureSuccessStatusCode();
+                var json = await res.Content.ReadFromJsonAsync<ApiResponse<CheckList>>();
+                return json;
+
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+
+
+        }
+        public async Task<ApiResponse<CheckList>> DeleteCheckList(int id)
+        {
+            var result = new ApiResponse<CheckList>();
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/App/DeleteCheckList/{id}", new { });
+                res.EnsureSuccessStatusCode();
+                var json = await res.Content.ReadFromJsonAsync<ApiResponse<CheckList>>();
+                return json;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+
+
+
+        public async Task<RoomCleaning> GetRoomCleaningById(int id)
+        {
+            RoomCleaning data = null;
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/App/RoomCleaning/{id}");
+
+                res.EnsureSuccessStatusCode();
+
+                data = await res.Content.ReadFromJsonAsync<RoomCleaning>();
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return data;
+        }
+        public async Task<IEnumerable<RoomCleaning>> GetAllRoomCleaning()
+        {
+            IEnumerable<RoomCleaning> details = null;
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/App/all-RoomCleaning");
+
+                res.EnsureSuccessStatusCode();
+
+                details = await res.Content.ReadFromJsonAsync<IEnumerable<RoomCleaning>>();
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return details;
+        }
+
+        public async Task<ApiResponse<RoomCleaning>> UpsertRoomCleaningAsync(RoomCleaning data)
+        {
+            var result = new ApiResponse<RoomCleaning>();
+
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/App/UpsertRoomCleaning", data);
+                res.EnsureSuccessStatusCode();
+                var json = await res.Content.ReadFromJsonAsync<ApiResponse<RoomCleaning>>();
+                return json;
+
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+
+
+        }
+        public async Task<ApiResponse<RoomCleaning>> DeleteRoomCleaning(int id)
+        {
+            var result = new ApiResponse<RoomCleaning>();
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/App/DeleteRoomCleaning/{id}", new { });
+                res.EnsureSuccessStatusCode();
+                var json = await res.Content.ReadFromJsonAsync<ApiResponse<RoomCleaning>>();
+                return json;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+
+        #endregion
+
+
+        public async Task<List<ItemDto>> GetPurchaseItemListById(int id)
+        {
+           List<ItemDto> data = new();
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/App/PurchaseItemList/{id}");
+
+                res.EnsureSuccessStatusCode();
+
+                data = await res.Content.ReadFromJsonAsync<List<ItemDto>>();
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return data;
+        }
     }
 }

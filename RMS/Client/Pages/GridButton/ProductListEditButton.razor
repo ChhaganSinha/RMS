@@ -1,44 +1,15 @@
-﻿@page "/Products"
-
-@using RMS.Client.Client
+﻿@using GridShared
+@using GridShared.Columns
+@using GridShared.Utility
+@using Microsoft.Extensions.Primitives
 @using RMS.Client.Pages.GridComponent
 @using RMS.Client.Shared.Popup
+@using RMS.Client.Client
 @inject AppClient client
-@inject IJSRuntime JSRuntime
+@implements ICustomGridComponent<ProductList>
 @inject NavigationManager NavigationManager
-@using Havit.Blazor.Components.Web
-@using Havit.Blazor.Components.Web.Bootstrap
-@using System.ComponentModel.DataAnnotations;
-@attribute [Authorize]
 
-<div class="page-header breadcumb-sticky">
-    <div class="page-block">
-        <div class="row align-items-center">
-            <div class="col-md-12">
-                <div class="page-header-title">
-                    <h5 class="m-b-10">
-                        Product List
-                        <a @onclick="()=>show=true" style="cursor:pointer"><i class="fa fa-plus-circle fa-lg text-primary" aria-hidden="true" title="Add Product"></i></a>
-                    </h5>
-                </div>
-                <ul class="breadcrumb">
-                    <li class="breadcrumb-item">
-                        <a href="/"><i class="feather icon-home"></i></a>
-                    </li>
-                    <li class="breadcrumb-item"><a>Product List</a></li>
-                </ul>
-            </div>
-        </div>
-    </div>
-</div>
-<div class="row">
-    <div class="col-sm-12 p-0">
-        <div class="card-body p-2 mt-n3">
-            <ProductListGrid />
-        </div>
-    </div>
-</div>
-
+<button class='btn btn-sm btn-warning' style="border-radius:15px" @onclick="MyClickHandler" title="Edit"><i class="fa fa-pencil-square-o"></i></button>
 <PageDialog Title="@Title" Show="@show" ClosePageDialog="ResetForm">
     @if (show)
     {
@@ -46,7 +17,6 @@
         <UiAlert Model="alert"></UiAlert>
         <EditForm Model="model" OnValidSubmit="OnSave">
             <DataAnnotationsValidator />
-
             <div class="form-group row">
                 <div class="col-md-6">
                     <label class="col-form-label bold-font required-field">Product Name</label>
@@ -87,7 +57,7 @@
                     </select>
                     <ValidationMessage For="() => model.UnitNames" />
                 </div>
-
+                
             </div>
             <div class="form-group row">
                 <div class="col-md-4">
@@ -122,21 +92,29 @@
 
 @code {
     [Parameter]
-    public int Id { get; set; }
+    public ProductList Item { get; set; }
+
+    [Parameter]
+    public CGrid<ProductList> Grid { get; set; }
 
     [CascadingParameter]
     protected AlertModel? alert { get; set; }
 
-    ProductList model = new();
-    public string Title = "Add Product";
-    bool show = false;
-    bool process = false;
     private Timer _timer;
     private int _delay = 2500;
+    bool show = false;
+    bool process = false;
+    string Title = "Update ProductList Details";
 
+    ProductList model = new();
     private List<ProductCategories> ProductCategories = new();
     private List<UnitNames> UnitNames = new();
 
+    private async Task MyClickHandler(MouseEventArgs e)
+    {
+        show = true;
+        model = await client.GetProductListById(Item.Id);
+    }
 
     protected override async Task OnInitializedAsync()
     {
@@ -153,11 +131,9 @@
         var response = await client.UpsertProductListAsync(model);
         if (response.IsSuccess)
         {
-
             // model = response.Result;
-            await ProductListGrid.RefreshGridAsync();
+            await EmployeesGrid.RefreshGridAsync();
             alert?.SetSuccess(response.Message);
-            model = new();
         }
         else
             alert?.SetError(response.Message);
@@ -179,10 +155,5 @@
         model = new();
         show = false;
         process = false;
-    }
-
-    public void OnClose()
-    {
-        model = new();
     }
 }

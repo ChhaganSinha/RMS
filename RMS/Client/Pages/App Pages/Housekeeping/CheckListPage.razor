@@ -1,4 +1,4 @@
-﻿@page "/Unit-Names"
+﻿@page "/checklist-page"
 
 @using RMS.Client.Client
 @using RMS.Client.Pages.GridComponent
@@ -14,16 +14,16 @@
             <div class="col-md-12">
                 <div class="page-header-title">
                     <h5 class="m-b-10">
-                        Unit Names
-                        <a @onclick="()=>show=true" style="cursor:pointer"><i class="fa fa-plus-circle fa-lg text-primary" aria-hidden="true" title="Add UnitNames"></i></a>
+                        Check List
+                        <a @onclick="()=>show=true" style="cursor:pointer"><i class="fa fa-plus-circle fa-lg text-primary" aria-hidden="true" title="Add Task"></i></a>
                     </h5>
                 </div>
                 <ul class="breadcrumb">
                     <li class="breadcrumb-item">
                         <a href="/"><i class="feather icon-home"></i></a>
                     </li>
-                    <li class="breadcrumb-item"><a>Unit</a></li>
-                    <li class="breadcrumb-item"><a>Names</a></li>
+                    <li class="breadcrumb-item"><a>Check</a></li>
+                    <li class="breadcrumb-item"><a>List</a></li>
                 </ul>
             </div>
         </div>
@@ -35,7 +35,7 @@
         <div class="card-body p-2 mt-n3">
             <div class="card text">
                 <div class="card-body">
-                    <UnitNamesGrid />
+                    <CheckListGrid />
                 </div>
             </div>
         </div>
@@ -50,9 +50,19 @@
         <EditForm Model="model" OnValidSubmit="OnSave">
             <DataAnnotationsValidator />
             <div>
-                <input type="text" placeholder="Enter Category" @bind-value="model.Name" class="form-control mb-2" />
+                <input type="text" placeholder="Enter Type Name" @bind-value="model.Name" class="form-control mb-2" />
                 <ValidationMessage For="() => model.Name" />
             </div>
+            <div>
+               
+                <select @bind="model.Type" class="form-control mb-2">
+                    <option value="">- Select Type -</option> <!-- Default option -->
+                    <option value="House Keeper">House Keeper</option> <!-- Hardcoded option for House Keeper -->
+                    <option value="Laundry">Laundry</option> <!-- Hardcoded option for Laundry -->
+                </select>
+                <ValidationMessage For="() => model.Type" />
+            </div>
+
             @if (process)
             {
                 <div style="text-align:center">
@@ -73,8 +83,8 @@
     [CascadingParameter]
     protected AlertModel? alert { get; set; }
 
-    UnitNames model = new();
-    public string Title = "Add Unit Names";
+    CheckList model = new();
+    public string Title = "Add CheckList";
     bool show = false;
     bool process = false;
     private Timer _timer;
@@ -91,11 +101,11 @@
         process = true;
         alert?.Clear();
 
-        var response = await client.UpsertUnitNamesAsync(model);
+        var response = await client.UpsertCheckListAsync(model);
         if (response.IsSuccess)
         {
             // model = response.Result;
-            await UnitNamesGrid.RefreshGridAsync();
+            await CheckListGrid.RefreshGridAsync();
             alert?.SetSuccess(response.Message);
             model = new();
         }
