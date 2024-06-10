@@ -1,0 +1,214 @@
+﻿@page "/room-cleaning"
+
+@using RMS.Client.Client
+@using RMS.Client.Pages.GridComponent
+@using RMS.Client.Shared.Popup
+@inject AppClient client
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
+@using Havit.Blazor.Components.Web
+@using Havit.Blazor.Components.Web.Bootstrap
+@using System.ComponentModel.DataAnnotations;
+@attribute [Authorize]
+
+<div class="page-header breadcumb-sticky">
+    <div class="page-block">
+        <div class="row align-items-center">
+            <div class="col-md-12">
+                <div class="page-header-title">
+                    <h5 class="m-b-10">
+                        Room Cleaning List
+                        <a @onclick="()=>show=true" style="cursor:pointer"><i class="fa fa-plus-circle fa-lg text-primary" aria-hidden="true" title="Add RoomCleaning"></i></a>
+                    </h5>
+                </div>
+                <ul class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a href="/"><i class="feather icon-home"></i></a>
+                    </li>
+                    <li class="breadcrumb-item"><a>Room Cleaning</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-sm-12 p-0">
+        <div class="card-body p-2 mt-n3">
+            <RoomCleaningGrid />
+        </div>
+    </div>
+</div>
+
+<PageDialog Title="@Title" Show="@show" ClosePageDialog="ResetForm">
+    @if (show)
+    {
+
+        <UiAlert Model="alert"></UiAlert>
+        <EditForm Model="@model" OnValidSubmit="OnSave">
+            <DataAnnotationsValidator />
+            <div class="form-group row">
+                <div class="col-md-6">
+                    <label class="col-form-label bold-font required-field">Room Number</label>
+                    <InputNumber @bind-Value="@model.RoomNo" id="roomNo" class="form-control"></InputNumber>
+                    <ValidationMessage For="() => model.RoomNo" />
+                </div>
+                <div class="col-md-6">
+                    <label class="col-form-label bold-font required-field">Assign To</label>
+                    <select @bind="model.AssignTo" class="form-control" id="assignTo">
+                        <option>- Select -</option>
+                        @foreach (var employee in Employees)
+                        {
+                            <option value="@employee.Id">@employee.Name (@employee.EmpId)</option>
+                        }
+                    </select>
+                    <ValidationMessage For="() => model.AssignTo" />
+
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="col-md-6">
+                    <label class="col-form-label bold-font required-field">Start Date</label>
+                    <InputDate @bind-Value="@model.DateStart" id="dateStart" class="form-control"></InputDate>
+                    <ValidationMessage For="() => model.DateStart" />
+                </div>
+                <div class="col-md-6">
+                    <label class="col-form-label bold-font required-field">End Date</label>
+                    <InputDate @bind-Value="@model.DateEnd" id="dateEnd" class="form-control"></InputDate>
+                    <ValidationMessage For="() => model.DateEnd" />
+                </div>
+            </div>
+            @* <div class="form-group row">
+        <div class="col-md-12">
+        <label class="col-form-label bold-font">Status</label>
+        <InputText @bind-Value="@model.Status" id="status" class="form-control"></InputText>
+        </div>
+        </div> *@
+            <div class="form-group row">
+                <div class="col-md-12">
+                    <label class="col-form-label bold-font required-field">Status</label>
+                    <select @bind="model.Status" class="form-control">
+                        <option>Ready</option>
+                        <option>Booked</option>
+                        <option>Assigned to Clean</option>
+                        <option>Booked and Assigned to Clean</option>
+                        <option>Under Maintenance</option>
+                        <option>Dirty</option>
+                        <option>Blocked</option>
+                        <option>Do not Reserve</option>
+                        <option>Under Process</option>
+                    </select>
+                    <ValidationMessage For="() => model.Status" />
+                </div>
+            </div>
+            @*        <div class="form-group row">
+        <div class="col-md-12">
+        <label class="col-form-label bold-font required-field">CheckList</label>
+        <div>
+        <input type="checkbox" id="clean" value="Clean" @onchange="OnCheckBoxChange" checked="@model.CheckList.Contains("Clean")" />
+        <label for="clean">Clean</label>
+        </div>
+        <div>
+        <input type="checkbox" id="floorCleaning" value="Floor Cleaning" @onchange="OnCheckBoxChange" checked="@model.CheckList.Contains("Floor Cleaning")" />
+        <label for="floorCleaning">Floor Cleaning</label>
+        </div>
+        <ValidationMessage For="() => model.CheckList" />
+        </div>
+        </div> *@
+            @if (process)
+            {
+                <div style="text-align:center">
+                    <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
+                </div>
+            }
+            <hr />
+            <button type="submit" class="btn btn-primary float-right col-md-4">Add</button>
+        </EditForm>
+        <br />
+    }
+</PageDialog>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    [CascadingParameter]
+    protected AlertModel? alert { get; set; }
+
+    RoomCleaning model = new();
+    public string Title = "Add RoomCleaning";
+    bool show = false;
+    bool process = false;
+    private Timer _timer;
+    private int _delay = 2500;
+
+    private List<Employee> Employees = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        alert?.Clear();
+        Employees = (await client.GetAllEmployee()).ToList();
+    }
+
+    public async Task OnSave()
+    {
+        process = true;
+        alert?.Clear();
+        model.EmpId = Employees.Where(x => x.Id == int.Parse(model.AssignTo))
+                       .Select(x => x.EmpId)
+                       .FirstOrDefault();
+        model.Name = Employees.Where(x => x.Id == int.Parse(model.AssignTo))
+        .Select(x => x.Name)
+        .FirstOrDefault();
+        var response = await client.UpsertRoomCleaningAsync(model);
+        if (response.IsSuccess)
+        {
+            alert?.SetSuccess(response.Message);
+            model = new();
+            await RoomCleaningGrid.RefreshGridAsync();
+        }
+        else
+        {
+            alert?.SetError(response.Message);
+        }
+
+        process = false;
+        StateHasChanged();
+        _timer = new Timer(TimerCallback, null, _delay, Timeout.Infinite);
+    }
+
+    private void TimerCallback(Object o)
+    {
+        alert?.Clear();
+        _timer.Dispose();
+        StateHasChanged();
+    }
+
+
+    private void ResetForm()
+    {
+        model = new();
+        show = false;
+        process = false;
+    }
+
+    public void OnClose()
+    {
+        model = new();
+    }
+
+    // private void OnCheckBoxChange(ChangeEventArgs e)
+    // {
+    //     var value = e.Value.ToString();
+    //     var items = model.CheckListItems;
+    //     if (items.Contains(value))
+    //     {
+    //         items.Remove(value);
+    //     }
+    //     else
+    //     {
+    //         items.Add(value);
+    //     }
+    //     model.CheckListItems = items;
+    //     model.CheckList = string.Join(",", items);
+    // }
+}

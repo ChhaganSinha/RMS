@@ -1,0 +1,94 @@
+﻿@page "/assign-room-cleaning"
+
+@using RMS.Client.Client
+@using RMS.Client.Shared
+@using System.ComponentModel.DataAnnotations
+@inject AppClient client
+
+<h3>Assign Room Cleaning</h3>
+
+<EditForm Model="@model" OnValidSubmit="OnValidSubmit">
+    <DataAnnotationsValidator />
+    <div class="form-group">
+        <label for="houseKeeper">House Keeper *</label>
+        <select @bind="model.HouseKeeper" class="form-control" id="houseKeeper">
+            <option value="">Nothing selected</option>
+            @foreach (var keeper in HouseKeepers)
+            {
+                <option value="@keeper">@keeper</option>
+            }
+        </select>
+        <ValidationMessage For="() => model.HouseKeeper" />
+    </div>
+
+    <div class="form-group">
+        <label for="roomType">Room Type</label>
+        <select @bind="model.RoomType" class="form-control" id="roomType">
+            <option value="">Select Room Type</option>
+            @foreach (var type in RoomTypes)
+            {
+                <option value="@type">@type</option>
+            }
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="status">Status</label>
+        <select @bind="model.Status" class="form-control" id="status">
+            <option value="">Select Status</option>
+            @foreach (var status in StatusList)
+            {
+                <option value="@status">@status</option>
+            }
+        </select>
+    </div>
+
+    <div class="row">
+        @foreach (var room in Rooms)
+        {
+            <div class="col-md-3 mb-2">
+                <div class="card">
+                    <div class="card-body">
+                        <input type="checkbox" @bind="room.IsSelected" class="form-check-input" id="room@room.RoomNo" />
+                        <label class="form-check-label" for="room@room.RoomNo">@room.RoomNo</label>
+                        <div>@room.Status</div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <button type="submit" class="btn btn-primary">Update</button>
+</EditForm>
+
+@code {
+    private RoomCleaningAssignmentModel model = new RoomCleaningAssignmentModel();
+
+    private List<string> HouseKeepers = new List<string> { "John", "Jane", "Doe" }; // Fetch from the backend
+    private List<string> RoomTypes = new List<string> { "Single", "Double", "Suite" }; // Fetch from the backend
+    private List<string> StatusList = new List<string>
+    {
+        "Ready", "Booked", "Assigned to Clean", "Booked and Assigned to Clean",
+        "Under Maintenance", "Dirty", "Blocked", "Do not Reserve", "Under Process"
+    };
+
+    private List<RoomModel> Rooms = new List<RoomModel>
+    {
+        new RoomModel { RoomNo = "Room No.101", Status = "Ready" },
+        new RoomModel { RoomNo = "Room No.102", Status = "Ready" },
+        // Add more rooms here...
+    };
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Fetch data from the backend
+        // HouseKeepers = await client.GetHouseKeepersAsync();
+        // RoomTypes = await client.GetRoomTypesAsync();
+        // Rooms = await client.GetRoomsAsync();
+    }
+
+    private void OnValidSubmit()
+    {
+        // Handle form submission
+    }
+}

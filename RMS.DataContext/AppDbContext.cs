@@ -30,9 +30,20 @@ namespace RMS.DataContext
 
         public DbSet<ProductCategories> ProductCategories { get; set; }
         public DbSet<UnitNames> UnitNames { get; set; }
+        public DbSet<ProductList> ProductList { get; set; }
+        public DbSet<SupplierList> SupplierList { get; set; }
+        public DbSet<DestroyedProducts> DestroyedProducts { get; set; }
+        public DbSet<SaleProducts> SaleProducts { get; set; }
+        public DbSet<PurchaseItem> PurchaseItem { get; set; }
+        public DbSet<ItemDto> ItemDto { get; set; }
 
         public DbSet<EmployeeDesignation> EmployeeDesignation { get; set; }
         public DbSet<EmployeeDepartment> EmployeeDepartment { get; set; }
         public DbSet<Employee> Employee { get; set; }
+
+
+        public DbSet<CheckList> CheckList { get; set; }
+        public DbSet<RoomCleaning> RoomCleaning { get; set; }
+
     }
 }

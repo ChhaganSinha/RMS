@@ -1,49 +1,21 @@
-﻿@page "/Purchase"
-
-@using RMS.Client.Client
+﻿@using GridShared
+@using GridShared.Columns
+@using GridShared.Utility
+@using Microsoft.Extensions.Primitives
 @using RMS.Client.Pages.GridComponent
 @using RMS.Client.Shared.Popup
+@using RMS.Client.Client
 @inject AppClient client
 @inject IJSRuntime JSRuntime
+@implements ICustomGridComponent<PurchaseItem>
 @inject NavigationManager NavigationManager
-@using Havit.Blazor.Components.Web
-@using Havit.Blazor.Components.Web.Bootstrap
-@using System.ComponentModel.DataAnnotations
-@attribute [Authorize]
 
-<div class="page-header mb-0 breadcumb-sticky">
-    <div class="page-block">
-        <div class="row align-items-center">
-            <div class="col-md-12">
-                <div class="page-header-title">
-                    <h5 class="m-b-10">
-                        Purchase List
-                        <a @onclick="()=>show=true" style="cursor:pointer"><i class="fa fa-plus-circle fa-lg text-primary" aria-hidden="true" title="Add PurchaseItem"></i></a>
-                    </h5>
-                </div>
-                <ul class="breadcrumb">
-                    <li class="breadcrumb-item">
-                        <a href="/"><i class="feather icon-home"></i></a>
-                    </li>
-                    <li class="breadcrumb-item"><a>PurchaseItem</a></li>
-                </ul>
-            </div>
-        </div>
-    </div>
-</div>
-<div class="row">
-    <div class="col-sm-12 p-0">
-        <div class="card-body p-2 mt-n3">
-            <PurchaseItemGrid />
-        </div>
-    </div>
-</div>
-
+<button class='btn btn-sm btn-warning' style="border-radius:15px" @onclick="MyClickHandler" title="Edit"><i class="fa fa-pencil-square-o"></i></button>
 <PageDialog Title="@Title" Show="@show" ClosePageDialog="ResetForm">
     @if (show)
     {
         <UiAlert Model="alert"></UiAlert>
-        <EditForm Model="@purchaseItem" OnValidSubmit="@HandleValidSubmit">
+        <EditForm Model="@purchaseItem" OnValidSubmit="@OnSave">
             <DataAnnotationsValidator />
 
             <div class="form-group row">
@@ -117,6 +89,7 @@
                                 <td>
                                     <input type="text" value="@item.Total.ToString("F2")" class="form-control" readonly />
                                 </td>
+
                                 @if (!purchaseItem.IsPaid)
                                 {
                                     <td class="text-center">
@@ -155,31 +128,80 @@
 </PageDialog>
 
 @code {
-    private PurchaseItem purchaseItem = new PurchaseItem();
     private List<SupplierList> SupplierList = new();
+    private List<ItemDto> item = new();
+    [Parameter]
+    public PurchaseItem Item { get; set; }
 
-    public string Title = "Add PurchaseItem";
-    bool show = false;
-    bool process = false;
+    [Parameter]
+    public CGrid<PurchaseItem> Grid { get; set; }
+
     [CascadingParameter]
     protected AlertModel? alert { get; set; }
 
     private Timer _timer;
     private int _delay = 2500;
+    bool show = false;
+    bool process = false;
+    string Title = "Update PurchaseItem Details";
+
+    PurchaseItem purchaseItem = new();
+
+    private async Task MyClickHandler(MouseEventArgs e)
+    {
+        show = true;
+        purchaseItem = await client.GetPurchaseItemById(Item.Id);
+        // Ensure Items collection is initialized if null
+        if (purchaseItem.Items == null)
+        {
+            purchaseItem.Items = new List<ItemDto>();
+        }
+    }
 
     protected override async Task OnInitializedAsync()
     {
         alert?.Clear();
         SupplierList = (await client.GetAllSupplierList()).ToList();
-        AddNewItem(); // Add a default item on initialization
+    }
+
+    public async Task OnSave()
+    {
+        // Calculate grand total
+        CalculateGrandTotal();
+
+        // Handle form submission logic
+        process = true;
+        alert?.Clear();
+
+        var response = await client.UpsertPurchaseItemAsync(purchaseItem);
+        if (response.IsSuccess)
+        {
+            await PurchaseItemGrid.RefreshGridAsync();
+            alert?.SetSuccess(response.Message);
+            ResetForm();
+        }
+        else
+        {
+            alert?.SetError(response.Message);
+        }
+
+        process = false;
+        StateHasChanged();
+        _timer = new Timer(TimerCallback, null, _delay, Timeout.Infinite);
+    }
+
+    private void TimerCallback(Object o)
+    {
+        alert?.Clear();
+        _timer.Dispose();
+        StateHasChanged();
     }
 
     private void ResetForm()
     {
-        purchaseItem = new PurchaseItem();
+        purchaseItem = new();
         show = false;
         process = false;
-        AddNewItem(); // Add a default item on reset
     }
 
     private void AddNewItem()
@@ -198,57 +220,24 @@
     private void CalculateGrandTotal()
     {
         purchaseItem.GrandTotal = Math.Round(purchaseItem.Items.Sum(item => item.Total), 2);
-    }
 
-    private async Task HandleValidSubmit()
-    {
-        // Calculate grand total
-        CalculateGrandTotal();
-
-        // Handle form submission logic
-        process = true;
-        alert?.Clear();
-
-        var response = await client.UpsertPurchaseItemAsync(purchaseItem);
-        if (response.IsSuccess)
-        {
-            await PurchaseItemGrid.RefreshGridAsync();
-            alert?.SetSuccess(response.Message);
-            purchaseItem = new();
-        }
-        else
-        {
-            alert?.SetError(response.Message);
-        }
-
-        process = false;
-        StateHasChanged();
-        _timer = new Timer(TimerCallback, null, _delay, Timeout.Infinite);
-    }
-
-    private void TimerCallback(Object o)
-    {
-        alert?.Clear();
-        _timer.Dispose();
-        StateHasChanged(); // Ensure StateHasChanged is called on the main thread
     }
 
     private async Task MarkAsPaid()
     {
-        alert?.Clear();
+
         purchaseItem.IsPaid = true;
         var response = await client.UpsertPurchaseItemAsync(purchaseItem);
         if (response.IsSuccess)
         {
             await PurchaseItemGrid.RefreshGridAsync();
             alert?.SetSuccess(response.Message);
-            ResetForm();
+            purchaseItem = new PurchaseItem();
         }
         else
         {
             alert?.SetError(response.Message);
         }
-      
         _timer = new Timer(TimerCallback, null, _delay, Timeout.Infinite);
     }
 }

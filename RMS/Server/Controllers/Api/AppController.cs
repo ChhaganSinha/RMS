@@ -25,7 +25,7 @@ namespace RMS.Server.Controllers.Api
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+   /* [Authorize]*/
     public class AppController : ControllerBase
     {
         readonly AppRepository _appRepository;
@@ -384,7 +384,226 @@ namespace RMS.Server.Controllers.Api
         {
             return await _appRepository.DeleteUnitNames(id);
         }
+
+
+
+        [HttpGet]
+        [Route("ProductList/{id}")]
+        public async Task<ProductList> GetProductListById(int id)
+        {
+            return await _appRepository.GetProductListById(id);
+        }
+
+        [HttpGet]
+        [Route("all-ProductList")]
+        public async Task<IEnumerable<ProductList>> GetAllProductList()
+        {
+            return await _appRepository.GetAllProductList();
+        }
+
+        [HttpPost]
+        [Route("UpsertProductList")]
+        public async Task<ApiResponse<ProductList>> UpsertProductList(ProductList data)
+        {
+            return await _appRepository.UpsertProductList(data);
+        }
+        [HttpPost]
+        [Route("DeleteProductList/{id}")]
+        public async Task<ApiResponse<ProductList>> DeleteProductList(int id)
+        {
+            return await _appRepository.DeleteProductList(id);
+        }
+
+
+
+
+        [HttpGet]
+        [Route("SupplierList/{id}")]
+        public async Task<SupplierList> GetSupplierListById(int id)
+        {
+            return await _appRepository.GetSupplierListById(id);
+        }
+
+        [HttpGet]
+        [Route("all-supplier-list")]
+        public async Task<IEnumerable<SupplierList>> GetAllSupplierList()
+        {
+            return await _appRepository.GetAllSupplierList();
+        }
+
+        [HttpPost]
+        [Route("UpsertSupplierList")]
+        public async Task<ApiResponse<SupplierList>> UpsertSupplierList(SupplierList data)
+        {
+            return await _appRepository.UpsertSupplierList(data);
+        }
+        [HttpPost]
+        [Route("DeleteSupplierList/{id}")]
+        public async Task<ApiResponse<SupplierList>> DeleteSupplierList(int id)
+        {
+            return await _appRepository.DeleteSupplierList(id);
+        }
+
+
+
+
+
+        [HttpGet]
+        [Route("DestroyedProducts/{id}")]
+        public async Task<DestroyedProducts> GetDestroyedProductsById(int id)
+        {
+            return await _appRepository.GetDestroyedProductsById(id);
+        }
+
+        [HttpGet]
+        [Route("all-DestroyedProducts")]
+        public async Task<IEnumerable<DestroyedProducts>> GetAllDestroyedProducts()
+        {
+            return await _appRepository.GetAllDestroyedProducts();
+        }
+
+        [HttpPost]
+        [Route("UpsertDestroyedProducts")]
+        public async Task<ApiResponse<DestroyedProducts>> UpsertDestroyedProducts(DestroyedProducts data)
+        {
+            return await _appRepository.UpsertDestroyedProducts(data);
+        }
+        [HttpPost]
+        [Route("DeleteDestroyedProducts/{id}")]
+        public async Task<ApiResponse<DestroyedProducts>> DeleteDestroyedProducts(int id)
+        {
+            return await _appRepository.DeleteDestroyedProducts(id);
+        }
+
+
+
+
+        [HttpGet]
+        [Route("DestroyedProducts/{id}")]
+        public async Task<SaleProducts> GetSaleProductsById(int id)
+        {
+            return await _appRepository.GetSaleProductsById(id);
+        }
+
+        [HttpGet]
+        [Route("all-SaleProducts")]
+        public async Task<IEnumerable<SaleProducts>> GetAllSaleProducts()
+        {
+            return await _appRepository.GetAllSaleProducts();
+        }
+
+        [HttpPost]
+        [Route("UpsertSaleProducts")]
+        public async Task<ApiResponse<SaleProducts>> UpsertSaleProducts(SaleProducts data)
+        {
+            return await _appRepository.UpsertSaleProducts(data);
+        }
+        [HttpPost]
+        [Route("DeleteSaleProducts/{id}")]
+        public async Task<ApiResponse<SaleProducts>> DeleteSaleProducts(int id)
+        {
+            return await _appRepository.DeleteSaleProducts(id);
+        }
+
+
+
+        [HttpGet]
+        [Route("PurchaseItem/{id}")]
+        public async Task<PurchaseItem> GetPurchaseItemById(int id)
+        {
+            return await _appRepository.GetPurchaseItemById(id);
+        }
+
+        [HttpGet]
+        [Route("all-PurchaseItem")]
+        public async Task<IEnumerable<PurchaseItem>> GetAllPurchaseItem()
+        {
+            return await _appRepository.GetAllPurchaseItem();
+        }
+
+        [HttpPost]
+        [Route("UpsertPurchaseItem")]
+        public async Task<ApiResponse<PurchaseItem>> UpsertPurchaseItem(PurchaseItem data)
+        {
+            return await _appRepository.UpsertPurchaseItem(data);
+        }
+        [HttpPost]
+        [Route("DeletePurchaseItem/{id}")]
+        public async Task<ApiResponse<PurchaseItem>> DeletePurchaseItem(int id)
+        {
+            return await _appRepository.DeletePurchaseItem(id);
+        }
         #endregion
+
+
+        #region HouseKeeping
+
+        [HttpGet]
+        [Route("CheckList/{id}")]
+        public async Task<CheckList> GetCheckListById(int id)
+        {
+            return await _appRepository.GetCheckListById(id);
+        }
+
+        [HttpGet]
+        [Route("all-CheckList")]
+        public async Task<IEnumerable<CheckList>> GetAllCheckList()
+        {
+            return await _appRepository.GetAllCheckList();
+        }
+
+        [HttpPost]
+        [Route("UpsertCheckList")]
+        public async Task<ApiResponse<CheckList>> UpsertCheckList(CheckList data)
+        {
+            return await _appRepository.UpsertCheckList(data);
+        }
+        [HttpPost]
+        [Route("DeleteCheckList/{id}")]
+        public async Task<ApiResponse<CheckList>> DeleteCheckList(int id)
+        {
+            return await _appRepository.DeleteCheckList(id);
+        }
+
+
+
+        [HttpGet]
+        [Route("RoomCleaning/{id}")]
+        public async Task<RoomCleaning> GetRoomCleaningId(int id)
+        {
+            return await _appRepository.GetRoomCleaningById(id);
+        }
+
+        [HttpGet]
+        [Route("all-RoomCleaning")]
+        public async Task<IEnumerable<RoomCleaning>> GetAllRoomCleaning()
+        {
+            return await _appRepository.GetAllRoomCleaning();
+        }
+
+        [HttpPost]
+        [Route("UpsertRoomCleaning")]
+        public async Task<ApiResponse<RoomCleaning>> UpsertRoomCleaning(RoomCleaning data)
+        {
+            return await _appRepository.UpsertRoomCleaning(data);
+        }
+        [HttpPost]
+        [Route("DeleteRoomCleaning/{id}")]
+        public async Task<ApiResponse<RoomCleaning>> DeleteRoomCleaning(int id)
+        {
+            return await _appRepository.DeleteRoomCleaning(id);
+        }
+
+        [HttpGet]
+        [Route("PurchaseItemList/{id}")]
+        public async Task<List<ItemDto>> GetPurchaseItemListById(int id)
+        {
+            return await _appRepository.GetPurchaseItemListById(id);
+        }
+
+        #endregion
+
+
     }
 
 

@@ -38,9 +38,16 @@ namespace RMS.Server.Intrastructure
             builder.EntitySet<Hall>("Hall");
             builder.EntitySet<ProductCategories>("ProductCategories");
             builder.EntitySet<UnitNames>("UnitNames");
+            builder.EntitySet<ProductList>("ProductList");
+            builder.EntitySet<SupplierList>("SupplierList");
+            builder.EntitySet<DestroyedProducts>("DestroyedProducts");
+            builder.EntitySet<SaleProducts>("SaleProducts");
+            builder.EntitySet<PurchaseItem>("PurchaseItem");
             builder.EntitySet<EmployeeDesignation>("EmployeeDesignation");
             builder.EntitySet<EmployeeDepartment>("EmployeeDepartment");
             builder.EntitySet<Employee>("Employee");
+            builder.EntitySet<CheckList>("CheckList");
+            builder.EntitySet<RoomCleaning>("RoomCleaning");
 
             return builder.GetEdmModel();
         }
