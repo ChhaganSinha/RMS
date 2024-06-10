@@ -95,9 +95,9 @@
         if (response.IsSuccess)
         {
             // model = response.Result;
+            await HallCategoryGrid.RefreshGridAsync();
             alert?.SetSuccess(response.Message);
             model = new();
-            await HallCategoryGrid.RefreshGridAsync();
         }
         else
             alert?.SetError(response.Message);

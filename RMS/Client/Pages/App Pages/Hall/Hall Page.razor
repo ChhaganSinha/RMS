@@ -246,12 +246,12 @@
 
                 var result = await client.UpsertHallFacilitiesMapping(HallFacilitiesMap);
             }
+            await HallGrid.RefreshGridAsync();
             alert?.SetSuccess(response.Message);
             model = new Hall(); // Reset model after saving
             categoriesId = null;
             SelectedFacilities = new();
             imageDataUrl = string.Empty;
-            await HallGrid.RefreshGridAsync();
         }
         else
         {

@@ -246,12 +246,12 @@
 
                 var result = await client.UpsertRoomFacilitiesMapping(RoomFacilitiesMap);
             }
+            await RoomGrid.RefreshGridAsync();
             alert?.SetSuccess(response.Message);
             model = new Room(); // Reset model after saving
             categoriesId = null;
             SelectedFacilities = new();
             imageDataUrl = string.Empty;
-            await RoomGrid.RefreshGridAsync();
         }
         else
         {
