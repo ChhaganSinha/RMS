@@ -319,11 +319,66 @@ namespace RMS.Server.Controllers.Api
         {
             return await _appRepository.UpsertHallFacility(data);
         }
+
+        [HttpGet]
+        [Route("GetFacilitiesMappingByHallId/{RoomId}")]
+        public async Task<List<HallFacilitiesMapping>> GetFacilitiesMappingByHallId(int HallId)
+        {
+            var data = await _appRepository.GetFacilitiesMappingByHallId(HallId);
+            return data;
+        }
+
+        [HttpPost]
+        [Route("UpsertHallFacilitiesMapping")]
+        public async Task<ApiResponse<string>> UpsertHallFacilitiesMapping(Dictionary<int, List<int>> dict)
+        {
+            var result = new ApiResponse<string>();
+            try
+            {
+                var outcome = await _appRepository.UpsertHallFacilitiesMapping(dict);
+                result.Message = "Success";
+            }
+            catch (Exception ex)
+            {
+                // Logger.LogError(ex, "Error while uploading data to TrainingCampIdMapping");
+            }
+
+            return result;
+        }
+
         [HttpPost]
         [Route("DeleteHallFacility/{id}")]
         public async Task<ApiResponse<HallFacilities>> DeleteHallFacility(int id)
         {
             return await _appRepository.DeleteHallFacility(id);
+        }
+
+
+        [HttpGet]
+        [Route("Hall/{id}")]
+        public async Task<Hall> GetHallById(int id)
+        {
+            return await _appRepository.GetHallById(id);
+        }
+
+        [HttpGet]
+        [Route("all-hall")]
+        public async Task<IEnumerable<Hall>> GetAllHall()
+        {
+            return await _appRepository.GetAllHall();
+        }
+
+        [HttpPost]
+        [Route("UpsertHall")]
+        public async Task<ApiResponse<Hall>> UpsertHall(Hall data)
+        {
+            return await _appRepository.UpsertHall(data);
+        }
+        [HttpPost]
+        [Route("DeleteHall/{id}")]
+        public async Task<ApiResponse<Hall>> DeleteHall(int id)
+        {
+            return await _appRepository.DeleteHall(id);
         }
         #endregion
 

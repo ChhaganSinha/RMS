@@ -786,6 +786,135 @@ namespace RMS.Repositories
             }
         }
 
+        public async Task<bool> UpsertHallFacilitiesMapping(Dictionary<int, List<int>> dict)
+        {
+            foreach (var kvp in dict)
+            {
+                var hallId = kvp.Key;
+                var facilityId = kvp.Value;
+
+                var existingfacilityIds = await AppDbCxt.HallFacilitiesMapping
+                    .Where(o => o.HallId == hallId)
+                    .Select(o => o.FacilityId)
+                    .ToListAsync();
+
+                var facilityIdsToAdd = facilityId.Except(existingfacilityIds);
+                var facilityIdsToRemove = existingfacilityIds.Except(facilityId);
+                var facilityIdsToKeep = facilityId.Intersect(existingfacilityIds);
+
+                if (facilityIdsToRemove.Any())
+                {
+                    var mappingsToRemove = await AppDbCxt.HallFacilitiesMapping
+                        .Where(tcm => tcm.HallId == hallId && facilityIdsToRemove.Contains(tcm.FacilityId))
+                        .ToListAsync();
+                    AppDbCxt.RemoveRange(mappingsToRemove);
+                }
+
+                if (facilityIdsToAdd.Any())
+                {
+                    var mappingsToAdd = facilityIdsToAdd.Select(c => new HallFacilitiesMapping
+                    {
+                        HallId = hallId,
+                        FacilityId = c
+                    });
+                    AppDbCxt.AddRange(mappingsToAdd);
+                }
+
+                await AppDbCxt.SaveChangesAsync();
+            }
+
+            return true;
+        }
+
+        public async Task<List<HallFacilitiesMapping>> GetFacilitiesMappingByHallId(int id)
+        {
+            var dataMapping = AppDbCxt.HallFacilitiesMapping.Where(o => o.HallId == id);
+            return dataMapping.ToList();
+        }
+
+        public async Task<Hall> GetHallById(int id)
+        {
+            Hall result = null;
+
+#pragma warning disable CS8600
+            result = AppDbCxt.Halls.FirstOrDefault(o => o.Id == id);
+#pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
+
+            return await Task.FromResult(result);
+        }
+
+        public async Task<IEnumerable<Hall>> GetAllHall()
+        {
+            IEnumerable<Hall> result = null;
+
+            result = AppDbCxt.Halls.ToList();
+            return result;
+        }
+        public async Task<ApiResponse<Hall>> UpsertHall(Hall data)
+        {
+            var result = new ApiResponse<Hall>();
+            try
+            {
+
+                if (data == null)
+                {
+                    result.IsSuccess = true;
+                    result.Message = "Invalid Hall data!";
+                    return result;
+                }
+
+                if (data.Id > 0)
+                {
+                    AppDbCxt.Halls.Update(data);
+                    result.Message = "Data Successfully Updated.";
+                }
+                else
+                {
+                    AppDbCxt.Halls.Add(data);
+                    result.Message = "Data Successfully Inserted.";
+                }
+
+                AppDbCxt.SaveChanges();
+                result.IsSuccess = true;
+                result.Result = data;
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+
+        public async Task<ApiResponse<Hall>> DeleteHall(int id)
+        {
+            var result = new ApiResponse<Hall>();
+            try
+            {
+                var existing = AppDbCxt.Halls.First(x => x.Id == id);
+                result.Result = existing;
+                if (existing == null)
+                {
+                    result.IsSuccess = true;
+                    result.Message = "Hall not found!";
+                    return result;
+                }
+
+                AppDbCxt.Halls.Remove(existing);
+                await AppDbCxt.SaveChangesAsync();
+                result.IsSuccess = true;
+                result.Message = "Successfully Deleted!";
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+
         #endregion
 
         #region Attendence  Section
