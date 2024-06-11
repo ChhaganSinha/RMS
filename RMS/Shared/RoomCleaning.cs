@@ -26,19 +26,7 @@ namespace RMS.Dto
 
         public string Status { get; set; } = string.Empty;
 
-        //public string CheckList { get; set; } = string.Empty;
-
-        //public List<string> CheckListItems
-        //{
-        //    get
-        //    {
-        //        return string.IsNullOrEmpty(CheckList) ? new List<string>() : new List<string>(CheckList.Split(','));
-        //    }
-        //    set
-        //    {
-        //        CheckList = string.Join(",", value);
-        //    }
-        //}
+       
 
     }
 }

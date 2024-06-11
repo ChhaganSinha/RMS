@@ -1,5 +1,47 @@
 ﻿@page "/all-record"
-<h3>All_Record</h3>
+@using RMS.Client.Client
+@using RMS.Client.Pages.GridComponent
+@using RMS.Client.Shared.Popup
+@inject AppClient client
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
+@using Havit.Blazor.Components.Web
+@using Havit.Blazor.Components.Web.Bootstrap
+@using System.ComponentModel.DataAnnotations;
+@attribute [Authorize]
+
+<div class="page-header breadcumb-sticky">
+    <div class="page-block">
+        <div class="row align-items-center">
+            <div class="col-md-12">
+                <div class="page-header-title">
+                    <h5 class="m-b-10">
+                        All Records
+                        
+                    </h5>
+                </div>
+                <ul class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a href="/"><i class="feather icon-home"></i></a>
+                    </li>
+                    <li class="breadcrumb-item"><a>All Records</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-sm-12 p-0">
+        <div class="card-body p-2 mt-n3">
+            <AllRecordsGrid />
+        </div>
+    </div>
+</div>
+
+
+
+
 
 @code {
 

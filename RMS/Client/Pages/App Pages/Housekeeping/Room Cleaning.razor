@@ -54,13 +54,23 @@
                 </div>
                 <div class="col-md-6">
                     <label class="col-form-label bold-font required-field">Assign To</label>
-                    <select @bind="model.AssignTo" class="form-control" id="assignTo">
+                    @* <select @bind="model.AssignTo" class="form-control" id="assignTo">
                         <option>- Select -</option>
                         @foreach (var employee in Employees)
                         {
                             <option value="@employee.Id">@employee.Name (@employee.EmpId)</option>
                         }
-                    </select>
+                    </select> *@
+                    <HxSelect TItem="Employee"
+                              TValue="int?"
+                              Data="Employees"
+                              @bind-Value="empid"
+                              TextSelector="@(employee => FormatEmployeeText(employee))"
+                              ValueSelector="@(employee => employee.Id)"
+                              Nullable="true"
+                              NullText="- Select -"
+                              NullDataText="Loading Employees..." />
+
                     <ValidationMessage For="() => model.AssignTo" />
 
                 </div>
@@ -130,7 +140,7 @@
 @code {
     [Parameter]
     public int Id { get; set; }
-
+    private int? empid;
     [CascadingParameter]
     protected AlertModel? alert { get; set; }
 
@@ -174,6 +184,10 @@
         process = false;
         StateHasChanged();
         _timer = new Timer(TimerCallback, null, _delay, Timeout.Infinite);
+    }
+    private string FormatEmployeeText(Employee employee)
+    {
+        return $"{employee.Name} ({employee.EmpId})";
     }
 
     private void TimerCallback(Object o)

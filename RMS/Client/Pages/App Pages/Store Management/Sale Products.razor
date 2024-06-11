@@ -63,13 +63,15 @@
             <div class="form-group row">
                 <div class="col-md-6">
                     <label class="col-form-label bold-font required-field">Select Product Category</label>
-                    <select @bind="model.ProductCategory" class="form-control" id="Category">
-                        <option selected>- Select -</option>
-                        @foreach (var val in ProductCategories)
-                        {
-                            <option value="@val.Id">@val.Name</option>
-                        }
-                    </select>
+                    <HxSelect TItem="ProductCategories"
+                              TValue="int?"
+                              Data="ProductCategories"
+                              @bind-Value="prodcategoriesId"
+                              TextSelector="@(ProductCategories => ProductCategories.Name)"
+                              ValueSelector="@(ProductCategories => ProductCategories.Id)"
+                              Nullable="true"
+                              NullText="-select-"
+                              NullDataText="Loading ProductCategories..." />
                     <ValidationMessage For="() => model.ProductCategory" />
                 </div>
                 <div class="col-md-6">
@@ -116,7 +118,7 @@
 @code {
     [Parameter]
     public int Id { get; set; }
-
+    private int? prodcategoriesId;
     [CascadingParameter]
     protected AlertModel? alert { get; set; }
 

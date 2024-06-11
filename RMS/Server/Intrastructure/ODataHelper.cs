@@ -52,6 +52,8 @@ namespace RMS.Server.Intrastructure
             builder.EntitySet<LeaveType>("LeaveType");
             builder.EntitySet<CheckList>("CheckList");
             builder.EntitySet<RoomCleaning>("RoomCleaning");
+            builder.EntitySet<AllRecord>("AllRecord");
+            builder.EntitySet<CleaningReport>("CleaningReport");
 
             return builder.GetEdmModel();
         }

@@ -49,13 +49,15 @@
             <div class="form-group row">
                 <div class="col-md-6">
                     <label class="col-form-label bold-font required-field">Supplier Name</label>
-                    <select @bind="purchaseItem.SupplierName" class="form-control" id="SupplierName" disabled="@purchaseItem.IsPaid">
-                        <option selected>- Select -</option>
-                        @foreach (var val in SupplierList)
-                        {
-                            <option value="@val.Id">@val.SupplierName</option>
-                        }
-                    </select>
+                    <HxSelect TItem="SupplierList"
+                              TValue="int?"
+                              Data="SupplierList"
+                              @bind-Value="supplierlist"
+                              TextSelector="@(SupplierList => SupplierList.SupplierName)"
+                              ValueSelector="@(SupplierList => SupplierList.Id)"
+                              Nullable="true"
+                              NullText="-select-"
+                              NullDataText="Loading categories..." />
                     <ValidationMessage For="() => purchaseItem.SupplierName" />
                 </div>
                 <div class="col-md-6">
@@ -157,7 +159,7 @@
 @code {
     private PurchaseItem purchaseItem = new PurchaseItem();
     private List<SupplierList> SupplierList = new();
-
+    private int? supplierlist;
     public string Title = "Add PurchaseItem";
     bool show = false;
     bool process = false;

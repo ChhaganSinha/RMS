@@ -44,9 +44,12 @@ namespace RMS.DataContext
         public DbSet<EmployeePayroll> EmployeePayroll { get; set; }
         public DbSet<CheckList> CheckList { get; set; }
         public DbSet<RoomCleaning> RoomCleaning { get; set; }
+        public DbSet<AllRecord> AllRecord { get; set; }
+        public DbSet<CleaningReport> CleaningReport { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Ignore<CleaningReport>();
             base.OnModelCreating(modelBuilder);
 
             //modelBuilder.Entity<EmployeeAttendance>()

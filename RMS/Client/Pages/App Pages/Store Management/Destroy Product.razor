@@ -47,7 +47,7 @@
         <EditForm Model="model" OnValidSubmit="OnSave">
             <DataAnnotationsValidator />
             <div class="form-group row">
-                <div class="col-md-6">
+                <div class="col-md-12">
                     <label class="col-form-label bold-font required-field">Product Name</label>
                     <InputText @bind-Value="@model.ProductName" id="name" class="form-control"></InputText>
                     <ValidationMessage For="() => model.ProductName" />
@@ -57,13 +57,15 @@
             <div class="form-group row">
                 <div class="col-md-6">
                     <label class="col-form-label bold-font required-field">Select Product Category</label>
-                    <select @bind="model.ProductCategory" class="form-control" id="Category">
-                        <option>- Select -</option>
-                        @foreach (var val in ProductCategories)
-                        {
-                            <option value="@val.Id">@val.Name</option>
-                        }
-                    </select>
+                    <HxSelect TItem="ProductCategories"
+                              TValue="int?"
+                              Data="ProductCategories"
+                              @bind-Value="prodcategoriesId"
+                              TextSelector="@(ProductCategories => ProductCategories.Name)"
+                              ValueSelector="@(ProductCategories => ProductCategories.Id)"
+                              Nullable="true"
+                              NullText="-select-"
+                              NullDataText="Loading ProductCategories..." />
                     <ValidationMessage For="() => model.ProductCategory" />
                 </div>
 
@@ -72,13 +74,12 @@
                     <InputNumber @bind-Value="@model.Quantity" id="available" class="form-control"></InputNumber>
                     <ValidationMessage For="() => model.Quantity" />
                 </div>
-
-                <div class="form-group row">
-                    <div class="col-md-12">
-                        <label class="col-form-label bold-font required-field">Comments</label>
-                        <InputTextArea @bind-Value="@model.Comments" id="comments" class="form-control" rows="5"></InputTextArea>
-                        <ValidationMessage For="() => model.Comments" />
-                    </div>
+            </div>
+            <div class="form-group row">
+                <div class="col-md-12">
+                    <label class="col-form-label bold-font required-field">Comments</label>
+                    <InputTextArea @bind-Value="@model.Comments" id="comments" class="form-control" rows="5"></InputTextArea>
+                    <ValidationMessage For="() => model.Comments" />
                 </div>
             </div>
 
@@ -103,6 +104,7 @@
 @code {
     [Parameter]
     public int Id { get; set; }
+    private int? prodcategoriesId;
 
     [CascadingParameter]
     protected AlertModel? alert { get; set; }
