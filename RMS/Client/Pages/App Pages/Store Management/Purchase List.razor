@@ -18,7 +18,7 @@
                 <div class="page-header-title">
                     <h5 class="m-b-10">
                         Purchase List
-                        <a @onclick="()=>show=true" style="cursor:pointer"><i class="fa fa-plus-circle fa-lg text-primary" aria-hidden="true" title="Add PurchaseItem"></i></a>
+                        <a @onclick="Show" style="cursor:pointer"><i class="fa fa-plus-circle fa-lg text-primary" aria-hidden="true" title="Add PurchaseItem"></i></a>
                     </h5>
                 </div>
                 <ul class="breadcrumb">
@@ -59,6 +59,12 @@
                               NullText="-select-"
                               NullDataText="Loading categories..." />
                     <ValidationMessage For="() => purchaseItem.SupplierName" />
+                    @if (supplierlist == null && submit)
+                    {
+                        <span style="color:red">Please select at least one</span>
+                    }
+
+                   
                 </div>
                 <div class="col-md-6">
                     <label class="col-form-label bold-font required-field">Invoice No</label>
@@ -162,6 +168,7 @@
     private int? supplierlist;
     public string Title = "Add PurchaseItem";
     bool show = false;
+    bool submit = false;
     bool process = false;
     [CascadingParameter]
     protected AlertModel? alert { get; set; }
@@ -175,9 +182,15 @@
         SupplierList = (await client.GetAllSupplierList()).ToList();
         AddNewItem(); // Add a default item on initialization
     }
-
+    private void Show()
+    {
+        show = true;
+        submit = false;
+        
+    }
     private void ResetForm()
     {
+        supplierlist = null;
         purchaseItem = new PurchaseItem();
         show = false;
         process = false;
@@ -204,12 +217,20 @@
 
     private async Task HandleValidSubmit()
     {
+        submit = true;
+        if (supplierlist == null)
+            return;
+
+        submit = false;
         // Calculate grand total
         CalculateGrandTotal();
 
         // Handle form submission logic
         process = true;
         alert?.Clear();
+        purchaseItem.SupplierNameId = supplierlist;
+        if (supplierlist != null)
+            purchaseItem.SupplierName = SupplierList.Where(x => x.Id == supplierlist).Select(x => x.SupplierName).First();
 
         var response = await client.UpsertPurchaseItemAsync(purchaseItem);
         if (response.IsSuccess)
@@ -222,7 +243,7 @@
         {
             alert?.SetError(response.Message);
         }
-
+        supplierlist = null;
         process = false;
         StateHasChanged();
         _timer = new Timer(TimerCallback, null, _delay, Timeout.Infinite);

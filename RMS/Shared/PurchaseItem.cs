@@ -6,16 +6,17 @@ namespace RMS.Dto
 {
     public class PurchaseItem : Auditable
     {
-        [Required]
+       
         public string SupplierName { get; set; } = string.Empty;
+        public int? SupplierNameId { get; set; }
 
-        [Required]
+        //[Required]
         public string InvoiceNo { get; set; } = string.Empty;
 
-        [Required]
+        //[Required]
         public DateTime PurchaseDate { get; set; }
 
-        [Required]
+        //[Required]
         public DateTime ExpiryDate { get; set; }
 
         public string Details { get; set; } = string.Empty;
@@ -29,21 +30,21 @@ namespace RMS.Dto
 
     public class ItemDto : BaseEntity
     {
-        [Required]
+        //[Required]
         public int PurchaseItemId { get; set; }
 
-        [Required]
+        //[Required]
         public string ItemName { get; set; } = string.Empty;
 
-        [Required]
+        //[Required]
         [Range(0, double.MaxValue, ErrorMessage = "Stock must be a non-negative number")]
         public decimal Stock { get; set; }
 
-        [Required]
+        //[Required]
         [Range(0, double.MaxValue, ErrorMessage = "Quantity must be a non-negative number")]
         public decimal Quantity { get; set; }
 
-        [Required]
+        //[Required]
         [Range(0, double.MaxValue, ErrorMessage = "Rate must be a non-negative number")]
         public decimal Rate { get; set; }
 

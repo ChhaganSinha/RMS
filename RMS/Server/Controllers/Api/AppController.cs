@@ -578,7 +578,7 @@ namespace RMS.Server.Controllers.Api
 
         [HttpPost]
         [Route("UpsertPurchaseItem")]
-        public async Task<ApiResponse<PurchaseItem>> UpsertPurchaseItem(PurchaseItem data)
+        public async Task<ApiResponse<PurchaseItem>> UpsertPurchaseItem([FromBody]PurchaseItem data)
         {
             return await _appRepository.UpsertPurchaseItem(data);
         }

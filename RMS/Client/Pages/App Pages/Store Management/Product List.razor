@@ -154,8 +154,12 @@
     {
         process = true;
         alert?.Clear();
-        // model.ProductCategory = prodcategoriesId;
-        // model.UnitNames = unitnames;
+        model.ProductCategoryId = prodcategoriesId;
+        if (prodcategoriesId != null)
+            model.ProductCategory = ProductCategories.Where(x => x.Id == prodcategoriesId).Select(x => x.Name).First();
+         model.UnitNamesId = unitnames;
+        if (unitnames != null)
+            model.UnitNames = UnitNames.Where(x => x.Id == unitnames).Select(x => x.Name).First();
         var response = await client.UpsertProductListAsync(model);
         if (response.IsSuccess)
         {

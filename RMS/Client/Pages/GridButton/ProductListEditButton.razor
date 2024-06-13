@@ -37,7 +37,7 @@
             <div class="form-group row">
                 <div class="col-md-6">
                     <label class="col-form-label bold-font required-field">Select Product Category</label>
-                    <select @bind="model.ProductCategory" class="form-control" id="Category">
+                    <select @bind="model.ProductCategoryId" class="form-control" id="Category">
                         <option selected>- Select -</option>
                         @foreach (var val in ProductCategories)
                         {
@@ -48,7 +48,7 @@
                 </div>
                 <div class="col-md-6">
                     <label class="col-form-label bold-font required-field">Select UnitName</label>
-                    <select @bind="model.UnitNames" class="form-control" id="Category">
+                    <select @bind="model.UnitNamesId" class="form-control" id="Category">
                         <option selected>- Select -</option>
                         @foreach (var val in UnitNames)
                         {

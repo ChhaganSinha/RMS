@@ -10,7 +10,7 @@
 @inject NavigationManager NavigationManager
 
 <button class='btn btn-sm btn-warning' style="border-radius:15px" @onclick="MyClickHandler" title="Edit"><i class="fa fa-pencil-square-o"></i></button>
-<SimpleDailog Title="@Title" Show="@show" OnCloseDialog="ResetForm">
+<PageDialog Title="@Title" Show="@show" ClosePageDialog="ResetForm">
     @if (show)
     {
 
@@ -19,32 +19,24 @@
             <DataAnnotationsValidator />
             <div class="form-group row">
                 <div class="col-md-6">
-                    <label class="col-form-label bold-font required-field">Employee ID</label>
-                    <InputText @bind-Value="@model.EmpId" id="empId" class="form-control"></InputText>
-                    <ValidationMessage For="() => model.EmpId" />
-                </div>
-                <div class="col-md-6">
-                    <label class="col-form-label bold-font required-field">Name</label>
-                    <InputText @bind-Value="@model.Name" id="name" class="form-control"></InputText>
-                    <ValidationMessage For="() => model.Name" />
-                </div>
-            </div>
-            <div class="form-group row">
-                <div class="col-md-6">
                     <label class="col-form-label bold-font required-field">Room Number</label>
                     <InputNumber @bind-Value="@model.RoomNo" id="roomNo" class="form-control"></InputNumber>
                     <ValidationMessage For="() => model.RoomNo" />
                 </div>
                 <div class="col-md-6">
                     <label class="col-form-label bold-font required-field">Assign To</label>
-                    <select @bind="model.AssignTo" class="form-control" id="assignTo">
-                        <option>- Select -</option>
-                        @foreach (var employee in Employees)
-                        {
-                            <option value="@employee.Id">@employee.EmpId</option>
-                        }
-                    </select>
+                    <HxSelect TItem="Employee"
+                              TValue="int?"
+                              Data="Employees"
+                              @bind-Value="empid"
+                              TextSelector="@(employee => FormatEmployeeText(employee))"
+                              ValueSelector="@(employee => employee.Id)"
+                              Nullable="true"
+                              NullText="- Select -"
+                              NullDataText="Loading Employees..." />
+
                     <ValidationMessage For="() => model.AssignTo" />
+                    
                 </div>
             </div>
             <div class="form-group row">
@@ -103,11 +95,11 @@
         </EditForm>
         <br />
     }
-</SimpleDailog>
+</PageDialog>
 @code {
     [Parameter]
     public RoomCleaning Item { get; set; }
-
+    private int? empid;
     [Parameter]
     public CGrid<RoomCleaning> Grid { get; set; }
 
@@ -126,8 +118,13 @@
 
     private async Task MyClickHandler(MouseEventArgs e)
     {
+
         show = true;
         model = await client.GetRoomCleaningById(Item.Id);
+        if (model.EmployeeId > 0)
+        {
+            empid = model.EmployeeId;
+        }
     }
 
     protected override async Task OnInitializedAsync()
@@ -140,7 +137,13 @@
     {
         process = true;
         alert?.Clear();
-
+        model.EmployeeId = empid;
+        model.EmpId = Employees.Where(x => x.Id == empid)
+                       .Select(x => x.EmpId)
+                       .FirstOrDefault();
+        model.Name = Employees.Where(x => x.Id == empid)
+        .Select(x => x.Name)
+        .FirstOrDefault();
         var response = await client.UpsertRoomCleaningAsync(model);
         if (response.IsSuccess)
         {
@@ -155,7 +158,10 @@
         StateHasChanged();
         _timer = new Timer(TimerCallback, null, _delay, Timeout.Infinite);
     }
-
+    private string FormatEmployeeText(Employee employee)
+    {
+        return $"{employee.Name} ({employee.EmpId})";
+    }
     private void TimerCallback(Object o)
     {
         alert?.Clear();

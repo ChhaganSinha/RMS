@@ -163,18 +163,19 @@
     {
         process = true;
         alert?.Clear();
-        model.EmpId = Employees.Where(x => x.Id == int.Parse(model.AssignTo))
+        model.EmployeeId = empid;
+        model.EmpId = Employees.Where(x => x.Id == empid)
                        .Select(x => x.EmpId)
                        .FirstOrDefault();
-        model.Name = Employees.Where(x => x.Id == int.Parse(model.AssignTo))
+        model.Name = Employees.Where(x => x.Id == empid)
         .Select(x => x.Name)
         .FirstOrDefault();
         var response = await client.UpsertRoomCleaningAsync(model);
         if (response.IsSuccess)
         {
+            await RoomCleaningGrid.RefreshGridAsync();
             alert?.SetSuccess(response.Message);
             model = new();
-            await RoomCleaningGrid.RefreshGridAsync();
         }
         else
         {
@@ -182,6 +183,7 @@
         }
 
         process = false;
+        empid = null;
         StateHasChanged();
         _timer = new Timer(TimerCallback, null, _delay, Timeout.Infinite);
     }
@@ -200,6 +202,7 @@
 
     private void ResetForm()
     {
+        empid = null;
         model = new();
         show = false;
         process = false;

@@ -144,7 +144,9 @@
     {
         process = true;
         alert?.Clear();
-
+        model.ProductCategoryId = prodcategoriesId;
+        if (prodcategoriesId != null)
+            model.ProductCategory = ProductCategories.Where(x => x.Id == prodcategoriesId).Select(x => x.Name).First();
         var response = await client.UpsertSaleProductsAsync(model);
         if (response.IsSuccess)
         {

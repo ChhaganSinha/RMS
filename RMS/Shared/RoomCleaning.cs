@@ -6,7 +6,8 @@ namespace RMS.Dto
 {
     public class RoomCleaning : BaseEntity
     {
-       
+
+        public int? EmployeeId { get; set; }
         public string EmpId { get; set; } = string.Empty;
 
        
@@ -15,7 +16,7 @@ namespace RMS.Dto
         [Required]
         public int RoomNo { get; set; }
 
-        [Required]
+ 
         public string AssignTo { get; set; } = string.Empty;
 
         [Required]
