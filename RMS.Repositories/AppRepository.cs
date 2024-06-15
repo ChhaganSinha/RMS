@@ -619,6 +619,91 @@ namespace RMS.Repositories
         }
         #endregion
 
+        #region Payrolls
+        public async Task<AdvanceSalary> GetAdvanceSalaryById(int id)
+        {
+            AdvanceSalary result = null;
+
+#pragma warning disable CS8600
+            result = AppDbCxt.AdvanceSalary.FirstOrDefault(o => o.Id == id);
+#pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
+
+            return await Task.FromResult(result);
+        }
+
+        public async Task<IEnumerable<AdvanceSalary>> GetAllAdvanceSalary()
+        {
+            IEnumerable<AdvanceSalary> result = null;
+
+            result = AppDbCxt.AdvanceSalary.ToList();
+            return result;
+        }
+        public async Task<ApiResponse<AdvanceSalary>> UpsertAdvanceSalary(AdvanceSalary data)
+        {
+            var result = new ApiResponse<AdvanceSalary>();
+            try
+            {
+
+                if (data == null)
+                {
+                    result.IsSuccess = true;
+                    result.Message = "Invalid Room Categories data!";
+                    return result;
+                }
+
+                if (data.Id > 0)
+                {
+                    AppDbCxt.AdvanceSalary.Update(data);
+                    result.Message = "Data Successfully Updated.";
+                }
+                else
+                {
+                    AppDbCxt.AdvanceSalary.Add(data);
+                    result.Message = "Data Successfully Inserted.";
+                }
+
+                AppDbCxt.SaveChanges();
+                result.IsSuccess = true;
+                result.Result = data;
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+
+        public async Task<ApiResponse<AdvanceSalary>> DeleteAdvanceSalary(int id)
+        {
+            var result = new ApiResponse<AdvanceSalary>();
+            try
+            {
+                var existing = AppDbCxt.AdvanceSalary.First(x => x.Id == id);
+                result.Result = existing;
+                if (existing == null)
+                {
+                    result.IsSuccess = true;
+                    result.Message = "Advance Salary not found!";
+                    return result;
+                }
+
+                AppDbCxt.AdvanceSalary.Remove(existing);
+                await AppDbCxt.SaveChangesAsync();
+                result.IsSuccess = true;
+                result.Message = "Successfully Deleted!";
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+        #endregion
+
         #region Hall Section
         public async Task<HallCategories> GetHallCategoryById(int id)
         {
@@ -1244,7 +1329,6 @@ namespace RMS.Repositories
             }
         }
         #endregion
-
 
 
         #region Product Section

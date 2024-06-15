@@ -1,4 +1,4 @@
-﻿@page "/attendance-report"
+﻿@page "/advance-salary"
 @using RMS.Client.Client
 @using RMS.Client.Pages.GridComponent
 @using RMS.Client.Shared.Popup
@@ -13,14 +13,16 @@
             <div class="col-md-12">
                 <div class="page-header-title">
                     <h5 class="m-b-10">
-                        Attendance Report
+                        Advance Salary
+                        <a @onclick="()=>show=true" style="cursor:pointer"><i class="fa fa-plus-circle fa-lg text-primary" aria-hidden="true" title="Add Hall"></i></a>
                     </h5>
                 </div>
                 <ul class="breadcrumb">
                     <li class="breadcrumb-item">
                         <a href="/"><i class="feather icon-home"></i></a>
                     </li>
-                    <li class="breadcrumb-item"><a>Attendance Report </a></li>
+                    <li class="breadcrumb-item"><a>Payroll</a></li>
+                    <li class="breadcrumb-item"><a>Advance Salary</a></li>
                 </ul>
             </div>
         </div>
@@ -32,34 +34,48 @@
         <div class="card-body p-2 mt-n3">
             <div class="card text">
                 <div class="card-body">
-                    <AttendanceReportGrid />
+                  
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-
 <SimpleDailog Title="@Title" Show="@show" OnCloseDialog="ResetForm">
     @if (show)
     {
 
+
         <EditForm Model="model" OnValidSubmit="OnSave">
             <DataAnnotationsValidator />
             <div>
-                <HxSelect TItem="Employee"
-                          TValue="int?"
-                          Data="employees"
-                          @bind-Value="employeeId"
-                          TextSelector="@(employee => employee.Name)"
-                          ValueSelector="@(employee => employee.Id)"
-                          Nullable="true"
-                          NullText="-select employee-"
-                          NullDataText="Loading employees..." />
-                @if (employeeId == null && submit)
-                {
-                    <p class="text-danger">Please select employee</p>
-                }
+                <div class="form-group row">
+                    <div>
+                        <label class="col-form-label bold-font">Select Employee</label>
+                        <HxSelect TItem="Employee"
+                                  TValue="int?"
+                                  Data="Employees"
+                                  @bind-Value="employeeId"
+                                  TextSelector="@(e => e.Name)"
+                                  ValueSelector="@(e => e.Id)"
+                                  Nullable="true"
+                                  NullText="-select-"
+                                  NullDataText="Loading..." />
+
+                            @if(employeeId == null && submit)
+                            {
+                                <p class="text-danger">Please select one</p>
+                            }
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="">
+                        <label class="col-form-label bold-font">Advance Amount</label>
+                        <InputNumber @bind-Value="model.AdvanceAmount" id="AdvanceAmount" class="form-control"></InputNumber>
+                        <ValidationMessage For="() => model.AdvanceAmount" />
+                    </div>
+
+                </div>
             </div>
             @if (process)
             {
@@ -67,14 +83,14 @@
                     <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
                 </div>
             }
-
             <UiAlert Model="alert"></UiAlert>
             <hr />
-            <button type="submit" class="btn btn-primary float-right col-md-4">CheckIn</button>
+            <button type="submit" class="btn btn-primary float-right col-md-4">Add</button>
         </EditForm>
         <br />
     }
 </SimpleDailog>
+
 
 @code {
     [Parameter]
@@ -83,21 +99,20 @@
     [CascadingParameter]
     protected AlertModel? alert { get; set; }
 
-    EmployeeAttendance model = new();
-    public string Title = "Check In";
-    bool show = false;
+    AdvanceSalary model = new();
+    public string Title = "Pay Advance";
     bool submit = false;
+    bool show = false;
     bool process = false;
     private Timer _timer;
     private int _delay = 2500;
-
-    public List<Employee> employees = new();
-    private int? employeeId;
+    private List<Employee> Employees = new();
+    private int ? employeeId;
 
     protected override async Task OnInitializedAsync()
     {
         alert?.Clear();
-        employees = (await client.GetAllEmployee()).ToList();
+        Employees = (await client.GetAllEmployee()).ToList();
     }
 
     public async Task OnSave()
@@ -106,15 +121,19 @@
         if (employeeId == null)
             return;
 
-        submit = false;
         process = true;
         alert?.Clear();
-        model.EmployeeId = employeeId ?? 0;
-        var response = await client.EmployeeCheckInAsync(model);
+        submit = false;
+        
+        model.EmployeeId = employeeId;
+        if (employeeId != null)
+            model.EmployeeName = Employees.Where(x => x.Id == employeeId).Select(x => x.Name).First();
+
+        var response = await client.UpsertAdvanceSalaryAsync(model);
         if (response.IsSuccess)
         {
             // model = response.Result;
-            await AttendanceReportGrid.RefreshGridAsync();
+            await AdvanceSalaryGrid.RefreshGridAsync();
             alert?.SetSuccess(response.Message);
             model = new();
         }

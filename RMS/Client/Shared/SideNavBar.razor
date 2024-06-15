@@ -29,7 +29,7 @@
                                 <i class="fa fa-bar-chart"></i>
                             </span><span class="pcoded-mtext">Dashboard</span>
                         </a>
-                    </li>       
+                    </li>
                     <li class="nav-item pcoded-hasmenu @(IsRoomExpanded ? "pcoded-trigger" : "")">
                         <a class="nav-link" @onclick="ToggleRoom" style="cursor:pointer">
                             <span class="pcoded-micon">
@@ -58,7 +58,7 @@
                     </li>
                     <li class="nav-item pcoded-menu-caption">
                         <label>Human Resource</label>
-                    </li> 
+                    </li>
                     <li class="nav-item pcoded-hasmenu @(IsEmployeeExpanded ? "pcoded-trigger" : "")">
                         <a class="nav-link " @onclick="ToggleEmployee" style="cursor:pointer">
                             <span class="pcoded-micon">
@@ -93,6 +93,7 @@
                             </span><span class="pcoded-mtext">Payroll</span>
                         </a>
                         <ul class="pcoded-submenu @(IsPayrollExpanded ? "d-block" : "d-none")">
+                            <li><a href="advance-salary">Advance Salary</a></li>
                             <li><a href="salary-type">Salary Type</a></li>
                             <li><a href="salary-setup">Salary Setup </a></li>
                             <li><a href="salary-generate">Salary Generate</a></li>
@@ -137,7 +138,7 @@
                             </span><span class="pcoded-mtext">Destroy Products</span>
                         </a>
                     </li>
-          
+
                     <li class="nav-item">
                         <a href="Sale-Products" class="nav-link" @onclick="ToggleSaleProducts" style="cursor:pointer">
                             <span class="pcoded-micon">
@@ -153,49 +154,49 @@
                     <li class="nav-item">
                         <a href="booking-list" class="nav-link" @onclick="ToggleDashboard" style="cursor:pointer">
                             <span class="pcoded-micon">
-                                <i class="fa-solid fa-hotel"></i>
+                                <i class="fa fa-list-alt"></i>
                             </span><span class="pcoded-mtext">Booking List</span>
-                           
+
                         </a>
                     </li>
                     <li class="nav-item">
                         <a href="check-in" class="nav-link" @onclick="ToggleDashboard" style="cursor:pointer">
                             <span class="pcoded-micon">
-                                <i class="fa-solid fa-door-open"></i>
+                                <i class="fa fa-sign-in"></i>
                             </span><span class="pcoded-mtext">
-                               Check In
+                                Check In
                             </span>
-                            
+
                         </a>
                     </li>
                     <li class="nav-item">
                         <a href="check-out" class="nav-link" @onclick="ToggleDashboard" style="cursor:pointer">
                             <span class="pcoded-micon">
-                                <i class="fa-solid fa-door-closed"></i>
+                                <i class="fa fa-sign-out"></i>
                             </span><span class="pcoded-mtext">
                                 Check Out
                             </span>
-                            
+
                         </a>
                     </li>
                     <li class="nav-item">
                         <a href="room-status" class="nav-link" @onclick="ToggleDashboard" style="cursor:pointer">
                             <span class="pcoded-micon">
-                                <i class="fa-solid fa-chart-gantt"></i>
+                                <i class="fa fa-calendar-check-o"></i>
                             </span><span class="pcoded-mtext">
                                 Room Status
                             </span>
-                           
+
                         </a>
                     </li>
-                  
 
 
 
-                     <li class="nav-item pcoded-menu-caption">
+
+                    <li class="nav-item pcoded-menu-caption">
                         <label>House Keeping</label>
                     </li>
-                 
+
                     <li class="nav-item">
                         <a href="checklist-page" class="nav-link" @onclick="ToggleDashboard" style="cursor:pointer">
                             <span class="pcoded-micon">
@@ -235,14 +236,14 @@
                             <span class="pcoded-micon">
                                 <i class="fa fa-flag-checkered"></i>
                             </span><span class="pcoded-mtext">
-                               Cleaning Report
+                                Cleaning Report
                             </span>
                         </a>
                     </li>
 
 
-                    
-             </ul>
+
+                </ul>
             </div>
         </div>
     </nav>

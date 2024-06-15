@@ -268,6 +268,34 @@ namespace RMS.Server.Controllers.Api
         }
         #endregion
 
+        #region Payrolls
+        [HttpGet]
+        [Route("AdvanceSalary/{id}")]
+        public async Task<AdvanceSalary> GetAdvanceSalaryById(int id)
+        {
+            return await _appRepository.GetAdvanceSalaryById(id);
+        }
+
+        [HttpGet]
+        [Route("all-AdvanceSalary")]
+        public async Task<IEnumerable<AdvanceSalary>> GetAllAdvanceSalary()
+        {
+            return await _appRepository.GetAllAdvanceSalary();
+        }
+
+        [HttpPost]
+        [Route("UpsertAdvanceSalary")]
+        public async Task<ApiResponse<AdvanceSalary>> UpsertAdvanceSalary(AdvanceSalary data)
+        {
+            return await _appRepository.UpsertAdvanceSalary(data);
+        }
+        [HttpPost]
+        [Route("DeleteAdvanceSalary/{id}")]
+        public async Task<ApiResponse<AdvanceSalary>> DeleteAdvanceSalary(int id)
+        {
+            return await _appRepository.DeleteAdvanceSalary(id);
+        }
+        #endregion
 
         #region Hall Setion
         [HttpGet]

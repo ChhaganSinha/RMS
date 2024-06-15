@@ -1020,6 +1020,89 @@ namespace RMS.Client.Client
         }
         #endregion
 
+        #region Payrolls
+        public async Task<AdvanceSalary> GetAdvanceSalaryById(int id)
+        {
+            AdvanceSalary data = null;
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/App/AdvanceSalary/{id}");
+
+                res.EnsureSuccessStatusCode();
+
+                data = await res.Content.ReadFromJsonAsync<AdvanceSalary>();
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return data;
+        }
+        public async Task<IEnumerable<AdvanceSalary>> GetAllAdvanceSalary()
+        {
+            IEnumerable<AdvanceSalary> details = null;
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/App/all-AdvanceSalary");
+
+                res.EnsureSuccessStatusCode();
+
+                details = await res.Content.ReadFromJsonAsync<IEnumerable<AdvanceSalary>>();
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return details;
+        }
+
+        public async Task<ApiResponse<AdvanceSalary>> UpsertAdvanceSalaryAsync(AdvanceSalary data)
+        {
+            var result = new ApiResponse<AdvanceSalary>();
+
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/App/UpsertAdvanceSalary", data);
+                res.EnsureSuccessStatusCode();
+                var json = await res.Content.ReadFromJsonAsync<ApiResponse<AdvanceSalary>>();
+                return json;
+
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+
+
+
+        }
+        public async Task<ApiResponse<AdvanceSalary>> DeleteAdvanceSalary(int id)
+        {
+            var result = new ApiResponse<AdvanceSalary>();
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/App/DeleteAdvanceSalary/{id}", new { });
+                res.EnsureSuccessStatusCode();
+                var json = await res.Content.ReadFromJsonAsync<ApiResponse<AdvanceSalary>>();
+                return json;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+        #endregion
+
         #region Leave Section
         public async Task<LeaveType> GetLeaveTypeById(int id)
         {

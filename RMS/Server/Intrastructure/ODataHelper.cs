@@ -48,6 +48,7 @@ namespace RMS.Server.Intrastructure
             builder.EntitySet<Employee>("Employee");
             builder.EntitySet<EmployeeAttendance>("EmployeeAttendance");
             builder.EntitySet<EmployeePayroll>("EmployeePayroll");
+            builder.EntitySet<AdvanceSalary>("AdvanceSalary");
             builder.EntitySet<Leave>("Leave");
             builder.EntitySet<LeaveType>("LeaveType");
             builder.EntitySet<CheckList>("CheckList");
