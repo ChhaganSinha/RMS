@@ -16,7 +16,7 @@
         @if (show)
         {
 
-            <UiAlert Model="alert"></UiAlert>
+
             <EditForm Model="model" OnValidSubmit="OnSave">
                 <DataAnnotationsValidator />
                 <div class="form-group row">
@@ -33,19 +33,6 @@
                 </div>
                 <div class="form-group row">
                     <div class="col-md-6">
-                        <label class="col-form-label bold-font">Select Designation</label>
-                        <HxSelect TItem="EmployeeDesignation"
-                                  TValue="int?"
-                                  Data="Designations"
-                                  @bind-Value="designationId"
-                                  TextSelector="@(e => e.Name)"
-                                  ValueSelector="@(e => e.Id)"
-                                  Nullable="true"
-                                  NullText="-select-"
-                                  NullDataText="Loading..." />
-                        <ValidationMessage For="() => model.EmployeeDesignation" />
-                    </div>
-                    <div class="col-md-6">
                         <label class="col-form-label bold-font">Select Department</label>
                         <HxSelect TItem="EmployeeDepartment"
                                   TValue="int?"
@@ -57,6 +44,19 @@
                                   NullText="-select-"
                                   NullDataText="Loading..." />
                         <ValidationMessage For="() => model.EmployeeDepartment" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="col-form-label bold-font">Select Designation</label>
+                        <HxSelect TItem="EmployeeDesignation"
+                                  TValue="int?"
+                                  Data="Designations"
+                                  @bind-Value="designationId"
+                                  TextSelector="@(e => e.Name)"
+                                  ValueSelector="@(e => e.Id)"
+                                  Nullable="true"
+                                  NullText="-select-"
+                                  NullDataText="Loading..." />
+                        <ValidationMessage For="() => model.EmployeeDesignation" />
                     </div>
                 </div>
                 <div class="form-group row">
@@ -121,6 +121,7 @@
                         <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
                     </div>
                 }
+                <UiAlert Model="alert"></UiAlert>
                 <hr style="margin-bottom: 2px;" />
                 <button type="submit" class="btn btn-primary float-right col-md-4">Add</button>
             </EditForm>

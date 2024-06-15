@@ -14,7 +14,7 @@
 <PageDialog Title="@Title" Show="@show" ClosePageDialog="ResetForm">
     @if (show)
     {
-        <UiAlert Model="alert"></UiAlert>
+
         <EditForm Model="@purchaseItem" OnValidSubmit="@OnSave">
             <DataAnnotationsValidator />
 
@@ -113,6 +113,7 @@
                 </div>
             </div>
 
+            <UiAlert Model="alert"></UiAlert>
             <div class="form-group row">
                 <div class="col-md-12 text-right">
                     @if (!purchaseItem.IsPaid)

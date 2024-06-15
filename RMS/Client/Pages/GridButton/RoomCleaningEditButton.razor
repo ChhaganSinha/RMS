@@ -14,7 +14,7 @@
     @if (show)
     {
 
-        <UiAlert Model="alert"></UiAlert>
+
         <EditForm Model="model" OnValidSubmit="OnSave">
             <DataAnnotationsValidator />
             <div class="form-group row">
@@ -90,6 +90,7 @@
                     <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
                 </div>
             }
+            <UiAlert Model="alert"></UiAlert>
             <hr />
             <button type="submit" class="btn btn-primary float-right col-md-4">Add</button>
         </EditForm>
