@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.ComponentModel.DataAnnotations;
 
 namespace RMS.Dto
 {
@@ -11,6 +12,7 @@ namespace RMS.Dto
     {
         public int? CategoryId { get; set; }
         public string Category { get; set; } = string.Empty;
+        [Required]
         public string HallNumber { get; set; } = string.Empty;
         public int NumberOfBed { get; set; }
         public string Facilities { get; set; } = string.Empty;

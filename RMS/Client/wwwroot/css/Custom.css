@@ -210,8 +210,8 @@ table.grid-table .grid-header {
 
 /**/
 .grid-table {
-    font-size: 14px !important;
+    font-size: 12px !important;
 }
 .table.grid-table .grid-header > .grid-header-group > .grid-header-title > button {
-    font-size: 15px !important;
+    font-size: 13px !important;
 }

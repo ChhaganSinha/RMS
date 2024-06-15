@@ -22,8 +22,8 @@ namespace RMS.Dto
         public int Pincode { get; set; } 
         public string AadharNumber { get; set; } = string.Empty;
         public string Salary { get; set; } = string.Empty;
-        public DateTime joiningDate { get; set; } 
-        //public bool IsActive { get; set; } 
+        public DateTime joiningDate { get; set; } = DateTime.Now;
+        //public bool IsActive { get; set; } = true;
 
     }
 }

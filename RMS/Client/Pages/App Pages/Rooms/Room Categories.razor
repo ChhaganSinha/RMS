@@ -44,20 +44,19 @@
 <SimpleDailog Title="@Title" Show="@show" OnCloseDialog="ResetForm">
     @if (show)
     {
-
-        <UiAlert Model="alert"></UiAlert>
         <EditForm Model="model" OnValidSubmit="OnSave">
             <DataAnnotationsValidator />
             <div>
                 <input type="text" placeholder="Enter Category" @bind-value="model.Name" class="form-control mb-2" />
                 <ValidationMessage For="() => model.Name" />
             </div>
-                @if (process)
-                {
+            @if (process)
+            {
                 <div style="text-align:center">
                     <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
                 </div>
-                }
+            }
+            <UiAlert Model="alert"></UiAlert>
             <hr />
             <button type="submit" class="btn btn-primary float-right col-md-4">Add</button>
         </EditForm>
@@ -78,7 +77,7 @@
     bool process = false;
     private Timer _timer;
     private int _delay = 2500;
-   
+
 
     protected override async Task OnInitializedAsync()
     {

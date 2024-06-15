@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
@@ -11,6 +12,7 @@ namespace RMS.Dto
     {
         public int ? CategoryId { get; set; }
         public string  Category { get; set; } = string.Empty;
+        [Required]
         public string RoomNumber { get; set; } = string.Empty;
         public int NumberOfBed { get; set; }
         public string Facilities { get; set; } = string.Empty;

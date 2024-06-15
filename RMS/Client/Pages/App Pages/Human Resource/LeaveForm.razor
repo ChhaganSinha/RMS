@@ -42,7 +42,7 @@
 <PageDialog Title="@Title" Show="@show" ClosePageDialog="ResetForm">
     @if (show)
     {
-        <UiAlert Model="alert"></UiAlert>
+
         <EditForm Model="model" OnValidSubmit="OnSave">
             <DataAnnotationsValidator />
 
@@ -133,7 +133,7 @@
                     <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
                 </div>
             }
-
+            <UiAlert Model="alert"></UiAlert>
             <hr style="margin-bottom: 2px;" />
             <button type="submit" class="btn btn-primary float-right col-md-4">Add</button>
         </EditForm>
