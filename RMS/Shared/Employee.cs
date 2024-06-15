@@ -25,7 +25,7 @@ namespace RMS.Dto
         public string AadharNumber { get; set; } = string.Empty;
         public string Salary { get; set; } = string.Empty;
         public DateTime joiningDate { get; set; } = DateTime.Now;
-        //public bool IsActive { get; set; } = true;
+        public bool IsActive { get; set; } = true;
 
     }
 }

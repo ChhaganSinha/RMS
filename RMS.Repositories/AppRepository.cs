@@ -73,7 +73,7 @@ namespace RMS.Repositories
             RoomCategories result = null;
 
 #pragma warning disable CS8600
-             result =  AppDbCxt.RoomCategories.FirstOrDefault(o => o.Id == id);
+            result = AppDbCxt.RoomCategories.FirstOrDefault(o => o.Id == id);
 #pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
 
             return await Task.FromResult(result);
@@ -145,7 +145,7 @@ namespace RMS.Repositories
             }
             catch (Exception ex)
             {
-                result.IsSuccess= false;
+                result.IsSuccess = false;
                 result.Message = ex.Message;
                 return result;
             }
@@ -647,17 +647,19 @@ namespace RMS.Repositories
                 if (data == null)
                 {
                     result.IsSuccess = true;
-                    result.Message = "Invalid Room Categories data!";
+                    result.Message = "Invalid data!";
                     return result;
                 }
 
                 if (data.Id > 0)
                 {
+                    data.ModifiedDate = DateTime.Now;
                     AppDbCxt.AdvanceSalary.Update(data);
                     result.Message = "Data Successfully Updated.";
                 }
                 else
                 {
+                    data.PaymentDate = DateTime.Now;
                     AppDbCxt.AdvanceSalary.Add(data);
                     result.Message = "Data Successfully Inserted.";
                 }
@@ -690,6 +692,174 @@ namespace RMS.Repositories
                 }
 
                 AppDbCxt.AdvanceSalary.Remove(existing);
+                await AppDbCxt.SaveChangesAsync();
+                result.IsSuccess = true;
+                result.Message = "Successfully Deleted!";
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+
+
+        public async Task<SalaryType> GetSalaryTypeById(int id)
+        {
+            SalaryType result = null;
+
+#pragma warning disable CS8600
+            result = AppDbCxt.SalaryType.FirstOrDefault(o => o.Id == id);
+#pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
+
+            return await Task.FromResult(result);
+        }
+
+        public async Task<IEnumerable<SalaryType>> GetAllSalaryType()
+        {
+            IEnumerable<SalaryType> result = null;
+
+            result = AppDbCxt.SalaryType.ToList();
+            return result;
+        }
+        public async Task<ApiResponse<SalaryType>> UpsertSalaryType(SalaryType data)
+        {
+            var result = new ApiResponse<SalaryType>();
+            try
+            {
+
+                if (data == null)
+                {
+                    result.IsSuccess = true;
+                    result.Message = "Invalid Room Categories data!";
+                    return result;
+                }
+
+                if (data.Id > 0)
+                {
+                    AppDbCxt.SalaryType.Update(data);
+                    result.Message = "Data Successfully Updated.";
+                }
+                else
+                {
+                    AppDbCxt.SalaryType.Add(data);
+                    result.Message = "Data Successfully Inserted.";
+                }
+
+                AppDbCxt.SaveChanges();
+                result.IsSuccess = true;
+                result.Result = data;
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+
+        public async Task<ApiResponse<SalaryType>> DeleteSalaryType(int id)
+        {
+            var result = new ApiResponse<SalaryType>();
+            try
+            {
+                var existing = AppDbCxt.SalaryType.First(x => x.Id == id);
+                result.Result = existing;
+                if (existing == null)
+                {
+                    result.IsSuccess = true;
+                    result.Message = "Advance Salary not found!";
+                    return result;
+                }
+
+                AppDbCxt.SalaryType.Remove(existing);
+                await AppDbCxt.SaveChangesAsync();
+                result.IsSuccess = true;
+                result.Message = "Successfully Deleted!";
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+
+
+        public async Task<EmployeePayroll> GetEmployeePayrollById(int id)
+        {
+            EmployeePayroll result = null;
+
+#pragma warning disable CS8600
+            result = AppDbCxt.EmployeePayroll.FirstOrDefault(o => o.Id == id);
+#pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
+
+            return await Task.FromResult(result);
+        }
+
+        public async Task<IEnumerable<EmployeePayroll>> GetAllEmployeePayroll()
+        {
+            IEnumerable<EmployeePayroll> result = null;
+
+            result = AppDbCxt.EmployeePayroll.ToList();
+            return result;
+        }
+        public async Task<ApiResponse<EmployeePayroll>> UpsertEmployeePayroll(EmployeePayroll data)
+        {
+            var result = new ApiResponse<EmployeePayroll>();
+            try
+            {
+
+                if (data == null)
+                {
+                    result.IsSuccess = true;
+                    result.Message = "Invalid Room Categories data!";
+                    return result;
+                }
+
+                if (data.Id > 0)
+                {
+                    AppDbCxt.EmployeePayroll.Update(data);
+                    result.Message = "Data Successfully Updated.";
+                }
+                else
+                {
+                    AppDbCxt.EmployeePayroll.Add(data);
+                    result.Message = "Data Successfully Inserted.";
+                }
+
+                AppDbCxt.SaveChanges();
+                result.IsSuccess = true;
+                result.Result = data;
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+
+        public async Task<ApiResponse<EmployeePayroll>> DeleteEmployeePayroll(int id)
+        {
+            var result = new ApiResponse<EmployeePayroll>();
+            try
+            {
+                var existing = AppDbCxt.EmployeePayroll.First(x => x.Id == id);
+                result.Result = existing;
+                if (existing == null)
+                {
+                    result.IsSuccess = true;
+                    result.Message = "Advance Salary not found!";
+                    return result;
+                }
+
+                AppDbCxt.EmployeePayroll.Remove(existing);
                 await AppDbCxt.SaveChangesAsync();
                 result.IsSuccess = true;
                 result.Message = "Successfully Deleted!";
@@ -1856,7 +2026,7 @@ namespace RMS.Repositories
             PurchaseItem result = null;
 
 #pragma warning disable CS8600
-            result = AppDbCxt.PurchaseItem.Include(o=>o.Items).FirstOrDefault(o => o.Id == id);
+            result = AppDbCxt.PurchaseItem.Include(o => o.Items).FirstOrDefault(o => o.Id == id);
 #pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
 
             return await Task.FromResult(result);

@@ -34,10 +34,26 @@ else
     Action<IGridColumnCollection<EmployeeAttendance>> columns = c =>
     {
 
-        c.Add(o => o.Id).SetWidth("10%").Css("table-bordered").Titled("SN.").Filterable(filter);
-        // c.Add(o => o.Employee.Name).SetWidth("80%").Css("table-bordered").Titled("Name").Filterable(filter);
+        c.Add(o => o.Id).Css("table-bordered").Titled("SN.").Filterable(filter);
+        c.Add(o => o.EmployeeName).Css("table-bordered").Titled("Name").Filterable(filter);
+        c.Add(o => o.EmpId).Css("table-bordered").Titled("Empl. Id").Filterable(filter);
+        c.Add(o => o.Date).Css("table-bordered").Filterable(filter);
+        c.Add(o => o.CheckIn)
+       .Css("table-bordered")
+       .Filterable(filter)
+       .RenderValueAs(o => o.CheckIn.ToString("HH:mm"));
 
-        c.Add().Encoded(false).Sanitized(false).RenderComponentAs<AttendanceCheckout>(new List<Action<object>> { RefreshGrid }).SetWidth("10px").Titled("Check Out");
+        c.Add(o => o.CheckOut)
+        .Css("table-bordered")
+        .Filterable(filter)
+        .RenderValueAs(o => o.CheckOut.ToString("HH:mm"));
+
+        c.Add(o => o.StayTime)
+      .Css("table-bordered")
+      .Filterable(filter)
+      .RenderValueAs(o => o.StayTime.ToString(@"hh\:mm\:ss"));
+
+        // c.Add().Encoded(false).Sanitized(false).RenderComponentAs<AttendanceCheckout>(new List<Action<object>> { RefreshGrid }).SetWidth("10px").Titled("Check Out");
     };
 
     protected override async Task OnParametersSetAsync()

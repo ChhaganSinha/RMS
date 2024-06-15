@@ -51,10 +51,15 @@
                     <InputText @bind-Value="@model.Name" id="name" class="form-control"></InputText>
                     <ValidationMessage For="() => model.Name" />
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-3">
                     <label class="col-form-label bold-font">Employee Id</label>
                     <InputText @bind-Value="@model.EmpId" id="Price" class="form-control"></InputText>
                     <ValidationMessage For="() => model.EmpId" />
+                </div>
+                <div class="col-md-3">
+                    <label class="col-form-label bold-font required-field">Phone No.</label>
+                    <InputText @bind-Value="@model.PhoneNumber" id="PhoneNumber" class="form-control"></InputText>
+                    <ValidationMessage For="() => model.PhoneNumber" />
                 </div>
             </div>
             <div class="form-group row">
@@ -86,19 +91,13 @@
                 </div>
             </div>
             <div class="form-group row">
-                <div class="col-md-6">
-                    <label class="col-form-label bold-font required-field">Phone No.</label>
-                    <InputText @bind-Value="@model.PhoneNumber" id="PhoneNumber" class="form-control"></InputText>
-                    <ValidationMessage For="() => model.PhoneNumber" />
-                </div>
+               
                 <div class="col-md-6">
                     <label class="col-form-label bold-font">Email</label>
                     <InputText @bind-Value="@model.Email" id="Email" class="form-control"></InputText>
                     <ValidationMessage For="() => model.Email" />
                 </div>
-            </div>
-            <div class="form-group row">
-                <div class="col-md-12">
+                <div class="col-md-6">
                     <label class="col-form-label bold-font required-field">Address</label>
                     <InputTextArea @bind-Value="@model.Address" id="Address" class="form-control"></InputTextArea>
                     <ValidationMessage For="() => model.Address" />
@@ -122,19 +121,17 @@
                 </div>
             </div>
             <div class="form-group row">
-                <div class="col-md-6">
+                <div class="col-md-4">
                     <label class="col-form-label bold-font required-field">Aadhar No.</label>
                     <InputText @bind-Value="@model.AadharNumber" id="AadharNumber" class="form-control"></InputText>
                     <ValidationMessage For="() => model.AadharNumber" />
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-4">
                     <label class="col-form-label bold-font">Salary</label>
                     <InputText @bind-Value="@model.Salary" id="Salary" class="form-control"></InputText>
                     <ValidationMessage For="() => model.Salary" />
                 </div>
-            </div>
-            <div class="form-group row">
-                <div class="col-md-6">
+                <div class="col-md-4">
                     <label class="col-form-label bold-font required-field">joining Date</label>
                     <InputDate @bind-Value="@model.joiningDate" id="joiningDate" class="form-control"></InputDate>
                     <ValidationMessage For="() => model.joiningDate" />

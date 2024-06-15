@@ -287,6 +287,10 @@ namespace RMS.Server.Controllers.Api
         [Route("UpsertAdvanceSalary")]
         public async Task<ApiResponse<AdvanceSalary>> UpsertAdvanceSalary(AdvanceSalary data)
         {
+            if(data.Id > 0)
+                data.ModifiedBy = User.Identity.Name;
+            else
+                data.CreatedBy = User.Identity.Name;
             return await _appRepository.UpsertAdvanceSalary(data);
         }
         [HttpPost]
@@ -294,6 +298,34 @@ namespace RMS.Server.Controllers.Api
         public async Task<ApiResponse<AdvanceSalary>> DeleteAdvanceSalary(int id)
         {
             return await _appRepository.DeleteAdvanceSalary(id);
+        }
+
+
+        [HttpGet]
+        [Route("EmployeePayroll/{id}")]
+        public async Task<EmployeePayroll> GetEmployeePayrollById(int id)
+        {
+            return await _appRepository.GetEmployeePayrollById(id);
+        }
+
+        [HttpGet]
+        [Route("all-EmployeePayroll")]
+        public async Task<IEnumerable<EmployeePayroll>> GetAllEmployeePayroll()
+        {
+            return await _appRepository.GetAllEmployeePayroll();
+        }
+
+        [HttpPost]
+        [Route("UpsertEmployeePayroll")]
+        public async Task<ApiResponse<EmployeePayroll>> UpsertEmployeePayroll(EmployeePayroll data)
+        {
+            return await _appRepository.UpsertEmployeePayroll(data);
+        }
+        [HttpPost]
+        [Route("DeleteEmployeePayroll/{id}")]
+        public async Task<ApiResponse<EmployeePayroll>> DeleteEmployeePayroll(int id)
+        {
+            return await _appRepository.DeleteEmployeePayroll(id);
         }
         #endregion
 

@@ -42,6 +42,7 @@ namespace RMS.DataContext
         public DbSet<Leave> Leave { get; set; }
         public DbSet<EmployeeAttendance> EmployeeAttendance { get; set; }
         public DbSet<EmployeePayroll> EmployeePayroll { get; set; }
+        public DbSet<SalaryType> SalaryType { get; set; }
         public DbSet<AdvanceSalary> AdvanceSalary { get; set; }
         public DbSet<CheckList> CheckList { get; set; }
         public DbSet<RoomCleaning> RoomCleaning { get; set; }

@@ -1101,6 +1101,89 @@ namespace RMS.Client.Client
                 return result;
             }
         }
+
+
+
+        public async Task<EmployeePayroll> GetEmployeePayrollById(int id)
+        {
+            EmployeePayroll data = null;
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/App/EmployeePayroll/{id}");
+
+                res.EnsureSuccessStatusCode();
+
+                data = await res.Content.ReadFromJsonAsync<EmployeePayroll>();
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return data;
+        }
+        public async Task<IEnumerable<EmployeePayroll>> GetAllEmployeePayroll()
+        {
+            IEnumerable<EmployeePayroll> details = null;
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/App/all-EmployeePayroll");
+
+                res.EnsureSuccessStatusCode();
+
+                details = await res.Content.ReadFromJsonAsync<IEnumerable<EmployeePayroll>>();
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return details;
+        }
+
+        public async Task<ApiResponse<EmployeePayroll>> UpsertEmployeePayrollAsync(EmployeePayroll data)
+        {
+            var result = new ApiResponse<EmployeePayroll>();
+
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/App/UpsertEmployeePayroll", data);
+                res.EnsureSuccessStatusCode();
+                var json = await res.Content.ReadFromJsonAsync<ApiResponse<EmployeePayroll>>();
+                return json;
+
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+
+
+
+        }
+        public async Task<ApiResponse<EmployeePayroll>> DeleteEmployeePayroll(int id)
+        {
+            var result = new ApiResponse<EmployeePayroll>();
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/App/DeleteEmployeePayroll/{id}", new { });
+                res.EnsureSuccessStatusCode();
+                var json = await res.Content.ReadFromJsonAsync<ApiResponse<EmployeePayroll>>();
+                return json;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
         #endregion
 
         #region Leave Section
