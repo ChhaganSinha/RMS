@@ -2421,6 +2421,126 @@ namespace RMS.Client.Client
             }
         }
 
+
+        public async Task<bool> UpsertFoodMenuTypeMapping(Dictionary<int, List<int>> dict)
+        {
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/App/UpsertFoodMenuTypeMapping", dict);
+                res.EnsureSuccessStatusCode();
+
+                return res.IsSuccessStatusCode;
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+        }
+
+        public async Task<List<FoodMenuTypeMapping>> GetFoodMenuTypeByFoodId(int id)
+        {
+            List<FoodMenuTypeMapping> Trainingcampaign = new();
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/App/GetFoodMenuTypeByFoodId/{id}");
+
+                res.EnsureSuccessStatusCode();
+
+                Trainingcampaign = await res.Content.ReadFromJsonAsync<List<FoodMenuTypeMapping>>();
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+            return Trainingcampaign;
+        }
+
+        public async Task<AddFood> GetFoodById(int id)
+        {
+            AddFood data = null;
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/App/AddFood/{id}");
+
+                res.EnsureSuccessStatusCode();
+
+                data = await res.Content.ReadFromJsonAsync<AddFood>();
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return data;
+        }
+        public async Task<IEnumerable<AddFood>> GetAllFood()
+        {
+            IEnumerable<AddFood> details = null;
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/App/all-AddFood");
+
+                res.EnsureSuccessStatusCode();
+
+                details = await res.Content.ReadFromJsonAsync<IEnumerable<AddFood>>();
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return details;
+        }
+
+        public async Task<ApiResponse<AddFood>> UpsertFoodAsync(AddFood data)
+        {
+            var result = new ApiResponse<AddFood>();
+
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/App/UpsertAddFood", data);
+                res.EnsureSuccessStatusCode();
+                var json = await res.Content.ReadFromJsonAsync<ApiResponse<AddFood>>();
+                return json;
+
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+
+
+
+        }
+        public async Task<ApiResponse<AddFood>> DeleteFood(int id)
+        {
+            var result = new ApiResponse<AddFood>();
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/App/DeleteFood/{id}", new { });
+                res.EnsureSuccessStatusCode();
+                var json = await res.Content.ReadFromJsonAsync<ApiResponse<AddFood>>();
+                return json;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+
+
         #endregion
 
     }

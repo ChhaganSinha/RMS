@@ -15,6 +15,8 @@ namespace RMS.Dto
         public string MenuType { get; set; } = string.Empty;
         public int? MenuTypeId { get; set; }
         public string FoodCategory { get; set; } = string.Empty;
+
+        public int? FoodCategoryId { get; set; }
         public string Variant { get; set; } = string.Empty;
         public int? VariantId { get; set; }
         public decimal Price { get; set; } 
