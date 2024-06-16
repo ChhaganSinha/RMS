@@ -18,15 +18,19 @@
         <EditForm Model="model" OnValidSubmit="OnSave">
             <DataAnnotationsValidator />
             <div>
-                <div class="col-md-12">
-                    <label class="col-form-label bold-font required-field">Type Name</label>
-                    <InputText @bind-Value="@model.TypeName" id="TypeName" class="form-control"></InputText>
-                    <ValidationMessage For="() => model.TypeName" />
+                <div class="form-group row">
+                    <div class="col-md-12">
+                        <label class="col-form-label bold-font required-field">Type Name</label>
+                        <InputText @bind-Value="@model.TypeName" id="TypeName" class="form-control"></InputText>
+                        <ValidationMessage For="() => model.TypeName" />
+                    </div>
                 </div>
-                <div class="col-md-12">
-                    <label class="col-form-label bold-font required-field">Leave Days</label>
-                    <InputNumber @bind-Value="@model.LeaveDays" id="LeaveDays" class="form-control"></InputNumber>
-                    <ValidationMessage For="() => model.LeaveDays" />
+                <div class="form-group row">
+                    <div class="col-md-12">
+                        <label class="col-form-label bold-font required-field">Leave Days</label>
+                        <InputNumber @bind-Value="@model.LeaveDays" id="LeaveDays" class="form-control"></InputNumber>
+                        <ValidationMessage For="() => model.LeaveDays" />
+                    </div>
                 </div>
             </div>
             @if (process || model == null)

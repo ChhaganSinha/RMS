@@ -91,7 +91,7 @@
                 </div>
             </div>
             <div class="form-group row">
-               
+
                 <div class="col-md-6">
                     <label class="col-form-label bold-font">Email</label>
                     <InputText @bind-Value="@model.Email" id="Email" class="form-control"></InputText>
@@ -109,7 +109,7 @@
                     <InputText @bind-Value="@model.City" id="City" class="form-control"></InputText>
                     <ValidationMessage For="() => model.City" />
                 </div>
-                 <div class="col-md-4">
+                <div class="col-md-4">
                     <label class="col-form-label bold-font required-field">State</label>
                     <InputText @bind-Value="@model.State" id="State" class="form-control"></InputText>
                     <ValidationMessage For="() => model.State" />
@@ -185,9 +185,9 @@
 
         model.DepartmentId = departmentId;
         if (departmentId != null)
-            model.EmployeeDesignation = Departments.Where(x => x.Id == departmentId).Select(x => x.Name).First();
-        
-            model.DesignationId = designationId;
+            model.EmployeeDepartment = Departments.Where(x => x.Id == departmentId).Select(x => x.Name).First();
+
+        model.DesignationId = designationId;
         if (designationId != null)
             model.EmployeeDesignation = Designations.Where(x => x.Id == designationId).Select(x => x.Name).First();
 

@@ -23,31 +23,39 @@ namespace RMS.Server.Controllers.Api.OData
             DbContext = dbContext;
         }
 
+        //[EnableQuery]
+        //[ODataAuthorize]
+        //public async Task<IQueryable<EmployeeAttendance>> Get()
+        //{
+        //    var currentDate = DateOnly.FromDateTime(DateTime.Today);
+        //    var attendanceExists = await DbContext.EmployeeAttendance
+        //                                          .AnyAsync(ea => ea.Date == currentDate);
+
+        //    if (!attendanceExists)
+        //    {
+        //        var employees = await DbContext.Employee.ToListAsync();
+        //        var attendances = employees.Select(e => new EmployeeAttendance
+        //        {
+        //            EmployeeId = e.Id,
+        //            EmployeeName = e.Name,
+        //            EmpId = e.EmpId,
+        //            Date = currentDate,
+        //        });
+
+        //        await DbContext.EmployeeAttendance.AddRangeAsync(attendances);
+        //        await DbContext.SaveChangesAsync();
+        //    }
+
+        //    return DbContext.EmployeeAttendance.AsQueryable();
+        //}
+
+
         [EnableQuery]
         [ODataAuthorize]
-        public async Task<IQueryable<EmployeeAttendance>> Get()
+        public IQueryable<EmployeeAttendance> Get()
         {
-            var currentDate = DateOnly.FromDateTime(DateTime.Today);
-            var attendanceExists = await DbContext.EmployeeAttendance
-                                                  .AnyAsync(ea => ea.Date == currentDate);
-
-            if (!attendanceExists)
-            {
-                var employees = await DbContext.Employee.ToListAsync();
-                var attendances = employees.Select(e => new EmployeeAttendance
-                {
-                    EmployeeId = e.Id,
-                    EmployeeName = e.Name,
-                    EmpId = e.EmpId,
-                    Date = currentDate,
-                });
-
-                await DbContext.EmployeeAttendance.AddRangeAsync(attendances);
-                await DbContext.SaveChangesAsync();
-            }
-
-            return DbContext.EmployeeAttendance.AsQueryable();
+            var data = DbContext.EmployeeAttendance.AsQueryable();
+            return data;
         }
-
     }
 }

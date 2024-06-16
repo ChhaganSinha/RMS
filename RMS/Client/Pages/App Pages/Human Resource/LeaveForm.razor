@@ -17,7 +17,7 @@
                 <div class="page-header-title">
                     <h5 class="m-b-10">
                         Leave
-                        <a @onclick="()=>show=true" style="cursor:pointer"><i class="fa fa-plus-circle fa-lg text-primary" aria-hidden="true" title="Add Leave"></i></a>
+                        <a @onclick="Show" style="cursor:pointer"><i class="fa fa-plus-circle fa-lg text-primary" aria-hidden="true" title="Add Leave"></i></a>
                     </h5>
                 </div>
                 <ul class="breadcrumb">
@@ -45,22 +45,27 @@
 
         <EditForm Model="model" OnValidSubmit="OnSave">
             <DataAnnotationsValidator />
-
             <div class="form-group row">
                 <div class="col-md-6">
                     <label class="col-form-label bold-font">Select Employee</label>
-                    <select @bind="model.EmployeeName" class="form-control" id="name">
-                        <option value="">- Select -</option>
-                        @foreach (var emp in Employees)
-                        {
-                            <option value="@emp.Id">@emp.Name</option>
-                        }
-                    </select>
-                    <ValidationMessage For="() => model.EmployeeName" />
+                    <HxSelect TItem="Employee"
+                              TValue="int?"
+                              Data="Employees"
+                              @bind-Value="employeeId"
+                              TextSelector="@(e => e.Name)"
+                              ValueSelector="@(e => e.Id)"
+                              Nullable="true"
+                              NullText="-select-"
+                              NullDataText="Loading..." />
+
+                    @if (employeeId == null && submit)
+                    {
+                        <p class="text-danger">Please select one</p>
+                    }
                 </div>
                 <div class="col-md-6">
                     <label class="col-form-label bold-font">Select Leave Type</label>
-                    <select @bind="model.LeaveType" class="form-control" id="LeaveType">
+                    <select @bind="model.LeaveTypeId" class="form-control" id="LeaveType">
                         <option value="">- Select -</option>
                         @foreach (var leaveType in LeaveTypes)
                         {
@@ -150,6 +155,7 @@
 
     Leave model = new();
     public string Title = "Add Leave";
+    bool submit = false;
     bool show = false;
     bool process = false;
     private Timer _timer;
@@ -157,13 +163,15 @@
 
     private List<LeaveType> LeaveTypes = new();
     private List<Employee> Employees = new();
+    private int? employeeId;
+    private int? leaveTypeId;
 
     private AuthenticationState authState;
 
     protected override async Task OnInitializedAsync()
     {
         alert?.Clear();
-        LeaveTypes = (await client.GetAllLeaveType()).ToList();
+        LeaveTypes = (await client.GetAllLeaveTypeAsync()).ToList();
         Employees = (await client.GetAllEmployee()).ToList();
         authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         if (Id == 0)
@@ -172,7 +180,7 @@
 
     private void CalculateApplyDays()
     {
-       
+
         if (model.ApplicationStartDate != default && model.ApplicationEndDate != default)
         {
             if (model.ApplicationStartDate <= model.ApplicationEndDate)
@@ -225,13 +233,28 @@
 
     public async Task OnSave()
     {
+        submit = true;
+        if (employeeId == null)
+            return;
+
+        submit = false;
         process = true;
         alert?.Clear();
+        model.EmployeeId = employeeId;
+        if (employeeId != null)
+            model.EmployeeName = Employees.Where(x => x.Id == employeeId).Select(x => x.Name).First();
+
+        // model.LeaveTypeId = leaveTypeId;
+        // if (leaveTypeId != null)
+        //     model.LeaveType = LeaveTypes.Where(x => x.Id == leaveTypeId).Select(x => x.TypeName).First();
+
+        model.LeaveType = LeaveTypes.Where(x => x.Id == model.LeaveTypeId).Select(x => x.TypeName).First();
 
         var response = await client.UpsertLeaveAsync(model);
         if (response.IsSuccess)
         {
             alert?.SetSuccess(response.Message);
+            employeeId = null;
             model = new Leave(); // Reset form after successful save
             await LeaveGrid.RefreshGridAsync(); // Refresh the grid where necessary
         }
@@ -256,5 +279,11 @@
     {
         model = new Leave();
         show = false;
+    }
+
+    private void Show()
+    {
+        show = true;
+        employeeId = null;
     }
 }

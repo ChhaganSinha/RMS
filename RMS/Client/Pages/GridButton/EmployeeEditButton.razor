@@ -166,9 +166,12 @@
         process = true;
         alert?.Clear();
         model.DepartmentId = departmentId;
-        model.EmployeeDesignation = Departments.Where(x => x.Id == departmentId).Select(x => x.Name).First();
+        if (departmentId != null)
+            model.EmployeeDepartment = Departments.Where(x => x.Id == departmentId).Select(x => x.Name).First();
+
         model.DesignationId = designationId;
-        model.EmployeeDesignation = Designations.Where(x => x.Id == designationId).Select(x => x.Name).First();
+        if (designationId != null)
+            model.EmployeeDesignation = Designations.Where(x => x.Id == designationId).Select(x => x.Name).First();
         var response = await client.UpsertEmployeeAsync(model);
         if (response.IsSuccess)
         {

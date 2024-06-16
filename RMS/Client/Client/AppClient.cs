@@ -920,10 +920,10 @@ namespace RMS.Client.Client
                 {
                     PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
                     Converters =
-            {
-                new DateOnlyJsonConverter(),
-                new TimeOnlyJsonConverter()
-            }
+                    {
+                        new DateOnlyJsonConverter(),
+                        new TimeOnlyJsonConverter()
+                    }
                 };
 
                 var jsonContent = JsonSerializer.Serialize(data, jsonOptions);
@@ -1207,16 +1207,16 @@ namespace RMS.Client.Client
 
             return data;
         }
-        public async Task<IEnumerable<LeaveType>> GetAllLeaveType()
+        public async Task<IEnumerable<LeaveType>> GetAllLeaveTypeAsync()
         {
-            IEnumerable<LeaveType> details = null;
+            IEnumerable<LeaveType> data = null;
             try
             {
-                var res = await HttpClient.GetAsync($"api/App/all-LeaveType");
+                var res = await HttpClient.GetAsync($"api/App/all-leaveType");
 
                 res.EnsureSuccessStatusCode();
 
-                details = await res.Content.ReadFromJsonAsync<IEnumerable<LeaveType>>();
+                data = await res.Content.ReadFromJsonAsync<IEnumerable<LeaveType>>();
 
             }
             catch (Exception ex)
@@ -1225,7 +1225,7 @@ namespace RMS.Client.Client
                 throw;
             }
 
-            return details;
+            return data;
         }
 
         public async Task<ApiResponse<LeaveType>> UpsertLeaveTypeAsync(LeaveType data)
@@ -2154,7 +2154,7 @@ namespace RMS.Client.Client
 
         public async Task<List<ItemDto>> GetPurchaseItemListById(int id)
         {
-           List<ItemDto> data = new();
+            List<ItemDto> data = new();
             try
             {
                 var res = await HttpClient.GetAsync($"api/App/PurchaseItemList/{id}");

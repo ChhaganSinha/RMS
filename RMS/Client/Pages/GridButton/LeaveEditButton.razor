@@ -8,40 +8,118 @@
 @inject AppClient client
 @implements ICustomGridComponent<Leave>
 @inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
 
 <button class='btn btn-sm btn-warning' style="border-radius:15px" @onclick="MyClickHandler" title="Edit"><i class="fa fa-pencil-square-o"></i></button>
-<SimpleDailog Title="@Title" Show="@show" OnCloseDialog="ResetForm">
+
+<PageDialog Title="@Title" Show="@show" ClosePageDialog="ResetForm">
     @if (show)
     {
-
-
         <EditForm Model="model" OnValidSubmit="OnSave">
             <DataAnnotationsValidator />
-            <div>
-                <div class="col-md-12">
-                    <label class="col-form-label bold-font required-field">Employee Name</label>
-                    <InputText @bind-Value="@model.EmployeeName" id="EmployeeName" class="form-control"></InputText>
-                    <ValidationMessage For="() => model.EmployeeName" />
+            <div class="form-group row">
+                <div class="col-md-6">
+                    <label class="col-form-label bold-font">Select Employee</label>
+                    <HxSelect TItem="Employee"
+                              TValue="int?"
+                              Data="Employees"
+                              @bind-Value="employeeId"
+                              TextSelector="@(e => e.Name)"
+                              ValueSelector="@(e => e.Id)"
+                              Nullable="true"
+                              NullText="-select-"
+                              NullDataText="Loading..." />
+
+                    @if (employeeId == null && submit)
+                    {
+                        <p class="text-danger">Please select one</p>
+                    }
                 </div>
-                <div class="col-md-12">
-                    <label class="col-form-label bold-font required-field">Leave Type</label>
-                    <InputNumber @bind-Value="@model.LeaveType" id="LeaveType" class="form-control"></InputNumber>
+                <div class="col-md-6">
+                    <label class="col-form-label bold-font">Select Leave Type</label>
+                    <select @bind="model.LeaveTypeId" class="form-control" id="LeaveType">
+                        <option value="">- Select -</option>
+                        @foreach (var leaveType in LeaveTypes)
+                        {
+                            <option value="@leaveType.Id">@leaveType.TypeName</option>
+                        }
+                    </select>
                     <ValidationMessage For="() => model.LeaveType" />
                 </div>
             </div>
-            @if (process || model == null)
+
+            <div class="form-group row">
+                <div class="col-md-6">
+                    <label class="col-form-label bold-font required-field">Application Start Date</label>
+                    <InputDate @bind-Value="@model.ApplicationStartDate" id="ApplicationStartDate" class="form-control" @onchange="CalculateApplyDays"></InputDate>
+                    <ValidationMessage For="() => model.ApplicationStartDate" />
+                </div>
+                <div class="col-md-6">
+                    <label class="col-form-label bold-font">Application End Date</label>
+                    <InputDate @bind-Value="@model.ApplicationEndDate" id="ApplicationEndDate" class="form-control" @oninput="CalculateApplyDays"></InputDate>
+                    <ValidationMessage For="() => model.ApplicationEndDate" />
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <div class="col-md-6">
+                    <label class="col-form-label bold-font required-field">Apply Days</label>
+                    <InputNumber @bind-Value="@model.ApplyDaysCount" id="ApplyDaysCount" class="form-control" disabled></InputNumber>
+                    <ValidationMessage For="() => model.ApplyDaysCount" />
+                </div>
+                <div class="col-md-6">
+                    <label class="col-form-label bold-font">Application Hard Copy</label>
+                    <InputFile OnChange="HandleFileSelection" />
+                    <ValidationMessage For="() => model.ApplicationHardCopy" />
+                    <div>
+                        @if (!string.IsNullOrWhiteSpace(model.ApplicationHardCopy) && model.ApplicationHardCopyByteData != null)
+                        {
+                            <img src="data:image;base64,@(Convert.ToBase64String(model.ApplicationHardCopyByteData))" style="max-width: 100%; max-height: 200px;" />
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <div class="col-md-6">
+                    <label class="col-form-label bold-font required-field">Approve Start Date</label>
+                    <InputDate @bind-Value="@model.ApproveStartDate" id="ApproveStartDate" class="form-control" @oninput="CalculateApproveDays"></InputDate>
+                    <ValidationMessage For="() => model.ApproveStartDate" />
+                </div>
+                <div class="col-md-6">
+                    <label class="col-form-label bold-font">Approve End Date</label>
+                    <InputDate @bind-Value="@model.ApproveEndDate" id="ApproveEndDate" class="form-control" @oninput="CalculateApproveDays"></InputDate>
+                    <ValidationMessage For="() => model.ApproveEndDate" />
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <div class="col-md-6">
+                    <label class="col-form-label bold-font required-field">Approve Days</label>
+                    <InputNumber @bind-Value="@model.ApproveDaysCount" id="ApproveDaysCount" class="form-control" disabled></InputNumber>
+                    <ValidationMessage For="() => model.ApproveDaysCount" />
+                </div>
+                <div class="col-md-6">
+                    <label class="col-form-label bold-font">Approved By</label>
+                    <InputText @bind-Value="@model.ApprovedBy" id="ApprovedBy" class="form-control" disabled></InputText>
+                    <ValidationMessage For="() => model.ApprovedBy" />
+                </div>
+            </div>
+
+            @if (process)
             {
                 <div style="text-align:center">
                     <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
                 </div>
             }
             <UiAlert Model="alert"></UiAlert>
-            <hr />
+            <hr style="margin-bottom: 2px;" />
             <button type="submit" class="btn btn-primary float-right col-md-4">Add</button>
         </EditForm>
         <br />
     }
-</SimpleDailog>
+</PageDialog>
+
 @code {
     [Parameter]
     public Leave Item { get; set; }
@@ -55,8 +133,14 @@
     private Timer _timer;
     private int _delay = 2500;
     bool show = false;
+    bool submit = false;
     bool process = false;
     string Title = "Update Leave Type";
+    private List<LeaveType> LeaveTypes = new();
+    private List<Employee> Employees = new();
+    private int? employeeId;
+    private int? leaveTypeId;
+    private AuthenticationState authState;
 
     Leave model = new();
 
@@ -64,11 +148,11 @@
     {
         show = true;
         model = await client.GetLeaveById(Item.Id);
-    }
-
-    protected override async Task OnInitializedAsync()
-    {
         alert?.Clear();
+        LeaveTypes = (await client.GetAllLeaveTypeAsync()).ToList();
+        Employees = (await client.GetAllEmployee()).ToList();
+        authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        employeeId = model.EmployeeId;
     }
 
     public async Task OnSave()
@@ -79,16 +163,30 @@
         var response = await client.UpsertLeaveAsync(model);
         if (response.IsSuccess)
         {
-            // model = response.Result;
             alert?.SetSuccess(response.Message);
             await LeaveGrid.RefreshGridAsync();
         }
         else
+        {
             alert?.SetError(response.Message);
+        }
 
         process = false;
         StateHasChanged();
         _timer = new Timer(TimerCallback, null, _delay, Timeout.Infinite);
+    }
+
+    private async Task HandleFileSelection(InputFileChangeEventArgs e)
+    {
+        var file = e.File;
+        if (file != null)
+        {
+            using var memoryStream = new MemoryStream();
+            await file.OpenReadStream().CopyToAsync(memoryStream);
+            model.ApplicationHardCopyByteData = memoryStream.ToArray();
+            model.ApplicationHardCopy = file.Name;
+        }
+        StateHasChanged();
     }
 
     private void TimerCallback(Object o)
@@ -105,4 +203,43 @@
         process = false;
     }
 
+    private void CalculateApplyDays()
+    {
+        if (model.ApplicationStartDate != default && model.ApplicationEndDate != default)
+        {
+            if (model.ApplicationStartDate <= model.ApplicationEndDate)
+            {
+                model.ApplyDaysCount = (model.ApplicationEndDate - model.ApplicationStartDate).Days + 1;
+            }
+            else
+            {
+                model.ApplyDaysCount = 0;
+            }
+        }
+        else
+        {
+            model.ApplyDaysCount = 0;
+        }
+        StateHasChanged();
+    }
+
+    private void CalculateApproveDays()
+    {
+        if (model.ApproveStartDate != default && model.ApproveEndDate != default)
+        {
+            if (model.ApproveStartDate <= model.ApproveEndDate)
+            {
+                model.ApproveDaysCount = (model.ApproveEndDate - model.ApproveStartDate).Days + 1;
+            }
+            else
+            {
+                model.ApproveDaysCount = 0;
+            }
+        }
+        else
+        {
+            model.ApproveDaysCount = 0;
+        }
+        StateHasChanged();
+    }
 }
