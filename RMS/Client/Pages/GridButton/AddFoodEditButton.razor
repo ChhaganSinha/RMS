@@ -1,0 +1,238 @@
+﻿@* @using GridShared
+@using GridShared.Columns
+@using GridShared.Utility
+@using Microsoft.Extensions.Primitives
+@using RMS.Client.Pages.GridComponent
+@using RMS.Client.Shared.Popup
+@using RMS.Client.Client
+@using System.ComponentModel.DataAnnotations
+@inject AppClient client
+@implements ICustomGridComponent<AddFood>
+@inject NavigationManager NavigationManager
+
+<button class='btn btn-sm btn-warning' style="border-radius:15px" @onclick="MyClickHandler" title="Edit"><i class="fa fa-pencil-square-o"></i></button>
+<PageDialog Title="@Title" Show="@show" ClosePageDialog="ResetForm">
+    @if (show)
+    {
+
+        <EditForm Model="model" OnValidSubmit="OnSave">
+            <DataAnnotationsValidator />
+            <div class="form-group row">
+                <div class="col-md-6">
+                    <label class="col-form-label bold-font required-field">AddFood Number</label>
+                    <InputText @bind-Value="@model.HallNumber" id="HallNumber" class="form-control"></InputText>
+                    <ValidationMessage For="() => model.HallNumber" />
+                </div>
+                <div class="col-md-6">
+                    <label class="col-form-label bold-font">Price</label>
+                    <InputNumber @bind-Value="@model.Price" id="Price" class="form-control"></InputNumber>
+                    <ValidationMessage For="() => model.Price" />
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="col-md-6">
+                    <label class="col-form-label bold-font">Select Category</label>
+                    <HxSelect TItem="HallCategories"
+                              TValue="int?"
+                              Data="Categories"
+                              @bind-Value="categoriesId"
+                              TextSelector="@(Categories => Categories.Name)"
+                              ValueSelector="@(Categories => Categories.Id)"
+                              Nullable="true"
+                              NullText="-select-"
+                              NullDataText="Loading categories..." />
+                    <ValidationMessage For="() => model.Category" />
+                </div>
+                <div class="col-md-6">
+                    <label class="col-form-label bold-font">Select Facilities</label>
+                    <HxMultiSelect TItem="HallFacilities"
+                                   AutoSort="false"
+                                   TValue="int"
+                                   Data="@Facilities"
+                                   @bind-Value="@SelectedFacilities"
+                                   TextSelector="@(p => p.Name)"
+                                   ValueSelector="@(p => p.Id)"
+                                   EmptyText="- Select -"
+                                   NullDataText="Loading..." />
+                    @if (SelectedFacilities.Count() == 0 && IsError)
+                    {
+                        <span style="color:red">Please select at least one Facility</span>
+                    }
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="col-md-4">
+                    <label class="col-form-label bold-font" style="padding-right: 0;">No. of Beds</label>
+                    <InputNumber @bind-Value="@model.NumberOfBed" id="NumberOfBed" class="form-control"></InputNumber>
+                    <ValidationMessage For="() => model.NumberOfBed" />
+                </div>
+                <div class="col-md-4">
+                    <label class="col-form-label bold-font" style="padding-right: 0;">Capacity</label>
+                    <InputText @bind-Value="@model.Capacity" id="Capacity" class="form-control"></InputText>
+                    <ValidationMessage For="() => model.Capacity" />
+                </div>
+                <div class="col-md-4">
+                    <label class="col-form-label bold-font" style="padding-right: 0;">Extra Capacity</label>
+                    <InputCheckbox @bind-Value="model.ExtraCapacity" id="ExtraCapacity" class="form-check-input" style="margin-left: -100px;margin-top: 45px; font-size: x-large;margin-top: 42px;" />
+                    <ValidationMessage For="() => model.ExtraCapacity" />
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="col-md-6">
+                    <label class="col-form-label bold-font" style="padding-right: 0;">Bed Charge</label>
+                    <InputText @bind-Value="@model.BedCharge" id="BedCharge" class="form-control"></InputText>
+                    <ValidationMessage For="() => model.BedCharge" />
+                </div>
+                <div class="col-md-6">
+                    <label class="col-form-label bold-font" style="padding-right: 0;">Person Charge</label>
+                    <InputText @bind-Value="@model.PersonCharge" id="PersonCharge" class="form-control"></InputText>
+                    <ValidationMessage For="() => model.PersonCharge" />
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="col-md-3">
+                    <label class="col-form-label bold-font" style="padding-right: 0;">IsActive</label>
+                    <InputCheckbox @bind-Value="model.IsActive" class="form-check-input" style="font-size: x-large;margin-top: 42px; margin-left: -56px;" />
+                    <ValidationMessage For="() => model.IsActive" />
+                </div>
+                <div class="col-md-9">
+                    <label class="col-form-label bold-font">Upload Image</label>
+                    <InputFile OnChange="HandleFileSelected" class="form-control" />
+                    <br />
+                    <img id="imgPreview" src="@imageDataUrl" style="max-width: 200px; max-height: 200px; display: @(imageDataUrl == null ? "none" : "block");" />
+                    <ValidationMessage For="() => model.ImageFile" />
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="col-md-12">
+                    <label class="col-form-label bold-font" style="padding-right: 0;">Descriptions</label>
+                    <InputTextArea @bind-Value="@model.Descriptions" id="Descriptions" class="form-control"></InputTextArea>
+                    <ValidationMessage For="() => model.Descriptions" />
+                </div>
+            </div>
+            @if (process)
+            {
+                <div style="text-align:center">
+                    <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
+                </div>
+            }
+            <UiAlert Model="alert"></UiAlert>
+            <hr style="margin-bottom: 2px;" />
+            <button type="submit" class="btn btn-primary float-right col-md-4">Add</button>
+        </EditForm>
+        <br />
+    }
+</PageDialog>
+@code {
+    [Parameter]
+    public Hall Item { get; set; }
+
+    [Parameter]
+    public CGrid<Hall> Grid { get; set; }
+
+    [CascadingParameter]
+    protected AlertModel? alert { get; set; }
+
+    private Timer _timer;
+    private int _delay = 2500;
+    bool show = false;
+    bool process = false;
+    string Title = "Update Hall Details";
+
+    private int? categoriesId;
+    [Required]
+    private List<int> SelectedFacilities { get; set; } = new();
+    private bool IsError = false;
+    List<HallCategories> Categories = new();
+    private List<HallFacilities> Facilities = new();
+    Dictionary<int, List<int>> HallFacilitiesMap = new Dictionary<int, List<int>>();
+
+    private string imageDataUrl;
+
+    Hall model = new();
+
+    private async Task MyClickHandler(MouseEventArgs e)
+    {
+        show = true;
+        model = await client.GetHallById(Item.Id);
+        alert?.Clear();
+        // Load Hall categories and facilities
+        Categories = (await client.GetAllHallCategory()).ToList();
+        Facilities = (await client.GetAllHallFacility()).ToList();
+        categoriesId = model.CategoryId > 0 ? model.CategoryId : null;
+
+        // Convert existing image data to base64 string for preview
+        if (model.ImageFile != null && model.ImageFile.Length > 0)
+        {
+            imageDataUrl = $"data:image/png;base64,{Convert.ToBase64String(model.ImageFile)}";
+        }
+
+        var hallFacilitiesMap = await client.GetFacilitiesMappingByHallId(model.Id);
+        SelectedFacilities.AddRange(hallFacilitiesMap.Select(o => o.FacilityId));
+    }
+
+    public async Task OnSave()
+    {
+        process = true;
+        alert?.Clear();
+        model.CategoryId = categoriesId;
+        model.Category = Categories.Where(x => x.Id == categoriesId).Select(x => x.Name).First();
+        var response = await client.UpsertHallAsync(model);
+        if (response.IsSuccess)
+        {
+            if (response.Result.Id > 0)
+            {
+                if (HallFacilitiesMap.ContainsKey(model.Id))
+                {
+                    HallFacilitiesMap[model.Id] = SelectedFacilities.Select(id => id).ToList();
+                }
+                else
+                {
+                    HallFacilitiesMap.Add(model.Id, SelectedFacilities.Select(id => id).ToList());
+                }
+
+                var result = await client.UpsertHallFacilitiesMapping(HallFacilitiesMap);
+            }
+            // model = response.Result;
+            alert?.SetSuccess(response.Message);
+            await HallGrid.RefreshGridAsync();
+        }
+        else
+            alert?.SetError(response.Message);
+
+        process = false;
+        StateHasChanged();
+        _timer = new Timer(TimerCallback, null, _delay, Timeout.Infinite);
+    }
+
+    private void TimerCallback(Object o)
+    {
+        alert?.Clear();
+        _timer.Dispose();
+        StateHasChanged();
+    }
+
+    private void ResetForm()
+    {
+        model = new();
+        show = false;
+        process = false;
+    }
+    private async Task HandleFileSelected(InputFileChangeEventArgs e)
+    {
+        var file = e.File;
+        if (file != null)
+        {
+            var buffer = new byte[file.Size];
+            await file.OpenReadStream().ReadAsync(buffer);
+
+            // Store the image data in the model
+            model.ImageFile = buffer;
+
+            // Convert the image to a data URL for preview
+            imageDataUrl = $"data:image/png;base64,{Convert.ToBase64String(buffer)}";
+        }
+    }
+}
+
+ *@

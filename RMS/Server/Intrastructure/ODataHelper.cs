@@ -56,6 +56,9 @@ namespace RMS.Server.Intrastructure
             builder.EntitySet<RoomCleaning>("RoomCleaning");
             builder.EntitySet<AllRecord>("AllRecord");
             builder.EntitySet<CleaningReport>("CleaningReport");
+            builder.EntitySet<MenuType>("MenuType");
+            builder.EntitySet<FoodCategory>("FoodCategory");
+            builder.EntitySet<AddVariants>("AddVariants");
 
             return builder.GetEdmModel();
         }

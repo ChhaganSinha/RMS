@@ -807,6 +807,94 @@ namespace RMS.Server.Controllers.Api
 
         #endregion
 
+        #region Resturant
+
+        [HttpGet]
+        [Route("MenuType/{id}")]
+        public async Task<MenuType> GetMenuTypeById(int id)
+        {
+            return await _appRepository.GetMenuTypeById(id);
+        }
+
+        [HttpGet]
+        [Route("all-MenuType")]
+        public async Task<IEnumerable<MenuType>> GetAllMenuType()
+        {
+            return await _appRepository.GetAllMenuType();
+        }
+
+        [HttpPost]
+        [Route("UpsertMenuType")]
+        public async Task<ApiResponse<MenuType>> UpsertMenuType(MenuType data)
+        {
+            return await _appRepository.UpsertMenuType(data);
+        }
+        [HttpPost]
+        [Route("DeleteMenuType/{id}")]
+        public async Task<ApiResponse<MenuType>> DeleteMenuType(int id)
+        {
+            return await _appRepository.DeleteMenuType(id);
+        }
+
+
+        [HttpGet]
+        [Route("FoodCategory/{id}")]
+        public async Task<FoodCategory> GetFoodCategoryById(int id)
+        {
+            return await _appRepository.GetFoodCategoryById(id);
+        }
+
+        [HttpGet]
+        [Route("all-FoodCategory")]
+        public async Task<IEnumerable<FoodCategory>> GetAllFoodCategory()
+        {
+            return await _appRepository.GetAllFoodCategory();
+        }
+
+        [HttpPost]
+        [Route("UpsertFoodCategory")]
+        public async Task<ApiResponse<FoodCategory>> UpsertFoodCategory(FoodCategory data)
+        {
+            return await _appRepository.UpsertFoodCategory(data);
+        }
+        [HttpPost]
+        [Route("DeleteFoodCategory/{id}")]
+        public async Task<ApiResponse<FoodCategory>> DeleteFoodCategory(int id)
+        {
+            return await _appRepository.DeleteFoodCategory(id);
+        }
+
+
+
+        [HttpGet]
+        [Route("AddVariants/{id}")]
+        public async Task<AddVariants> GetAddVariantsById(int id)
+        {
+            return await _appRepository.GetAddVariantsById(id);
+        }
+
+        [HttpGet]
+        [Route("all-AddVariants")]
+        public async Task<IEnumerable<AddVariants>> GetAllAddVariants()
+        {
+            return await _appRepository.GetAllAddVariants();
+        }
+
+        [HttpPost]
+        [Route("UpsertAddVariants")]
+        public async Task<ApiResponse<AddVariants>> UpsertAddVariants(AddVariants data)
+        {
+            return await _appRepository.UpsertAddVariants(data);
+        }
+        [HttpPost]
+        [Route("DeleteMenuType/{id}")]
+        public async Task<ApiResponse<AddVariants>> DeleteAddVariants(int id)
+        {
+            return await _appRepository.DeleteAddVariants(id);
+        }
+
+
+        #endregion
     }
 
 

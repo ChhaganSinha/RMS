@@ -2291,5 +2291,261 @@ namespace RMS.Repositories
             return await Task.FromResult(result);
         }
         #endregion
+
+
+        #region Restaurant
+
+        public async Task<MenuType> GetMenuTypeById(int id)
+        {
+            MenuType result = null;
+
+#pragma warning disable CS8600
+            result = AppDbCxt.MenuType.FirstOrDefault(o => o.Id == id);
+#pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
+
+            return await Task.FromResult(result);
+        }
+
+        public async Task<IEnumerable<MenuType>> GetAllMenuType()
+        {
+            IEnumerable<MenuType> result = null;
+
+            result = AppDbCxt.MenuType.ToList();
+            return result;
+        }
+        public async Task<ApiResponse<MenuType>> UpsertMenuType(MenuType data)
+        {
+            var result = new ApiResponse<MenuType>();
+            try
+            {
+
+                if (data == null)
+                {
+                    result.IsSuccess = true;
+                    result.Message = "Invalid MenuType data!";
+                    return result;
+                }
+
+                if (data.Id > 0)
+                {
+                    AppDbCxt.MenuType.Update(data);
+                    result.Message = "Data Successfully Updated.";
+                }
+                else
+                {
+                    AppDbCxt.MenuType.Add(data);
+                    result.Message = "Data Successfully Inserted.";
+                }
+
+                AppDbCxt.SaveChanges();
+                result.IsSuccess = true;
+                result.Result = data;
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+
+        public async Task<ApiResponse<MenuType>> DeleteMenuType(int id)
+        {
+            var result = new ApiResponse<MenuType>();
+            try
+            {
+                var existing = AppDbCxt.MenuType.First(x => x.Id == id);
+                result.Result = existing;
+                if (existing == null)
+                {
+                    result.IsSuccess = true;
+                    result.Message = "MenuType not found!";
+                    return result;
+                }
+
+                AppDbCxt.MenuType.Remove(existing);
+                await AppDbCxt.SaveChangesAsync();
+                result.IsSuccess = true;
+                result.Message = "Successfully Deleted!";
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+
+        public async Task<FoodCategory> GetFoodCategoryById(int id)
+        {
+            FoodCategory result = null;
+
+#pragma warning disable CS8600
+            result = AppDbCxt.FoodCategory.FirstOrDefault(o => o.Id == id);
+#pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
+
+            return await Task.FromResult(result);
+        }
+
+        public async Task<IEnumerable<FoodCategory>> GetAllFoodCategory()
+        {
+            IEnumerable<FoodCategory> result = null;
+
+            result = AppDbCxt.FoodCategory.ToList();
+            return result;
+        }
+        public async Task<ApiResponse<FoodCategory>> UpsertFoodCategory(FoodCategory data)
+        {
+            var result = new ApiResponse<FoodCategory>();
+            try
+            {
+
+                if (data == null)
+                {
+                    result.IsSuccess = true;
+                    result.Message = "Invalid FoodCategory data!";
+                    return result;
+                }
+
+                if (data.Id > 0)
+                {
+                    AppDbCxt.FoodCategory.Update(data);
+                    result.Message = "Data Successfully Updated.";
+                }
+                else
+                {
+                    AppDbCxt.FoodCategory.Add(data);
+                    result.Message = "Data Successfully Inserted.";
+                }
+
+                AppDbCxt.SaveChanges();
+                result.IsSuccess = true;
+                result.Result = data;
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+
+        public async Task<ApiResponse<FoodCategory>> DeleteFoodCategory(int id)
+        {
+            var result = new ApiResponse<FoodCategory>();
+            try
+            {
+                var existing = AppDbCxt.FoodCategory.First(x => x.Id == id);
+                result.Result = existing;
+                if (existing == null)
+                {
+                    result.IsSuccess = true;
+                    result.Message = "FoodCategory not found!";
+                    return result;
+                }
+
+                AppDbCxt.FoodCategory.Remove(existing);
+                await AppDbCxt.SaveChangesAsync();
+                result.IsSuccess = true;
+                result.Message = "Successfully Deleted!";
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+
+
+        public async Task<AddVariants> GetAddVariantsById(int id)
+        {
+            AddVariants result = null;
+
+#pragma warning disable CS8600
+            result = AppDbCxt.AddVariants.FirstOrDefault(o => o.Id == id);
+#pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
+
+            return await Task.FromResult(result);
+        }
+
+        public async Task<IEnumerable<AddVariants>> GetAllAddVariants()
+        {
+            IEnumerable<AddVariants> result = null;
+
+            result = AppDbCxt.AddVariants.ToList();
+            return result;
+        }
+        public async Task<ApiResponse<AddVariants>> UpsertAddVariants(AddVariants data)
+        {
+            var result = new ApiResponse<AddVariants>();
+            try
+            {
+
+                if (data == null)
+                {
+                    result.IsSuccess = true;
+                    result.Message = "Invalid AddVariants data!";
+                    return result;
+                }
+
+                if (data.Id > 0)
+                {
+                    AppDbCxt.AddVariants.Update(data);
+                    result.Message = "Data Successfully Updated.";
+                }
+                else
+                {
+                    AppDbCxt.AddVariants.Add(data);
+                    result.Message = "Data Successfully Inserted.";
+                }
+
+                AppDbCxt.SaveChanges();
+                result.IsSuccess = true;
+                result.Result = data;
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+
+        public async Task<ApiResponse<AddVariants>> DeleteAddVariants(int id)
+        {
+            var result = new ApiResponse<AddVariants>();
+            try
+            {
+                var existing = AppDbCxt.AddVariants.First(x => x.Id == id);
+                result.Result = existing;
+                if (existing == null)
+                {
+                    result.IsSuccess = true;
+                    result.Message = "AddVariants not found!";
+                    return result;
+                }
+
+                AppDbCxt.AddVariants.Remove(existing);
+                await AppDbCxt.SaveChangesAsync();
+                result.IsSuccess = true;
+                result.Message = "Successfully Deleted!";
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+
+
+        #endregion
     }
 }

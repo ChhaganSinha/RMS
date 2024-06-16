@@ -1,0 +1,88 @@
+﻿@using GridBlazor
+@using GridBlazor.Pages
+@using GridShared
+@using GridShared.Utility
+@using Microsoft.Extensions.Primitives
+@using RMS.Client.Pages.GridButton
+@inject NavigationManager NavigationManager
+@inject HttpClient HttpClient
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+@if (_task.IsCompleted)
+{
+    <div class="row">
+        <div class="col-sm-12">
+            <GridComponent @ref="Component" T="AddFood" Grid="@_grid"></GridComponent>
+        </div>
+    </div>
+}
+else
+{
+    <div class="col-sm-12" style="margin-top:40vh">
+        <div class="loader-progress"></div>
+    </div>
+}
+
+@code
+{
+    private CGrid<AddFood> _grid;
+    private Task _task;
+    private static GridComponent<AddFood> Component;
+    static bool filter = true;
+    static AuthenticationState authState;
+
+    Action<IGridColumnCollection<AddFood>> columns = c =>
+    {
+
+        c.Add(o => o.Id).SetWidth("10%").Css("table-bordered").Titled("SN.").Filterable(filter);
+        c.Add(o => o.FoodName).Css("table-bordered").Titled("Food Name").Filterable(filter);
+        c.Add(o => o.MenuType).Css("table-bordered").Titled("Menu Type").Filterable(filter);
+        c.Add(o => o.FoodCategory).Css("table-bordered").Titled("Food Category").Filterable(filter);
+        c.Add(o => o.Variant).Css("table-bordered").Titled("Variant").Filterable(filter);
+        c.Add(o => o.Price).Css("table-bordered").Titled("Price").Filterable(filter);
+        c.Add(o => o.TaxPercentage).Css("table-bordered").Titled("Tax %").Filterable(filter);
+        c.Add(o => o.CookingTime).Css("table-bordered").Titled("Cooking Time").Filterable(filter);
+        
+       
+
+        c.Add().Encoded(false).Sanitized(false).RenderComponentAs<AddFoodEditButton>().SetWidth("10px").Titled("Edit");
+        c.Add().Encoded(false).Sanitized(false).RenderComponentAs<AddFoodDeleteButton>(new List<Action<object>> { RefreshGrid }).SetWidth("10px").Titled("Delete");
+    };
+
+    protected override async Task OnParametersSetAsync()
+    {
+        authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        string url = $"odata/AddFood";
+        var query = new QueryDictionary<StringValues>();
+        query.Add("grid-sorting", "Id__1__1");
+
+        var client = new GridODataClient<AddFood>(HttpClient, url, query, false, "ordersGrid", columns, 5)
+            .Sortable(true)
+            // .Filterable(true)
+            // .ClearFiltersButton(true)
+            .SetStriped(true)
+            .WithMultipleFilters()
+            .WithGridItemsCount()
+            // .SetExcelExport(true, true, "AddFood.xlsx")
+            .ChangePageSize(true)
+            .EmptyText("No data available")
+            .SetKeyboard(true)
+            .Searchable(true, false, false);
+
+        _grid = client.Grid;
+        _task = client.UpdateGrid();
+        await _task;
+    }
+
+    public static async void RefreshGrid(object item)
+    {
+        await Component.UpdateGrid();
+    }
+    public static async Task RefreshGridAsync()
+    {
+        if (Component != null)
+        {
+            await Component.UpdateGrid();
+        }
+    }
+}

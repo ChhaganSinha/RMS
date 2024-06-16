@@ -2174,5 +2174,254 @@ namespace RMS.Client.Client
         }
 
 
+        #region Restaurant
+
+        public async Task<MenuType> GetMenuTypeById(int id)
+        {
+            MenuType data = null;
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/App/MenuType/{id}");
+
+                res.EnsureSuccessStatusCode();
+
+                data = await res.Content.ReadFromJsonAsync<MenuType>();
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return data;
+        }
+        public async Task<IEnumerable<MenuType>> GetAllMenuType()
+        {
+            IEnumerable<MenuType> details = null;
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/App/all-MenuType");
+
+                res.EnsureSuccessStatusCode();
+
+                details = await res.Content.ReadFromJsonAsync<IEnumerable<MenuType>>();
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return details;
+        }
+
+        public async Task<ApiResponse<MenuType>> UpsertMenuTypeAsync(MenuType data)
+        {
+            var result = new ApiResponse<MenuType>();
+
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/App/UpsertMenuType", data);
+                res.EnsureSuccessStatusCode();
+                var json = await res.Content.ReadFromJsonAsync<ApiResponse<MenuType>>();
+                return json;
+
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+
+
+
+        }
+        public async Task<ApiResponse<MenuType>> DeleteMenuType(int id)
+        {
+            var result = new ApiResponse<MenuType>();
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/App/DeleteMenuType/{id}", new { });
+                res.EnsureSuccessStatusCode();
+                var json = await res.Content.ReadFromJsonAsync<ApiResponse<MenuType>>();
+                return json;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+
+
+        public async Task<FoodCategory> GetFoodCategoryById(int id)
+        {
+            FoodCategory data = null;
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/App/FoodCategory/{id}");
+
+                res.EnsureSuccessStatusCode();
+
+                data = await res.Content.ReadFromJsonAsync<FoodCategory>();
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return data;
+        }
+        public async Task<IEnumerable<FoodCategory>> GetAllFoodCategory()
+        {
+            IEnumerable<FoodCategory> details = null;
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/App/all-FoodCategory");
+
+                res.EnsureSuccessStatusCode();
+
+                details = await res.Content.ReadFromJsonAsync<IEnumerable<FoodCategory>>();
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return details;
+        }
+
+        public async Task<ApiResponse<FoodCategory>> UpsertFoodCategoryAsync(FoodCategory data)
+        {
+            var result = new ApiResponse<FoodCategory>();
+
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/App/UpsertFoodCategory", data);
+                res.EnsureSuccessStatusCode();
+                var json = await res.Content.ReadFromJsonAsync<ApiResponse<FoodCategory>>();
+                return json;
+
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+
+
+
+        }
+        public async Task<ApiResponse<FoodCategory>> DeleteFoodCategory(int id)
+        {
+            var result = new ApiResponse<FoodCategory>();
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/App/DeleteFoodCategory/{id}", new { });
+                res.EnsureSuccessStatusCode();
+                var json = await res.Content.ReadFromJsonAsync<ApiResponse<FoodCategory>>();
+                return json;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+
+
+        public async Task<AddVariants> GetAddVariantsById(int id)
+        {
+            AddVariants data = null;
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/App/AddVariants/{id}");
+
+                res.EnsureSuccessStatusCode();
+
+                data = await res.Content.ReadFromJsonAsync<AddVariants>();
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return data;
+        }
+        public async Task<IEnumerable<AddVariants>> GetAllAddVariants()
+        {
+            IEnumerable<AddVariants> details = null;
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/App/all-AddVariants");
+
+                res.EnsureSuccessStatusCode();
+
+                details = await res.Content.ReadFromJsonAsync<IEnumerable<AddVariants>>();
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return details;
+        }
+
+        public async Task<ApiResponse<AddVariants>> UpsertAddVariantsAsync(AddVariants data)
+        {
+            var result = new ApiResponse<AddVariants>();
+
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/App/UpsertAddVariants", data);
+                res.EnsureSuccessStatusCode();
+                var json = await res.Content.ReadFromJsonAsync<ApiResponse<AddVariants>>();
+                return json;
+
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+
+
+
+        }
+        public async Task<ApiResponse<AddVariants>> DeleteAddVariants(int id)
+        {
+            var result = new ApiResponse<AddVariants>();
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/App/DeleteAddVariants/{id}", new { });
+                res.EnsureSuccessStatusCode();
+                var json = await res.Content.ReadFromJsonAsync<ApiResponse<AddVariants>>();
+                return json;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+
+        #endregion
+
     }
 }

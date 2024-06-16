@@ -48,6 +48,9 @@ namespace RMS.DataContext
         public DbSet<RoomCleaning> RoomCleaning { get; set; }
         public DbSet<AllRecord> AllRecord { get; set; }
         public DbSet<CleaningReport> CleaningReport { get; set; }
+        public DbSet<MenuType> MenuType { get; set; }
+        public DbSet<FoodCategory> FoodCategory { get; set; }
+        public DbSet<AddVariants> AddVariants { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
