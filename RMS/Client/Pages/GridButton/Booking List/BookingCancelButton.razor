@@ -5,17 +5,17 @@
 @using RMS.Client.Client
 @using RMS.Client.Shared.Popup
 @inject AppClient client
-@implements ICustomGridComponent<EmployeePayroll>
+@implements ICustomGridComponent<BookingList>
 @inject NavigationManager NavigationManager
 
-<button class='btn btn-sm btn-info' @onclick="MyClickHandler" title="Salary Generate"><i class="fa fa-money"></i>  Generate</button>
+<button class='btn btn-sm btn-danger' style="border-radius:15px" @onclick="MyClickHandler" title="Delete"><i class="fa fa-trash"></i></button>
 <SimpleDailog Title="@Title" Show="@show" OnCloseDialog="ResetForm">
     @if (show)
     {
         @if (!TaskCompleted && !process)
         {
             <div style="text-align:center;">
-                <h6 class="pb-2">Generate Salary?</h6>
+                <h6 class="pb-2">Are you sure want to Cancel Reservation?</h6>
 
                 <button class="btn btn-danger" @onclick="Delete">Yes</button>
                 <button class="btn btn-primary" @onclick="ResetForm">No</button>
@@ -40,10 +40,10 @@
 
 @code {
     [Parameter]
-    public EmployeePayroll Item { get; set; }
+    public BookingList Item { get; set; }
 
     [Parameter]
-    public CGrid<EmployeePayroll> Grid { get; set; }
+    public CGrid<BookingList> Grid { get; set; }
 
     [Parameter]
     public IList<Action<object>> Actions { get; set; }
@@ -52,20 +52,20 @@
     bool process = false;
     bool TaskCompleted = false;
     string MessageBody = string.Empty;
-    string Title = "Salary Generate";
+    string Title = "Delete Booking Type";
 
     private async void Delete()
     {
         process = true;
-        var responce = await client.DeleteHallCategory(Item.Id);
-        if (responce.IsSuccess == true)
-        {
-            MessageBody = responce.Message;
-        }
-        else
-        {
-            MessageBody = responce.Message;
-        }
+        // var responce = await client.DeleteBookingList(Item.Id);
+        // if (responce.IsSuccess == true)
+        // {
+        //     MessageBody = responce.Message;
+        // }
+        // else
+        // {
+        //     MessageBody = responce.Message;
+        // }
 
         TaskCompleted = true;
         Actions[0]?.Invoke(Item);

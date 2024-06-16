@@ -807,6 +807,63 @@ namespace RMS.Server.Controllers.Api
 
         #endregion
 
+        #region Booking Section
+        [HttpGet]
+        [Route("BookingType/{id}")]
+        public async Task<BookingType> GetBookingTypeById(int id)
+        {
+            return await _appRepository.GetBookingTypeById(id);
+        }
+
+        [HttpGet]
+        [Route("all-BookingType")]
+        public async Task<IEnumerable<BookingType>> GetAllBookingType()
+        {
+            return await _appRepository.GetAllBookingType();
+        }
+
+        [HttpPost]
+        [Route("UpsertBookingType")]
+        public async Task<ApiResponse<BookingType>> UpsertBookingType(BookingType data)
+        {
+            return await _appRepository.UpsertBookingType(data);
+        }
+        [HttpPost]
+        [Route("DeleteBookingType/{id}")]
+        public async Task<ApiResponse<BookingType>> DeleteBookingType(int id)
+        {
+            return await _appRepository.DeleteBookingType(id);
+        }
+
+
+
+        [HttpGet]
+        [Route("BookingList/{id}")]
+        public async Task<BookingList> GetBookingListById(int id)
+        {
+            return await _appRepository.GetBookingListById(id);
+        }
+
+        [HttpGet]
+        [Route("all-BookingList")]
+        public async Task<IEnumerable<BookingList>> GetAllBookingList()
+        {
+            return await _appRepository.GetAllBookingList();
+        }
+
+        [HttpPost]
+        [Route("UpsertBookingList")]
+        public async Task<ApiResponse<BookingList>> UpsertBookingList(BookingList data)
+        {
+            return await _appRepository.UpsertBookingList(data);
+        }
+        [HttpPost]
+        [Route("DeleteBookingList/{id}")]
+        public async Task<ApiResponse<BookingList>> DeleteBookingList(int id)
+        {
+            return await _appRepository.DeleteBookingList(id);
+        }
+        #endregion
     }
 
 

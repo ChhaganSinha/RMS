@@ -2173,6 +2173,170 @@ namespace RMS.Client.Client
             return data;
         }
 
+        #region Booking Section
+        public async Task<BookingType> GetBookingTypeById(int id)
+        {
+            BookingType data = null;
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/App/BookingType/{id}");
 
+                res.EnsureSuccessStatusCode();
+
+                data = await res.Content.ReadFromJsonAsync<BookingType>();
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return data;
+        }
+        public async Task<IEnumerable<BookingType>> GetAllBookingType()
+        {
+            IEnumerable<BookingType> details = null;
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/App/all-BookingType");
+
+                res.EnsureSuccessStatusCode();
+
+                details = await res.Content.ReadFromJsonAsync<IEnumerable<BookingType>>();
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return details;
+        }
+
+        public async Task<ApiResponse<BookingType>> UpsertBookingTypeAsync(BookingType data)
+        {
+            var result = new ApiResponse<BookingType>();
+
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/App/UpsertBookingType", data);
+                res.EnsureSuccessStatusCode();
+                var json = await res.Content.ReadFromJsonAsync<ApiResponse<BookingType>>();
+                return json;
+
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+
+
+
+        }
+        public async Task<ApiResponse<BookingType>> DeleteBookingType(int id)
+        {
+            var result = new ApiResponse<BookingType>();
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/App/DeleteBookingType/{id}", new { });
+                res.EnsureSuccessStatusCode();
+                var json = await res.Content.ReadFromJsonAsync<ApiResponse<BookingType>>();
+                return json;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+
+
+
+        public async Task<BookingList> GetBookingListById(int id)
+        {
+            BookingList data = null;
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/App/BookingList/{id}");
+
+                res.EnsureSuccessStatusCode();
+
+                data = await res.Content.ReadFromJsonAsync<BookingList>();
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return data;
+        }
+        public async Task<IEnumerable<BookingList>> GetAllBookingList()
+        {
+            IEnumerable<BookingList> details = null;
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/App/all-BookingList");
+
+                res.EnsureSuccessStatusCode();
+
+                details = await res.Content.ReadFromJsonAsync<IEnumerable<BookingList>>();
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return details;
+        }
+
+        public async Task<ApiResponse<BookingList>> UpsertBookingListAsync(BookingList data)
+        {
+            var result = new ApiResponse<BookingList>();
+
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/App/UpsertBookingList", data);
+                res.EnsureSuccessStatusCode();
+                var json = await res.Content.ReadFromJsonAsync<ApiResponse<BookingList>>();
+                return json;
+
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+
+
+
+        }
+        public async Task<ApiResponse<BookingList>> DeleteBookingList(int id)
+        {
+            var result = new ApiResponse<BookingList>();
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/App/DeleteBookingList/{id}", new { });
+                res.EnsureSuccessStatusCode();
+                var json = await res.Content.ReadFromJsonAsync<ApiResponse<BookingList>>();
+                return json;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+        #endregion
     }
 }

@@ -8,6 +8,7 @@
 @using Havit.Blazor.Components.Web
 @using Havit.Blazor.Components.Web.Bootstrap
 @using System.ComponentModel.DataAnnotations;
+@using RMS.Dto.Enum
 @attribute [Authorize]
 
 <div class="page-header breadcumb-sticky">
@@ -45,16 +46,36 @@
         <EditForm Model="model" OnValidSubmit="OnSave">
             <DataAnnotationsValidator />
             <div class="form-group row">
-                <div class="col-md-6">
+                <div class="col-md-4">
                     <label class="col-form-label bold-font required-field">Room Number</label>
                     <InputText @bind-Value="@model.RoomNumber" id="RoomNumber" class="form-control"></InputText>
                     <ValidationMessage For="() => model.RoomNumber" />
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-4">
                     <label class="col-form-label bold-font">Price</label>
                     <InputNumber @bind-Value="@model.Price" id="Price" class="form-control"></InputNumber>
                     <ValidationMessage For="() => model.Price" />
                 </div>
+                <div class="col-md-4">
+                    <label class="col-form-label bold-font">Floor</label>
+                    <select class="form-control" @bind="model.floor">
+                        @foreach (var floor in Enum.GetValues(typeof(Floor)).Cast<Floor>())
+                        {
+                            <option value="@floor">@floor</option>
+                        }
+                    </select>
+                    <ValidationMessage For="() => model.floor" />
+                </div>
+               @*  <div class="col-md-3">
+                    <label class="col-form-label bold-font">Room Status</label>
+                    <select class="form-control" @bind="model.Status">
+                        @foreach (var status in Enum.GetValues(typeof(RoomHallStatus)).Cast<RoomHallStatus>())
+                        {
+                            <option value="@status">@status</option>
+                        }
+                    </select>
+                    <ValidationMessage For="() => model.Status" />
+                </div> *@
             </div>
             <div class="form-group row">
                 <div class="col-md-6">

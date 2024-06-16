@@ -2291,5 +2291,175 @@ namespace RMS.Repositories
             return await Task.FromResult(result);
         }
         #endregion
+
+        #region Booking Section
+        public async Task<BookingType> GetBookingTypeById(int id)
+        {
+            BookingType result = null;
+
+#pragma warning disable CS8600
+            result = AppDbCxt.BookingType.FirstOrDefault(o => o.Id == id);
+#pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
+
+            return await Task.FromResult(result);
+        }
+
+        public async Task<IEnumerable<BookingType>> GetAllBookingType()
+        {
+            IEnumerable<BookingType> result = null;
+
+            result = AppDbCxt.BookingType.ToList();
+            return result;
+        }
+        public async Task<ApiResponse<BookingType>> UpsertBookingType(BookingType data)
+        {
+            var result = new ApiResponse<BookingType>();
+            try
+            {
+
+                if (data == null)
+                {
+                    result.IsSuccess = true;
+                    result.Message = "Invalid Booking Type data!";
+                    return result;
+                }
+
+                if (data.Id > 0)
+                {
+                    AppDbCxt.BookingType.Update(data);
+                    result.Message = "Data Successfully Updated.";
+                }
+                else
+                {
+                    AppDbCxt.BookingType.Add(data);
+                    result.Message = "Data Successfully Inserted.";
+                }
+
+                AppDbCxt.SaveChanges();
+                result.IsSuccess = true;
+                result.Result = data;
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+
+        public async Task<ApiResponse<BookingType>> DeleteBookingType(int id)
+        {
+            var result = new ApiResponse<BookingType>();
+            try
+            {
+                var existing = AppDbCxt.BookingType.First(x => x.Id == id);
+                result.Result = existing;
+                if (existing == null)
+                {
+                    result.IsSuccess = true;
+                    result.Message = "Booking Type not found!";
+                    return result;
+                }
+
+                AppDbCxt.BookingType.Remove(existing);
+                await AppDbCxt.SaveChangesAsync();
+                result.IsSuccess = true;
+                result.Message = "Successfully Deleted!";
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+
+
+
+        public async Task<BookingList> GetBookingListById(int id)
+        {
+            BookingList result = null;
+
+#pragma warning disable CS8600
+            result = AppDbCxt.BookingList.FirstOrDefault(o => o.Id == id);
+#pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
+
+            return await Task.FromResult(result);
+        }
+
+        public async Task<IEnumerable<BookingList>> GetAllBookingList()
+        {
+            IEnumerable<BookingList> result = null;
+
+            result = AppDbCxt.BookingList.ToList();
+            return result;
+        }
+        public async Task<ApiResponse<BookingList>> UpsertBookingList(BookingList data)
+        {
+            var result = new ApiResponse<BookingList>();
+            try
+            {
+
+                if (data == null)
+                {
+                    result.IsSuccess = true;
+                    result.Message = "Invalid Booking Type data!";
+                    return result;
+                }
+
+                if (data.Id > 0)
+                {
+                    AppDbCxt.BookingList.Update(data);
+                    result.Message = "Data Successfully Updated.";
+                }
+                else
+                {
+                    AppDbCxt.BookingList.Add(data);
+                    result.Message = "Data Successfully Inserted.";
+                }
+
+                AppDbCxt.SaveChanges();
+                result.IsSuccess = true;
+                result.Result = data;
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+
+        public async Task<ApiResponse<BookingList>> DeleteBookingList(int id)
+        {
+            var result = new ApiResponse<BookingList>();
+            try
+            {
+                var existing = AppDbCxt.BookingList.First(x => x.Id == id);
+                result.Result = existing;
+                if (existing == null)
+                {
+                    result.IsSuccess = true;
+                    result.Message = "Booking Type not found!";
+                    return result;
+                }
+
+                AppDbCxt.BookingList.Remove(existing);
+                await AppDbCxt.SaveChangesAsync();
+                result.IsSuccess = true;
+                result.Message = "Successfully Deleted!";
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+        #endregion
     }
 }

@@ -1,0 +1,83 @@
+﻿@using GridBlazor
+@using GridBlazor.Pages
+@using GridShared
+@using GridShared.Utility
+@using Microsoft.Extensions.Primitives
+@using RMS.Client.Pages.GridButton
+@using RMS.Client.Pages.GridButton.Booking_List
+@inject NavigationManager NavigationManager
+@inject HttpClient HttpClient
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+@if (_task.IsCompleted)
+{
+    <div class="row">
+        <div class="col-sm-12">
+            <GridComponent @ref="Component" T="BookingList" Grid="@_grid"></GridComponent>
+        </div>
+    </div>
+}
+else
+{
+    <div class="col-sm-12" style="margin-top:40vh">
+        <div class="loader-progress"></div>
+    </div>
+}
+
+@code
+{
+    private CGrid<BookingList> _grid;
+    private Task _task;
+    private static GridComponent<BookingList> Component;
+    static bool filter = true;
+    static AuthenticationState authState;
+
+    Action<IGridColumnCollection<BookingList>> columns = c =>
+    {
+
+        c.Add(o => o.Id).SetWidth("10%").Css("table-bordered").Titled("SN.").Filterable(filter);
+        c.Add(o => o.RoomNumber).Css("table-bordered").Titled("SN.").Filterable(filter);
+    
+    
+
+        c.Add().Encoded(false).Sanitized(false).RenderComponentAs<BookingEditButton>().SetWidth("10px").Titled("Edit");
+        c.Add().Encoded(false).Sanitized(false).RenderComponentAs<BookingCancelButton>(new List<Action<object>> { RefreshGrid }).SetWidth("10px").Titled("Delete");
+    };
+
+    protected override async Task OnParametersSetAsync()
+    {
+        authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        string url = $"odata/BookingList";
+        var query = new QueryDictionary<StringValues>();
+        query.Add("grid-sorting", "Id__1__1");
+
+        var client = new GridODataClient<BookingList>(HttpClient, url, query, false, "ordersGrid", columns, 5)
+            .Sortable(true)
+            .Filterable(true)
+            .ClearFiltersButton(true)
+            .SetStriped(true)
+            .WithMultipleFilters()
+            .WithGridItemsCount()
+            .SetExcelExport(true, true, "BookingList.xlsx")
+            .ChangePageSize(true)
+            .EmptyText("No data available")
+            .SetKeyboard(true)
+            .Searchable(true, false, false);
+
+        _grid = client.Grid;
+        _task = client.UpdateGrid();
+        await _task;
+    }
+
+    public static async void RefreshGrid(object item)
+    {
+        await Component.UpdateGrid();
+    }
+    public static async Task RefreshGridAsync()
+    {
+        if (Component != null)
+        {
+            await Component.UpdateGrid();
+        }
+    }
+}

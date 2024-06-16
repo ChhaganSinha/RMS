@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RMS.Dto.Enum;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -26,5 +27,7 @@ namespace RMS.Dto
         public string ImageName {  get; set; } = string.Empty;
       
         public byte[] ? ImageFile { get; set; }
+        public RoomHallStatus Status { get; set; } = RoomHallStatus.Available;
+        public Floor floor { get; set; } = Floor.FirstFloor;
     }
 }

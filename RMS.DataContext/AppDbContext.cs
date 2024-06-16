@@ -48,6 +48,8 @@ namespace RMS.DataContext
         public DbSet<RoomCleaning> RoomCleaning { get; set; }
         public DbSet<AllRecord> AllRecord { get; set; }
         public DbSet<CleaningReport> CleaningReport { get; set; }
+        public DbSet<BookingType> BookingType { get; set; }
+        public DbSet<BookingList> BookingList { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

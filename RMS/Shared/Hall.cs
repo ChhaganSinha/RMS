@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations;
+using RMS.Dto.Enum;
 
 namespace RMS.Dto
 {
@@ -26,5 +27,8 @@ namespace RMS.Dto
         public string ImageName { get; set; } = string.Empty;
 
         public byte[]? ImageFile { get; set; }
+
+        public RoomHallStatus Status { get; set; } = RoomHallStatus.Available;
+        public Floor floor { get; set; } = Floor.FirstFloor;
     }
 }
