@@ -75,17 +75,17 @@
             <div class="form-group row">
                 <div class="col-md-6">
                     <label class="col-form-label bold-font">Select Menu Type</label>
-                    <HxSelect TItem="MenuType"
+                    <HxMultiSelect TItem="MenuType"
                               AutoSort="false"
                               TValue="int"
-                              Data="@MenuType"
-                              @bind-Value="@menutypeid"
+                              Data="@menuTypes"
+                              @bind-Value="@selectedMenuTypeid"
                               TextSelector="@(p => p.Name)"
                               ValueSelector="@(p => p.Id)"
                               Nullable="true"
                               NullText="-select-"
                               NullDataText="Loading menuType..." />
-                    <ValidationMessage For="() => model.MenuType" />
+
                 </div>
 
                 <div class="col-md-6">
@@ -215,9 +215,9 @@
     private int _delay = 2500;
 
     [Required]
-    private List<int> menutypeid = new();
+    private List<int> selectedMenuTypeid = new();
     private bool IsError = false;
-    private List<MenuType> MenuType = new();
+    private List<MenuType> menuTypes = new();
     private List<FoodCategory> Category = new();
     private List<AddVariants> Variants = new();
     Dictionary<int, List<int>> FoodMenuTypeMap = new Dictionary<int, List<int>>();
@@ -245,7 +245,7 @@
         alert?.Clear();
 
         // Load room categories and facilities
-        MenuType = (await client.GetAllMenuType()).ToList();
+        menuTypes = (await client.GetAllMenuType()).ToList();
         Category = (await client.GetAllFoodCategory()).ToList();
         Variants = (await client.GetAllAddVariants()).ToList();
 
@@ -329,7 +329,7 @@
     public void OnClose()
     {
         model = new AddFood();
-        menutypeid = null;
+        selectedMenuTypeid = null;
         foodcategoryid = null;
         variantsid = null;
     }
@@ -337,7 +337,7 @@
     public void OnAdd()
     {
         model = new AddFood();
-        menutypeid = null;
+        selectedMenuTypeid = null;
         foodcategoryid = null;
         variantsid = null;
         show = true;
