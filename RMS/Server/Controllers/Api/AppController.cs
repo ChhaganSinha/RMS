@@ -775,6 +775,37 @@ namespace RMS.Server.Controllers.Api
 
         #endregion
 
+        #region Attendance Section
+
+        [HttpPost]
+        [Route("EmployeeCheckIn")]
+        public async Task<ApiResponse<EmployeeAttendance>> EmployeeCheckInAsync(EmployeeAttendance data)
+        {
+            return await _appRepository.EmployeeCheckInAsync(data);
+        }
+
+        [HttpPost]
+        [Route("EmployeeCheckOut")]
+        public async Task<ApiResponse<EmployeeAttendance>> EmployeeCheckOutAsync(EmployeeAttendance data)
+        {
+            return await _appRepository.EmployeeCheckOutAsync(data);
+        }
+
+        [HttpPost]
+        [Route("UpdateEmployeeAttendance")]
+        public async Task<ApiResponse<EmployeeAttendance>> UpdateEmployeeAttendance(EmployeeAttendance data)
+        {
+            return await _appRepository.UpdateEmployeeAttendance(data);
+        }
+
+        [HttpGet]
+        [Route("all-EmployeeAttendance")]
+        public async Task<IEnumerable<EmployeeAttendance>> GetAllEmployeeAttendance()
+        {
+            return await _appRepository.GetAllEmployeeAttendance();
+        }
+
+        #endregion
 
     }
 

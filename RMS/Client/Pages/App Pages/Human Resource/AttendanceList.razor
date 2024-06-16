@@ -15,7 +15,7 @@
                 <div class="page-header-title">
                     <h5 class="m-b-10">
                         Attendance List
-                        <a class="btn btn-success" @onclick="()=>show=true" style="cursor:pointer">Single CheckIn</a>
+                        <a class="btn btn-success" @onclick="Show" style="cursor:pointer">Single CheckIn</a>
                     </h5>
                 </div>
                 <ul class="breadcrumb">
@@ -47,7 +47,7 @@
 
         <EditForm Model="model" OnValidSubmit="OnSave">
             <DataAnnotationsValidator />
-            <div>
+            <div class="row mb-1">
                 <HxSelect TItem="Employee"
                           TValue="int?"
                           Data="employees"
@@ -111,13 +111,16 @@
         process = true;
         alert?.Clear();
         model.EmployeeId = employeeId ?? 0;
+        model.EmployeeName = employees.Where(o => o.Id == employeeId).Select(o => o.Name).First();
+        model.EmpId = employees.Where(o => o.Id == employeeId).Select(o => o.EmpId).First();
         var response = await client.EmployeeCheckInAsync(model);
         if (response.IsSuccess)
         {
             // model = response.Result;
-            await AttendanceGrid.RefreshGridAsync();
             alert?.SetSuccess(response.Message);
+            employeeId = null;
             model = new();
+            await AttendanceGrid.RefreshGridAsync();
         }
         else
             alert?.SetError(response.Message);
@@ -144,5 +147,11 @@
     public void OnClose()
     {
         model = new();
+    }
+
+    public void Show()
+    {
+        show = true;
+        employeeId = null;
     }
 }

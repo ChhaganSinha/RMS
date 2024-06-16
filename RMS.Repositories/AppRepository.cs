@@ -1186,24 +1186,27 @@ namespace RMS.Repositories
                 }
 
                 var today = DateOnly.FromDateTime(DateTime.Now);
-                var existingAttendance = AppDbCxt.EmployeeAttendance
-                    .FirstOrDefault(o => o.EmployeeId == data.EmployeeId && o.Date == today);
+                //var existingAttendance = AppDbCxt.EmployeeAttendance
+                //    .FirstOrDefault(o => o.EmployeeId == data.EmployeeId && o.Date == today);
 
-                if (existingAttendance.CheckIn != TimeOnly.MinValue)
+                var existingAttendance = AppDbCxt.EmployeeAttendance
+                    .FirstOrDefault(o => o.EmployeeId == data.EmployeeId);
+
+                if (existingAttendance != null && existingAttendance.CheckIn != TimeOnly.MinValue)
                 {
                     result.IsSuccess = false;
                     result.Message = "Employee has already checked in today.";
                     return result;
                 }
 
-                existingAttendance.Date = today;
-                existingAttendance.CheckIn = TimeOnly.FromDateTime(DateTime.Now);
-                AppDbCxt.EmployeeAttendance.Update(existingAttendance);
+                data.Date = today;
+                data.CheckIn = TimeOnly.FromDateTime(DateTime.Now);
+                AppDbCxt.EmployeeAttendance.Update(data);
                 AppDbCxt.SaveChanges();
 
                 result.IsSuccess = true;
                 result.Message = "Successfully Checked In.";
-                result.Result = data;
+                //result.Result = data;
                 return result;
             }
             catch (Exception ex)
