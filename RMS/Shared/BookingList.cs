@@ -12,6 +12,7 @@ namespace RMS.Dto
         public string BookingNumber { get; set; }
         public int ? RoomTypeId { get; set; }
         public string RoomType { get; set; }
+        public int ? RoomId { get; set; }
         public string RoomNumber { get; set; }
         public string Name { get; set; }
         public string Phone { get; set; }
@@ -22,5 +23,7 @@ namespace RMS.Dto
         public BookingStatus BookingStatus { get; set; }
         public PaymentStatus PaymentStatus { get; set; }
 
+        public virtual Room Room { get; set; }
+        //public virtual Hall Hall { get; set; }
     }
 }

@@ -15,7 +15,7 @@
                 <div class="page-header-title">
                     <h5 class="m-b-10">
                         Booking List
-                        <a @onclick="Show" style="cursor:pointer"><i class="fa fa-plus-circle fa-lg text-primary" aria-hidden="true" title="New Booking"></i></a>
+                        <a href="new-booking" style="cursor:pointer"><i class="fa fa-plus-circle fa-lg text-primary" aria-hidden="true" title="New Booking"></i></a>
                     </h5>
                 </div>
                 <ul class="breadcrumb">
@@ -90,7 +90,7 @@
         process = true;
         alert?.Clear();
 
-        var response = await client.UpsertBookingListAsync(model);
+        var response = await client.BookRoomAsync(model);
         if (response.IsSuccess)
         {
             // model = response.Result;

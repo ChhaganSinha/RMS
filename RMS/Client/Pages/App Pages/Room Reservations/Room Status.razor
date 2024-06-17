@@ -51,7 +51,7 @@
                                 <option value="">All Types</option>
                                 @foreach (var type in roomTypes)
                                 {
-                                    <option value="@type">@type</option>
+                                    <option value="@type.Name">@type.Name</option>
                                 }
                             </select>
                         </div>
@@ -70,28 +70,48 @@
                     </div>
 
                     <div class="row">
-                        @if (filteredRooms.Count > 0)
+                        @if (loading)
                         {
-                            @foreach (var room in filteredRooms)
-                            {
-                                <div class="col-md-4 mb-3">
-                                    <div class="card" style="background-image: url('data:image;base64,@Convert.ToBase64String(room.ImageFile)'); background-size: cover; background-position: center;">
-                                        <div class="card-body d-flex flex-column justify-content-center align-items-center text-center text-white" style="background-color: rgba(0, 0, 0, 0.5);">
-                                            <div class="card-body">
-                                                <h5 class="card-title">@room.RoomNumber</h5>
-                                                <p class="card-text">@room.Category</p>
-                                                <button class="btn btn-primary mt-2" @onclick="() => BookRoom(room)">Book</button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            }
+                            <div class="col-sm-12" style="margin-top:40vh">
+                                <div class="loader-progress"></div>
+                            </div>
                         }
                         else
                         {
-                            <p class="text-primary"> No Room Data Available!</p>
+                            @if (filteredRooms.Count > 0)
+                            {
+                                @foreach (var room in filteredRooms)
+                                {
+                                    <div class="col-sm-6 col-lg-4 col-xl-3 col-xxl-2">
+                                        <div class="position-relative d-flex justify-content-center">
+                                            <div class="card shadow" style="width: 100%; border: 1px solid silver;">
+                                                <div class="hotel-image">
+                                                    <img src="data:image;base64,@Convert.ToBase64String(room.ImageFile)" class="image-inner card-img-top" alt="Room Image">
+                                                </div>
+                                                <div class="card-img-overlay d-flex flex-column justify-content-center text-center text-white" style="background-color: rgba(0, 0, 0, 0.5); margin: 2px; border: 1px solid firebrick;">
+                                                    @* <h4 class="fs-21 mt-2 font-weight-bold">Floor: @room.floor</h4> *@
+                                                    <h5 class="mt-2 font-weight-bold">Room No: @room.RoomNumber</h5>
+                                                    <p class="m-0">Room Type: @room.Category</p>
+                                                    <p class="m-0">Check Out: None</p>
+                                                    <p class="m-0 text-c-green">Charge: @room.Price</p>
+                                                    <button type="button" style="width: 60%;align-self: center;" class="btn btn-success btn-sm mt-5 font-weight-bold" @onclick="() => BookRoom(room)">
+                                                        Available
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                 }
+                            }
+                            else
+                            {
+                                <p class="text-primary"> No Room Data Available!</p>
+                            }
                         }
                     </div>
+
+
+
                 </div>
             </div>
         </div>
@@ -101,9 +121,39 @@
 <SimpleDailog Title="@Title" Show="@show" OnCloseDialog="ResetForm">
     @if (show)
     {
-        <EditForm Model="model" OnValidSubmit="OnSave">
+        <EditForm Model="roomModel" OnValidSubmit="OnSave">
             <DataAnnotationsValidator />
             <div>
+                <div class="form-group row mb-2">
+                    <label class="col-form-label col-md-6 bold-font" style="padding-right: 0;"><i class="fa fa-check-square"></i> Booking Status</label>
+                    <div class="col-md-6">
+                        <div class="form-control">@roomModel.Status.ToString()</div>
+                    </div>
+                </div>
+                <div class="form-group row mb-2">
+                    <label class="col-form-label col-md-6 bold-font" style="padding-right: 0;"><i class="fa fa-sort-numeric-asc"></i> Room Number</label>
+                    <div class="col-md-6">
+                        <div class="form-control">@roomModel.RoomNumber.ToString()</div>
+                    </div>
+                </div>
+                <div class="form-group row mb-2">
+                    <label class="col-form-label col-md-6 bold-font" style="padding-right: 0;"><i class="fa fa-th-list"></i> Room Type</label>
+                    <div class="col-md-6">
+                        <div class="form-control">@roomModel.Category.ToString()</div>
+                    </div>
+                </div>
+                <div class="form-group row mb-2">
+                    <label class="col-form-label col-md-6 bold-font" style="padding-right: 0;"><i class="fa fa-usd"></i> Rent/Day</label>
+                    <div class="col-md-6">
+                        <div class="form-control">@roomModel.Price.ToString()</div>
+                    </div>
+                </div>
+                <div class="form-group row mb-2">
+                    <label class="col-form-label col-md-6 bold-font" style="padding-right: 0;"><i class="fa fa-user"></i> Extra Capacity</label>
+                    <div class="col-md-6">
+                        <div class="form-control">@(roomModel.ExtraCapacity ? "Yes" : "No")</div>
+                    </div>
+                </div>
             </div>
             @if (process)
             {
@@ -113,7 +163,7 @@
             }
             <UiAlert Model="alert"></UiAlert>
             <hr />
-            <button type="submit" class="btn btn-primary float-right col-md-4">Add</button>
+            <button type="submit" class="btn btn-primary float-right col-md-5">Book Now</button>
         </EditForm>
         <br />
     }
@@ -127,26 +177,30 @@
     protected AlertModel? alert { get; set; }
 
     BookingList model = new();
-    public string Title = "Room/Hall Booking";
+    public string Title = "Room Booking";
     bool show = false;
     bool process = false;
+    bool loading = true; // Add loading flag
     private Timer _timer;
     private int _delay = 2500;
 
     List<Room> Rooms = new();
     List<Room> filteredRooms = new();
     List<RoomHallStatus> roomStatuses = Enum.GetValues(typeof(RoomHallStatus)).Cast<RoomHallStatus>().ToList();
-    List<string> roomTypes = new() { "Single", "Double", "Suite" };
+    List<RoomCategories> roomTypes = new();
     List<Floor> floors = Enum.GetValues(typeof(Floor)).Cast<Floor>().ToList();
     RoomHallStatus? selectedRoomStatus = null;
     string selectedRoomType = string.Empty;
     Floor? selectedFloor = null;
+    Room roomModel = new();
 
     protected override async Task OnInitializedAsync()
     {
         alert?.Clear();
         Rooms = (await client.GetAllRoom()).ToList();
+        roomTypes = (await client.GetAllRoomCategory()).ToList();
         filteredRooms = Rooms;
+        loading = false; // Set loading to false once data is loaded
     }
 
     private void ApplyFilters()
@@ -160,23 +214,14 @@
 
     private async Task BookRoom(Room room)
     {
-        model = new BookingList
-            {
-                RoomNumber = room.RoomNumber,
-                RoomType = room.Category
-            };
+        roomModel = room;
         show = true;
         StateHasChanged();
     }
 
     public async Task OnSave()
     {
-        process = true;
-        alert?.Clear();
-
-        process = false;
-        StateHasChanged();
-        _timer = new Timer(TimerCallback, null, _delay, Timeout.Infinite);
+        NavigationManager.NavigateTo($"new-booking/{roomModel.Id}");
     }
 
     private void TimerCallback(Object o)
@@ -197,6 +242,7 @@
     {
         model = new();
     }
+
     public void Show()
     {
         show = true;

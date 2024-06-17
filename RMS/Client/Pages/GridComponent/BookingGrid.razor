@@ -36,12 +36,25 @@ else
     {
 
         c.Add(o => o.Id).SetWidth("10%").Css("table-bordered").Titled("SN.").Filterable(filter);
-        c.Add(o => o.RoomNumber).Css("table-bordered").Titled("SN.").Filterable(filter);
+        c.Add(o => o.BookingNumber).Css("table-bordered").Titled("booking No.").Filterable(filter);
+        c.Add(o => o.RoomNumber).Css("table-bordered").Titled("Room No.").Filterable(filter);
+        c.Add(o => o.RoomType).Css("table-bordered").Filterable(filter);
+        c.Add(o => o.Name).Css("table-bordered").Filterable(filter);
+        c.Add(o => o.Phone).Css("table-bordered").Filterable(filter);
+        c.Add(o => o.CheckIn).Css("table-bordered").Filterable(filter);
+        c.Add(o => o.CheckOut).Css("table-bordered").Filterable(filter);
+        c.Add(o => o.PaidAmount).Css("table-bordered").Filterable(filter);
+        c.Add(o => o.DueAmount).Css("table-bordered").Filterable(filter);
+        c.Add(o => o.BookingStatus).Css("table-bordered").Filterable(filter);
+        c.Add(o => o.PaymentStatus).Css("table-bordered").Filterable(filter);
     
     
 
-        c.Add().Encoded(false).Sanitized(false).RenderComponentAs<BookingEditButton>().SetWidth("10px").Titled("Edit");
-        c.Add().Encoded(false).Sanitized(false).RenderComponentAs<BookingCancelButton>(new List<Action<object>> { RefreshGrid }).SetWidth("10px").Titled("Delete");
+        c.Add().Encoded(false).Sanitized(false).RenderComponentAs<BookingEditButton>().SetWidth("1px");
+        c.Add().Encoded(false).Sanitized(false).RenderComponentAs<BookingCheckInButton>().SetWidth("1px");
+        c.Add().Encoded(false).Sanitized(false).RenderComponentAs<BookingViewButton>().SetWidth("1px");
+        c.Add().Encoded(false).Sanitized(false).RenderComponentAs<BookingPrintButton>().SetWidth("1px");
+        c.Add().Encoded(false).Sanitized(false).RenderComponentAs<BookingCancelButton>(new List<Action<object>> { RefreshGrid }).SetWidth("10px");
     };
 
     protected override async Task OnParametersSetAsync()

@@ -1,0 +1,100 @@
+﻿@using GridShared
+@using GridShared.Columns
+@using GridShared.Utility
+@using Microsoft.Extensions.Primitives
+@using RMS.Client.Pages.GridComponent
+@using RMS.Client.Shared.Popup
+@using RMS.Client.Client
+@inject AppClient client
+@implements ICustomGridComponent<BookingList>
+@inject NavigationManager NavigationManager
+
+<button class='btn btn-sm btn-secondary' style="border-radius:15px" @onclick="MyClickHandler" title="View"><i class="fa fa-eye"></i></button>
+<SimpleDailog Title="@Title" Show="@show" OnCloseDialog="ResetForm">
+    @if (show)
+    {
+
+
+        <EditForm Model="model" OnValidSubmit="OnSave">
+            <DataAnnotationsValidator />
+            <div>
+              
+            </div>
+
+            @if (process || model == null)
+            {
+                <div style="text-align:center">
+                    <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
+                </div>
+            }
+            <UiAlert Model="alert"></UiAlert>
+            <hr />
+            <button type="submit" class="btn btn-primary float-right col-md-4">Add</button>
+        </EditForm>
+        <br />
+    }
+</SimpleDailog>
+@code {
+    [Parameter]
+    public BookingList Item { get; set; }
+
+    [Parameter]
+    public CGrid<BookingList> Grid { get; set; }
+
+    [CascadingParameter]
+    protected AlertModel? alert { get; set; }
+
+    private Timer _timer;
+    private int _delay = 2500;
+    bool show = false;
+    bool process = false;
+    string Title = "Update Category";
+
+    BookingList model = new();
+
+    private async Task MyClickHandler(MouseEventArgs e)
+    {
+        show = true;
+       // model = await client.GetBookingListById(Item.Id);
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        alert?.Clear();
+    }
+
+    public async Task OnSave()
+    {
+        process = true;
+        alert?.Clear();
+
+        // var response = await client.UpsertBookingListAsync(model);
+        // if (response.IsSuccess)
+        // {
+        //     // model = response.Result;
+        //     alert?.SetSuccess(response.Message);
+        //     await BookingListGrid.RefreshGridAsync();
+        // }
+        // else
+        //     alert?.SetError(response.Message);
+
+        process = false;
+        StateHasChanged();
+        _timer = new Timer(TimerCallback, null, _delay, Timeout.Infinite);
+    }
+
+    private void TimerCallback(Object o)
+    {
+        alert?.Clear();
+        _timer.Dispose();
+        StateHasChanged();
+    }
+
+    private void ResetForm()
+    {
+        model = new();
+        show = false;
+        process = false;
+    }
+
+}
