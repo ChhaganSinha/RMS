@@ -45,6 +45,7 @@
 
         <EditForm Model="model" OnValidSubmit="OnSave">
             <DataAnnotationsValidator />
+            @* <ValidationSummary/> *@
             <div class="form-group row">
                 <div class="col-md-6">
                     <label class="col-form-label bold-font">Select Employee</label>
@@ -79,12 +80,13 @@
             <div class="form-group row">
                 <div class="col-md-6">
                     <label class="col-form-label bold-font required-field">Application Start Date</label>
-                    <InputDate @bind-Value="@model.ApplicationStartDate" id="ApplicationStartDate" class="form-control" @onchange="CalculateApplyDays"></InputDate>
+                    <input type="date" @bind-Value="@model.ApplicationStartDate" id="ApplicationStartDate" class="form-control" @bind-Value:event="oninput" @onchange="CalculateApplyDays"></input>
                     <ValidationMessage For="() => model.ApplicationStartDate" />
                 </div>
                 <div class="col-md-6">
                     <label class="col-form-label bold-font">Application End Date</label>
-                    <InputDate @bind-Value="@model.ApplicationEndDate" id="ApplicationEndDate" class="form-control" @oninput="CalculateApplyDays"></InputDate>
+                    <input type="date" @bind-Value="@model.ApplicationEndDate" id="ApplicationEndDate" class="form-control" @bind-Value:event="oninput" @onchange="CalculateApplyDays"></input>
+
                     <ValidationMessage For="() => model.ApplicationEndDate" />
                 </div>
             </div>
@@ -109,12 +111,12 @@
             <div class="form-group row">
                 <div class="col-md-6">
                     <label class="col-form-label bold-font required-field">Approve Start Date</label>
-                    <InputDate @bind-Value="@model.ApproveStartDate" id="ApproveStartDate" class="form-control" @oninput="CalculateApproveDays"></InputDate>
+                    <input type="date" @bind-Value="@model.ApproveStartDate" id="ApproveStartDate" class="form-control" @bind-Value:event="oninput" @onchange="CalculateApproveDays"></input>
                     <ValidationMessage For="() => model.ApproveStartDate" />
                 </div>
                 <div class="col-md-6">
                     <label class="col-form-label bold-font">Approve End Date</label>
-                    <InputDate @bind-Value="@model.ApproveEndDate" id="ApproveEndDate" class="form-control" @oninput="CalculateApproveDays"></InputDate>
+                    <input type="date" @bind-Value="@model.ApproveEndDate" id="ApproveEndDate" class="form-control" @bind-Value:event="oninput" @onchange="CalculateApproveDays"></input>
                     <ValidationMessage For="() => model.ApproveEndDate" />
                 </div>
             </div>
