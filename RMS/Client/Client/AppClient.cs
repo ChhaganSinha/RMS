@@ -2459,16 +2459,16 @@ namespace RMS.Client.Client
             return Trainingcampaign;
         }
 
-        public async Task<AddFood> GetFoodById(int id)
+        public async Task<Food> GetFoodById(int id)
         {
-            AddFood data = null;
+            Food data = null;
             try
             {
                 var res = await HttpClient.GetAsync($"api/App/AddFood/{id}");
 
                 res.EnsureSuccessStatusCode();
 
-                data = await res.Content.ReadFromJsonAsync<AddFood>();
+                data = await res.Content.ReadFromJsonAsync<Food>();
 
             }
             catch (Exception ex)
@@ -2479,16 +2479,16 @@ namespace RMS.Client.Client
 
             return data;
         }
-        public async Task<IEnumerable<AddFood>> GetAllFood()
+        public async Task<IEnumerable<Food>> GetAllFood()
         {
-            IEnumerable<AddFood> details = null;
+            IEnumerable<Food> details = null;
             try
             {
                 var res = await HttpClient.GetAsync($"api/App/all-AddFood");
 
                 res.EnsureSuccessStatusCode();
 
-                details = await res.Content.ReadFromJsonAsync<IEnumerable<AddFood>>();
+                details = await res.Content.ReadFromJsonAsync<IEnumerable<Food>>();
 
             }
             catch (Exception ex)
@@ -2500,15 +2500,15 @@ namespace RMS.Client.Client
             return details;
         }
 
-        public async Task<ApiResponse<AddFood>> UpsertFoodAsync(AddFood data)
+        public async Task<ApiResponse<Food>> UpsertFoodAsync(Food data)
         {
-            var result = new ApiResponse<AddFood>();
+            var result = new ApiResponse<Food>();
 
             try
             {
                 var res = await HttpClient.PostAsJsonAsync($"api/App/UpsertAddFood", data);
                 res.EnsureSuccessStatusCode();
-                var json = await res.Content.ReadFromJsonAsync<ApiResponse<AddFood>>();
+                var json = await res.Content.ReadFromJsonAsync<ApiResponse<Food>>();
                 return json;
 
             }
@@ -2522,14 +2522,14 @@ namespace RMS.Client.Client
 
 
         }
-        public async Task<ApiResponse<AddFood>> DeleteFood(int id)
+        public async Task<ApiResponse<Food>> DeleteFood(int id)
         {
-            var result = new ApiResponse<AddFood>();
+            var result = new ApiResponse<Food>();
             try
             {
                 var res = await HttpClient.PostAsJsonAsync($"api/App/DeleteFood/{id}", new { });
                 res.EnsureSuccessStatusCode();
-                var json = await res.Content.ReadFromJsonAsync<ApiResponse<AddFood>>();
+                var json = await res.Content.ReadFromJsonAsync<ApiResponse<Food>>();
                 return json;
             }
             catch (Exception ex)

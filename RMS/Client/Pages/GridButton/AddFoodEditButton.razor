@@ -7,7 +7,7 @@
 @using RMS.Client.Client
 @using System.ComponentModel.DataAnnotations
 @inject AppClient client
-@implements ICustomGridComponent<AddFood>
+@implements ICustomGridComponent<Food>
 @inject NavigationManager NavigationManager
 
 <button class='btn btn-sm btn-warning' style="border-radius:15px" @onclick="MyClickHandler" title="Edit"><i class="fa fa-pencil-square-o"></i></button>
@@ -121,13 +121,13 @@
 </PageDialog>
 @code {
     [Parameter]
-    public AddFood Item { get; set; }
+    public Food Item { get; set; }
 
     private int? foodcategoryid;
     private int? variantsid;
 
     [Parameter]
-    public CGrid<AddFood> Grid { get; set; }
+    public CGrid<Food> Grid { get; set; }
 
     [CascadingParameter]
     protected AlertModel? alert { get; set; }
@@ -149,7 +149,7 @@
 
     private string imageDataUrl;
 
-    AddFood model = new();
+    Food model = new();
 
     private async Task MyClickHandler(MouseEventArgs e)
     {
@@ -196,7 +196,7 @@
             }
             await FoodGrid.RefreshGridAsync();
             alert?.SetSuccess(response.Message);
-            model = new AddFood();
+            model = new Food();
             foodcategoryid = null;
             variantsid = null;
             selectedMenuTypeid = new();

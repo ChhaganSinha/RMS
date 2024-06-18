@@ -1,11 +1,11 @@
-﻿@* @using GridShared
+﻿@using GridShared
 @using GridShared.Columns
 @using GridShared.Utility
 @using Microsoft.Extensions.Primitives
 @using RMS.Client.Client
 @using RMS.Client.Shared.Popup
 @inject AppClient client
-@implements ICustomGridComponent<AddFood>
+@implements ICustomGridComponent<Food>
 @inject NavigationManager NavigationManager
 
 <button class='btn btn-sm btn-danger' style="border-radius:15px" @onclick="MyClickHandler" title="Delete"><i class="fa fa-trash"></i></button>
@@ -39,10 +39,10 @@
 
 @code {
     [Parameter]
-    public AddFood Item { get; set; }
+    public Food Item { get; set; }
 
     [Parameter]
-    public CGrid<AddFood> Grid { get; set; }
+    public CGrid<Food> Grid { get; set; }
 
     [Parameter]
     public IList<Action<object>> Actions { get; set; }
@@ -51,12 +51,12 @@
     bool process = false;
     bool TaskCompleted = false;
     string MessageBody = string.Empty;
-    string Title = "Delete AddFood";
+    string Title = "Delete Food";
 
     private async void Delete()
     {
         process = true;
-        var responce = await client.DeleteAddFood(Item.Id);
+        var responce = await client.DeleteFood(Item.Id);
         if (responce.IsSuccess == true)
         {
             MessageBody = responce.Message;
@@ -88,4 +88,3 @@
     }
 
 }
- *@

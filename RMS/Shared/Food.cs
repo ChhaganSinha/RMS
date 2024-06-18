@@ -8,10 +8,10 @@ using System.ComponentModel.DataAnnotations;
 
 namespace RMS.Dto
 {
-    public class AddFood : Auditable
+    public class Food : Auditable
     {
+        
         public string FoodName { get; set; } = string.Empty;
-        [Required]
         public string MenuType { get; set; } = string.Empty;
         public int? MenuTypeId { get; set; }
         public string FoodCategory { get; set; } = string.Empty;

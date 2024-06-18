@@ -21,9 +21,9 @@ namespace RMS.Server.Controllers.Api.OData
 
         [EnableQuery]
         [ODataAuthorize]
-        public IQueryable<AddFood> Get()
+        public IQueryable<Food> Get()
         {
-            var data = DbContext.AddFood.AsQueryable();
+            var data = DbContext.Food.AsQueryable();
             return data;
         }
     }
