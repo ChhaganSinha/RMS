@@ -41,7 +41,6 @@
 <PageDialog Title="@Title" Show="@show" ClosePageDialog="ResetForm">
     @if (show)
     {
-        <UiAlert Model="alert"></UiAlert>
         <EditForm Model="model" OnValidSubmit="OnSave">
             <DataAnnotationsValidator />
             <div class="form-group row">
@@ -232,7 +231,10 @@
         model.VariantId = variantsid;
         if (variantsid != null)
             model.Variant = Category.Where(x => x.Id == variantsid).Select(x => x.Name).First();
-        // Ensure the model includes the selected facilities
+        if (selectedMenuTypeid.Count > 0)
+            model.MenuType = string.Join(", ", menuTypes.Where(menuType => selectedMenuTypeid.Contains(menuType.Id)).Select(menuType => menuType.Name));
+
+    
         var response = await client.UpsertFoodAsync(model);
         if (response.IsSuccess)
         {
