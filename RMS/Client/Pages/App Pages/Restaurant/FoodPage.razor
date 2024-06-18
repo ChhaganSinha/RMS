@@ -158,7 +158,7 @@
     private int? foodcategoryid;
     private int? variantsid;
 
-    AddFood model = new();
+    Food model = new();
     public string Title = "Add Food";
     bool show = false;
     bool process = false;
@@ -251,7 +251,7 @@
             }
             await FoodGrid.RefreshGridAsync();
             alert?.SetSuccess(response.Message);
-            model = new AddFood();
+            model = new Food();
             foodcategoryid = null;
             variantsid = null;
             selectedMenuTypeid = new();
@@ -276,14 +276,14 @@
 
     private void ResetForm()
     {
-        model = new AddFood();
+        model = new Food();
         show = false;
         process = false;
     }
 
     public void OnClose()
     {
-        model = new AddFood();
+        model = new Food();
         selectedMenuTypeid = null;
         foodcategoryid = null;
         variantsid = null;
@@ -291,7 +291,7 @@
 
     public void OnAdd()
     {
-        model = new AddFood();
+        model = new Food();
         selectedMenuTypeid = null;
         foodcategoryid = null;
         variantsid = null;

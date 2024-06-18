@@ -953,21 +953,21 @@ namespace RMS.Server.Controllers.Api
 
         [HttpGet]
         [Route("AddFood/{id}")]
-        public async Task<AddFood> GetFoodById(int id)
+        public async Task<Food> GetFoodById(int id)
         {
             return await _appRepository.GetFoodById(id);
         }
 
         [HttpGet]
         [Route("all-AddFood")]
-        public async Task<IEnumerable<AddFood>> GetAllFood()
+        public async Task<IEnumerable<Food>> GetAllFood()
         {
             return await _appRepository.GetAllFood();
         }
 
         [HttpPost]
         [Route("UpsertAddFood")]
-        public async Task<ApiResponse<AddFood>> UpsertFood(AddFood data)
+        public async Task<ApiResponse<Food>> UpsertFood(Food data)
         {
             return await _appRepository.UpsertFood(data);
         }
@@ -1000,7 +1000,7 @@ namespace RMS.Server.Controllers.Api
 
         [HttpPost]
         [Route("DeleteFood/{id}")]
-        public async Task<ApiResponse<AddFood>> DeleteFood(int id)
+        public async Task<ApiResponse<Food>> DeleteFood(int id)
         {
             return await _appRepository.DeleteFood(id);
         }

@@ -2716,26 +2716,66 @@ namespace RMS.Repositories
         }
 
 
+        //public async Task<bool> UpsertFoodMenuTypeMapping(Dictionary<int, List<int>> dict)
+        //{
+        //    foreach (var kvp in dict)
+        //    {
+        //        var foodId = kvp.Key;
+        //        var menuTypeId = kvp.Value;
+
+        //        var existingfacilityIds = await AppDbCxt.FoodMenuTypeMapping
+        //            .Where(o => o.FoodId == foodId)
+        //            .Select(o => o.MenuTypeId)
+        //            .ToListAsync();
+
+        //        var facilityIdsToAdd = menuTypeId.Except(existingfacilityIds);
+        //        var facilityIdsToRemove = existingfacilityIds.Except(menuTypeId);
+        //        var facilityIdsToKeep = menuTypeId.Intersect(existingfacilityIds);
+
+        //        if (facilityIdsToRemove.Any())
+        //        {
+        //            var mappingsToRemove = await AppDbCxt.FoodMenuTypeMapping
+        //                .Where(tcm => tcm.FoodId == foodId && facilityIdsToRemove.Contains(tcm.MenuTypeId))
+        //                .ToListAsync();
+        //            AppDbCxt.RemoveRange(mappingsToRemove);
+        //        }
+
+        //        if (facilityIdsToAdd.Any())
+        //        {
+        //            var mappingsToAdd = facilityIdsToAdd.Select(c => new FoodMenuTypeMapping
+        //            {
+        //                FoodId = foodId,
+        //                MenuTypeId = c
+        //            });
+        //            AppDbCxt.AddRange(mappingsToAdd);
+        //        }
+
+        //        await AppDbCxt.SaveChangesAsync();
+        //    }
+
+        //    return true;
+        //}
+
         public async Task<bool> UpsertFoodMenuTypeMapping(Dictionary<int, List<int>> dict)
         {
             foreach (var kvp in dict)
             {
-                var foodId = kvp.Key;
-                var menuTypeId = kvp.Value;
+                var hallId = kvp.Key;
+                var facilityId = kvp.Value;
 
                 var existingfacilityIds = await AppDbCxt.FoodMenuTypeMapping
-                    .Where(o => o.FoodId == foodId)
+                    .Where(o => o.FoodId == hallId)
                     .Select(o => o.MenuTypeId)
                     .ToListAsync();
 
-                var facilityIdsToAdd = menuTypeId.Except(existingfacilityIds);
-                var facilityIdsToRemove = existingfacilityIds.Except(menuTypeId);
-                var facilityIdsToKeep = menuTypeId.Intersect(existingfacilityIds);
+                var facilityIdsToAdd = facilityId.Except(existingfacilityIds);
+                var facilityIdsToRemove = existingfacilityIds.Except(facilityId);
+                var facilityIdsToKeep = facilityId.Intersect(existingfacilityIds);
 
                 if (facilityIdsToRemove.Any())
                 {
                     var mappingsToRemove = await AppDbCxt.FoodMenuTypeMapping
-                        .Where(tcm => tcm.FoodId == foodId && facilityIdsToRemove.Contains(tcm.MenuTypeId))
+                        .Where(tcm => tcm.FoodId == hallId && facilityIdsToRemove.Contains(tcm.MenuTypeId))
                         .ToListAsync();
                     AppDbCxt.RemoveRange(mappingsToRemove);
                 }
@@ -2744,7 +2784,7 @@ namespace RMS.Repositories
                 {
                     var mappingsToAdd = facilityIdsToAdd.Select(c => new FoodMenuTypeMapping
                     {
-                        FoodId = foodId,
+                        FoodId = hallId,
                         MenuTypeId = c
                     });
                     AppDbCxt.AddRange(mappingsToAdd);
@@ -2756,33 +2796,34 @@ namespace RMS.Repositories
             return true;
         }
 
+
         public async Task<List<FoodMenuTypeMapping>> GetFoodMenuTypeByFoodId(int id)
         {
             var dataMapping = AppDbCxt.FoodMenuTypeMapping.Where(o => o.FoodId == id);
             return dataMapping.ToList();
         }
 
-        public async Task<AddFood> GetFoodById(int id)
+        public async Task<Food> GetFoodById(int id)
         {
-            AddFood result = null;
+            Food result = null;
 
 #pragma warning disable CS8600
-            result = AppDbCxt.AddFood.FirstOrDefault(o => o.Id == id);
+            result = AppDbCxt.Food.FirstOrDefault(o => o.Id == id);
 #pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
 
             return await Task.FromResult(result);
         }
 
-        public async Task<IEnumerable<AddFood>> GetAllFood()
+        public async Task<IEnumerable<Food>> GetAllFood()
         {
-            IEnumerable<AddFood> result = null;
+            IEnumerable<Food> result = null;
 
-            result = AppDbCxt.AddFood.ToList();
+            result = AppDbCxt.Food.ToList();
             return result;
         }
-        public async Task<ApiResponse<AddFood>> UpsertFood(AddFood data)
+        public async Task<ApiResponse<Food>> UpsertFood(Food data)
         {
-            var result = new ApiResponse<AddFood>();
+            var result = new ApiResponse<Food>();
             try
             {
 
@@ -2795,12 +2836,12 @@ namespace RMS.Repositories
 
                 if (data.Id > 0)
                 {
-                    AppDbCxt.AddFood.Update(data);
+                    AppDbCxt.Food.Update(data);
                     result.Message = "Data Successfully Updated.";
                 }
                 else
                 {
-                    AppDbCxt.AddFood.Add(data);
+                    AppDbCxt.Food.Add(data);
                     result.Message = "Data Successfully Inserted.";
                 }
 
@@ -2817,12 +2858,12 @@ namespace RMS.Repositories
             }
         }
 
-        public async Task<ApiResponse<AddFood>> DeleteFood(int id)
+        public async Task<ApiResponse<Food>> DeleteFood(int id)
         {
-            var result = new ApiResponse<AddFood>();
+            var result = new ApiResponse<Food>();
             try
             {
-                var existing = AppDbCxt.AddFood.First(x => x.Id == id);
+                var existing = AppDbCxt.Food.First(x => x.Id == id);
                 result.Result = existing;
                 if (existing == null)
                 {
@@ -2831,7 +2872,7 @@ namespace RMS.Repositories
                     return result;
                 }
 
-                AppDbCxt.AddFood.Remove(existing);
+                AppDbCxt.Food.Remove(existing);
                 await AppDbCxt.SaveChangesAsync();
                 result.IsSuccess = true;
                 result.Message = "Successfully Deleted!";

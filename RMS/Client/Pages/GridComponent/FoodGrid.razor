@@ -12,7 +12,7 @@
 {
     <div class="row">
         <div class="col-sm-12">
-            <GridComponent @ref="Component" T="AddFood" Grid="@_grid"></GridComponent>
+            <GridComponent @ref="Component" T="Food" Grid="@_grid"></GridComponent>
         </div>
     </div>
 }
@@ -25,13 +25,13 @@ else
 
 @code
 {
-    private CGrid<AddFood> _grid;
+    private CGrid<Food> _grid;
     private Task _task;
-    private static GridComponent<AddFood> Component;
+    private static GridComponent<Food> Component;
     static bool filter = true;
     static AuthenticationState authState;
 
-    Action<IGridColumnCollection<AddFood>> columns = c =>
+    Action<IGridColumnCollection<Food>> columns = c =>
     {
 
         c.Add(o => o.Id).SetWidth("10%").Css("table-bordered").Titled("SN.").Filterable(filter);
@@ -52,11 +52,11 @@ else
     protected override async Task OnParametersSetAsync()
     {
         authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        string url = $"odata/AddFood";
+        string url = $"odata/Food";
         var query = new QueryDictionary<StringValues>();
         query.Add("grid-sorting", "Id__1__1");
 
-        var client = new GridODataClient<AddFood>(HttpClient, url, query, false, "ordersGrid", columns, 5)
+        var client = new GridODataClient<Food>(HttpClient, url, query, false, "ordersGrid", columns, 5)
             .Sortable(true)
             // .Filterable(true)
             // .ClearFiltersButton(true)
