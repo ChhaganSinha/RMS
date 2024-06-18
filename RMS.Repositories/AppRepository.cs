@@ -2716,6 +2716,136 @@ namespace RMS.Repositories
         }
 
 
+        public async Task<bool> UpsertFoodMenuTypeMapping(Dictionary<int, List<int>> dict)
+        {
+            foreach (var kvp in dict)
+            {
+                var foodId = kvp.Key;
+                var menuTypeId = kvp.Value;
+
+                var existingfacilityIds = await AppDbCxt.FoodMenuTypeMapping
+                    .Where(o => o.FoodId == foodId)
+                    .Select(o => o.MenuTypeId)
+                    .ToListAsync();
+
+                var facilityIdsToAdd = menuTypeId.Except(existingfacilityIds);
+                var facilityIdsToRemove = existingfacilityIds.Except(menuTypeId);
+                var facilityIdsToKeep = menuTypeId.Intersect(existingfacilityIds);
+
+                if (facilityIdsToRemove.Any())
+                {
+                    var mappingsToRemove = await AppDbCxt.FoodMenuTypeMapping
+                        .Where(tcm => tcm.FoodId == foodId && facilityIdsToRemove.Contains(tcm.MenuTypeId))
+                        .ToListAsync();
+                    AppDbCxt.RemoveRange(mappingsToRemove);
+                }
+
+                if (facilityIdsToAdd.Any())
+                {
+                    var mappingsToAdd = facilityIdsToAdd.Select(c => new FoodMenuTypeMapping
+                    {
+                        FoodId = foodId,
+                        MenuTypeId = c
+                    });
+                    AppDbCxt.AddRange(mappingsToAdd);
+                }
+
+                await AppDbCxt.SaveChangesAsync();
+            }
+
+            return true;
+        }
+
+        public async Task<List<FoodMenuTypeMapping>> GetFoodMenuTypeByFoodId(int id)
+        {
+            var dataMapping = AppDbCxt.FoodMenuTypeMapping.Where(o => o.FoodId == id);
+            return dataMapping.ToList();
+        }
+
+        public async Task<AddFood> GetFoodById(int id)
+        {
+            AddFood result = null;
+
+#pragma warning disable CS8600
+            result = AppDbCxt.AddFood.FirstOrDefault(o => o.Id == id);
+#pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
+
+            return await Task.FromResult(result);
+        }
+
+        public async Task<IEnumerable<AddFood>> GetAllFood()
+        {
+            IEnumerable<AddFood> result = null;
+
+            result = AppDbCxt.AddFood.ToList();
+            return result;
+        }
+        public async Task<ApiResponse<AddFood>> UpsertFood(AddFood data)
+        {
+            var result = new ApiResponse<AddFood>();
+            try
+            {
+
+                if (data == null)
+                {
+                    result.IsSuccess = true;
+                    result.Message = "Invalid Food data!";
+                    return result;
+                }
+
+                if (data.Id > 0)
+                {
+                    AppDbCxt.AddFood.Update(data);
+                    result.Message = "Data Successfully Updated.";
+                }
+                else
+                {
+                    AppDbCxt.AddFood.Add(data);
+                    result.Message = "Data Successfully Inserted.";
+                }
+
+                AppDbCxt.SaveChanges();
+                result.IsSuccess = true;
+                result.Result = data;
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+
+        public async Task<ApiResponse<AddFood>> DeleteFood(int id)
+        {
+            var result = new ApiResponse<AddFood>();
+            try
+            {
+                var existing = AppDbCxt.AddFood.First(x => x.Id == id);
+                result.Result = existing;
+                if (existing == null)
+                {
+                    result.IsSuccess = true;
+                    result.Message = "Food not found!";
+                    return result;
+                }
+
+                AppDbCxt.AddFood.Remove(existing);
+                await AppDbCxt.SaveChangesAsync();
+                result.IsSuccess = true;
+                result.Message = "Successfully Deleted!";
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+
+
         #endregion
     }
 }

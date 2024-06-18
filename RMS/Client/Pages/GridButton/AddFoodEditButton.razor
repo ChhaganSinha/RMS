@@ -1,4 +1,4 @@
-﻿@* @using GridShared
+﻿@using GridShared
 @using GridShared.Columns
 @using GridShared.Utility
 @using Microsoft.Extensions.Primitives
@@ -14,88 +14,88 @@
 <PageDialog Title="@Title" Show="@show" ClosePageDialog="ResetForm">
     @if (show)
     {
-
+        <UiAlert Model="alert"></UiAlert>
         <EditForm Model="model" OnValidSubmit="OnSave">
             <DataAnnotationsValidator />
             <div class="form-group row">
-                <div class="col-md-6">
-                    <label class="col-form-label bold-font required-field">AddFood Number</label>
-                    <InputText @bind-Value="@model.HallNumber" id="HallNumber" class="form-control"></InputText>
-                    <ValidationMessage For="() => model.HallNumber" />
+                <!-- Food Name -->
+                <div class="col-md-4">
+                    <label class="col-form-label bold-font required-field">Food Name</label>
+                    <InputText @bind-Value="@model.FoodName" id="FoodName" class="form-control"></InputText>
+                    <ValidationMessage For="() => model.FoodName" />
                 </div>
-                <div class="col-md-6">
+
+                <!-- Price -->
+                <div class="col-md-4">
                     <label class="col-form-label bold-font">Price</label>
                     <InputNumber @bind-Value="@model.Price" id="Price" class="form-control"></InputNumber>
                     <ValidationMessage For="() => model.Price" />
                 </div>
-            </div>
-            <div class="form-group row">
-                <div class="col-md-6">
-                    <label class="col-form-label bold-font">Select Category</label>
-                    <HxSelect TItem="HallCategories"
-                              TValue="int?"
-                              Data="Categories"
-                              @bind-Value="categoriesId"
-                              TextSelector="@(Categories => Categories.Name)"
-                              ValueSelector="@(Categories => Categories.Id)"
-                              Nullable="true"
-                              NullText="-select-"
-                              NullDataText="Loading categories..." />
-                    <ValidationMessage For="() => model.Category" />
+
+                <!-- Tax Percentage -->
+                <div class="col-md-4">
+                    <label class="col-form-label bold-font">Tax %</label>
+                    <InputNumber @bind-Value="@model.TaxPercentage" id="TaxPercentage" class="form-control"></InputNumber>
+                    <ValidationMessage For="() => model.TaxPercentage" />
                 </div>
-                <div class="col-md-6">
-                    <label class="col-form-label bold-font">Select Facilities</label>
-                    <HxMultiSelect TItem="HallFacilities"
+            </div>
+
+            <div class="form-group row">
+                <!-- Select Menu Type -->
+                <div class="col-md-4">
+                    <label class="col-form-label bold-font">Select Menu Type</label>
+                    <HxMultiSelect TItem="MenuType"
                                    AutoSort="false"
                                    TValue="int"
-                                   Data="@Facilities"
-                                   @bind-Value="@SelectedFacilities"
+                                   Data="@menuTypes"
+                                   @bind-Value="@selectedMenuTypeid"
                                    TextSelector="@(p => p.Name)"
                                    ValueSelector="@(p => p.Id)"
                                    EmptyText="- Select -"
                                    NullDataText="Loading..." />
-                    @if (SelectedFacilities.Count() == 0 && IsError)
-                    {
-                        <span style="color:red">Please select at least one Facility</span>
-                    }
+                </div>
+
+                <!-- Select Food Category -->
+                <div class="col-md-4">
+                    <label class="col-form-label bold-font">Select Food Category</label>
+                    <HxSelect TItem="FoodCategory"
+                              TValue="int?"
+                              Data="Category"
+                              @bind-Value="foodcategoryid"
+                              TextSelector="@(FoodCategory => FoodCategory.Name)"
+                              ValueSelector="@(FoodCategory => FoodCategory.Id)"
+                              Nullable="true"
+                              NullText="- Select -"
+                              NullDataText="Loading categories..." />
+                    <ValidationMessage For="() => model.FoodCategory" />
+                </div>
+
+                <!-- Select Food Variants -->
+                <div class="col-md-4">
+                    <label class="col-form-label bold-font">Select Food Variants</label>
+                    <HxSelect TItem="AddVariants"
+                              TValue="int?"
+                              Data="Variants"
+                              @bind-Value="variantsid"
+                              TextSelector="@(Variants => Variants.Name)"
+                              ValueSelector="@(Variants => Variants.Id)"
+                              Nullable="true"
+                              NullText="- Select -"
+                              NullDataText="Loading variants..." />
+                    <ValidationMessage For="() => model.Variant" />
                 </div>
             </div>
+
             <div class="form-group row">
+                <!-- Cooking Time -->
                 <div class="col-md-4">
-                    <label class="col-form-label bold-font" style="padding-right: 0;">No. of Beds</label>
-                    <InputNumber @bind-Value="@model.NumberOfBed" id="NumberOfBed" class="form-control"></InputNumber>
-                    <ValidationMessage For="() => model.NumberOfBed" />
+                    <label class="col-form-label bold-font">Cooking Time</label>
+                    <InputText @bind-Value="@model.CookingTime" id="CookingTime" class="form-control"></InputText>
+                    <ValidationMessage For="() => model.CookingTime" />
                 </div>
+
+                <!-- Upload Image -->
                 <div class="col-md-4">
-                    <label class="col-form-label bold-font" style="padding-right: 0;">Capacity</label>
-                    <InputText @bind-Value="@model.Capacity" id="Capacity" class="form-control"></InputText>
-                    <ValidationMessage For="() => model.Capacity" />
-                </div>
-                <div class="col-md-4">
-                    <label class="col-form-label bold-font" style="padding-right: 0;">Extra Capacity</label>
-                    <InputCheckbox @bind-Value="model.ExtraCapacity" id="ExtraCapacity" class="form-check-input" style="margin-left: -100px;margin-top: 45px; font-size: x-large;margin-top: 42px;" />
-                    <ValidationMessage For="() => model.ExtraCapacity" />
-                </div>
-            </div>
-            <div class="form-group row">
-                <div class="col-md-6">
-                    <label class="col-form-label bold-font" style="padding-right: 0;">Bed Charge</label>
-                    <InputText @bind-Value="@model.BedCharge" id="BedCharge" class="form-control"></InputText>
-                    <ValidationMessage For="() => model.BedCharge" />
-                </div>
-                <div class="col-md-6">
-                    <label class="col-form-label bold-font" style="padding-right: 0;">Person Charge</label>
-                    <InputText @bind-Value="@model.PersonCharge" id="PersonCharge" class="form-control"></InputText>
-                    <ValidationMessage For="() => model.PersonCharge" />
-                </div>
-            </div>
-            <div class="form-group row">
-                <div class="col-md-3">
-                    <label class="col-form-label bold-font" style="padding-right: 0;">IsActive</label>
-                    <InputCheckbox @bind-Value="model.IsActive" class="form-check-input" style="font-size: x-large;margin-top: 42px; margin-left: -56px;" />
-                    <ValidationMessage For="() => model.IsActive" />
-                </div>
-                <div class="col-md-9">
                     <label class="col-form-label bold-font">Upload Image</label>
                     <InputFile OnChange="HandleFileSelected" class="form-control" />
                     <br />
@@ -103,19 +103,15 @@
                     <ValidationMessage For="() => model.ImageFile" />
                 </div>
             </div>
-            <div class="form-group row">
-                <div class="col-md-12">
-                    <label class="col-form-label bold-font" style="padding-right: 0;">Descriptions</label>
-                    <InputTextArea @bind-Value="@model.Descriptions" id="Descriptions" class="form-control"></InputTextArea>
-                    <ValidationMessage For="() => model.Descriptions" />
-                </div>
-            </div>
+
+            <!-- Loading Indicator and Alerts -->
             @if (process)
             {
                 <div style="text-align:center">
                     <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
                 </div>
             }
+
             <UiAlert Model="alert"></UiAlert>
             <hr style="margin-bottom: 2px;" />
             <button type="submit" class="btn btn-primary float-right col-md-4">Add</button>
@@ -125,10 +121,13 @@
 </PageDialog>
 @code {
     [Parameter]
-    public Hall Item { get; set; }
+    public AddFood Item { get; set; }
+
+    private int? foodcategoryid;
+    private int? variantsid;
 
     [Parameter]
-    public CGrid<Hall> Grid { get; set; }
+    public CGrid<AddFood> Grid { get; set; }
 
     [CascadingParameter]
     protected AlertModel? alert { get; set; }
@@ -137,68 +136,76 @@
     private int _delay = 2500;
     bool show = false;
     bool process = false;
-    string Title = "Update Hall Details";
+    string Title = "Update Food Details";
 
-    private int? categoriesId;
+ 
     [Required]
-    private List<int> SelectedFacilities { get; set; } = new();
+    private List<int> selectedMenuTypeid { get; set; } = new();
     private bool IsError = false;
-    List<HallCategories> Categories = new();
-    private List<HallFacilities> Facilities = new();
-    Dictionary<int, List<int>> HallFacilitiesMap = new Dictionary<int, List<int>>();
+    private List<MenuType> menuTypes = new();
+    private List<FoodCategory> Category = new();
+    private List<AddVariants> Variants = new();
+    Dictionary<int, List<int>> FoodMenuTypeMap = new Dictionary<int, List<int>>();
 
     private string imageDataUrl;
 
-    Hall model = new();
+    AddFood model = new();
 
     private async Task MyClickHandler(MouseEventArgs e)
     {
         show = true;
-        model = await client.GetHallById(Item.Id);
+        model = await client.GetFoodById(Item.Id);
         alert?.Clear();
         // Load Hall categories and facilities
-        Categories = (await client.GetAllHallCategory()).ToList();
-        Facilities = (await client.GetAllHallFacility()).ToList();
-        categoriesId = model.CategoryId > 0 ? model.CategoryId : null;
-
+        menuTypes = (await client.GetAllMenuType()).ToList();
+        Category = (await client.GetAllFoodCategory()).ToList();
+        Variants = (await client.GetAllAddVariants()).ToList();
         // Convert existing image data to base64 string for preview
         if (model.ImageFile != null && model.ImageFile.Length > 0)
         {
             imageDataUrl = $"data:image/png;base64,{Convert.ToBase64String(model.ImageFile)}";
         }
 
-        var hallFacilitiesMap = await client.GetFacilitiesMappingByHallId(model.Id);
-        SelectedFacilities.AddRange(hallFacilitiesMap.Select(o => o.FacilityId));
+        var foodMenuTypeMap = await client.GetFoodMenuTypeByFoodId(model.Id);
+        selectedMenuTypeid.AddRange(foodMenuTypeMap.Select(o => o.MenuTypeId));
     }
 
     public async Task OnSave()
     {
         process = true;
         alert?.Clear();
-        model.CategoryId = categoriesId;
-        model.Category = Categories.Where(x => x.Id == categoriesId).Select(x => x.Name).First();
-        var response = await client.UpsertHallAsync(model);
+        model.FoodCategoryId = foodcategoryid;
+        if (foodcategoryid != null)
+            model.FoodCategory = Category.Where(x => x.Id == foodcategoryid).Select(x => x.Name).First();
+        // Ensure the model includes the selected facilities
+        var response = await client.UpsertFoodAsync(model);
         if (response.IsSuccess)
         {
             if (response.Result.Id > 0)
             {
-                if (HallFacilitiesMap.ContainsKey(model.Id))
+                if (FoodMenuTypeMap.ContainsKey(model.Id))
                 {
-                    HallFacilitiesMap[model.Id] = SelectedFacilities.Select(id => id).ToList();
+                    FoodMenuTypeMap[model.Id] = selectedMenuTypeid.Select(id => id).ToList();
                 }
                 else
                 {
-                    HallFacilitiesMap.Add(model.Id, SelectedFacilities.Select(id => id).ToList());
+                    FoodMenuTypeMap.Add(model.Id, selectedMenuTypeid.Select(id => id).ToList());
                 }
 
-                var result = await client.UpsertHallFacilitiesMapping(HallFacilitiesMap);
+                var result = await client.UpsertFoodMenuTypeMapping(FoodMenuTypeMap);
             }
-            // model = response.Result;
+            await FoodGrid.RefreshGridAsync();
             alert?.SetSuccess(response.Message);
-            await HallGrid.RefreshGridAsync();
+            model = new AddFood();
+            foodcategoryid = null;
+            variantsid = null;
+            selectedMenuTypeid = new();
+            imageDataUrl = string.Empty;
         }
         else
+        {
             alert?.SetError(response.Message);
+        }
 
         process = false;
         StateHasChanged();
@@ -234,5 +241,3 @@
         }
     }
 }
-
- *@

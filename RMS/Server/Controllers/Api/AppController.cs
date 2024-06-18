@@ -951,6 +951,60 @@ namespace RMS.Server.Controllers.Api
         }
 
 
+        [HttpGet]
+        [Route("AddFood/{id}")]
+        public async Task<AddFood> GetFoodById(int id)
+        {
+            return await _appRepository.GetFoodById(id);
+        }
+
+        [HttpGet]
+        [Route("all-AddFood")]
+        public async Task<IEnumerable<AddFood>> GetAllFood()
+        {
+            return await _appRepository.GetAllFood();
+        }
+
+        [HttpPost]
+        [Route("UpsertAddFood")]
+        public async Task<ApiResponse<AddFood>> UpsertFood(AddFood data)
+        {
+            return await _appRepository.UpsertFood(data);
+        }
+
+        [HttpGet]
+        [Route("GetFoodMenuTypeByFoodId/{FoodId}")]
+        public async Task<List<FoodMenuTypeMapping>> GetFoodMenuTypeByFoodId(int FoodId)
+        {
+            var data = await _appRepository.GetFoodMenuTypeByFoodId(FoodId);
+            return data;
+        }
+
+        [HttpPost]
+        [Route("UpsertFoodMenuTypeMapping")]
+        public async Task<ApiResponse<string>> UpsertFoodMenuTypeMapping(Dictionary<int, List<int>> dict)
+        {
+            var result = new ApiResponse<string>();
+            try
+            {
+                var outcome = await _appRepository.UpsertFoodMenuTypeMapping(dict);
+                result.Message = "Success";
+            }
+            catch (Exception ex)
+            {
+                // Logger.LogError(ex, "Error while uploading data to TrainingCampIdMapping");
+            }
+
+            return result;
+        }
+
+        [HttpPost]
+        [Route("DeleteFood/{id}")]
+        public async Task<ApiResponse<AddFood>> DeleteFood(int id)
+        {
+            return await _appRepository.DeleteFood(id);
+        }
+
         #endregion
     }
 
