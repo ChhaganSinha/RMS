@@ -1,5 +1,7 @@
 ﻿@page "/"
 @using RMS.Client.Client
+@using RMS.Client.Shared.ChartJs
+@using RMS.Dto.Dashboard
 @inject AppClient client
 @inject NavigationManager NavigationManager
 @attribute [Authorize]
@@ -12,8 +14,8 @@
                         <div class="card-body">
                             <h6 class="text-white">Orders Received</h6>
                             <h2 class="text-right text-white"><i
-                                    class="feather icon-shopping-cart float-left"></i><span>486</span></h2>
-                            <p class="m-b-0">Completed Orders<span class="float-right">351</span></p>
+                                    class="feather icon-shopping-cart float-left"></i><span>0</span></h2>
+                            <p class="m-b-0">Completed Orders<span class="float-right">0</span></p>
                         </div>
                     </div>
                 </div>
@@ -22,8 +24,8 @@
                         <div class="card-body">
                             <h6 class="text-white">Total Sales</h6>
                             <h2 class="text-right text-white"><i
-                                    class="feather icon-tag float-left"></i><span>1641</span></h2>
-                            <p class="m-b-0">This Month<span class="float-right">213</span></p>
+                                    class="feather icon-tag float-left"></i><span>0</span></h2>
+                            <p class="m-b-0">This Month<span class="float-right">0</span></p>
                         </div>
                     </div>
                 </div>
@@ -32,8 +34,8 @@
                         <div class="card-body">
                             <h6 class="text-white">Revenue</h6>
                             <h2 class="text-right text-white"><i
-                                    class="feather icon-repeat float-left"></i><span>$42,562</span></h2>
-                            <p class="m-b-0">This Month<span class="float-right">$5,032</span></p>
+                                    class="feather icon-repeat float-left"></i><span>$0</span></h2>
+                            <p class="m-b-0">This Month<span class="float-right">$0</span></p>
                         </div>
                     </div>
                 </div>
@@ -42,14 +44,47 @@
                         <div class="card-body">
                             <h6 class="text-white">Total Profit</h6>
                             <h2 class="text-right text-white"><i
-                                    class="feather icon-award float-left"></i><span>$9,562</span></h2>
-                            <p class="m-b-0">This Month<span class="float-right">$542</span></p>
+                                    class="feather icon-award float-left"></i><span>$0</span></h2>
+                            <p class="m-b-0">This Month<span class="float-right">$0</span></p>
                         </div>
                     </div>
                 </div>
+                @* dummy chart *@
+                <div class="row">
+    <div class="col-xl-6 col-md-6">
+        <div class="card">
+            <div class="card-header text-center">
+                <h5>Month wise Customer Reservation</h5>
+            </div>
+            <div class="card-body">
+                <div style="width: 100%;">
+                    <Chart Id="TrainingBar" Type="@ChartType.bar" Datasets="@TrainingBarChartData" AspectRatio="false"
+                           Labels="@TrainingBarChartLabels" Ids="@TrainingBarChartIds" IsStacked="false">
+                    </Chart>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-6 col-md-6">
+        <div class="card">
+            <div class="card-header text-center">
+                    <h5>Trend of Customer Reservation</h5>
+            </div>
+            <div class="card-body">
+                <div style="width: 100%;">
+                    <Chart Id="TrainingLine" Type="@ChartType.line" Datasets="@TrainingLineChartData" AspectRatio="false"
+                           Labels="@TrainingLineChartLabels" Ids="@TrainingLineChartIds" IsStacked="false">
+                    </Chart>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
+                @* dummy chart *@
 
-                <div class="col-md-12 col-xl-6">
+                #<!-- #region name -->
+@*                 <div class="col-md-12 col-xl-6">
                     <div class="card">
                         <div class="card-header">
                             <h5>Unique Visitor</h5>
@@ -2427,8 +2462,34 @@
                             </div>
                         </div>
                     </div>
-                </div>
-
+                </div> *@
+    <!-- #endregion -->
             </div>
 
-                   
+@code {
+    private List<ChartJsDataset> TrainingBarChartData = new List<ChartJsDataset>
+    {
+        new ChartJsDataset
+        {
+            Label = "Booking",
+            Data = new string[] { "50", "35", "40", "65", "42", "35", "55" },
+            BackgroundColor = new string[] { "rgba(75, 192, 192, 0.2)" }
+        }
+    };
+
+    private List<ChartJsDataset> TrainingLineChartData = new List<ChartJsDataset>
+    {
+        new ChartJsDataset
+        {
+            Label = "Completion Percentage",
+            Data = new string[] { "50", "60", "70", "80", "90", "85", "95" },
+            BackgroundColor = new string[] { "rgba(153, 102, 255, 0.2)" }
+        }
+    };
+
+    private string[] TrainingBarChartLabels = { "January", "February", "March", "April", "May", "June", "July" };
+    private int[] TrainingBarChartIds = { 1, 2, 3, 4, 5, 6, 7 };
+
+    private string[] TrainingLineChartLabels = { "January", "February", "March", "April", "May", "June", "July" };
+    private int[] TrainingLineChartIds = { 1, 2, 3, 4, 5, 6, 7 };
+}

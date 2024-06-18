@@ -50,6 +50,9 @@ namespace RMS.DataContext
         public DbSet<CleaningReport> CleaningReport { get; set; }
         public DbSet<BookingType> BookingType { get; set; }
         public DbSet<BookingList> BookingList { get; set; }
+        public DbSet<MenuType> MenuType { get; set; }
+        public DbSet<FoodCategory> FoodCategory { get; set; }
+        public DbSet<AddVariants> AddVariants { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

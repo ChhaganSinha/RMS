@@ -14,10 +14,10 @@ namespace RMS.Dto
         public string InvoiceNo { get; set; } = string.Empty;
 
         //[Required]
-        public DateTime PurchaseDate { get; set; }
+        public DateTime PurchaseDate { get; set; } = DateTime.Now;
 
         //[Required]
-        public DateTime ExpiryDate { get; set; }
+        public DateTime ExpiryDate { get; set; } = DateTime.Now.AddDays(30);
 
         public string Details { get; set; } = string.Empty;
 
