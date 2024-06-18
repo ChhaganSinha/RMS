@@ -1,94 +1,129 @@
 ﻿@page "/assign-room-cleaning"
-
 @using RMS.Client.Client
-@using RMS.Client.Shared
-@using System.ComponentModel.DataAnnotations
+@using RMS.Client.Pages.GridComponent
+@using RMS.Client.Shared.Popup
 @inject AppClient client
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
+@using Havit.Blazor.Components.Web
+@using Havit.Blazor.Components.Web.Bootstrap
+@using System.ComponentModel.DataAnnotations;
+@using RMS.Dto.Enum
+@attribute [Authorize]
 
-<h3>Assign Room Cleaning</h3>
-
-<EditForm Model="@model" OnValidSubmit="OnValidSubmit">
-    <DataAnnotationsValidator />
-    <div class="form-group">
-        <label for="houseKeeper">House Keeper *</label>
-        <select @bind="model.HouseKeeper" class="form-control" id="houseKeeper">
-            <option value="">Nothing selected</option>
-            @foreach (var keeper in HouseKeepers)
-            {
-                <option value="@keeper">@keeper</option>
-            }
-        </select>
-        <ValidationMessage For="() => model.HouseKeeper" />
-    </div>
-
-    <div class="form-group">
-        <label for="roomType">Room Type</label>
-        <select @bind="model.RoomType" class="form-control" id="roomType">
-            <option value="">Select Room Type</option>
-            @foreach (var type in RoomTypes)
-            {
-                <option value="@type">@type</option>
-            }
-        </select>
-    </div>
-
-    <div class="form-group">
-        <label for="status">Status</label>
-        <select @bind="model.Status" class="form-control" id="status">
-            <option value="">Select Status</option>
-            @foreach (var status in StatusList)
-            {
-                <option value="@status">@status</option>
-            }
-        </select>
-    </div>
-
-    <div class="row">
-        @foreach (var room in Rooms)
-        {
-            <div class="col-md-3 mb-2">
-                <div class="card">
-                    <div class="card-body">
-                        <input type="checkbox" @bind="room.IsSelected" class="form-check-input" id="room@room.RoomNo" />
-                        <label class="form-check-label" for="room@room.RoomNo">@room.RoomNo</label>
-                        <div>@room.Status</div>
-                    </div>
+<div class="page-header breadcumb-sticky">
+    <div class="page-block">
+        <div class="row align-items-center">
+            <div class="col-md-12">
+                <div class="page-header-title">
+                    <h5 class="m-b-10">
+                        Assign Room Cleaning
+                    </h5>
                 </div>
+                <ul class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a href="/"><i class="feather icon-home"></i></a>
+                    </li>
+                    <li class="breadcrumb-item"><a>Assign Cleaning</a></li>
+                </ul>
             </div>
-        }
+        </div>
     </div>
+</div>
 
-    <button type="submit" class="btn btn-primary">Update</button>
-</EditForm>
+<div class="row">
+    <div class="col-sm-12 p-0">
+        <div class="card-body p-2 mt-n3">
+        @*     <EditForm Model="@model" OnValidSubmit="OnValidSubmit">
+                <DataAnnotationsValidator />
+                <div class="form-group">
+                    <label for="houseKeeper">House Keeper</label>
+                    <select @bind="model.HouseKeeper" class="form-control" id="houseKeeper">
+                        <option value="">Nothing selected</option>
+                        @foreach (var keeper in HouseKeepers)
+                        {
+                            <option value="@keeper">@keeper.Name</option>
+                        }
+                    </select>
+                    <ValidationMessage For="() => model.HouseKeeper" />
+                </div>
+
+                <div class="form-group">
+                    <label for="roomType">Room Type</label>
+                    <select @bind="model.RoomType" class="form-control" id="roomType">
+                        <option value="">Select Room Type</option>
+                        @foreach (var type in RoomTypes)
+                        {
+                            <option value="@type">@type.Name</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="status">Status</label>
+                    <select @bind="model.Status" class="form-control" id="status">
+                        <option value="">Select Status</option>
+                        @foreach (var status in StatusList)
+                        {
+                            <option value="@status">@status</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <button type="button" class="btn btn-secondary" @onclick="FilterRooms">Search</button>
+                </div>
+
+                <div class="row">
+                    @foreach (var room in FilteredRooms)
+                    {
+                        <div class="col-md-3 mb-2">
+                            <div class="card">
+                                <div class="card-body">
+                                    <input type="checkbox" @bind="room.IsSelected" class="form-check-input" id="room@room.RoomNumber" />
+                                    <label class="form-check-label" for="room@room.RoomNumber">@room.RoomNumber</label>
+                                    <div>@room.Status</div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <button type="submit" class="btn btn-primary">Update</button>
+            </EditForm> *@
+        </div>
+    </div>
+</div>
 
 @code {
     private RoomCleaningAssignmentModel model = new RoomCleaningAssignmentModel();
 
-    private List<string> HouseKeepers = new List<string> { "John", "Jane", "Doe" }; // Fetch from the backend
-    private List<string> RoomTypes = new List<string> { "Single", "Double", "Suite" }; // Fetch from the backend
-    private List<string> StatusList = new List<string>
-    {
-        "Ready", "Booked", "Assigned to Clean", "Booked and Assigned to Clean",
-        "Under Maintenance", "Dirty", "Blocked", "Do not Reserve", "Under Process"
-    };
+    private IEnumerable<Employee> HouseKeepers = new List<Employee>();
+    private IEnumerable<RoomCategories> RoomTypes = new List<RoomCategories>();
+    private IEnumerable<Room> Rooms = new List<Room>();
+    private IEnumerable<Room> FilteredRooms = new List<Room>();
 
-    private List<RoomModel> Rooms = new List<RoomModel>
-    {
-        new RoomModel { RoomNo = "Room No.101", Status = "Ready" },
-        new RoomModel { RoomNo = "Room No.102", Status = "Ready" },
-        // Add more rooms here...
-    };
+    private static readonly List<string> StatusList = Enum.GetNames(typeof(RoomStatus)).ToList();
 
     protected override async Task OnInitializedAsync()
     {
-        // Fetch data from the backend
-        // HouseKeepers = await client.GetHouseKeepersAsync();
-        // RoomTypes = await client.GetRoomTypesAsync();
-        // Rooms = await client.GetRoomsAsync();
+        HouseKeepers = await client.GetAllEmployee();
+        RoomTypes = await client.GetAllRoomCategory();
+        Rooms = await client.GetAllRoom();
+        FilteredRooms = Rooms;
+    }
+
+    private void FilterRooms()
+    {
+        // FilteredRooms = Rooms.Where(room =>
+        //     (string.IsNullOrEmpty(model.HouseKeeper) || room.AssignedHouseKeeper == model.HouseKeeper) &&
+        //     (string.IsNullOrEmpty(model.RoomType) || room.Category.CategoryName == model.RoomType) &&
+        //     (string.IsNullOrEmpty(model.Status) || room.Status.ToString() == model.Status)
+        // ).ToList();
     }
 
     private void OnValidSubmit()
     {
-        // Handle form submission
+        
     }
 }

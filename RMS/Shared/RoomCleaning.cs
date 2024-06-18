@@ -20,10 +20,10 @@ namespace RMS.Dto
         public string AssignTo { get; set; } = string.Empty;
 
         [Required]
-        public DateTime DateStart { get; set; }
+        public DateTime DateStart { get; set; } = DateTime.Now;
 
         [Required]
-        public DateTime DateEnd { get; set; }
+        public DateTime DateEnd { get; set; } = DateTime.Now;
 
         public string Status { get; set; } = string.Empty;
 
