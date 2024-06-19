@@ -31,23 +31,15 @@ else
     static bool filter = true;
     static AuthenticationState authState;
 
-    Action<IGridColumnCollection<Food>> columns = c =>
+    private string GetImageHtml(Food food)
     {
-
-        c.Add(o => o.Id).SetWidth("10%").Css("table-bordered").Titled("SN.").Filterable(filter);
-        c.Add(o => o.FoodName).Css("table-bordered").Titled("Food Name").Filterable(filter);
-        c.Add(o => o.MenuType).Css("table-bordered").Titled("Menu Type").Filterable(filter);
-        c.Add(o => o.FoodCategory).Css("table-bordered").Titled("Food Category").Filterable(filter);
-        c.Add(o => o.Variant).Css("table-bordered").Titled("Variant").Filterable(filter);
-        c.Add(o => o.Price).Css("table-bordered").Titled("Price").Filterable(filter);
-        c.Add(o => o.TaxPercentage).Css("table-bordered").Titled("Tax %").Filterable(filter);
-        c.Add(o => o.CookingTime).Css("table-bordered").Titled("Cooking Time").Filterable(filter);
-        
-       
-
-        c.Add().Encoded(false).Sanitized(false).RenderComponentAs<AddFoodEditButton>().SetWidth("10px").Titled("Edit");
-        c.Add().Encoded(false).Sanitized(false).RenderComponentAs<AddFoodDeleteButton>(new List<Action<object>> { RefreshGrid }).SetWidth("10px").Titled("Delete");
-    };
+        if (food.ImageFile != null && food.ImageFile.Length > 0)
+        {
+            var base64Image = Convert.ToBase64String(food.ImageFile);
+            return $"<img src=\"data:image/png;base64,{base64Image}\" style=\"max-width: 100px; max-height: 100px;\" />";
+        }
+        return string.Empty;
+    }
 
     protected override async Task OnParametersSetAsync()
     {
@@ -56,14 +48,29 @@ else
         var query = new QueryDictionary<StringValues>();
         query.Add("grid-sorting", "Id__1__1");
 
+        Action<IGridColumnCollection<Food>> columns = c =>
+        {
+            c.Add(o => o.Id).SetWidth("10%").Css("table-bordered").Titled("SN.").Filterable(filter);
+            c.Add().Encoded(false).Sanitized(false).SetWidth("15%").Css("table-bordered").Titled("Image")
+                .RenderValueAs(o => GetImageHtml(o));
+            c.Add(o => o.FoodName).Css("table-bordered").Titled("Food Name").Filterable(filter);
+            c.Add(o => o.MenuType).Css("table-bordered").Titled("Menu Type").Filterable(filter);
+            c.Add(o => o.FoodCategory).Css("table-bordered").Titled("Food Category").Filterable(filter);
+            c.Add(o => o.Variant).Css("table-bordered").Titled("Variant").Filterable(filter);
+            c.Add(o => o.Price).Css("table-bordered").Titled("Price").Filterable(filter).Format("{0:F2}");
+            c.Add(o => o.TaxPercentage).Css("table-bordered").Titled("Tax %").Filterable(filter).Format("{0:F2}");
+            c.Add(o => o.CookingTime).Css("table-bordered").Titled("Cooking Time").Filterable(filter);
+
+
+            c.Add().Encoded(false).Sanitized(false).RenderComponentAs<AddFoodEditButton>().SetWidth("10px").Titled("Edit");
+            c.Add().Encoded(false).Sanitized(false).RenderComponentAs<AddFoodDeleteButton>(new List<Action<object>> { RefreshGrid }).SetWidth("10px").Titled("Delete");
+        };
+
         var client = new GridODataClient<Food>(HttpClient, url, query, false, "ordersGrid", columns, 5)
             .Sortable(true)
-            // .Filterable(true)
-            // .ClearFiltersButton(true)
             .SetStriped(true)
             .WithMultipleFilters()
             .WithGridItemsCount()
-            // .SetExcelExport(true, true, "AddFood.xlsx")
             .ChangePageSize(true)
             .EmptyText("No data available")
             .SetKeyboard(true)

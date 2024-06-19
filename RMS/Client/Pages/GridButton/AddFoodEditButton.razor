@@ -27,17 +27,18 @@
                 <!-- Price -->
                 <div class="col-md-4">
                     <label class="col-form-label bold-font">Price</label>
-                    <InputNumber @bind-Value="@model.Price" @bind-Value:format="0.00" id="Price" class="form-control"></InputNumber>
+                    <InputNumber @bind-Value="@model.Price" id="Price" class="form-control" step="0.01" format="0.00"></InputNumber>
                     <ValidationMessage For="() => model.Price" />
                 </div>
-
 
                 <!-- Tax Percentage -->
                 <div class="col-md-4">
                     <label class="col-form-label bold-font">Tax %</label>
-                    <InputNumber @bind-Value="@model.TaxPercentage" @bind-Value:format="0.00" id="TaxPercentage" class="form-control"></InputNumber>
+                    <InputNumber @bind-Value="@model.TaxPercentage" id="TaxPercentage" class="form-control" step="0.01" format="0.00"></InputNumber>
                     <ValidationMessage For="() => model.TaxPercentage" />
                 </div>
+
+
             </div>
 
             <div class="form-group row">
@@ -99,7 +100,10 @@
                     <label class="col-form-label bold-font">Upload Image</label>
                     <InputFile OnChange="HandleFileSelected" class="form-control" />
                     <br />
-                    <img id="imgPreview" src="@imageDataUrl" style="max-width: 200px; max-height: 200px; display: @(imageDataUrl == null ? "none" : "block");" />
+                    @if (!string.IsNullOrEmpty(imageDataUrl))
+                    {
+                        <img src="@imageDataUrl" style="max-width: 200px; max-height: 200px;" />
+                    }
                     <ValidationMessage For="() => model.ImageFile" />
                 </div>
             </div>
@@ -150,6 +154,19 @@
     private string imageDataUrl;
 
     Food model = new();
+    private async Task HandleFileSelected(InputFileChangeEventArgs e)
+    {
+        var file = e.File;
+        if (file != null)
+        {
+            using (var memoryStream = new MemoryStream())
+            {
+                await file.OpenReadStream().CopyToAsync(memoryStream);
+                model.ImageFile = memoryStream.ToArray();
+                imageDataUrl = $"data:{file.ContentType};base64,{Convert.ToBase64String(model.ImageFile)}";
+            }
+        }
+    }
 
     private async Task MyClickHandler(MouseEventArgs e)
     {
@@ -165,7 +182,7 @@
         {
             imageDataUrl = $"data:image/png;base64,{Convert.ToBase64String(model.ImageFile)}";
         }
-   
+
         foodcategoryid = model.FoodCategoryId > 0 ? model.FoodCategoryId : null;
         variantsid = model.VariantId > 0 ? model.VariantId : null;
         var foodMenuTypeMap = await client.GetFoodMenuTypeByFoodId(model.Id);
@@ -176,18 +193,18 @@
     {
         process = true;
         alert?.Clear();
-        
+
         model.FoodCategoryId = foodcategoryid;
         if (foodcategoryid != null)
             model.FoodCategory = Category.Where(x => x.Id == foodcategoryid).Select(x => x.Name).First();
-        
-            model.VariantId = variantsid;
+
+        model.VariantId = variantsid;
         if (variantsid != null)
             model.Variant = Category.Where(x => x.Id == variantsid).Select(x => x.Name).First();
 
         if (selectedMenuTypeid.Count > 0)
             model.MenuType = string.Join(", ", menuTypes.Where(menuType => selectedMenuTypeid.Contains(menuType.Id)).Select(menuType => menuType.Name));
-       
+
         var response = await client.UpsertFoodAsync(model);
         if (response.IsSuccess)
         {
@@ -233,20 +250,5 @@
         model = new();
         show = false;
         process = false;
-    }
-    private async Task HandleFileSelected(InputFileChangeEventArgs e)
-    {
-        var file = e.File;
-        if (file != null)
-        {
-            var buffer = new byte[file.Size];
-            await file.OpenReadStream().ReadAsync(buffer);
-
-            // Store the image data in the model
-            model.ImageFile = buffer;
-
-            // Convert the image to a data URL for preview
-            imageDataUrl = $"data:image/png;base64,{Convert.ToBase64String(buffer)}";
-        }
     }
 }
