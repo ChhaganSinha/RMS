@@ -20,12 +20,10 @@
                     <label class="col-form-label bold-font required-field">Select Product Category</label>
                     <HxSelect TItem="ProductCategories"
                               TValue="int?"
-                              Value="prodcategoriesId"
-                              ValueChanged="OnProductCategoryChanged"
-                              ValueExpression="(() => prodcategoriesId)"
+                              @bind-Value="prodcategoriesId"
                               Data="ProductCategories"
-                              TextSelector="@(ProductCategories => ProductCategories.Name)"
-                              ValueSelector="@(ProductCategories => ProductCategories.Id)"
+                              TextSelector="@(productCategory => productCategory.Name)"
+                              ValueSelector="@(productCategory => productCategory.Id)"
                               Nullable="true"
                               NullText="-select-"
                               NullDataText="Loading ProductCategories..." />
@@ -42,12 +40,10 @@
                     <label class="col-form-label bold-font required-field">Product Name</label>
                     <HxSelect TItem="ProductList"
                               TValue="int?"
-                              Value="prodlistid"
-                              ValueChanged="OnProductNameChanged"
-                              ValueExpression="(() => prodlistid)"
+                              @bind-Value="prodlistid"
                               Data="FilteredProductList"
-                              TextSelector="@(ProductList => ProductList.ProductName)"
-                              ValueSelector="@(ProductList => ProductList.Id)"
+                              TextSelector="@(productList => productList.ProductName)"
+                              ValueSelector="@(productList => productList.Id)"
                               Nullable="true"
                               NullText="-select-"
                               NullDataText="Loading ProductList..." />
@@ -104,14 +100,19 @@
     {
         show = true;
         model = await client.GetDestroyedProductsById(Item.Id);
-    }
-
-    protected override async Task OnInitializedAsync()
-    {
         alert?.Clear();
         ProductCategories = (await client.GetAllProductCategory()).ToList();
         ProductList = (await client.GetAllProductList()).ToList();
+        // Set the category ID and update the filtered product list
+        prodcategoriesId = model.ProductCategoryId;
+        OnProductCategoryChanged(prodcategoriesId);
+
+        // Set the product name ID after updating the filtered product list
+        prodlistid = model.ProductNameId;
+
+        StateHasChanged();
     }
+
 
     private void OnProductCategoryChanged (int? newCategoryId)
     {

@@ -27,18 +27,16 @@
                 <!-- Price -->
                 <div class="col-md-4">
                     <label class="col-form-label bold-font">Price</label>
-                    <InputNumber @bind-Value="@model.Price" id="Price" class="form-control" step="0.01" format="0.00"></InputNumber>
+                    <InputNumber @bind-Value="@model.Price" id="Price" class="form-control"></InputNumber>
                     <ValidationMessage For="() => model.Price" />
                 </div>
 
                 <!-- Tax Percentage -->
                 <div class="col-md-4">
                     <label class="col-form-label bold-font">Tax %</label>
-                    <InputNumber @bind-Value="@model.TaxPercentage" id="TaxPercentage" class="form-control" step="0.01" format="0.00"></InputNumber>
+                    <InputNumber @bind-Value="@model.TaxPercentage" id="TaxPercentage" class="form-control"></InputNumber>
                     <ValidationMessage For="() => model.TaxPercentage" />
                 </div>
-
-
             </div>
 
             <div class="form-group row">
@@ -59,16 +57,16 @@
                 <!-- Select Food Category -->
                 <div class="col-md-4">
                     <label class="col-form-label bold-font">Select Food Category</label>
-                    <HxSelect TItem="FoodCategory"
-                              TValue="int?"
-                              Data="Category"
-                              @bind-Value="foodcategoryid"
-                              TextSelector="@(FoodCategory => FoodCategory.Name)"
-                              ValueSelector="@(FoodCategory => FoodCategory.Id)"
-                              Nullable="true"
-                              NullText="- Select -"
-                              NullDataText="Loading categories..." />
-                    <ValidationMessage For="() => model.FoodCategory" />
+                    <HxMultiSelect TItem="FoodCategory"
+                                   AutoSort="false"
+                                   TValue="int"
+                                   Data="@Category"
+                                   @bind-Value="@foodcategoryid"
+                                   TextSelector="@(p => p.Name)"
+                                   ValueSelector="@(p => p.Id)"
+                                   EmptyText="- Select -"
+                                   NullDataText="Loading..." />
+
                 </div>
 
                 <!-- Select Food Variants -->
@@ -100,10 +98,7 @@
                     <label class="col-form-label bold-font">Upload Image</label>
                     <InputFile OnChange="HandleFileSelected" class="form-control" />
                     <br />
-                    @if (!string.IsNullOrEmpty(imageDataUrl))
-                    {
-                        <img src="@imageDataUrl" style="max-width: 200px; max-height: 200px;" />
-                    }
+                    <img id="imgPreview" src="@imageDataUrl" style="max-width: 200px; max-height: 200px; display: @(imageDataUrl == null ? "none" : "block");" />
                     <ValidationMessage For="() => model.ImageFile" />
                 </div>
             </div>
@@ -118,7 +113,7 @@
 
             <UiAlert Model="alert"></UiAlert>
             <hr style="margin-bottom: 2px;" />
-            <button type="submit" class="btn btn-primary float-right col-md-4">Update</button>
+            <button type="submit" class="btn btn-primary float-right col-md-4">Add</button>
         </EditForm>
         <br />
     }
@@ -127,7 +122,7 @@
     [Parameter]
     public Food Item { get; set; }
 
-    private int? foodcategoryid;
+   
     private int? variantsid;
 
     [Parameter]
@@ -145,11 +140,13 @@
 
     [Required]
     private List<int> selectedMenuTypeid { get; set; } = new();
+    private List<int> foodcategoryid { get; set; } = new();
     private bool IsError = false;
     private List<MenuType> menuTypes = new();
     private List<FoodCategory> Category = new();
     private List<AddVariants> Variants = new();
     Dictionary<int, List<int>> FoodMenuTypeMap = new Dictionary<int, List<int>>();
+    Dictionary<int, List<int>> FoodCategoryMap = new Dictionary<int, List<int>>();
 
     private string imageDataUrl;
 
@@ -183,10 +180,14 @@
             imageDataUrl = $"data:image/png;base64,{Convert.ToBase64String(model.ImageFile)}";
         }
 
-        foodcategoryid = model.FoodCategoryId > 0 ? model.FoodCategoryId : null;
+        
         variantsid = model.VariantId > 0 ? model.VariantId : null;
+
         var foodMenuTypeMap = await client.GetFoodMenuTypeByFoodId(model.Id);
         selectedMenuTypeid.AddRange(foodMenuTypeMap.Select(o => o.MenuTypeId));
+
+        var foodCategoryMap = await client.GetFoodCategoryByFoodId(model.Id);
+        foodcategoryid.AddRange(foodCategoryMap.Select(o => o.FoodCategoryId));
     }
 
     public async Task OnSave()
@@ -194,9 +195,8 @@
         process = true;
         alert?.Clear();
 
-        model.FoodCategoryId = foodcategoryid;
-        if (foodcategoryid != null)
-            model.FoodCategory = Category.Where(x => x.Id == foodcategoryid).Select(x => x.Name).First();
+        if (foodcategoryid.Count > 0)
+            model.FoodCategory = string.Join(", ", Category.Where(Category => foodcategoryid.Contains(Category.Id)).Select(Category => Category.Name));
 
         model.VariantId = variantsid;
         if (variantsid != null)
@@ -220,6 +220,20 @@
                 }
 
                 var result = await client.UpsertFoodMenuTypeMapping(FoodMenuTypeMap);
+            }
+
+            if (response.Result.Id > 0)
+            {
+                if (FoodCategoryMap.ContainsKey(model.Id))
+                {
+                    FoodCategoryMap[model.Id] = foodcategoryid.Select(id => id).ToList();
+                }
+                else
+                {
+                    FoodCategoryMap.Add(model.Id, foodcategoryid.Select(id => id).ToList());
+                }
+
+                var result = await client.UpsertFoodCategoryMapping(FoodCategoryMap);
             }
             await FoodGrid.RefreshGridAsync();
             alert?.SetSuccess(response.Message);

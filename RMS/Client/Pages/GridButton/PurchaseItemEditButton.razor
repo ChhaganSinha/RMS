@@ -93,7 +93,7 @@
                         {
                             <tr>
                                 <td>
-                                    <select class="form-control" Value="item.PurchaseItemId" @onchange="async (e) => await OnProductChanged(item, e)">
+                                    <select @bind-value="item.PurchaseItemId" class="form-control" @onchange="async (e) => await OnProductChanged(item, e)" @bind-value:event="oninput">
                                         <option value="">-Select-</option>
                                         @foreach (var product in ProductList)
                                         {
@@ -176,6 +176,11 @@
     {
         show = true;
         purchaseItem = await client.GetPurchaseItemById(Item.Id);
+        alert?.Clear();
+        SupplierList = (await client.GetAllSupplierList()).ToList();
+        ProductList = (await client.GetAllProductList()).ToList();
+        supplierlist = purchaseItem.SupplierNameId;
+
         // Ensure Items collection is initialized if null
         if (purchaseItem.Items == null)
         {
@@ -183,13 +188,13 @@
         }
     }
 
-    protected override async Task OnInitializedAsync()
-    {
-        alert?.Clear();
-        SupplierList = (await client.GetAllSupplierList()).ToList();
-        ProductList = (await client.GetAllProductList()).ToList();
-        AddNewItem(); // Add a default item on initialization
-    }
+    // protected override async Task OnInitializedAsync()
+    // {
+    //     alert?.Clear();
+    //     SupplierList = (await client.GetAllSupplierList()).ToList();
+    //     ProductList = (await client.GetAllProductList()).ToList();
+    //     AddNewItem(); // Add a default item on initialization
+    // }
     private void Show()
     {
         show = true;
@@ -274,17 +279,17 @@
         }
         _timer = new Timer(TimerCallback, null, _delay, Timeout.Infinite);
     }
-    private async Task OnProductChanged(ItemDto item, ChangeEventArgs e)
+    private async Task OnProductChanged(ItemDto item,  ChangeEventArgs e)
     {
-        if (int.TryParse(e.Value.ToString(), out int productId))
-        {
-            var selectedProduct = ProductList.FirstOrDefault(p => p.Id == productId);
+       
+        string ? selectedProductId = e.Value.ToString();
+        var selectedProduct = ProductList.FirstOrDefault(p => p.Id == int.Parse(selectedProductId));
             if (selectedProduct != null)
             {
                 item.ItemName = selectedProduct.ProductName;
                 item.Stock = selectedProduct.Available;
                 StateHasChanged();
             }
-        }
+        
     }
 }

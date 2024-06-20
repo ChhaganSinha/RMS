@@ -9,12 +9,12 @@
 @implements ICustomGridComponent<SaleProducts>
 @inject NavigationManager NavigationManager
 
-<button class='btn btn-sm btn-warning' style="border-radius:15px" @onclick="MyClickHandler" title="Edit"><i class="fa fa-pencil-square-o"></i></button>
+<button class='btn btn-sm btn-warning' style="border-radius:15px" @onclick="MyClickHandler" title="Edit">
+    <i class="fa fa-pencil-square-o"></i>
+</button>
 <PageDialog Title="@Title" Show="@show" ClosePageDialog="ResetForm">
     @if (show)
     {
-
-
         <EditForm Model="model" OnValidSubmit="OnSave">
             <DataAnnotationsValidator />
             <div class="form-group row">
@@ -22,12 +22,10 @@
                     <label class="col-form-label bold-font required-field">Select Product Category</label>
                     <HxSelect TItem="ProductCategories"
                               TValue="int?"
-                              Value="prodcategoriesId"
-                              ValueChanged="OnProductCategoryChanged"
-                              ValueExpression="(() => prodcategoriesId)"
+                              @bind-Value="prodcategoriesId"
                               Data="ProductCategories"
-                              TextSelector="@(ProductCategories => ProductCategories.Name)"
-                              ValueSelector="@(ProductCategories => ProductCategories.Id)"
+                              TextSelector="@(productCategory => productCategory.Name)"
+                              ValueSelector="@(productCategory => productCategory.Id)"
                               Nullable="true"
                               NullText="-select-"
                               NullDataText="Loading ProductCategories..." />
@@ -36,7 +34,7 @@
 
                 <div class="col-md-6">
                     <label class="col-form-label bold-font required-field">Price</label>
-                    <InputNumber @bind-Value="@model.Price" id="available" class="form-control"></InputNumber>
+                    <InputNumber @bind-Value="model.Price" id="available" class="form-control"></InputNumber>
                     <ValidationMessage For="() => model.Price" />
                 </div>
             </div>
@@ -45,12 +43,10 @@
                     <label class="col-form-label bold-font required-field">Select Product Name</label>
                     <HxSelect TItem="ProductList"
                               TValue="int?"
-                              Value="prodlistid"
-                              ValueChanged="OnProductNameChanged"
-                              ValueExpression="(() => prodlistid)"
+                              @bind-Value="prodlistid"
                               Data="FilteredProductList"
-                              TextSelector="@(ProductList => ProductList.ProductName)"
-                              ValueSelector="@(ProductList => ProductList.Id)"
+                              TextSelector="@(productList => productList.ProductName)"
+                              ValueSelector="@(productList => productList.Id)"
                               Nullable="true"
                               NullText="-select-"
                               NullDataText="Loading ProductList..." />
@@ -58,31 +54,18 @@
                 </div>
                 <div class="col-md-6">
                     <label class="col-form-label bold-font required-field">Quantity</label>
-                    <InputNumber @bind-Value="@model.Quantity" id="available" class="form-control"></InputNumber>
+                    <InputNumber @bind-Value="model.Quantity" id="available" class="form-control"></InputNumber>
                     <ValidationMessage For="() => model.Quantity" />
                 </div>
-
-
-
-
-
-
-
-
             </div>
-
-
 
             <div class="form-group row">
                 <div class="col-md-12">
                     <label class="col-form-label bold-font required-field">Comments</label>
-                    <InputTextArea @bind-Value="@model.Comments" id="name" class="form-control"></InputTextArea>
+                    <InputTextArea @bind-Value="model.Comments" id="name" class="form-control"></InputTextArea>
                     <ValidationMessage For="() => model.Comments" />
                 </div>
-
             </div>
-
-
 
             @if (process)
             {
@@ -126,13 +109,18 @@
     {
         show = true;
         model = await client.GetSaleProductsById(Item.Id);
-    }
-
-    protected override async Task OnInitializedAsync()
-    {
         alert?.Clear();
         ProductCategories = (await client.GetAllProductCategory()).ToList();
         ProductList = (await client.GetAllProductList()).ToList();
+
+        // Set the category ID and update the filtered product list
+        prodcategoriesId = model.ProductCategoryId;
+        OnProductCategoryChanged(prodcategoriesId);
+
+        // Set the product name ID after updating the filtered product list
+        prodlistid = model.ProductNameId;
+
+        StateHasChanged();
     }
 
     private void OnProductCategoryChanged(int? newCategoryId)
@@ -168,12 +156,13 @@
         var response = await client.UpsertSaleProductsAsync(model);
         if (response.IsSuccess)
         {
-            // model = response.Result;
             await SaleProductsGrid.RefreshGridAsync();
             alert?.SetSuccess(response.Message);
         }
         else
+        {
             alert?.SetError(response.Message);
+        }
 
         process = false;
         StateHasChanged();
