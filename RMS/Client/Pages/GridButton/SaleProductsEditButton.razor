@@ -19,9 +19,19 @@
             <DataAnnotationsValidator />
             <div class="form-group row">
                 <div class="col-md-6">
-                    <label class="col-form-label bold-font required-field">Product Name</label>
-                    <InputText @bind-Value="@model.ProductName" id="name" class="form-control"></InputText>
-                    <ValidationMessage For="() => model.ProductName" />
+                    <label class="col-form-label bold-font required-field">Select Product Category</label>
+                    <HxSelect TItem="ProductCategories"
+                              TValue="int?"
+                              Value="prodcategoriesId"
+                              ValueChanged="OnProductCategoryChanged"
+                              ValueExpression="(() => prodcategoriesId)"
+                              Data="ProductCategories"
+                              TextSelector="@(ProductCategories => ProductCategories.Name)"
+                              ValueSelector="@(ProductCategories => ProductCategories.Id)"
+                              Nullable="true"
+                              NullText="-select-"
+                              NullDataText="Loading ProductCategories..." />
+                    <ValidationMessage For="() => model.ProductCategory" />
                 </div>
 
                 <div class="col-md-6">
@@ -32,15 +42,19 @@
             </div>
             <div class="form-group row">
                 <div class="col-md-6">
-                    <label class="col-form-label bold-font required-field">Select Product Category</label>
-                    <select @bind="model.ProductCategory" class="form-control" id="Category">
-                        <option selected>- Select -</option>
-                        @foreach (var val in ProductCategories)
-                        {
-                            <option value="@val.Id">@val.Name</option>
-                        }
-                    </select>
-                    <ValidationMessage For="() => model.ProductCategory" />
+                    <label class="col-form-label bold-font required-field">Select Product Name</label>
+                    <HxSelect TItem="ProductList"
+                              TValue="int?"
+                              Value="prodlistid"
+                              ValueChanged="OnProductNameChanged"
+                              ValueExpression="(() => prodlistid)"
+                              Data="FilteredProductList"
+                              TextSelector="@(ProductList => ProductList.ProductName)"
+                              ValueSelector="@(ProductList => ProductList.Id)"
+                              Nullable="true"
+                              NullText="-select-"
+                              NullDataText="Loading ProductList..." />
+                    <ValidationMessage For="() => model.ProductName" />
                 </div>
                 <div class="col-md-6">
                     <label class="col-form-label bold-font required-field">Quantity</label>
@@ -80,11 +94,14 @@
             <hr style="margin-bottom: 2px;" />
             <button type="submit" class="btn btn-primary float-right col-md-4">Add</button>
         </EditForm>
-        <br />
     }
 </PageDialog>
 
 @code {
+    [Parameter]
+    public int Id { get; set; }
+    private int? prodcategoriesId;
+    private int? prodlistid;
     [Parameter]
     public SaleProducts Item { get; set; }
 
@@ -94,6 +111,8 @@
     [CascadingParameter]
     protected AlertModel? alert { get; set; }
     private List<ProductCategories> ProductCategories = new();
+    private List<ProductList> ProductList = new();
+    private List<ProductList> FilteredProductList = new();
 
     private Timer _timer;
     private int _delay = 2500;
@@ -113,13 +132,39 @@
     {
         alert?.Clear();
         ProductCategories = (await client.GetAllProductCategory()).ToList();
+        ProductList = (await client.GetAllProductList()).ToList();
+    }
+
+    private void OnProductCategoryChanged(int? newCategoryId)
+    {
+        prodcategoriesId = newCategoryId;
+        if (prodcategoriesId.HasValue)
+        {
+            FilteredProductList = ProductList.Where(p => p.ProductCategoryId == prodcategoriesId.Value).ToList();
+        }
+        else
+        {
+            FilteredProductList = new List<ProductList>();
+        }
+        prodlistid = null;
+        StateHasChanged();
+    }
+
+    private void OnProductNameChanged(int? newProductId)
+    {
+        prodlistid = newProductId;
     }
 
     public async Task OnSave()
     {
         process = true;
         alert?.Clear();
-
+        model.ProductCategoryId = prodcategoriesId;
+        if (prodcategoriesId != null)
+            model.ProductCategory = ProductCategories.Where(x => x.Id == prodcategoriesId).Select(x => x.Name).First();
+        model.ProductNameId = prodlistid;
+        if (prodlistid != null)
+            model.ProductName = ProductList.Where(x => x.Id == prodlistid).Select(x => x.ProductName).First();
         var response = await client.UpsertSaleProductsAsync(model);
         if (response.IsSuccess)
         {

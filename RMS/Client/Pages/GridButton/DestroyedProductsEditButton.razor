@@ -13,40 +13,47 @@
 <PageDialog Title="@Title" Show="@show" ClosePageDialog="ResetForm">
     @if (show)
     {
-
-
         <EditForm Model="model" OnValidSubmit="OnSave">
             <DataAnnotationsValidator />
             <div class="form-group row">
-                <div class="col-md-12">
-                    <label class="col-form-label bold-font required-field">Product Name</label>
-                    <InputText @bind-Value="@model.ProductName" id="name" class="form-control"></InputText>
-                    <ValidationMessage For="() => model.ProductName" />
-                </div>
-
-            </div>
-            <div class="form-group row">
                 <div class="col-md-6">
                     <label class="col-form-label bold-font required-field">Select Product Category</label>
-                    <select @bind="model.ProductCategory" class="form-control" id="Category">
-                        <option>- Select -</option>
-                        @foreach (var val in ProductCategories)
-                        {
-                            <option value="@val.Id">@val.Name</option>
-                        }
-                    </select>
+                    <HxSelect TItem="ProductCategories"
+                              TValue="int?"
+                              Value="prodcategoriesId"
+                              ValueChanged="OnProductCategoryChanged"
+                              ValueExpression="(() => prodcategoriesId)"
+                              Data="ProductCategories"
+                              TextSelector="@(ProductCategories => ProductCategories.Name)"
+                              ValueSelector="@(ProductCategories => ProductCategories.Id)"
+                              Nullable="true"
+                              NullText="-select-"
+                              NullDataText="Loading ProductCategories..." />
                     <ValidationMessage For="() => model.ProductCategory" />
                 </div>
-
                 <div class="col-md-6">
                     <label class="col-form-label bold-font required-field">Quantity</label>
                     <InputNumber @bind-Value="@model.Quantity" id="available" class="form-control"></InputNumber>
                     <ValidationMessage For="() => model.Quantity" />
                 </div>
-
-                
             </div>
-
+            <div class="form-group row">
+                <div class="col-md-12">
+                    <label class="col-form-label bold-font required-field">Product Name</label>
+                    <HxSelect TItem="ProductList"
+                              TValue="int?"
+                              Value="prodlistid"
+                              ValueChanged="OnProductNameChanged"
+                              ValueExpression="(() => prodlistid)"
+                              Data="FilteredProductList"
+                              TextSelector="@(ProductList => ProductList.ProductName)"
+                              ValueSelector="@(ProductList => ProductList.Id)"
+                              Nullable="true"
+                              NullText="-select-"
+                              NullDataText="Loading ProductList..." />
+                    <ValidationMessage For="() => model.ProductName" />
+                </div>
+            </div>
             <div class="form-group row">
                 <div class="col-md-12">
                     <label class="col-form-label bold-font required-field">Comments</label>
@@ -54,12 +61,6 @@
                     <ValidationMessage For="() => model.Comments" />
                 </div>
             </div>
-
-
-
-
-
-
             @if (process)
             {
                 <div style="text-align:center">
@@ -75,6 +76,10 @@
 </PageDialog>
 
 @code {
+    [Parameter]
+    public int Id { get; set; }
+    private int? prodcategoriesId;
+    private int? prodlistid;
     [Parameter]
     public DestroyedProducts Item { get; set; }
 
@@ -92,6 +97,8 @@
 
     DestroyedProducts model = new();
     private List<ProductCategories> ProductCategories = new();
+    private List<ProductList> ProductList = new();
+    private List<ProductList> FilteredProductList = new();
 
     private async Task MyClickHandler(MouseEventArgs e)
     {
@@ -103,12 +110,37 @@
     {
         alert?.Clear();
         ProductCategories = (await client.GetAllProductCategory()).ToList();
+        ProductList = (await client.GetAllProductList()).ToList();
+    }
+
+    private void OnProductCategoryChanged (int? newCategoryId)
+    {
+        prodcategoriesId = newCategoryId;
+        if (prodcategoriesId.HasValue)
+        {
+            FilteredProductList = ProductList.Where(p => p.ProductCategoryId == prodcategoriesId.Value).ToList();
+        }
+        else
+        {
+            FilteredProductList = new List<ProductList>();
+        }
+    }
+    private void OnProductNameChanged(int? newProductId)
+    {
+        prodlistid = newProductId;
     }
 
     public async Task OnSave()
     {
         process = true;
         alert?.Clear();
+
+        model.ProductCategoryId = prodcategoriesId;
+        if (prodcategoriesId != null)
+            model.ProductCategory = ProductCategories.Where(x => x.Id == prodcategoriesId).Select(x => x.Name).First();
+        model.ProductNameId = prodlistid;
+        if (prodlistid != null)
+            model.ProductName = ProductList.Where(x => x.Id == prodlistid).Select(x => x.ProductName).First();
 
         var response = await client.UpsertDestroyedProductsAsync(model);
         if (response.IsSuccess)
