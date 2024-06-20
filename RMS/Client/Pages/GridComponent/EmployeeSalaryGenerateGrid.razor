@@ -45,7 +45,9 @@ else
         c.Add(o => o.Tax).Format("{0:F2}").Css("table-bordered").Filterable(filter);
         c.Add(o => o.PF).Format("{0:F2}").Css("table-bordered").Filterable(filter);
         c.Add(o => o.IncomeTax).Format("{0:F2}").Css("table-bordered").Filterable(filter);
-        c.Add(o => o.NetSalary).Format("{0:F2}").Css("table-bordered").Filterable(filter);
+       // c.Add(o => o.NetSalary).Format("{0:F2}").Css("table-bordered").Filterable(filter);
+        c.Add(o => o.AdvanceAmount).Format("{0:F2}").Css("table-bordered").Filterable(filter);
+        c.Add(o => o.PayableSalary).Titled("Net Salary").Format("{0:F2}").Css("table-bordered").Filterable(filter);
 
         // c.Add().Encoded(false).Sanitized(false).RenderComponentAs<EmployeePayrollEditButton>().SetWidth("10px").Titled("Edit");
         c.Add().Encoded(false).Sanitized(false).RenderComponentAs<SalaryGenerateButton>(new List<Action<object>> { RefreshGrid }).SetWidth("10px").Titled("Salary Generate");

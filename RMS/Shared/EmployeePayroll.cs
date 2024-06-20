@@ -23,6 +23,8 @@ namespace RMS.Dto
         public decimal IncomeTax => GrossSalary * (IncomeTaxPercentage / 100);
 
         public decimal NetSalary => GrossSalary - Tax - PF - IncomeTax;
+        public decimal AdvanceAmount { get; set; }
+        public decimal PayableSalary { get; set; }
 
         // Optional: Validation method to ensure consistency
         public void Validate()

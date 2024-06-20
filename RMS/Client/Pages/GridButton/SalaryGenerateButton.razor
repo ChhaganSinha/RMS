@@ -8,6 +8,8 @@
 @implements ICustomGridComponent<EmployeePayroll>
 @inject NavigationManager NavigationManager
 
+@if (Item.PayableSalary == 0 || Item.PayableSalary == null)
+{
 <button class='btn btn-sm btn-info' @onclick="MyClickHandler" title="Salary Generate"><i class="fa fa-money"></i>  Generate</button>
 <SimpleDailog Title="@Title" Show="@show" OnCloseDialog="ResetForm">
     @if (show)
@@ -37,6 +39,11 @@
         <br />
     }
 </SimpleDailog>
+}
+else
+{
+    <h6 class="text-danger">Generated</h6>
+}
 
 @code {
     [Parameter]
@@ -57,7 +64,7 @@
     private async void Delete()
     {
         process = true;
-        var responce = await client.DeleteHallCategory(Item.Id);
+        var responce = await client.GenerateSalaryAsync(Item);
         if (responce.IsSuccess == true)
         {
             MessageBody = responce.Message;

@@ -389,7 +389,7 @@
 
                         <div class="row">
                             <!-- Payments Details Card -->
-                            <div class="col-lg-4 mb-3 mb-lg-0 d-flex">
+                            <div class="col-lg-6 mb-3 mb-lg-0 d-flex">
                                 <div class="card flex-fill w-100">
                                     <div class="card-header py-3">
                                         <h6 class="fs-17 font-weight-600 mb-0">
@@ -399,7 +399,7 @@
                                     <hr class="m-0" />
                                     <div class="card-body">
                                         <div class="row">
-                                            <div class="col-12 mb-3">
+                                            <div class="col-6 mb-3">
                                                 <div class="form-group mb-0">
                                                     <label class="font-weight-600 mb-1">Discount Reason</label>
                                                     <div class="input-group">
@@ -408,7 +408,7 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="col-12 mb-3">
+                                            <div class="col-6 mb-3">
                                                 <div class="form-group mb-0">
                                                     <label class="font-weight-600 mb-1">Discount (Max-100%)</label>
                                                     <div class="input-group">
@@ -417,7 +417,7 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="col-12 mb-3">
+                                            <div class="col-6 mb-3">
                                                 <div class="form-group mb-0">
                                                     <label class="font-weight-600 mb-1">Discount Amount</label>
                                                     <div class="input-group">
@@ -426,7 +426,7 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="col-12 mb-3">
+                                            <div class="col-6 mb-3">
                                                 <div class="form-group mb-0">
                                                     <label class="font-weight-600 mb-1">Commission (%)</label>
                                                     <div class="input-group">
@@ -435,7 +435,7 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="col-12 mb-3">
+                                            <div class="col-6 mb-3">
                                                 <div class="form-group mb-0">
                                                     <label class="font-weight-600 mb-1">Commission Amount</label>
                                                     <div class="input-group">
@@ -450,7 +450,7 @@
                             </div>
 
                             <!-- Billing Details Card -->
-                            <div class="col-lg-4 d-flex">
+                            <div class="col-lg-6 d-flex">
                                 <div class="card flex-fill w-100">
                                     <div class="card-header py-3">
                                         <h6 class="fs-17 font-weight-600 mb-0">Billing Details</h6>
@@ -458,19 +458,19 @@
                                     <hr class="m-0" />
                                     <div class="card-body">
                                         <div class="row">
-                                            <div class="col-12 mb-3">
+                                            <div class="col-6 mb-3">
                                                 <label class="font-weight-600 mb-0">Booking Charge</label>
                                                 <label class="font-weight-600 mb-0" id="booking_charge">0</label>
                                             </div>
-                                            <div class="col-12 mb-3">
+                                            <div class="col-6 mb-3">
                                                 <label class="font-weight-600 mb-0">Tax</label>
                                                 <label class="font-weight-600 mb-0" id="tax_charge">0</label>
                                             </div>
-                                            <div class="col-12 mb-3">
+                                            <div class="col-6 mb-3">
                                                 <label class="font-weight-600 mb-0">Service Charge</label>
                                                 <label class="font-weight-600 mb-0" id="service_charge">0</label>
                                             </div>
-                                            <div class="col-12 mb-3">
+                                            <div class="col-6 mb-3">
                                                 <label class="font-weight-600 mb-0"><b>Total</b></label>
                                                 <label class="font-weight-600 mb-0" id="total_charge">0</label>
                                             </div>
@@ -479,411 +479,17 @@
                                 </div>
                             </div>
 
-                            <!-- Advance Details Card -->
-                            <div class="col-lg-4 d-flex">
-                                <div class="card flex-fill w-100">
-                                    <div class="card-header py-3">
-                                        <h6 class="fs-17 font-weight-600 mb-0">Advance Details</h6>
-                                    </div>
-                                    <hr class="m-0" />
-                                    <div class="card-body">
-                                        <div class="row">
-                                            <div class="col-12 mb-3">
-                                                <div class="form-group mb-0">
-                                                    <label class="font-weight-600 mb-1">Payment Mode</label>
-                                                    <div class="input-group">
-                                                        <span class="input-group-text"><i class="fas fa-credit-card"></i></span>
-                                                        <select class="form-select" data-live-search="true" data-width="100%" id="paymentmode">
-                                                            <option value="" selected>Choose Payment Mode</option>
-                                                            <option value="Bank Payment">Bank Payment</option>
-                                                            <option value="SSLCommerz">SSLCommerz</option>
-                                                            <option value="Cash Payment">Cash Payment</option>
-                                                            <option value="Paypal">Paypal</option>
-                                                            <option value="Card Payment">Card Payment</option>
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-12 mb-3">
-                                                <div class="form-group mb-0">
-                                                    <label class="font-weight-600 mb-1">Total Amount</label>
-                                                    <div class="input-group">
-                                                        <span class="input-group-text">$</span>
-                                                        <input type="text" disabled class="form-control" id="totalamount" placeholder="Total amount">
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-12 mb-3" id="carddiv" hidden>
-                                                <div class="form-group mb-0">
-                                                    <label class="font-weight-600 mb-1">Bank Name</label>
-                                                    <div class="input-group">
-                                                        <span class="input-group-text"><i class="fas fa-credit-card"></i></span>
-                                                        <input type="text" disabled class="form-control" id="cardno" placeholder="Account number">
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-12 mb-3" id="bankdiv" hidden>
-                                                <div class="form-group mb-0">
-                                                    <label class="font-weight-600 mb-1">Bank Name</label>
-                                                    <div class="input-group">
-                                                        <span class="input-group-text"><i class="fa fa-university"></i></span>
-                                                        <select class="form-select" data-live-search="true" data-width="100%" id="bankname">
-                                                            <option value="" selected>Choose Bank Name</option>
-                                                            <option value="Dhaka Bank">Dhaka Bank</option>
-                                                            <option value="Bank AlFalah">Bank AlFalah</option>
-                                                            <option value="Standard Bank">Standard Bank</option>
-                                                            <option value="State Bank">State Bank</option>
-                                                            <option value="DBBL">DBBL</option>
-                                                            <option value="AIBL">AIBL</option>
-                                                            <option value="bank">bank</option>
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-12 mb-3">
-                                                <div class="form-group mb-0">
-                                                    <label class="font-weight-600 mb-1">Advance Remarks</label>
-                                                    <div class="input-group">
-                                                        <span class="input-group-text"><i class="fas fa-comments"></i></span>
-                                                        <input type="text" class="form-control" id="advanceremarks" disabled placeholder="Advance Remarks">
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-12 mb-3">
-                                                <div class="form-group mb-0">
-                                                    <label class="font-weight-600 mb-1">Advance Amount</label>
-                                                    <div class="input-group">
-                                                        <span class="input-group-text">$</span>
-                                                        <input type="number" disabled class="form-control" id="advanceamount" placeholder="Advance Amount">
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
                         </div>
 
 
 
                         <div class="text-right mt-3">
-                            <button type="button" disabled="" class="btn btn-primary w-100p" onclick="newBooking()" id="bookingsave">Save</button>
+                            <button type="button" class="btn btn-primary w-100p" id="bookingsave">Save</button>
                         </div>
                         <!-- Occupant Details Modal -->
                         <div class="modal custom-modal" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                             <div class="modal-dialog modal-xl">
-                                <div class="modal-content border-0">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="exampleModalLabel">Customer Details</h5>
-                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                            <span aria-hidden="true">×</span>
-                                        </button>
-                                    </div>
-                                    <div class="modal-body">
-                                        <div class="row">
-                                            <div class="col-md-6 d-flex">
-                                                <div class="card flex-fill w-100 border mb-4">
-                                                    <div class="card-header py-3">
-                                                        <h6 class="fs-17 font-weight-600 mb-0">Guest Details</h6>
-                                                    </div>
-                                                    <div class="card-body">
-                                                        <div class="row">
-                                                            <div class="col-md-6 mb-3">
-                                                                <div class="form-group mb-0">
-                                                                    <label>Country Code</label>
-                                                                    <div class="icon-addon addon-md">
-                                                                        <input type="text" class="form-control" id="code" placeholder="Country Code">
-                                                                        <label class="fas fa-globe-americas"></label>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-md-6 mb-3">
-                                                                <div class="form-group mb-0">
-                                                                    <label for="mobileNo">Mobile No.</label>
-                                                                    <div class="icon-addon addon-md">
-                                                                        <input type="number" class="form-control" id="mobileNo" placeholder="Mobile No.">
-                                                                        <label class="fas fa-mobile"></label>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-md-6 mb-3">
-                                                                <div class="form-group mb-0">
-                                                                    <label>Title</label>
-                                                                    <div class="icon-addon addon-md">
-                                                                        <select class="form-select" id="title">
-                                                                            <option selected="" value="Mr">Mr</option>
-                                                                            <option value="Ms">Ms</option>
-                                                                            <option value="Mrs">Mrs.</option>
-                                                                            <option value="Dr">Dr</option>
-                                                                            <option value="Engineer">Engineer</option>
-                                                                        </select>
-                                                                        <label class="fas fa-meh"></label>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-md-6 mb-3">
-                                                                <div class="form-group mb-0">
-                                                                    <label for="firstname">First Name <span class="text-danger">*</span></label>
-                                                                    <div class="icon-addon addon-md">
-                                                                        <input type="text" class="form-control" id="firstname" placeholder="First Name">
-                                                                        <label class="fas fa-user-circle"></label>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-md-6 mb-3">
-                                                                <div class="form-group mb-0">
-                                                                    <label for="lastname">Last Name</label>
-                                                                    <div class="icon-addon addon-md">
-                                                                        <input type="text" class="form-control" id="lastname" placeholder="Last Name">
-                                                                        <label class="fas fa-user-circle"></label>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-md-6 mb-3">
-                                                                <div class="form-group mb-0">
-                                                                    <label for="fathername">Father Name</label>
-                                                                    <div class="icon-addon addon-md">
-                                                                        <input type="text" class="form-control" id="fathername" placeholder="Father Name">
-                                                                        <label class="fas fa-user-circle"></label>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-md-6 align-self-center mb-3">
-                                                                <div class="custom-control custom-radio custom-control-inline">
-                                                                    <input type="radio" id="male" name="customRadioInline" class="custom-control-input" value="male">
-                                                                    <label class="custom-control-label" for="male">Male</label>
-                                                                </div>
-                                                                <div class="custom-control custom-radio custom-control-inline">
-                                                                    <input type="radio" id="female" name="customRadioInline" class="custom-control-input" value="female">
-                                                                    <label class="custom-control-label" for="female">Female</label>
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-md-6 mb-3">
-                                                                <div class="form-group mb-0">
-                                                                    <label for="occupation">Occupation</label>
-                                                                    <div class="icon-addon addon-md">
-                                                                        <input type="text" class="form-control" id="occupation" placeholder="Occupation">
-                                                                        <label class="fas fa-anchor"></label>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-md-6 mb-3">
-                                                                <div class="form-group mb-0">
-                                                                    <label for="dob">Date of Birth</label>
-                                                                    <div class="icon-addon addon-md">
-                                                                        <input type="text" autocomplete="off" name="datefilter2" class="form-control datefilter2" id="dob" placeholder="mm/dd/yyyy" value="">
-                                                                        <label class="fas fa-calendar-alt"></label>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-md-6 mb-3">
-                                                                <div class="form-group mb-0">
-                                                                    <label for="anniversary">Anniversary</label>
-                                                                    <div class="icon-addon addon-md">
-                                                                        <input type="text" name="datefilter2" autocomplete="off" class="form-control datefilter2" id="anniversary" placeholder="mm/dd/yyyy" value="">
-                                                                        <label class="fas fa-calendar-alt"></label>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-md-6 mb-3">
-                                                                <div class="form-group mb-0">
-                                                                    <label for="nationality">Nationality</label>
-                                                                    <div class="icon-addon addon-md">
-                                                                        <input type="text" name="datefilter2" class="form-control" id="nationality" placeholder="Nationality" value="">
-                                                                        <label class="fas fa-flag-usa"></label>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-md-6 align-self-center mb-3">
-                                                                <div class="custom-control custom-checkbox">
-                                                                    <input type="checkbox" name="vip" value="vip" class="custom-control-input" id="vip">
-                                                                    <label class="custom-control-label" for="vip">VIP?</label>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6 d-flex">
-                                                <div class="card flex-fill w-100 border mb-4">
-                                                    <div class="card-header py-3">
-                                                        <h6 class="fs-17 font-weight-600 mb-0">Contact Details</h6>
-                                                    </div>
-                                                    <div class="card-body">
-                                                        <div class="row">
-                                                            <div class="col-md-6 mb-3">
-                                                                <div class="form-group mb-0">
-                                                                    <label for="contacttype">Contact Type</label>
-                                                                    <div class="icon-addon addon-md">
-                                                                        <select class="form-select" id="contacttype">
-                                                                            <option selected="" value="">
-                                                                                Choose
-                                                                                Contact Type
-                                                                            </option>
-                                                                            <option value="Home">Home</option>
-                                                                            <option value="Personal">Personal</option>
-                                                                            <option value="Official">Official</option>
-                                                                            <option value="Business">Business</option>
-                                                                        </select>
-                                                                        <label class="fas fa-address-book"></label>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-md-6 mb-3">
-                                                                <div class="form-group mb-0">
-                                                                    <label for="email">Email</label>
-                                                                    <div class="icon-addon addon-md">
-                                                                        <input type="email" class="form-control" id="email" placeholder="example@email.com">
-                                                                        <label class="fas fa-envelope"></label>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-md-6 mb-3">
-                                                                <div class="form-group mb-0">
-                                                                    <label for="floatingSelect">Country</label>
-                                                                    <div class="icon-addon addon-md">
-                                                                        <input type="country" class="form-control" id="country" placeholder="Country">
-                                                                        <label class="fas fa-globe-americas"></label>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-md-6 mb-3">
-                                                                <div class="form-group mb-0">
-                                                                    <label for="floatingSelect">State</label>
-                                                                    <div class="icon-addon addon-md">
-                                                                        <input type="state" class="form-control" id="state" placeholder="State">
-                                                                        <label class="fas fa-globe-americas"></label>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-md-6 mb-3">
-                                                                <div class="form-group mb-0">
-                                                                    <label for="floatingSelect">City</label>
-                                                                    <div class="icon-addon addon-md">
-                                                                        <input type="city" class="form-control" id="city" placeholder="City">
-                                                                        <label class="fas fa-globe-americas"></label>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-md-6 mb-3">
-                                                                <div class="form-group mb-0">
-                                                                    <label for="zipcode">Zipcode</label>
-                                                                    <div class="icon-addon addon-md">
-                                                                        <input type="number" class="form-control" id="zipcode" placeholder="Zipcode">
-                                                                        <label class="fas fa-code-branch"></label>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-md-12 mb-3">
-                                                                <div class="form-floating with-icon">
-                                                                    <textarea class="form-control" placeholder="Address" id="address"></textarea>
-                                                                    <label for="address">Address</label>
-                                                                    <i class="fas fa-map-pin"></i>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6 d-flex">
-                                                <div class="card flex-fill w-100 border mb-4 mb-md-0">
-                                                    <div class="card-header py-3">
-                                                        <h6 class="fs-17 font-weight-600 mb-0">Identity Details</h6>
-                                                    </div>
-                                                    <div class="card-body">
-                                                        <div class="row">
-                                                            <div class="col-md-6 mb-3">
-                                                                <div class="form-group mb-0">
-                                                                    <label for="pitype">Identity Type</label>
-                                                                    <div class="icon-addon addon-md">
-                                                                        <input type="text" class="form-control" id="pitype" placeholder="Identity Type">
-                                                                        <label class="fas fa-images"></label>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-md-6 mb-3">
-                                                                <div class="form-group mb-0">
-                                                                    <label for="pid">ID # <span class="text-danger">*</span></label>
-                                                                    <div class="icon-addon addon-md">
-                                                                        <input type="text" class="form-control" id="pid" placeholder="ID">
-                                                                        <label class="fas fa-images"></label>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-md-12">
-                                                                <label>Identity Upload</label>
-                                                            </div>
-                                                            <div class="col-md-6 mb-3">
-                                                                <div class="image-upload position-relative overflow-hidden m-auto">
-                                                                    <input type="file" id="imgfront" onchange="fileValueOne(this)">
-                                                                    <input type="hidden" id="imgffront">
-                                                                    <label for="imgfront" class="upload-field mb-0" id="file-label">
-                                                                        <span class="file-thumbnail">
-                                                                            <span class="d-block text-center mb-2">Front Side</span>
-                                                                            <img id="image-preview" src="https://hotel.bdtask-demo.com/xainhotel//assets/img/proof_icon.png" alt="">
-                                                                            <span id="filename" class="d-block mt-2">Drag and Drop</span>
-                                                                            <span class="format">Supports JPG, JPEG, PNG, SVG</span>
-                                                                        </span>
-                                                                    </label>
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-md-6 mb-3">
-                                                                <div class="image-upload position-relative overflow-hidden m-auto">
-                                                                    <input type="file" id="imgback" onchange="fileValuesTwo(this)">
-                                                                    <input type="hidden" id="imgbback">
-                                                                    <label for="imgback" class="upload-field mb-0" id="file-label">
-                                                                        <span class="file-thumbnail">
-                                                                            <span class="d-block text-center mb-2">Back Side</span>
-                                                                            <img id="image-preview2" src="https://hotel.bdtask-demo.com/xainhotel/assets/img/proof_icon.png" alt="">
-                                                                            <span id="filename2" class="d-block mt-2">Drag and Drop</span>
-                                                                            <span class="format">Supports JPG, JPEG, PNG, SVG</span>
-                                                                        </span>
-                                                                    </label>
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-md-12 mb-3">
-                                                                <div class="form-floating with-icon">
-                                                                    <textarea class="form-control" placeholder="Remarks" id="comments"></textarea>
-                                                                    <i class="far fa-comment-dots"></i>
-                                                                    <label for="comments">Comments</label>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6 d-flex">
-                                                <div class="card flex-fill w-100 border">
-                                                    <div class="card-header py-3">
-                                                        <h6 class="fs-17 font-weight-600 mb-0">Guest Image</h6>
-                                                    </div>
-                                                    <div class="card-body">
-                                                        <div class="row">
-                                                            <div class="col-md-8 col-lg-6 mb-3">
-                                                                <div class="image-upload position-relative overflow-hidden m-auto">
-                                                                    <input type="file" id="imgguest" onchange="fileValuesThree(this)">
-                                                                    <input type="hidden" id="imggguest">
-                                                                    <label for="imgguest" class="upload-field mb-0" id="file-label">
-                                                                        <span class="file-thumbnail">
-                                                                            <span class="d-block text-center mb-2">Customer Image</span>
-                                                                            <img id="image-preview3" src="https://hotel.bdtask-demo.com/xainhotel//assets/img/user.png" alt="">
-                                                                            <span id="filename3" class="d-block mt-2">Drag and Drop</span>
-                                                                            <span class="format">Supports JPG, JPEG, PNG, SVG</span>
-                                                                        </span>
-                                                                    </label>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
-                                        <button type="button" disabled="" class="btn btn-primary" id="addcustomer">Add</button>
-                                    </div>
-                                </div>
+                               <NewCustomerPage />
                             </div>
                         </div>
                         <div class="modal fade" id="exampleModal2" tabindex="-1" aria-labelledby="exampleModalLabel2" aria-hidden="true">

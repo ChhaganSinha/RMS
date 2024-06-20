@@ -1,0 +1,444 @@
+﻿@using RMS.Client.Client
+@using RMS.Client.Pages.GridComponent
+@using RMS.Client.Shared.Popup
+@inject AppClient client
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
+@using Havit.Blazor.Components.Web
+@using Havit.Blazor.Components.Web.Bootstrap
+@using System.ComponentModel.DataAnnotations;
+@using RMS.Dto.Enum
+@attribute [Authorize]
+
+<div class="modal-content border-0">
+    <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">@Title</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span>
+        </button>
+    </div>
+    
+
+    <EditForm Model="model" OnValidSubmit="OnSave"> 
+        <div class="modal-body">
+
+            <div class="row">
+                <div class="col-md-6 d-flex">
+                    <div class="card flex-fill w-100 border mb-4">
+                        <div class="card-header py-3">
+                            <h6 class="fs-17 font-weight-600 mb-0">Guest Details</h6>
+                        </div>
+                        <hr class="m-0"/>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <div class="form-group mb-0">
+                                       <label class="form-label font-weight-600 mb-1">Country Code </label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fas fa-globe-americas"></i></span>
+                                            <input type="text" @bind ="model.CountryCode" class="form-control" id="code" placeholder="Country Code">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <div class="form-group mb-0">
+                                       <label class="form-label font-weight-600 mb-1" for="mobileNo">Mobile No.</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fas fa-mobile"></i></span>
+                                            <input type="number" @bind="model.MobileNo" class="form-control" id="mobileNo" placeholder="Mobile No.">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <div class="form-group mb-0">
+                                       <label class="form-label font-weight-600 mb-1">Title</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fas fa-meh"></i></span>
+                                            <select class="form-select" @bind="model.Title" id="title">
+                                                <option selected="" value="Mr">Mr</option>
+                                                <option value="Ms">Ms</option>
+                                                <option value="Mrs">Mrs.</option>
+                                                <option value="Dr">Dr</option>
+                                                <option value="Engineer">Engineer</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <div class="form-group mb-0">
+                                       <label class="form-label font-weight-600 mb-1" for="firstname">First Name <span class="text-danger">*</span></label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fas fa-user-circle"></i></span>
+                                            <input type="text" class="form-control" @bind="model.FirstName" id="firstname" placeholder="First Name">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <div class="form-group mb-0">
+                                       <label class="form-label font-weight-600 mb-1" for="lastname">Last Name</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fas fa-user-circle"></i></span>
+                                            <input type="text" class="form-control" @bind ="model.LastName" id="lastname" placeholder="Last Name">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <div class="form-group mb-0">
+                                       <label class="form-label font-weight-600 mb-1" for="fathername">Father Name</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fas fa-user-circle"></i></span>
+                                            <input type="text" class="form-control" @bind="model.FatherName" id="fathername" placeholder="Father Name">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 align-self-center mb-3">
+
+                                    <div class="custom-control custom-radio custom-control-inline">
+                                        <input type="radio" checked="@(model.Gender == GenderEnum.Male.ToString())"
+                                               name="Gender" @onchange="@(() => model.Gender = GenderEnum.Male.ToString())" />
+                                        <label class="custom-control-label" for="male">Male</label>
+                                    </div>
+                                    <div class="custom-control custom-radio custom-control-inline">
+                                        <input type="radio" checked="@(model.Gender == GenderEnum.Female.ToString())"
+                                               name="Gender" @onchange="@(() => model.Gender = GenderEnum.Female.ToString())" />
+                                        <label class="custom-control-label" for="female">Female</label>
+                                    </div>
+
+                                    <div class="custom-control custom-radio custom-control-inline">
+                                        <input type="radio" checked="@(model.Gender == GenderEnum.Other.ToString())"
+                                               name="Gender" @onchange="@(() => model.Gender = GenderEnum.Other.ToString())" />
+                                        <label class="custom-control-label" for="female">Other</label>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <div class="form-group mb-0">
+                                       <label class="form-label font-weight-600 mb-1" for="occupation">Occupation</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fas fa-anchor"></i></span>
+                                            <input type="text" @bind="model.Occupation" class="form-control" id="occupation" placeholder="Occupation">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <div class="form-group mb-0">
+                                       <label class="form-label font-weight-600 mb-1" for="dob">Date of Birth</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
+                                            <input type="date" autocomplete="off" @bind="model.DateOfBirth" name="datefilter2" class="form-control datefilter2" id="dob" placeholder="mm/dd/yyyy">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <div class="form-group mb-0">
+                                       <label class="form-label font-weight-600 mb-1" for="anniversary">Anniversary</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="" fas fa-calendar-alt"></i></span>
+                                            <input type="date" name="datefilter2 "@bind="model.Anniversary" autocomplete="off" class="form-control datefilter2" id="anniversary" placeholder="mm/dd/yyyy">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <div class="form-group mb-0">
+                                       <label class="form-label font-weight-600 mb-1" for="nationality">Nationality</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fas fa-flag-usa"></i></span>
+                                            <input type="text" name="datefilter2" @bind="model.Nationality" class="form-control" id="nationality" placeholder="Nationality" >
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 align-self-center mb-3">
+                                    <div class="custom-control custom-checkbox" style="margin-top: 24px;">
+                                        <input type="checkbox" @bind="model.IsVIP" name="vip" value="vip" class="custom-control-input" id="vip">
+                                       <label class="custom-control-label" for="vip">VIP?</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 d-flex">
+                    <div class="card flex-fill w-100 border mb-4">
+                        <div class="card-header py-3">
+                            <h6 class="fs-17 font-weight-600 mb-0">Contact Details</h6>
+                        </div>
+                        <hr class="m-0" />
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <div class="form-group mb-0">
+                                       <label class="form-label font-weight-600 mb-1" for="contacttype">Contact Type</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fas fa-address-book"></i></span>
+                                            <select class="form-select" id="contacttype" @bind="model.ContactType">
+                                                <option value="0">Choose Contact Type</option> <!-- Optional: Add a default option -->
+                                                @foreach (ContactTypeEnum type in Enum.GetValues(typeof(ContactTypeEnum)))
+                                                {
+                                                    if (type != ContactTypeEnum.None)
+                                                    {
+                                                        <option value="@type">@type</option>
+                                                    }
+                                                }
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <div class="form-group mb-0">
+                                       <label class="form-label font-weight-600 mb-1" for="email">Email</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                                            <input type="email" @bind="model.Email" class="form-control" id="email" placeholder="example@email.com">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <div class="form-group mb-0">
+                                       <label class="form-label font-weight-600 mb-1" for="floatingSelect">Country</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fas fa-globe-americas"></i></span>
+                                            <input type="country" @bind="model.Country" class="form-control" id="country" placeholder="Country">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <div class="form-group mb-0">
+                                       <label class="form-label font-weight-600 mb-1" for="floatingSelect">State</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fas fa-globe-americas"></i></span>
+                                            <input type="state" @bind="model.State" class="form-control" id="state" placeholder="State">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <div class="form-group mb-0">
+                                       <label class="form-label font-weight-600 mb-1" for="floatingSelect">City</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fas fa-globe-americas"></i></span>
+                                            <input type="city" @bind="model.City" class="form-control" id="city" placeholder="City">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <div class="form-group mb-0">
+                                       <label class="form-label font-weight-600 mb-1" for="zipcode">Zipcode</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fas fa-code-branch"></i></span>
+                                            <input type="number" @bind="model.Zipcode" class="form-control" id="zipcode" placeholder="Zipcode">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12 mb-3">
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-map-pin"></i></span>
+                                        <textarea class="form-control" @bind="model.Address" placeholder="Address" id="address"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 d-flex">
+                    <div class="card flex-fill w-100 border">
+                        <div class="card-header py-3">
+                            <h6 class="fs-17 font-weight-600 mb-0">Identity Details</h6>
+                        </div>
+                        <hr class="m-0" />
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <div class="form-group mb-0">
+                                       <label class="form-label font-weight-600 mb-1" for="pitype">Identity Type</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fas fa-images"></i></span>
+                                            <select class="form-select" id="contacttype" @bind="model.IdentityType">
+                                                <option value="0">Identity Type</option> <!-- Optional: Add a default option -->
+                                                @foreach (ContactTypeEnum type in Enum.GetValues(typeof(IdentityType)))
+                                                {
+                                                    if (type != ContactTypeEnum.None)
+                                                    {
+                                                        <option value="@type">@type</option>
+                                                    }
+                                                }
+                                            </select>
+                            
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <div class="form-group mb-0">
+                                       <label class="form-label font-weight-600 mb-1" for="pid">ID # <span class="text-danger">*</span></label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fas fa-images"></i></span>
+                                            <input type="text" @bind="model.Id" class="form-control" id="pid" placeholder="ID">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                   <label class="form-label font-weight-600 mb-1">Identity Upload</label>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <div class="image-upload position-relative overflow-hidden m-auto">
+                                        <InputFile OnChange="OnFrontFileChange" id="imgfront" class="form-control" />
+                                        <label for="imgfront" class="upload-field mb-0" id="file-label1">
+                                            <span class="file-thumbnail">
+                                                <span class="d-block text-center mb-2">Front Side</span>
+                                                <img id="image-preview1" src="@frontImagePreview" width="200" alt="">
+                                                <span id="filename1" class="d-block mt-2">Drag and Drop</span>
+                                                <span class="format">Supports JPG, JPEG, PNG, SVG</span>
+                                            </span>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <div class="image-upload position-relative overflow-hidden m-auto">
+                                        <InputFile OnChange="OnBackFileChange" id="imgback" class="form-control" />
+                                        <label for="imgback" class="upload-field mb-0" id="file-label2">
+                                            <span class="file-thumbnail">
+                                                <span class="d-block text-center mb-2">Back Side</span>
+                                                <img id="image-preview2" src="@backImagePreview" width="200" alt="">
+                                                <span id="filename2" class="d-block mt-2">Drag and Drop</span>
+                                                <span class="format">Supports JPG, JPEG, PNG, SVG</span>
+                                            </span>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-md-12 mb-3">
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="far fa-comment-dots"></i></span>
+                                        <textarea class="form-control" placeholder="Comments" id="comments"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 d-flex">
+                    <div class="card flex-fill w-100 border">
+                        <div class="card-header py-3">
+                            <h6 class="fs-17 font-weight-600 mb-0">Guest Image</h6>
+                        </div>
+                        <hr class="m-0" />
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-8 col-lg-6 mb-3">
+                                    <div class="image-upload position-relative overflow-hidden m-auto">
+                                        <InputFile OnChange="OnCustomerFileChange" id="imgguest" class="form-control" />
+                                        <label for="imgguest" class="upload-field mb-0" id="file-label3">
+                                            <span class="file-thumbnail">
+                                                <span class="d-block text-center mb-2">Customer Image</span>
+                                                <img id="image-preview3" src="@customerImagePreview" width="100" style="margin-left: 50px;" alt="">
+                                                <span id="filename3" class="d-block mt-2">Drag and Drop</span>
+                                                <span class="format">Supports JPG, JPEG, PNG, SVG</span>
+                                            </span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-danger" @onclick="OnClose" data-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary" id="addcustomer">Add</button>
+        </div>
+    </EditForm>
+</div>
+@code{
+    [Parameter]
+    public int Id { get; set; }
+
+    [CascadingParameter]
+    protected AlertModel? alert { get; set; }
+
+    private int? categoriesId;
+
+    CustomerDetailsDTO model = new();
+    public string Title = "Customer Details";
+    bool show = false;
+    bool process = false;
+    private Timer _timer;
+    private int _delay = 2500;
+
+
+    public async Task OnSave()
+    {
+        process = true;
+        alert?.Clear();
+
+        // model.CategoryId = categoriesId;
+        // if (categoriesId != null)
+        //     model.Category = Categories.Where(x => x.Id == categoriesId).Select(x => x.Name).First();
+
+        var response = await client.UpsertCustomerAsync(model);
+        if (response.IsSuccess)
+        {
+            
+        }
+        else
+        {
+            alert?.SetError(response.Message);
+        }
+
+        process = false;
+        StateHasChanged();
+        _timer = new Timer(TimerCallback, null, _delay, Timeout.Infinite);
+    }
+
+    private void TimerCallback(Object o)
+    {
+        alert?.Clear();
+        _timer.Dispose();
+        StateHasChanged();
+    }
+
+    private void ResetForm()
+    {
+        model = new CustomerDetailsDTO();
+        show = false;
+        process = false;
+    }
+
+    private string frontImagePreview = "/assets/images/proof_icon.png";
+    private string backImagePreview = "/assets/images/proof_icon.png";
+    private string customerImagePreview = "~/assets/images/user.png";
+
+    private async Task OnFrontFileChange(InputFileChangeEventArgs e)
+    {
+        var file = e.File;
+        model.FrontIdentityImage = new byte[file.Size];
+        await file.OpenReadStream().ReadAsync(model.FrontIdentityImage);
+        frontImagePreview = await GetImagePreviewUrl(file);
+    }
+
+    private async Task OnBackFileChange(InputFileChangeEventArgs e)
+    {
+        var file = e.File;
+        model.BackIdentityImage = new byte[file.Size];
+        await file.OpenReadStream().ReadAsync(model.BackIdentityImage);
+        backImagePreview = await GetImagePreviewUrl(file);
+    }
+
+    private async Task OnCustomerFileChange(InputFileChangeEventArgs e)
+    {
+        var file = e.File;
+        model.GuestImage = new byte[file.Size];
+        await file.OpenReadStream().ReadAsync(model.GuestImage);
+        customerImagePreview = await GetImagePreviewUrl(file);
+    }
+
+    private async Task<string> GetImagePreviewUrl(IBrowserFile file)
+    {
+        var buffer = new byte[file.Size];
+        await file.OpenReadStream().ReadAsync(buffer);
+        var base64 = Convert.ToBase64String(buffer);
+        return $"data:{file.ContentType};base64,{base64}";
+    }
+
+    public void OnClose()
+    {
+
+    }
+}

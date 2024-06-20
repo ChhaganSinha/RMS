@@ -1167,6 +1167,29 @@ namespace RMS.Client.Client
 
 
         }
+
+        public async Task<ApiResponse<EmployeePayroll>> GenerateSalaryAsync(EmployeePayroll data)
+        {
+            var result = new ApiResponse<EmployeePayroll>();
+
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/App/GenerateSalary", data);
+                res.EnsureSuccessStatusCode();
+                var json = await res.Content.ReadFromJsonAsync<ApiResponse<EmployeePayroll>>();
+                return json;
+
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+
+
+
+        }
         public async Task<ApiResponse<EmployeePayroll>> DeleteEmployeePayroll(int id)
         {
             var result = new ApiResponse<EmployeePayroll>();
@@ -1368,7 +1391,6 @@ namespace RMS.Client.Client
         }
 
         #endregion
-
 
         #region Product Section
 
@@ -1900,7 +1922,26 @@ namespace RMS.Client.Client
         }
 
 
+        public async Task<List<ItemDto>> GetPurchaseItemListById(int id)
+        {
+            List<ItemDto> data = new();
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/App/PurchaseItemList/{id}");
 
+                res.EnsureSuccessStatusCode();
+
+                data = await res.Content.ReadFromJsonAsync<List<ItemDto>>();
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return data;
+        }
 
         public async Task<PurchaseItem> GetPurchaseItemById(int id)
         {
@@ -1982,7 +2023,6 @@ namespace RMS.Client.Client
             }
         }
         #endregion
-
 
         #region HouseKeeping
 
@@ -2151,28 +2191,6 @@ namespace RMS.Client.Client
 
         #endregion
 
-
-        public async Task<List<ItemDto>> GetPurchaseItemListById(int id)
-        {
-            List<ItemDto> data = new();
-            try
-            {
-                var res = await HttpClient.GetAsync($"api/App/PurchaseItemList/{id}");
-
-                res.EnsureSuccessStatusCode();
-
-                data = await res.Content.ReadFromJsonAsync<List<ItemDto>>();
-
-            }
-            catch (Exception ex)
-            {
-                Logger.LogCritical(ex, ex.Message);
-                throw;
-            }
-
-            return data;
-        }
-
         #region Booking Section
         public async Task<BookingType> GetBookingTypeById(int id)
         {
@@ -2338,6 +2356,7 @@ namespace RMS.Client.Client
             }
         }
         #endregion
+
         #region Restaurant
 
         public async Task<MenuType> GetMenuTypeById(int id)
@@ -2705,6 +2724,89 @@ namespace RMS.Client.Client
         }
 
 
+        #endregion
+
+        #region Customer Section
+        public async Task<CustomerDetailsDTO> GetCustomerById(int id)
+        {
+            CustomerDetailsDTO data = null;
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/App/Customer/{id}");
+
+                res.EnsureSuccessStatusCode();
+
+                data = await res.Content.ReadFromJsonAsync<CustomerDetailsDTO>();
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return data;
+        }
+        public async Task<IEnumerable<CustomerDetailsDTO>> GetAllCustomer()
+        {
+            IEnumerable<CustomerDetailsDTO> details = null;
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/App/all-Customer");
+
+                res.EnsureSuccessStatusCode();
+
+                details = await res.Content.ReadFromJsonAsync<IEnumerable<CustomerDetailsDTO>>();
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return details;
+        }
+
+        public async Task<ApiResponse<CustomerDetailsDTO>> UpsertCustomerAsync(CustomerDetailsDTO data)
+        {
+            var result = new ApiResponse<CustomerDetailsDTO>();
+
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/App/UpsertCustomer", data);
+                res.EnsureSuccessStatusCode();
+                var json = await res.Content.ReadFromJsonAsync<ApiResponse<CustomerDetailsDTO>>();
+                return json;
+
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+
+
+
+        }
+        public async Task<ApiResponse<CustomerDetailsDTO>> DeleteCustomer(int id)
+        {
+            var result = new ApiResponse<CustomerDetailsDTO>();
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/App/DeleteCustomer/{id}", new { });
+                res.EnsureSuccessStatusCode();
+                var json = await res.Content.ReadFromJsonAsync<ApiResponse<CustomerDetailsDTO>>();
+                return json;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
         #endregion
 
     }

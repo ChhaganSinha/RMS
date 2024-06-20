@@ -379,6 +379,12 @@ namespace RMS.Server.Controllers.Api
             return await _appRepository.UpsertEmployeePayroll(data);
         }
         [HttpPost]
+        [Route("GenerateSalary")]
+        public async Task<ApiResponse<EmployeePayroll>> GenerateSalaryAsync(EmployeePayroll data)
+        {
+            return await _appRepository.GenerateSalaryAsync(data);
+        }
+        [HttpPost]
         [Route("DeleteEmployeePayroll/{id}")]
         public async Task<ApiResponse<EmployeePayroll>> DeleteEmployeePayroll(int id)
         {
@@ -498,7 +504,6 @@ namespace RMS.Server.Controllers.Api
             return await _appRepository.DeleteHall(id);
         }
         #endregion
-
 
         #region Product Section
         [HttpGet]
@@ -707,7 +712,6 @@ namespace RMS.Server.Controllers.Api
         }
         #endregion
 
-
         #region HouseKeeping
 
         [HttpGet]
@@ -864,6 +868,7 @@ namespace RMS.Server.Controllers.Api
             return await _appRepository.DeleteBookingList(id);
         }
         #endregion
+
         #region Resturant
 
         [HttpGet]
@@ -1005,6 +1010,35 @@ namespace RMS.Server.Controllers.Api
             return await _appRepository.DeleteFood(id);
         }
 
+        #endregion
+
+        #region Customer Section
+        [HttpGet]
+        [Route("Customer/{id}")]
+        public async Task<CustomerDetailsDTO> GetCustomerById(int id)
+        {
+            return await _appRepository.GetCustomerById(id);
+        }
+
+        [HttpGet]
+        [Route("all-Customer")]
+        public async Task<IEnumerable<CustomerDetailsDTO>> GetAllCustomer()
+        {
+            return await _appRepository.GetAllCustomer();
+        }
+
+        [HttpPost]
+        [Route("UpsertCustomer")]
+        public async Task<ApiResponse<CustomerDetailsDTO>> UpsertCustomer(CustomerDetailsDTO data)
+        {
+            return await _appRepository.UpsertCustomer(data);
+        }
+        [HttpPost]
+        [Route("DeleteCustomer/{id}")]
+        public async Task<ApiResponse<CustomerDetailsDTO>> DeleteCustomer(int id)
+        {
+            return await _appRepository.DeleteCustomer(id);
+        }
         #endregion
     }
 

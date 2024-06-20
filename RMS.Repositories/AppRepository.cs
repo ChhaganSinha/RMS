@@ -845,6 +845,37 @@ namespace RMS.Repositories
             }
         }
 
+        public async Task<ApiResponse<EmployeePayroll>> GenerateSalaryAsync(EmployeePayroll data)
+        {
+            var result = new ApiResponse<EmployeePayroll>();
+            try
+            {
+
+                if (data == null)
+                {
+                    result.IsSuccess = true;
+                    result.Message = "Invalid data!";
+                    return result;
+                }
+                var advanceAmount = await AppDbCxt.AdvanceSalary.Where(o => o.EmployeeId == data.EmployeeId).Select(o => o.AdvanceAmount).FirstAsync();
+                data.PayableSalary = data.NetSalary - advanceAmount;
+                data.AdvanceAmount = advanceAmount;
+                AppDbCxt.EmployeePayroll.Update(data);
+                result.Message = "Salary Successfully Generated.";
+
+                AppDbCxt.SaveChanges();
+                result.IsSuccess = true;
+                result.Result = data;
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+
         public async Task<ApiResponse<EmployeePayroll>> DeleteEmployeePayroll(int id)
         {
             var result = new ApiResponse<EmployeePayroll>();
@@ -1503,7 +1534,6 @@ namespace RMS.Repositories
         }
         #endregion
 
-
         #region Product Section
         public async Task<ProductCategories> GetProductCategoryById(int id)
         {
@@ -2109,7 +2139,6 @@ namespace RMS.Repositories
 
         #endregion
 
-
         #region HouseKeeping
         public async Task<CheckList> GetCheckListById(int id)
         {
@@ -2461,7 +2490,6 @@ namespace RMS.Repositories
             }
         }
         #endregion
-
 
         #region Restaurant
 
@@ -2887,6 +2915,91 @@ namespace RMS.Repositories
         }
 
 
+        #endregion
+
+        #region Customer Section
+        public async Task<CustomerDetailsDTO> GetCustomerById(int id)
+        {
+            CustomerDetailsDTO result = null;
+
+#pragma warning disable CS8600
+            result = AppDbCxt.CustomerDetailsDTO.FirstOrDefault(o => o.Id == id);
+#pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
+
+            return await Task.FromResult(result);
+        }
+
+        public async Task<IEnumerable<CustomerDetailsDTO>> GetAllCustomer()
+        {
+            IEnumerable<CustomerDetailsDTO> result = null;
+
+            result = AppDbCxt.CustomerDetailsDTO.ToList();
+            return result;
+        }
+        public async Task<ApiResponse<CustomerDetailsDTO>> UpsertCustomer(CustomerDetailsDTO data)
+        {
+            var result = new ApiResponse<CustomerDetailsDTO>();
+            try
+            {
+
+                if (data == null)
+                {
+                    result.IsSuccess = true;
+                    result.Message = "Invalid Customer Details data!";
+                    return result;
+                }
+
+                if (data.Id > 0)
+                {
+                    AppDbCxt.CustomerDetailsDTO.Update(data);
+                    result.Message = "Data Successfully Updated.";
+                }
+                else
+                {
+                    AppDbCxt.CustomerDetailsDTO.Add(data);
+                    result.Message = "Data Successfully Inserted.";
+                }
+
+                AppDbCxt.SaveChanges();
+                result.IsSuccess = true;
+                result.Result = data;
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+
+        public async Task<ApiResponse<CustomerDetailsDTO>> DeleteCustomer(int id)
+        {
+            var result = new ApiResponse<CustomerDetailsDTO>();
+            try
+            {
+                var existing = AppDbCxt.CustomerDetailsDTO.First(x => x.Id == id);
+                result.Result = existing;
+                if (existing == null)
+                {
+                    result.IsSuccess = true;
+                    result.Message = "Customer Details not found!";
+                    return result;
+                }
+
+                AppDbCxt.CustomerDetailsDTO.Remove(existing);
+                await AppDbCxt.SaveChangesAsync();
+                result.IsSuccess = true;
+                result.Message = "Successfully Deleted!";
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
         #endregion
     }
 }
