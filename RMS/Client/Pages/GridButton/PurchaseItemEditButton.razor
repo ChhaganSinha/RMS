@@ -14,21 +14,39 @@
 <PageDialog Title="@Title" Show="@show" ClosePageDialog="ResetForm">
     @if (show)
     {
-
-        <EditForm Model="@purchaseItem" OnValidSubmit="@OnSave">
+        <EditForm Model="@purchaseItem" OnValidSubmit="OnSave">
             <DataAnnotationsValidator />
 
             <div class="form-group row">
                 <div class="col-md-6">
                     <label class="col-form-label bold-font required-field">Supplier Name</label>
-                    <select @bind="purchaseItem.SupplierNameId" class="form-control" id="SupplierName" disabled="@purchaseItem.IsPaid">
-                        <option selected>- Select -</option>
-                        @foreach (var val in SupplierList)
-                        {
-                            <option value="@val.Id">@val.SupplierName</option>
-                        }
-                    </select>
+                    @* <select class="form-control" @bind="supplierlist">
+                <option value="">-Select-</option>
+                @foreach (var supplier in SupplierList)
+                {
+                <option value="@supplier.Id">@supplier.SupplierName</option>
+                }
+                </select>
+                <ValidationMessage For="() => purchaseItem.SupplierName" />
+                @if (supplierlist == null && submit)
+                {
+                <span style="color:red">Please select at least one</span>
+                } *@
+                    <HxSelect TItem="SupplierList"
+                              TValue="int?"
+                              Data="SupplierList"
+                              @bind-Value="supplierlist"
+                              TextSelector="@(SupplierList => SupplierList.SupplierName)"
+                              ValueSelector="@(SupplierList => SupplierList.Id)"
+                              Nullable="true"
+                              NullText="-select-"
+                              NullDataText="Loading categories..." />
                     <ValidationMessage For="() => purchaseItem.SupplierName" />
+                    @if (supplierlist == null && submit)
+                    {
+                        <span style="color:red">Please select at least one</span>
+                    }
+
                 </div>
                 <div class="col-md-6">
                     <label class="col-form-label bold-font required-field">Invoice No</label>
@@ -75,10 +93,16 @@
                         {
                             <tr>
                                 <td>
-                                    <InputText @bind-Value="item.ItemName" class="form-control" placeholder="Item Name" disabled="@purchaseItem.IsPaid" />
+                                    <select class="form-control" Value="item.PurchaseItemId" @onchange="async (e) => await OnProductChanged(item, e)">
+                                        <option value="">-Select-</option>
+                                        @foreach (var product in ProductList)
+                                        {
+                                            <option value="@product.Id">@product.ProductName</option>
+                                        }
+                                    </select>
                                 </td>
                                 <td>
-                                    <InputNumber @bind-Value="item.Stock" class="form-control" placeholder="Stock/Qnt" @oninput="(e) => { item.UpdateTotal(); CalculateGrandTotal(); }" disabled="@purchaseItem.IsPaid" />
+                                    <InputNumber @bind-Value="item.Stock" class="form-control" placeholder="Stock/Qnt" disabled="true" />
                                 </td>
                                 <td>
                                     <InputNumber @bind-Value="item.Quantity" class="form-control" placeholder="Quantity" @oninput="(e) => { item.UpdateTotal(); CalculateGrandTotal(); }" disabled="@purchaseItem.IsPaid" />
@@ -89,7 +113,6 @@
                                 <td>
                                     <input type="text" value="@item.Total.ToString("F2")" class="form-control" readonly />
                                 </td>
-
                                 @if (!purchaseItem.IsPaid)
                                 {
                                     <td class="text-center">
@@ -112,7 +135,6 @@
                     <h4>Grand Total: @purchaseItem.GrandTotal</h4>
                 </div>
             </div>
-
             <UiAlert Model="alert"></UiAlert>
             <div class="form-group row">
                 <div class="col-md-12 text-right">
@@ -124,13 +146,14 @@
                 </div>
             </div>
         </EditForm>
-        <br />
     }
 </PageDialog>
 
 @code {
     private List<SupplierList> SupplierList = new();
     private List<ItemDto> item = new();
+    private List<ProductList> ProductList = new();
+    private int? supplierlist;
     [Parameter]
     public PurchaseItem Item { get; set; }
 
@@ -143,6 +166,7 @@
     private Timer _timer;
     private int _delay = 2500;
     bool show = false;
+    bool submit = false;
     bool process = false;
     string Title = "Update PurchaseItem Details";
 
@@ -163,6 +187,13 @@
     {
         alert?.Clear();
         SupplierList = (await client.GetAllSupplierList()).ToList();
+        ProductList = (await client.GetAllProductList()).ToList();
+        AddNewItem(); // Add a default item on initialization
+    }
+    private void Show()
+    {
+        show = true;
+        submit = false;
     }
 
     public async Task OnSave()
@@ -173,7 +204,9 @@
         // Handle form submission logic
         process = true;
         alert?.Clear();
-
+        purchaseItem.SupplierNameId = supplierlist;
+        if (supplierlist != null)
+            purchaseItem.SupplierName = SupplierList.Where(x => x.Id == supplierlist).Select(x => x.SupplierName).First();
         var response = await client.UpsertPurchaseItemAsync(purchaseItem);
         if (response.IsSuccess)
         {
@@ -240,5 +273,18 @@
             alert?.SetError(response.Message);
         }
         _timer = new Timer(TimerCallback, null, _delay, Timeout.Infinite);
+    }
+    private async Task OnProductChanged(ItemDto item, ChangeEventArgs e)
+    {
+        if (int.TryParse(e.Value.ToString(), out int productId))
+        {
+            var selectedProduct = ProductList.FirstOrDefault(p => p.Id == productId);
+            if (selectedProduct != null)
+            {
+                item.ItemName = selectedProduct.ProductName;
+                item.Stock = selectedProduct.Available;
+                StateHasChanged();
+            }
+        }
     }
 }

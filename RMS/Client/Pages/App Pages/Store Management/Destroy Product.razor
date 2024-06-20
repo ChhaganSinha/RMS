@@ -18,7 +18,7 @@
                 <div class="page-header-title">
                     <h5 class="m-b-10">
                         Destroyed Products
-                        <a @onclick="()=>show=true" style="cursor:pointer"><i class="fa fa-plus-circle fa-lg text-primary" aria-hidden="true" title="Add DestroyedProducts"></i></a>
+                        <a @onclick="Show" style="cursor:pointer"><i class="fa fa-plus-circle fa-lg text-primary" aria-hidden="true" title="Add DestroyedProducts"></i></a>
                     </h5>
                 </div>
                 <ul class="breadcrumb">
@@ -42,25 +42,17 @@
 <PageDialog Title="@Title" Show="@show" ClosePageDialog="ResetForm">
     @if (show)
     {
-
-
         <EditForm Model="model" OnValidSubmit="OnSave">
             <DataAnnotationsValidator />
-            <div class="form-group row">
-                <div class="col-md-12">
-                    <label class="col-form-label bold-font required-field">Product Name</label>
-                    <InputText @bind-Value="@model.ProductName" id="name" class="form-control"></InputText>
-                    <ValidationMessage For="() => model.ProductName" />
-                </div>
-
-            </div>
             <div class="form-group row">
                 <div class="col-md-6">
                     <label class="col-form-label bold-font required-field">Select Product Category</label>
                     <HxSelect TItem="ProductCategories"
                               TValue="int?"
+                              Value="prodcategoriesId"
+                              ValueChanged="OnProductCategoryChanged"
+                              ValueExpression="(() => prodcategoriesId)"
                               Data="ProductCategories"
-                              @bind-Value="prodcategoriesId"
                               TextSelector="@(ProductCategories => ProductCategories.Name)"
                               ValueSelector="@(ProductCategories => ProductCategories.Id)"
                               Nullable="true"
@@ -68,11 +60,27 @@
                               NullDataText="Loading ProductCategories..." />
                     <ValidationMessage For="() => model.ProductCategory" />
                 </div>
-
                 <div class="col-md-6">
                     <label class="col-form-label bold-font required-field">Quantity</label>
                     <InputNumber @bind-Value="@model.Quantity" id="available" class="form-control"></InputNumber>
                     <ValidationMessage For="() => model.Quantity" />
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="col-md-12">
+                    <label class="col-form-label bold-font required-field">Select Product Name</label>
+                    <HxSelect TItem="ProductList"
+                              TValue="int?"
+                              Value="prodlistid"
+                              ValueChanged="OnProductNameChanged"
+                              ValueExpression="(() => prodlistid)"
+                              Data="FilteredProductList"
+                              TextSelector="@(ProductList => ProductList.ProductName)"
+                              ValueSelector="@(ProductList => ProductList.Id)"
+                              Nullable="true"
+                              NullText="-select-"
+                              NullDataText="Loading ProductList..." />
+                    <ValidationMessage For="() => model.ProductName" />
                 </div>
             </div>
             <div class="form-group row">
@@ -82,12 +90,6 @@
                     <ValidationMessage For="() => model.Comments" />
                 </div>
             </div>
-
-            
-                
-           
-            
-
             @if (process)
             {
                 <div style="text-align:center">
@@ -106,6 +108,7 @@
     [Parameter]
     public int Id { get; set; }
     private int? prodcategoriesId;
+    private int? prodlistid;
 
     [CascadingParameter]
     protected AlertModel? alert { get; set; }
@@ -118,14 +121,35 @@
     private int _delay = 2500;
 
     private List<ProductCategories> ProductCategories = new();
-   
-
+    private List<ProductList> ProductList = new();
+    private List<ProductList> FilteredProductList = new();
 
     protected override async Task OnInitializedAsync()
     {
         alert?.Clear();
         ProductCategories = (await client.GetAllProductCategory()).ToList();
-      
+        ProductList = (await client.GetAllProductList()).ToList();
+       
+    }
+
+    private void OnProductCategoryChanged(int? newCategoryId)
+    {
+        prodcategoriesId = newCategoryId;
+        if (prodcategoriesId.HasValue)
+        {
+            FilteredProductList = ProductList.Where(p => p.ProductCategoryId == prodcategoriesId.Value).ToList();
+        }
+        else
+        {
+            FilteredProductList = new List<ProductList>();
+        }
+        prodlistid = null;
+        StateHasChanged();
+    }
+
+    private void OnProductNameChanged(int? newProductId)
+    {
+        prodlistid = newProductId;
     }
 
     public async Task OnSave()
@@ -135,18 +159,22 @@
         model.ProductCategoryId = prodcategoriesId;
         if (prodcategoriesId != null)
             model.ProductCategory = ProductCategories.Where(x => x.Id == prodcategoriesId).Select(x => x.Name).First();
+        model.ProductNameId = prodlistid;
+        if (prodlistid != null)
+            model.ProductName = ProductList.Where(x => x.Id == prodlistid).Select(x => x.ProductName).First();
         var response = await client.UpsertDestroyedProductsAsync(model);
         if (response.IsSuccess)
         {
-
-            // model = response.Result;
             await DestroyedProductsGrid.RefreshGridAsync();
             alert?.SetSuccess(response.Message);
             model = new();
         }
         else
+        {
             alert?.SetError(response.Message);
-
+        }
+        prodcategoriesId = null;
+        prodlistid = null;
         process = false;
         StateHasChanged();
         _timer = new Timer(TimerCallback, null, _delay, Timeout.Infinite);
@@ -164,10 +192,21 @@
         model = new();
         show = false;
         process = false;
+        prodcategoriesId = null;
+        prodlistid = null;
+        FilteredProductList = new List<ProductList>();
     }
 
     public void OnClose()
     {
         model = new();
+    }
+
+    public void Show()
+    {
+        show = true;
+        prodcategoriesId = null;
+        prodlistid = null;
+        FilteredProductList = new List<ProductList>();
     }
 }

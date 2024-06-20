@@ -6,8 +6,6 @@
 @inject AppClient client
 @inject IJSRuntime JSRuntime
 @inject NavigationManager NavigationManager
-@using Havit.Blazor.Components.Web
-@using Havit.Blazor.Components.Web.Bootstrap
 @using System.ComponentModel.DataAnnotations
 @attribute [Authorize]
 
@@ -42,13 +40,24 @@
 <PageDialog Title="@Title" Show="@show" ClosePageDialog="ResetForm">
     @if (show)
     {
-
         <EditForm Model="@purchaseItem" OnValidSubmit="@HandleValidSubmit">
             <DataAnnotationsValidator />
 
             <div class="form-group row">
                 <div class="col-md-6">
                     <label class="col-form-label bold-font required-field">Supplier Name</label>
+                    @* <select class="form-control" @bind="supplierlist">
+                        <option value="">-Select-</option>
+                        @foreach (var supplier in SupplierList)
+                        {
+                            <option value="@supplier.Id">@supplier.SupplierName</option>
+                        }
+                    </select>
+                    <ValidationMessage For="() => purchaseItem.SupplierName" />
+                    @if (supplierlist == null && submit)
+                    {
+                        <span style="color:red">Please select at least one</span>
+                    } *@
                     <HxSelect TItem="SupplierList"
                               TValue="int?"
                               Data="SupplierList"
@@ -64,7 +73,6 @@
                         <span style="color:red">Please select at least one</span>
                     }
 
-                   
                 </div>
                 <div class="col-md-6">
                     <label class="col-form-label bold-font required-field">Invoice No</label>
@@ -111,10 +119,16 @@
                         {
                             <tr>
                                 <td>
-                                    <InputText @bind-Value="item.ItemName" class="form-control" placeholder="Item Name" disabled="@purchaseItem.IsPaid" />
+                                    <select class="form-control" Value="item.PurchaseItemId" @onchange="async (e) => await OnProductChanged(item, e)">
+                                        <option value="">-Select-</option>
+                                        @foreach (var product in ProductList)
+                                        {
+                                            <option value="@product.Id">@product.ProductName</option>
+                                        }
+                                    </select>
                                 </td>
                                 <td>
-                                    <InputNumber @bind-Value="item.Stock" class="form-control" placeholder="Stock/Qnt" @oninput="(e) => { item.UpdateTotal(); CalculateGrandTotal(); }" disabled="@purchaseItem.IsPaid" />
+                                    <InputNumber @bind-Value="item.Stock" class="form-control" placeholder="Stock/Qnt" disabled="true" />
                                 </td>
                                 <td>
                                     <InputNumber @bind-Value="item.Quantity" class="form-control" placeholder="Quantity" @oninput="(e) => { item.UpdateTotal(); CalculateGrandTotal(); }" disabled="@purchaseItem.IsPaid" />
@@ -164,6 +178,7 @@
 @code {
     private PurchaseItem purchaseItem = new PurchaseItem();
     private List<SupplierList> SupplierList = new();
+    private List<ProductList> ProductList = new();
     private int? supplierlist;
     public string Title = "Add PurchaseItem";
     bool show = false;
@@ -179,13 +194,13 @@
     {
         alert?.Clear();
         SupplierList = (await client.GetAllSupplierList()).ToList();
+        ProductList = (await client.GetAllProductList()).ToList();
         AddNewItem(); // Add a default item on initialization
     }
     private void Show()
     {
         show = true;
         submit = false;
-        
     }
     private void ResetForm()
     {
@@ -270,7 +285,21 @@
         {
             alert?.SetError(response.Message);
         }
-      
+
         _timer = new Timer(TimerCallback, null, _delay, Timeout.Infinite);
+    }
+
+    private async Task OnProductChanged(ItemDto item, ChangeEventArgs e)
+    {
+        if (int.TryParse(e.Value.ToString(), out int productId))
+        {
+            var selectedProduct = ProductList.FirstOrDefault(p => p.Id == productId);
+            if (selectedProduct != null)
+            {
+                item.ItemName = selectedProduct.ProductName;
+                item.Stock = selectedProduct.Available;
+                StateHasChanged();
+            }
+        }
     }
 }
