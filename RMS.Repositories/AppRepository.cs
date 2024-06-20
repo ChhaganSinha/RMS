@@ -2824,6 +2824,46 @@ namespace RMS.Repositories
             return true;
         }
 
+        public async Task<bool> UpsertFoodCategoryMapping(Dictionary<int, List<int>> dict)
+        {
+            foreach (var kvp in dict)
+            {
+                var hallId = kvp.Key;
+                var facilityId = kvp.Value;
+
+                var existingfacilityIds = await AppDbCxt.FoodCategoryMapping
+                    .Where(o => o.FoodId == hallId)
+                    .Select(o => o.FoodCategoryId)
+                    .ToListAsync();
+
+                var facilityIdsToAdd = facilityId.Except(existingfacilityIds);
+                var facilityIdsToRemove = existingfacilityIds.Except(facilityId);
+                var facilityIdsToKeep = facilityId.Intersect(existingfacilityIds);
+
+                if (facilityIdsToRemove.Any())
+                {
+                    var mappingsToRemove = await AppDbCxt.FoodCategoryMapping
+                        .Where(tcm => tcm.FoodId == hallId && facilityIdsToRemove.Contains(tcm.FoodCategoryId))
+                        .ToListAsync();
+                    AppDbCxt.RemoveRange(mappingsToRemove);
+                }
+
+                if (facilityIdsToAdd.Any())
+                {
+                    var mappingsToAdd = facilityIdsToAdd.Select(c => new FoodCategoryMapping
+                    {
+                        FoodId = hallId,
+                        FoodCategoryId = c
+                    });
+                    AppDbCxt.AddRange(mappingsToAdd);
+                }
+
+                await AppDbCxt.SaveChangesAsync();
+            }
+
+            return true;
+        }
+
 
         public async Task<List<FoodMenuTypeMapping>> GetFoodMenuTypeByFoodId(int id)
         {
@@ -2831,6 +2871,11 @@ namespace RMS.Repositories
             return dataMapping.ToList();
         }
 
+        public async Task<List<FoodCategoryMapping>> GetFoodCategoryByFoodId(int id)
+        {
+            var dataMapping = AppDbCxt.FoodCategoryMapping.Where(o => o.FoodId == id);
+            return dataMapping.ToList();
+        }
         public async Task<Food> GetFoodById(int id)
         {
             Food result = null;

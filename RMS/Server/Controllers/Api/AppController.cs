@@ -985,6 +985,14 @@ namespace RMS.Server.Controllers.Api
             return data;
         }
 
+        [HttpGet]
+        [Route("GetFoodCategoryByFoodId/{FoodId}")]
+        public async Task<List<FoodCategoryMapping>> GetFoodCategoryByFoodId(int FoodId)
+        {
+            var data = await _appRepository.GetFoodCategoryByFoodId(FoodId);
+            return data;
+        }
+
         [HttpPost]
         [Route("UpsertFoodMenuTypeMapping")]
         public async Task<ApiResponse<string>> UpsertFoodMenuTypeMapping(Dictionary<int, List<int>> dict)
@@ -993,6 +1001,24 @@ namespace RMS.Server.Controllers.Api
             try
             {
                 var outcome = await _appRepository.UpsertFoodMenuTypeMapping(dict);
+                result.Message = "Success";
+            }
+            catch (Exception ex)
+            {
+                // Logger.LogError(ex, "Error while uploading data to TrainingCampIdMapping");
+            }
+
+            return result;
+        }
+
+        [HttpPost]
+        [Route("UpsertFoodCategoryMapping")]
+        public async Task<ApiResponse<string>> UpsertFoodCategoryMapping(Dictionary<int, List<int>> dict)
+        {
+            var result = new ApiResponse<string>();
+            try
+            {
+                var outcome = await _appRepository.UpsertFoodCategoryMapping(dict);
                 result.Message = "Success";
             }
             catch (Exception ex)
