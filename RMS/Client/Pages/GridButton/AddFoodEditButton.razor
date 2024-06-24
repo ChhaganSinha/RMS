@@ -57,31 +57,31 @@
                 <!-- Select Food Category -->
                 <div class="col-md-4">
                     <label class="col-form-label bold-font">Select Food Category</label>
-                    <HxMultiSelect TItem="FoodCategory"
-                                   AutoSort="false"
-                                   TValue="int"
-                                   Data="@Category"
-                                   @bind-Value="@foodcategoryid"
-                                   TextSelector="@(p => p.Name)"
-                                   ValueSelector="@(p => p.Id)"
-                                   EmptyText="- Select -"
-                                   NullDataText="Loading..." />
+
+                    <HxSelect TItem="FoodCategory"
+                              TValue="int?"
+                              Data="Category"
+                              @bind-Value="foodcategoryid"
+                              TextSelector="@(Variants => Variants.Name)"
+                              ValueSelector="@(Variants => Variants.Id)"
+                              Nullable="true"
+                              NullText="- Select -"
+                              NullDataText="Loading variants..." />
 
                 </div>
 
                 <!-- Select Food Variants -->
                 <div class="col-md-4">
                     <label class="col-form-label bold-font">Select Food Variants</label>
-                    <HxSelect TItem="AddVariants"
-                              TValue="int?"
-                              Data="Variants"
-                              @bind-Value="variantsid"
-                              TextSelector="@(Variants => Variants.Name)"
-                              ValueSelector="@(Variants => Variants.Id)"
-                              Nullable="true"
-                              NullText="- Select -"
-                              NullDataText="Loading variants..." />
-                    <ValidationMessage For="() => model.Variant" />
+                    <HxMultiSelect TItem="AddVariants"
+                                   AutoSort="false"
+                                   TValue="int"
+                                   Data="@Variants"
+                                   @bind-Value="@variantsid"
+                                   TextSelector="@(p => p.Name)"
+                                   ValueSelector="@(p => p.Id)"
+                                   EmptyText="- Select -"
+                                   NullDataText="Loading..." />
                 </div>
             </div>
 
@@ -113,7 +113,7 @@
 
             <UiAlert Model="alert"></UiAlert>
             <hr style="margin-bottom: 2px;" />
-            <button type="submit" class="btn btn-primary float-right col-md-4">Add</button>
+            <button type="submit" class="btn btn-primary float-right col-md-4">Update</button>
         </EditForm>
         <br />
     }
@@ -123,7 +123,7 @@
     public Food Item { get; set; }
 
    
-    private int? variantsid;
+    private List<int> variantsid = new();
 
     [Parameter]
     public CGrid<Food> Grid { get; set; }
@@ -140,13 +140,13 @@
 
     [Required]
     private List<int> selectedMenuTypeid { get; set; } = new();
-    private List<int> foodcategoryid { get; set; } = new();
+    private int? foodcategoryid;
     private bool IsError = false;
     private List<MenuType> menuTypes = new();
     private List<FoodCategory> Category = new();
     private List<AddVariants> Variants = new();
     Dictionary<int, List<int>> FoodMenuTypeMap = new Dictionary<int, List<int>>();
-    Dictionary<int, List<int>> FoodCategoryMap = new Dictionary<int, List<int>>();
+    Dictionary<int, List<int>> FoodVarientMap = new Dictionary<int, List<int>>();
 
     private string imageDataUrl;
 
@@ -181,13 +181,13 @@
         }
 
         
-        variantsid = model.VariantId > 0 ? model.VariantId : null;
+        foodcategoryid = model.FoodCategoryId > 0 ? model.FoodCategoryId : null;
 
         var foodMenuTypeMap = await client.GetFoodMenuTypeByFoodId(model.Id);
         selectedMenuTypeid.AddRange(foodMenuTypeMap.Select(o => o.MenuTypeId));
 
-        var foodCategoryMap = await client.GetFoodCategoryByFoodId(model.Id);
-        foodcategoryid.AddRange(foodCategoryMap.Select(o => o.FoodCategoryId));
+        var foodVarientMap = await client.GetFoodVarientByFoodId(model.Id);
+        variantsid.AddRange(foodVarientMap.Select(o => o.FoodVarientId));
     }
 
     public async Task OnSave()
@@ -195,12 +195,13 @@
         process = true;
         alert?.Clear();
 
-        if (foodcategoryid.Count > 0)
-            model.FoodCategory = string.Join(", ", Category.Where(Category => foodcategoryid.Contains(Category.Id)).Select(Category => Category.Name));
+        model.FoodCategoryId = foodcategoryid;
+        if (foodcategoryid != null)
+            model.FoodCategory = Category.Where(x => x.Id == foodcategoryid).Select(x => x.Name).First();
 
-        model.VariantId = variantsid;
-        if (variantsid != null)
-            model.Variant = Category.Where(x => x.Id == variantsid).Select(x => x.Name).First();
+        //model.VariantId = variantsid;
+        if (variantsid.Count > 0)
+            model.Variant = string.Join(", ", Variants.Where(x => variantsid.Contains(x.Id)).Select(x => x.Name));
 
         if (selectedMenuTypeid.Count > 0)
             model.MenuType = string.Join(", ", menuTypes.Where(menuType => selectedMenuTypeid.Contains(menuType.Id)).Select(menuType => menuType.Name));
@@ -224,16 +225,16 @@
 
             if (response.Result.Id > 0)
             {
-                if (FoodCategoryMap.ContainsKey(model.Id))
+                if (FoodVarientMap.ContainsKey(model.Id))
                 {
-                    FoodCategoryMap[model.Id] = foodcategoryid.Select(id => id).ToList();
+                    FoodVarientMap[model.Id] = variantsid.Select(id => id).ToList();
                 }
                 else
                 {
-                    FoodCategoryMap.Add(model.Id, foodcategoryid.Select(id => id).ToList());
+                    FoodVarientMap.Add(model.Id, variantsid.Select(id => id).ToList());
                 }
 
-                var result = await client.UpsertFoodCategoryMapping(FoodCategoryMap);
+                var result = await client.UpsertFoodVarientMapping(FoodVarientMap);
             }
             await FoodGrid.RefreshGridAsync();
             alert?.SetSuccess(response.Message);

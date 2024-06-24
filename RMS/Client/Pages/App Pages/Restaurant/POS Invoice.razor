@@ -49,26 +49,31 @@
                         <!-- Left Column: Search and Food Categories -->
                         <div class="col-md-12 p-0">
                             <div class="card p-2">
-                                <input type="text" placeholder=" Search for food..." class="form-control mb-3" @bind="searchQuery" />
+                                <input type="text" placeholder="Search for food..." class="form-control mb-3" @bind="searchQuery" @oninput="FilterFoods" />
                                 <div class="row">
                                     <div class="col-md-3">
-                                        <div class="nav flex-column nav-pills overflow-auto" style="height: 100vh;">
+                                        <div class="nav flex-column nav-pills overflow-auto" style="height: 100vh; border:1px dashed; padding:10px; overflow:auto">
+                                            <a style="font-size:16px; cursor:pointer;"
+                                               class="nav-link mb-2 btn-success @GetVerticalTabClass(VerticalTab.AllFood)"
+                                               @onclick="() => SetVerticalActiveTab(VerticalTab.AllFood)">
+                                                All Food
+                                            </a>
                                             @foreach (var category in foodCategories)
                                             {
-                                                <button style="font-size:16px" class="nav-link mb-2 @GetVerticalTabClass((VerticalTab)category.Id)" @onclick="() => SetVerticalActiveTab((VerticalTab)category.Id)">@category.Name</button>
+                                                <a style="font-size:16px; cursor:pointer;" class="nav-link mb-2 @GetVerticalTabClass((VerticalTab)category.Id) btn-success" @onclick="() => SetVerticalActiveTab((VerticalTab)category.Id)">@category.Name</a>
                                             }
                                         </div>
                                     </div>
                                     <div class="col-md-9">
                                         <div class="row">
-                                            @foreach (var food in foods.Where(f => f.FoodCategoryId == (int)verticalActiveTab))
+                                            @foreach (var food in filteredFoods)
                                             {
-                                                <div class="col-md-4">
-                                                    <div class="card mb-2">
-                                                        <img src="@GetImageSrc(food)" class="card-img-top" alt="@food.FoodName">
+                                                <div class="col-md-3">
+                                                    <div class="card mb-2" @onclick="() => ShowFoodDetailsModal(food)" style="cursor:pointer;">
+                                                        <img src="@GetImageSrc(food)" class="card-img-top" alt="@food.FoodName" width="100">
                                                         <div class="card-body p-2">
-                                                            <h5 class="card-title">@food.FoodName</h5>
-                                                            <p class="card-text">Price: @food.Price.ToString("0.00")</p>
+                                                            <h6 class="card-title m-0">@food.FoodName</h6>
+                                                            <p class="card-text m-0" style="font-size:8px">Price: @food.Price.ToString("0.00")</p>
                                                             <!-- Hidden Inputs -->
                                                             <input type="hidden" name="select_product_id" class="select_product_id" value="@food.Id">
                                                             <input type="hidden" name="select_totalvarient" class="select_totalvarient" value="@food.VariantId.HasValue ? 1 : 0">
@@ -116,7 +121,7 @@
                                         </select>
                                     </div>
                                     <div class="form-group col-md-3">
-                                        <label class="bold-font"  for="waiter">Waiter</label>
+                                        <label class="bold-font" for="waiter">Waiter</label>
                                         <HxSelect TItem="Employee"
                                                   TValue="int?"
                                                   Data="employees"
@@ -254,15 +259,37 @@
                             </div>
                         </div>
                     </form>
-
                 }
-
             </div>
         </div>
 
-
     </div>
 
+    <!-- Add to cart Modal -->
+    <PageDialog Show="@showcart" ClosePageDialog="ResetForm">
+        @if (showcart)
+        {
+            <table class="table table-bordered table-hover bg-white" id="purchaseTable">
+                <thead>
+                    <tr>
+                        <th class="text-center">Item Information</th>
+                        <th class="text-center">Size</th>
+                        <th class="text-center wp_100">TaxPercentage</th>
+                        <th class="text-center wp_120">Price</th>
+                    </tr>
+                </thead>
+                <tbody id="addItem">
+                    <td class="text-center">@selectedFood.FoodName</td>
+                    <td class="text-center">@selectedFood.Variant</td>
+                    <td class="text-center">@selectedFood.TaxPercentage.ToString("F2")</td>
+                    <td class="text-center">@selectedFood.Price.ToString("F2")</td>
+                </tbody>
+                <footer class="mt-1">
+                    <button class="btn btn-primary btn-sm"> <i class="fa fa-shopping-cart"></i> Add to Cart </button>
+                </footer>
+            </table>
+        }
+    </PageDialog>
     <div class="modal" id="calculatorModal" tabindex="-1" role="dialog" aria-labelledby="calculatorModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content border-0" style="width: 340px;">
@@ -279,6 +306,8 @@
         </div>
     </div>
 </div>
+
+
 <style>
     .fixedclasspos {
         bottom: 0;
@@ -297,6 +326,11 @@
 </style>
 
 @code {
+    bool showcart = false;
+    private void ResetForm()
+    {
+        showcart = false;
+    }
     private enum TopTab
     {
         NewOrder,
@@ -306,14 +340,15 @@
 
     private enum VerticalTab
     {
+        AllFood = -1,
         Category1,
         Category2,
-        Category3
     }
 
     private TopTab topActiveTab = TopTab.NewOrder;
     private VerticalTab verticalActiveTab = VerticalTab.Category1;
-    private string searchQuery;
+    private string searchQuery = string.Empty;
+    private List<Food> filteredFoods = new();
 
     public List<FoodCategory> foodCategories = new();
     public List<Food> foods = new();
@@ -335,7 +370,7 @@
 
     private void CancelOrder()
     {
-        // Implement logic to cancel the order
+        
     }
 
     private void PlaceOrder()
@@ -352,18 +387,22 @@
         Variants = (await client.GetAllAddVariants()).ToList();
         if (foodCategories.Count > 0)
         {
-            verticalActiveTab = (VerticalTab)foodCategories[0].Id; 
+            verticalActiveTab = (VerticalTab)foodCategories[0].Id;
         }
+        FilterFoods();
     }
+
     private void SetVerticalActiveTab(VerticalTab categoryId)
     {
         verticalActiveTab = categoryId;
+        FilterFoods();
     }
 
     private string GetVerticalTabClass(VerticalTab categoryId)
     {
         return verticalActiveTab == categoryId ? "active" : string.Empty;
     }
+
     private string GetImageSrc(Food food)
     {
         if (food.ImageFile != null)
@@ -371,13 +410,48 @@
             var base64 = Convert.ToBase64String(food.ImageFile);
             return $"data:image/jpeg;base64,{base64}";
         }
-        return "path/to/default/image.jpg"; // default image path if none provided
+        return "path/to/default/image.jpg";
     }
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+
+
+
+    private void FilterFoods()
     {
-        if (firstRender)
+        if (string.IsNullOrWhiteSpace(searchQuery))
         {
-            // await JSRuntime.InvokeVoidAsync("setModalDraggableAndResizable");
+            ApplyCategoryFilter(verticalActiveTab);
+        }
+        else
+        {
+            filteredFoods = foods
+                .Where(f => f.FoodName.Contains(searchQuery, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+            verticalActiveTab = VerticalTab.AllFood;
+        }
+
+        StateHasChanged();
+    }
+
+    private void ApplyCategoryFilter(VerticalTab categoryId)
+    {
+        if (categoryId == VerticalTab.AllFood)
+        {
+            filteredFoods = foods.ToList();
+        }
+        else
+        {
+            filteredFoods = foods
+                .Where(f => f.FoodCategoryId == (int)categoryId)
+                .ToList();
         }
     }
+
+    private Food selectedFood;
+    private void ShowFoodDetailsModal(Food food)
+    {
+        selectedFood = food;
+        showcart = true;
+        StateHasChanged();
+    }
+
 }

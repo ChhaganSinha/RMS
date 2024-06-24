@@ -246,13 +246,13 @@
         {
             if (response.Result.Id > 0)
             {
-                if (HallFacilitiesMap.ContainsKey(model.Id))
+                if (HallFacilitiesMap.ContainsKey(response.Result.Id))
                 {
-                    HallFacilitiesMap[model.Id] = SelectedFacilities.Select(id => id).ToList();
+                    HallFacilitiesMap[response.Result.Id] = SelectedFacilities.Select(id => id).ToList();
                 }
                 else
                 {
-                    HallFacilitiesMap.Add(model.Id, SelectedFacilities.Select(id => id).ToList());
+                    HallFacilitiesMap.Add(response.Result.Id, SelectedFacilities.Select(id => id).ToList());
                 }
 
                 var result = await client.UpsertHallFacilitiesMapping(HallFacilitiesMap);

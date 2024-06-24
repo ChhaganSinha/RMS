@@ -2824,16 +2824,16 @@ namespace RMS.Repositories
             return true;
         }
 
-        public async Task<bool> UpsertFoodCategoryMapping(Dictionary<int, List<int>> dict)
+        public async Task<bool> UpsertFoodVarientMapping(Dictionary<int, List<int>> dict)
         {
             foreach (var kvp in dict)
             {
                 var hallId = kvp.Key;
                 var facilityId = kvp.Value;
 
-                var existingfacilityIds = await AppDbCxt.FoodCategoryMapping
+                var existingfacilityIds = await AppDbCxt.FoodVarientMapping
                     .Where(o => o.FoodId == hallId)
-                    .Select(o => o.FoodCategoryId)
+                    .Select(o => o.FoodVarientId)
                     .ToListAsync();
 
                 var facilityIdsToAdd = facilityId.Except(existingfacilityIds);
@@ -2842,18 +2842,18 @@ namespace RMS.Repositories
 
                 if (facilityIdsToRemove.Any())
                 {
-                    var mappingsToRemove = await AppDbCxt.FoodCategoryMapping
-                        .Where(tcm => tcm.FoodId == hallId && facilityIdsToRemove.Contains(tcm.FoodCategoryId))
+                    var mappingsToRemove = await AppDbCxt.FoodVarientMapping
+                        .Where(tcm => tcm.FoodId == hallId && facilityIdsToRemove.Contains(tcm.FoodVarientId))
                         .ToListAsync();
                     AppDbCxt.RemoveRange(mappingsToRemove);
                 }
 
                 if (facilityIdsToAdd.Any())
                 {
-                    var mappingsToAdd = facilityIdsToAdd.Select(c => new FoodCategoryMapping
+                    var mappingsToAdd = facilityIdsToAdd.Select(c => new FoodVarientMapping
                     {
                         FoodId = hallId,
-                        FoodCategoryId = c
+                        FoodVarientId = c
                     });
                     AppDbCxt.AddRange(mappingsToAdd);
                 }
@@ -2871,9 +2871,9 @@ namespace RMS.Repositories
             return dataMapping.ToList();
         }
 
-        public async Task<List<FoodCategoryMapping>> GetFoodCategoryByFoodId(int id)
+        public async Task<List<FoodVarientMapping>> GetFoodVarientByFoodId(int id)
         {
-            var dataMapping = AppDbCxt.FoodCategoryMapping.Where(o => o.FoodId == id);
+            var dataMapping = AppDbCxt.FoodVarientMapping.Where(o => o.FoodId == id);
             return dataMapping.ToList();
         }
         public async Task<Food> GetFoodById(int id)
@@ -2936,8 +2936,7 @@ namespace RMS.Repositories
             var result = new ApiResponse<Food>();
             try
             {
-                var existing = AppDbCxt.Food.First(x => x.Id == id);
-                result.Result = existing;
+                var existing = AppDbCxt.Food.FirstOrDefault(x => x.Id == id);
                 if (existing == null)
                 {
                     result.IsSuccess = true;
@@ -2945,8 +2944,19 @@ namespace RMS.Repositories
                     return result;
                 }
 
+                // Remove related FoodVarientMapping entries
+                var varientMappings = AppDbCxt.FoodVarientMapping.Where(vm => vm.FoodId == id).ToList();
+                AppDbCxt.FoodVarientMapping.RemoveRange(varientMappings);
+
+                // Remove related FoodMenuTypeMapping entries
+                var menuTypeMappings = AppDbCxt.FoodMenuTypeMapping.Where(mm => mm.FoodId == id).ToList();
+                AppDbCxt.FoodMenuTypeMapping.RemoveRange(menuTypeMappings);
+
+                // Remove the food item
                 AppDbCxt.Food.Remove(existing);
                 await AppDbCxt.SaveChangesAsync();
+
+                result.Result = existing;
                 result.IsSuccess = true;
                 result.Message = "Successfully Deleted!";
                 return result;
@@ -2958,6 +2968,7 @@ namespace RMS.Repositories
                 return result;
             }
         }
+
 
 
         #endregion

@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace RMS.Dto
 {
-    public class FoodCategoryMapping : BaseEntity
+    public class FoodVarientMapping : BaseEntity
     {
         public int FoodId { get; set; }
-        public int FoodCategoryId { get; set; }
+        public int FoodVarientId { get; set; }
     }
 }

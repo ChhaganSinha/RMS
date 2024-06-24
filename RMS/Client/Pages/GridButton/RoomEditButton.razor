@@ -203,13 +203,13 @@
         {
             if (response.Result.Id > 0)
             {
-                if (RoomFacilitiesMap.ContainsKey(model.Id))
+                if (RoomFacilitiesMap.ContainsKey(response.Result.Id))
                 {
-                    RoomFacilitiesMap[model.Id] = SelectedFacilities.Select(id => id).ToList();
+                    RoomFacilitiesMap[response.Result.Id] = SelectedFacilities.Select(id => id).ToList();
                 }
                 else
                 {
-                    RoomFacilitiesMap.Add(model.Id, SelectedFacilities.Select(id => id).ToList());
+                    RoomFacilitiesMap.Add(response.Result.Id, SelectedFacilities.Select(id => id).ToList());
                 }
 
                 var result = await client.UpsertRoomFacilitiesMapping(RoomFacilitiesMap);

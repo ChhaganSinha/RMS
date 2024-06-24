@@ -986,10 +986,10 @@ namespace RMS.Server.Controllers.Api
         }
 
         [HttpGet]
-        [Route("GetFoodCategoryByFoodId/{FoodId}")]
-        public async Task<List<FoodCategoryMapping>> GetFoodCategoryByFoodId(int FoodId)
+        [Route("GetFoodVarientByFoodId/{FoodId}")]
+        public async Task<List<FoodVarientMapping>> GetFoodVarientByFoodId(int FoodId)
         {
-            var data = await _appRepository.GetFoodCategoryByFoodId(FoodId);
+            var data = await _appRepository.GetFoodVarientByFoodId(FoodId);
             return data;
         }
 
@@ -1012,13 +1012,13 @@ namespace RMS.Server.Controllers.Api
         }
 
         [HttpPost]
-        [Route("UpsertFoodCategoryMapping")]
-        public async Task<ApiResponse<string>> UpsertFoodCategoryMapping(Dictionary<int, List<int>> dict)
+        [Route("UpsertFoodVarientMapping")]
+        public async Task<ApiResponse<string>> UpsertFoodVarientMapping(Dictionary<int, List<int>> dict)
         {
             var result = new ApiResponse<string>();
             try
             {
-                var outcome = await _appRepository.UpsertFoodCategoryMapping(dict);
+                var outcome = await _appRepository.UpsertFoodVarientMapping(dict);
                 result.Message = "Success";
             }
             catch (Exception ex)

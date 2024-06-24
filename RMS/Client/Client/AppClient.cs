@@ -2622,11 +2622,11 @@ namespace RMS.Client.Client
 
         }
 
-        public async Task<bool> UpsertFoodCategoryMapping(Dictionary<int, List<int>> dict)
+        public async Task<bool> UpsertFoodVarientMapping(Dictionary<int, List<int>> dict)
         {
             try
             {
-                var res = await HttpClient.PostAsJsonAsync($"api/App/UpsertFoodCategoryMapping", dict);
+                var res = await HttpClient.PostAsJsonAsync($"api/App/UpsertFoodVarientMapping", dict);
                 res.EnsureSuccessStatusCode();
 
                 return res.IsSuccessStatusCode;
@@ -2659,16 +2659,16 @@ namespace RMS.Client.Client
             return Trainingcampaign;
         }
 
-        public async Task<List<FoodCategoryMapping>> GetFoodCategoryByFoodId(int id)
+        public async Task<List<FoodVarientMapping>> GetFoodVarientByFoodId(int id)
         {
-            List<FoodCategoryMapping> Trainingcampaign = new();
+            List<FoodVarientMapping> Trainingcampaign = new();
             try
             {
-                var res = await HttpClient.GetAsync($"api/App/GetFoodCategoryByFoodId/{id}");
+                var res = await HttpClient.GetAsync($"api/App/GetFoodVarientByFoodId/{id}");
 
                 res.EnsureSuccessStatusCode();
 
-                Trainingcampaign = await res.Content.ReadFromJsonAsync<List<FoodCategoryMapping>>();
+                Trainingcampaign = await res.Content.ReadFromJsonAsync<List<FoodVarientMapping>>();
 
             }
             catch (Exception ex)
