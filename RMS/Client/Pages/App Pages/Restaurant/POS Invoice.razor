@@ -1,0 +1,383 @@
+﻿@page "/pos"
+@using RMS.Client.Client
+@using RMS.Client.Pages.GridComponent
+@using RMS.Client.Shared.Popup
+@inject AppClient client
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
+@using System.ComponentModel.DataAnnotations
+@using RMS.Dto.Enum
+@attribute [Authorize]
+
+<div class="page-header breadcumb-sticky">
+    <div class="page-block">
+        <div class="row align-items-center">
+            <div class="col-md-12">
+                <div class="page-header-title">
+                    <h5 class="m-b-10">
+                        POS Invoice
+                    </h5>
+                </div>
+                <ul class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a href="/"><i class="feather icon-home"></i></a>
+                    </li>
+                    <li class="breadcrumb-item"><a>POS Invoice</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div>
+    <div>
+        <div class="row">
+            <div class="col-sm-12">
+
+                <div class="d-flex justify-content-start mb-3">
+                    <a href="/" class="btn btn-primary mr-2">
+                        <i class="fa fa-home fa-2x" aria-hidden="true"></i>
+                    </a>
+                    <button class="btn btn-success mr-2 @GetTopTabClass(TopTab.NewOrder)" @onclick="() => SetTopActiveTab(TopTab.NewOrder)">New Order</button>
+                    <button class="btn btn-warning mr-2 @GetTopTabClass(TopTab.OngoingOrder)" @onclick="() => SetTopActiveTab(TopTab.OngoingOrder)">Ongoing Order</button>
+                    <button class="btn btn-info @GetTopTabClass(TopTab.TodayOrder)" @onclick="() => SetTopActiveTab(TopTab.TodayOrder)">Today Order</button>
+                </div>
+
+                @if (topActiveTab == TopTab.NewOrder)
+                {
+                    <form>
+                        <!-- Left Column: Search and Food Categories -->
+                        <div class="col-md-12 p-0">
+                            <div class="card p-2">
+                                <input type="text" placeholder=" Search for food..." class="form-control mb-3" @bind="searchQuery" />
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <div class="nav flex-column nav-pills overflow-auto" style="height: 100vh;">
+                                            @foreach (var category in foodCategories)
+                                            {
+                                                <button style="font-size:16px" class="nav-link mb-2 @GetVerticalTabClass((VerticalTab)category.Id)" @onclick="() => SetVerticalActiveTab((VerticalTab)category.Id)">@category.Name</button>
+                                            }
+                                        </div>
+                                    </div>
+                                    <div class="col-md-9">
+                                        <div class="row">
+                                            @foreach (var food in foods.Where(f => f.FoodCategoryId == (int)verticalActiveTab))
+                                            {
+                                                <div class="col-md-4">
+                                                    <div class="card mb-2">
+                                                        <img src="@GetImageSrc(food)" class="card-img-top" alt="@food.FoodName">
+                                                        <div class="card-body p-2">
+                                                            <h5 class="card-title">@food.FoodName</h5>
+                                                            <p class="card-text">Price: @food.Price.ToString("0.00")</p>
+                                                            <!-- Hidden Inputs -->
+                                                            <input type="hidden" name="select_product_id" class="select_product_id" value="@food.Id">
+                                                            <input type="hidden" name="select_totalvarient" class="select_totalvarient" value="@food.VariantId.HasValue ? 1 : 0">
+                                                            <input type="hidden" name="select_iscustomeqty" class="select_iscustomeqty" value="">
+                                                            <input type="hidden" name="select_product_size" class="select_product_size" value="">
+                                                            <input type="hidden" name="select_product_isgroup" class="select_product_isgroup" value="">
+                                                            <input type="hidden" name="select_product_cat" class="select_product_cat" value="@food.FoodCategoryId">
+                                                            <input type="hidden" name="select_varient_name" class="select_varient_name" value="@food.Variant">
+                                                            <input type="hidden" name="select_product_name" class="select_product_name" value="@food.FoodName">
+                                                            <input type="hidden" name="select_product_price" class="select_product_price" value="@food.Price">
+                                                            <input type="hidden" name="select_addons" class="select_addons" value="">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right Column: Customer and Order Details -->
+                        <div class="col-md-12 p-0">
+                            <div class="card p-2">
+                                <div class="form-row">
+                                    <div class="form-group col-md-3">
+                                        <label class="bold-font required-field" for="customerName">Customer Name</label>
+                                        <HxSelect TItem="CustomerDetailsDTO"
+                                                  TValue="int?"
+                                                  Data="customerDetailsDTOs"
+                                                  @bind-Value="customerId"
+                                                  TextSelector="@(o => o.FirstName)"
+                                                  ValueSelector="@(o => o.Id)"
+                                                  Nullable="true"
+                                                  NullText="-select-"
+                                                  NullDataText="Loading..." />
+                                    </div>
+                                    <div class="form-group col-md-3">
+                                        <label class="bold-font" for="customerType">Customer Type</label>
+                                        <select class="form-control" id="CustomerType">
+                                            @foreach (var val in Enum.GetValues(typeof(CustomerType)))
+                                            {
+                                                <option value="@val">@val</option>
+                                            }
+                                        </select>
+                                    </div>
+                                    <div class="form-group col-md-3">
+                                        <label class="bold-font"  for="waiter">Waiter</label>
+                                        <HxSelect TItem="Employee"
+                                                  TValue="int?"
+                                                  Data="employees"
+                                                  @bind-Value="employeeId"
+                                                  TextSelector="@(o => o.Name)"
+                                                  ValueSelector="@(o => o.Id)"
+                                                  Nullable="true"
+                                                  NullText="-select-"
+                                                  NullDataText="Loading..." />
+                                    </div>
+                                    <div class="form-group col-md-3">
+                                        <label class="bold-font" for="table">Table</label>
+                                        <select id="table" class="form-control">
+                                            <option>Table 1</option>
+                                            <option>Table 2</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group col-md-3">
+                                        <label class="bold-font" for="cookingTime">Cooking Time</label>
+                                        <input name="cookedtime" type="text" class="form-control timepicker3 hasDatepicker" id="cookedtime" placeholder="00:00:00" autocomplete="off">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Right Column: food Order Details -->
+                        <div class="table-responsive" id="addfoodlist">
+                            <table class="table table-bordered" border="1" width="100%" id="addinvoice">
+                                <thead>
+                                    <tr>
+                                        <th>Item</th>
+                                        <th>Variant Name</th>
+                                        <th>Price</th>
+                                        <th>Quantity</th>
+                                        <th>Total</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="itemNumber">
+                                    <tr id="1">
+                                        <th id="product_name_MFU4E">
+                                            La Pigeon Burger<br>
+                                        </th>
+                                        <td>
+                                            Large
+                                        </td>
+
+                                        <td width="">
+                                            275
+                                        </td>
+                                        <td scope="row">
+                                            <a class="btn btn-info btn-sm btnleftalign" onclick="posupdatecart('4c74d497ab9a8034abb7f0fcfebdd4f8',9,18,1,'add')"><i class="fa fa-plus" aria-hidden="true"></i></a>
+                                            <span id="productionsetting-9-18"> 1                </span>
+                                            <a class="btn btn-danger btn-sm btnrightalign" onclick="posupdatecart('4c74d497ab9a8034abb7f0fcfebdd4f8',9,18,1,'del')"><i class="fa fa-minus" aria-hidden="true"></i></a>
+                                        </td>
+                                        <td width="">
+                                            137.5
+                                        </td>
+
+                                        <td width:"80"="">
+                                            <a class="btn btn-danger btn-sm btnrightalign" onclick="removecart('4c74d497ab9a8034abb7f0fcfebdd4f8')"><i class="ti-trash" aria-hidden="true"></i></a>
+                                        </td>
+                                    </tr>
+
+                                    <input name="grandtotal" id="grtotal" type="hidden" value="137.5">
+
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="row d-flex flex-wrap align-items-center">
+                            <div class="col-sm-6 leftview">
+                                <input name="distype" id="distype" type="hidden" value="1" autocomplete="off">
+                                <input name="sdtype" id="sdtype" type="hidden" value="1" autocomplete="off">
+                                <input type="hidden" id="orginattotal" value="149.875" name="orginattotal" autocomplete="off">
+                                <input type="hidden" id="invoice_discount" class="form-control text-right" name="invoice_discount" value="137.5" autocomplete="off">
+                                <table class="table table-bordered footersumtotal">
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <div class="row m-0">
+                                                    <label for="date" class="col-sm-8 mb-0">
+                                                        Vat/Tax(2%):
+                                                    </label>
+                                                    <label class="col-sm-4 mb-0">
+                                                        <input type="hidden" id="vat" name="vat" value="2.75" autocomplete="off">
+                                                        <strong>
+                                                            $ <span id="calvat">2.75</span>
+                                                        </strong>
+                                                    </label>
+                                                </div>
+                                            </td>
+                                            <td rowspan="2">
+                                                <div class="row">
+                                                    <label for="date" class="mb-0 col-sm-6">Grand Total:</label>
+                                                    <label class="col-sm-6 p-0 mb-0">
+                                                        <input type="hidden" id="orggrandTotal" value="149.875" name="orggrandTotal" autocomplete="off">
+                                                        <input name="grandtotal" type="hidden" value="149.875" id="grandtotal" autocomplete="off">
+                                                        <br />
+                                                        <span class="badge badge-primary grandbg font-26">
+                                                            <strong>
+                                                                $ <span id="caltotal">149.875</span>
+                                                            </strong>
+                                                        </span>
+                                                    </label>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <div class="row m-0">
+                                                    <label for="date" class="col-sm-8 mb-0">
+                                                        Service Charge(%)
+                                                        :
+                                                    </label>
+                                                    <div class="col-sm-4 p-0">
+                                                        <input type="text" id="service_charge" style="margin:0 !important;" class="form-control text-right mb-5" value="7" name="service_charge" placeholder="0.00" autocomplete="off">
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="col-sm-6 text-right">
+                                <a class="btn btn-outline-secondary mr-2" data-toggle="modal" data-target="#calculatorModal">
+                                    <i class="fas fa-calculator"></i>
+                                </a>
+                                <a class="btn btn-danger mr-2" @onclick="CancelOrder">
+                                    <i class="fas fa-times"></i> Cancel Order
+                                </a>
+                                <a class="btn btn-success" @onclick="PlaceOrder">
+                                    <i class="fas fa-check"></i> Place Order
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+
+                }
+
+            </div>
+        </div>
+
+
+    </div>
+
+    <div class="modal" id="calculatorModal" tabindex="-1" role="dialog" aria-labelledby="calculatorModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content border-0" style="width: 340px;">
+                <div class="modal-header bg-dark text-white p-1">
+                    <h6 class="modal-title ml-1 text-white" id="calculatorModalLabel">Calculator</h6>
+                    <a type="button" title="Close" data-dismiss="modal" style="cursor: pointer; margin-left: auto;">
+                        <i class="fa fa-times-circle fa-lg text-secondry" aria-hidden="true"></i>
+                    </a>
+                </div>
+                <div class="modal-body p-0">
+                    <Calculator />
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<style>
+    .fixedclasspos {
+        bottom: 0;
+        background: #fff;
+        z-index: 999;
+        padding: 5px 15px;
+        border-top: 1px solid #e0e0e0;
+        position: fixed;
+        left: 0;
+        margin-left: 250px;
+        right: 0;
+        -webkit-transition: margin-left .3s ease-in-out;
+        transition: margin-left .3s ease-in-out
+    }
+
+</style>
+
+@code {
+    private enum TopTab
+    {
+        NewOrder,
+        OngoingOrder,
+        TodayOrder
+    }
+
+    private enum VerticalTab
+    {
+        Category1,
+        Category2,
+        Category3
+    }
+
+    private TopTab topActiveTab = TopTab.NewOrder;
+    private VerticalTab verticalActiveTab = VerticalTab.Category1;
+    private string searchQuery;
+
+    public List<FoodCategory> foodCategories = new();
+    public List<Food> foods = new();
+    public List<AddVariants> Variants = new();
+    public List<CustomerDetailsDTO> customerDetailsDTOs = new();
+    public List<Employee> employees = new();
+    private int? customerId;
+    private int? employeeId;
+
+    private void SetTopActiveTab(TopTab tab)
+    {
+        topActiveTab = tab;
+    }
+
+    private string GetTopTabClass(TopTab tab)
+    {
+        return topActiveTab == tab ? "active" : string.Empty;
+    }
+
+    private void CancelOrder()
+    {
+        // Implement logic to cancel the order
+    }
+
+    private void PlaceOrder()
+    {
+        // Implement logic to place the order
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        foodCategories = (await client.GetAllFoodCategory()).ToList();
+        foods = (await client.GetAllFood()).ToList();
+        customerDetailsDTOs = (await client.GetAllCustomer()).ToList();
+        employees = (await client.GetAllEmployee()).ToList();
+        Variants = (await client.GetAllAddVariants()).ToList();
+        if (foodCategories.Count > 0)
+        {
+            verticalActiveTab = (VerticalTab)foodCategories[0].Id; 
+        }
+    }
+    private void SetVerticalActiveTab(VerticalTab categoryId)
+    {
+        verticalActiveTab = categoryId;
+    }
+
+    private string GetVerticalTabClass(VerticalTab categoryId)
+    {
+        return verticalActiveTab == categoryId ? "active" : string.Empty;
+    }
+    private string GetImageSrc(Food food)
+    {
+        if (food.ImageFile != null)
+        {
+            var base64 = Convert.ToBase64String(food.ImageFile);
+            return $"data:image/jpeg;base64,{base64}";
+        }
+        return "path/to/default/image.jpg"; // default image path if none provided
+    }
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            // await JSRuntime.InvokeVoidAsync("setModalDraggableAndResizable");
+        }
+    }
+}

@@ -49,7 +49,7 @@ namespace RMS.DataContext
         public DbSet<AllRecord> AllRecord { get; set; }
         public DbSet<CleaningReport> CleaningReport { get; set; }
         public DbSet<BookingType> BookingType { get; set; }
-        public DbSet<BookingList> BookingList { get; set; }
+        public DbSet<ReservationDetailsDto> ReservationDetails { get; set; }
         public DbSet<MenuType> MenuType { get; set; }
         public DbSet<FoodCategory> FoodCategory { get; set; }
         public DbSet<AddVariants> AddVariants { get; set; }
@@ -57,6 +57,7 @@ namespace RMS.DataContext
         public DbSet<FoodMenuTypeMapping> FoodMenuTypeMapping { get; set; }
         public DbSet<FoodCategoryMapping> FoodCategoryMapping { get; set; }
         public DbSet<CustomerDetailsDTO> CustomerDetailsDTO { get; set; }
+        public DbSet<PosDTO> PosDTO { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

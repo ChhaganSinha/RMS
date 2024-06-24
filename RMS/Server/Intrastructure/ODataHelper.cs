@@ -62,6 +62,7 @@ namespace RMS.Server.Intrastructure
             builder.EntitySet<AddVariants>("AddVariants");
             builder.EntitySet<Food>("Food");
             builder.EntitySet<CustomerDetailsDTO>("CustomerDetailsDTO");
+            builder.EntitySet<ReservationDetailsDto>("ReservationDetailsDto");
 
             return builder.GetEdmModel();
         }

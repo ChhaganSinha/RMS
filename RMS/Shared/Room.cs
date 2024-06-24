@@ -30,4 +30,13 @@ namespace RMS.Dto
         public RoomHallStatus Status { get; set; } = RoomHallStatus.Available;
         public Floor floor { get; set; } = Floor.FirstFloor;
     }
+
+    public class RoomBooking : Auditable
+    {
+        public int BookingId { get; set; }
+        public string RoomType { get; set; }
+        public string RoomNo { get; set; }
+        public int Adults { get; set; }
+        public int Children { get; set; }
+    }
 }

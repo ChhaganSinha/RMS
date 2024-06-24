@@ -1,0 +1,142 @@
+﻿@page "/calculator"
+
+<style>
+    /* CSS Styles */
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
+    .calculator {
+        background-color: black;
+        padding: 20px;
+        margin: 0 auto;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        border-radius: 1px;
+    }
+
+    .result-box {
+        background-color: yellowgreen;
+        width: 100%;
+        padding: 10px;
+        font-size: 24px;
+        border: none;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3) inset;
+        border-radius: 5px;
+    }
+
+    .buttons {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        grid-gap: 10px;
+        margin-top: 20px;
+    }
+
+    button {
+        padding: 10px;
+        font-size: 24px;
+        border: none;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+        button:hover {
+            background-color: #ddd;
+        }
+
+    .clear {
+        background-color: #ff4136;
+        color: #fff;
+    }
+
+    .number, .decimal {
+        background-color: #fff;
+        color: #333;
+    }
+
+    .operator {
+        background-color: #0074d9;
+        color: #fff;
+    }
+
+    .equals {
+        background-color: #01ff70;
+        grid-row: span 3;
+        color: #fff;
+    }
+</style>
+
+<div class="calculator">
+    <input type="text" id="result" @bind="displayValue" readonly class="result-box">
+    <div class="buttons">
+        <button class="clear" @onclick="Clear">C</button>
+        <button class="operator" @onclick='() => OperatorClick("/")'>/</button>
+        <button class="operator" @onclick='() => OperatorClick("*")'>*</button>
+        <button class="operator" @onclick='() => OperatorClick("-")'>-</button>
+        <button class="number" @onclick='() => NumberClick("7")'>7</button>
+        <button class="number" @onclick='() => NumberClick("8")'>8</button>
+        <button class="number" @onclick='() => NumberClick("9")'>9</button>
+        <button class="operator" @onclick='() => OperatorClick("+")'>+</button>
+        <button class="number" @onclick='() => NumberClick("4")'>4</button>
+        <button class="number" @onclick='() => NumberClick("5")'>5</button>
+        <button class="number" @onclick='() => NumberClick("6")'>6</button>
+        <button class="equals" @onclick="Calculate">=</button>
+        <button class="number" @onclick='() => NumberClick("1")'>1</button>
+        <button class="number" @onclick='() => NumberClick("2")'>2</button>
+        <button class="number" @onclick='() => NumberClick("3")'>3</button>
+        <button class="number" @onclick='() => NumberClick("0")'>0</button>
+        <button class="decimal" @onclick='() => DecimalClick(".")'>.</button>
+    </div>
+</div>
+
+@code {
+    private string displayValue = "";
+
+    private void Clear()
+    {
+        displayValue = "";
+    }
+
+    private void OperatorClick(string operatorValue)
+    {
+        AppendValue(operatorValue);
+    }
+
+    private void NumberClick(string numberValue)
+    {
+        AppendValue(numberValue);
+    }
+
+    private void DecimalClick(string decimalValue)
+    {
+        AppendValue(decimalValue);
+    }
+
+    private void Calculate()
+    {
+        try
+        {
+            displayValue = Evaluate(displayValue);
+        }
+        catch (Exception ex)
+        {
+            displayValue = "Error";
+            Console.WriteLine($"Exception occurred: {ex.Message}");
+        }
+    }
+
+    private string Evaluate(string expression)
+    {
+        var dataTable = new System.Data.DataTable();
+        var result = dataTable.Compute(expression, "");
+        return result.ToString();
+    }
+
+    private void AppendValue(string value)
+    {
+        displayValue += value;
+    }
+}

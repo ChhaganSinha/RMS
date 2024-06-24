@@ -13,7 +13,7 @@
 {
     <div class="row">
         <div class="col-sm-12">
-            <GridComponent @ref="Component" T="BookingList" Grid="@_grid"></GridComponent>
+            <GridComponent @ref="Component" T="ReservationDetailsDto" Grid="@_grid"></GridComponent>
         </div>
     </div>
 }
@@ -26,27 +26,20 @@ else
 
 @code
 {
-    private CGrid<BookingList> _grid;
+    private CGrid<ReservationDetailsDto> _grid;
     private Task _task;
-    private static GridComponent<BookingList> Component;
+    private static GridComponent<ReservationDetailsDto> Component;
     static bool filter = true;
     static AuthenticationState authState;
 
-    Action<IGridColumnCollection<BookingList>> columns = c =>
+    Action<IGridColumnCollection<ReservationDetailsDto>> columns = c =>
     {
 
         c.Add(o => o.Id).SetWidth("10%").Css("table-bordered").Titled("SN.").Filterable(filter);
-        c.Add(o => o.BookingNumber).Css("table-bordered").Titled("booking No.").Filterable(filter);
-        c.Add(o => o.RoomNumber).Css("table-bordered").Titled("Room No.").Filterable(filter);
-        c.Add(o => o.RoomType).Css("table-bordered").Filterable(filter);
-        c.Add(o => o.Name).Css("table-bordered").Filterable(filter);
-        c.Add(o => o.Phone).Css("table-bordered").Filterable(filter);
-        c.Add(o => o.CheckIn).Css("table-bordered").Filterable(filter);
+        c.Add(o => o.BookingReferenceNo).Css("table-bordered").Titled("booking No.").Filterable(filter);
+        c.Add(o => o.BookingType).Css("table-bordered").Titled("Room No.").Filterable(filter);
         c.Add(o => o.CheckOut).Css("table-bordered").Filterable(filter);
-        c.Add(o => o.PaidAmount).Css("table-bordered").Filterable(filter);
-        c.Add(o => o.DueAmount).Css("table-bordered").Filterable(filter);
-        c.Add(o => o.BookingStatus).Css("table-bordered").Filterable(filter);
-        c.Add(o => o.PaymentStatus).Css("table-bordered").Filterable(filter);
+        c.Add(o => o.CheckIn).Css("table-bordered").Filterable(filter);
     
     
 
@@ -60,11 +53,11 @@ else
     protected override async Task OnParametersSetAsync()
     {
         authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        string url = $"odata/BookingList";
+        string url = $"odata/ReservationDetailsDto";
         var query = new QueryDictionary<StringValues>();
         query.Add("grid-sorting", "Id__1__1");
 
-        var client = new GridODataClient<BookingList>(HttpClient, url, query, false, "ordersGrid", columns, 5)
+        var client = new GridODataClient<ReservationDetailsDto>(HttpClient, url, query, false, "ordersGrid", columns, 5)
             .Sortable(true)
             .Filterable(true)
             .ClearFiltersButton(true)

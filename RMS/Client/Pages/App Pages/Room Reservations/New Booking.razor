@@ -5,6 +5,8 @@
 @using RMS.Client.Shared.Popup
 @using RMS.Dto
 @using RMS.Dto.Enum
+@using Havit.Blazor.Components.Web
+@using Havit.Blazor.Components.Web.Bootstrap
 @inject AppClient client
 @inject IJSRuntime JSRuntime
 @inject NavigationManager NavigationManager
@@ -35,413 +37,302 @@
         <div class="p-2 mt-n3">
             <div class="text">
                 <div class="">
+                    <EditForm Model="model" OnValidSubmit="OnSave">
+                        <DataAnnotationsValidator />
+                        @* <ValidationSummary/> *@
+                        <div id="reservation">
+                            <div class="card mb-4">
+                                <div class="card-header py-2 ">
+                                    <h6 class="fs-17 font-weight-600 mb-0">
+                                        Reservation Details <span id="msg" class="red-message"></span>
+                                        <small class="float-end">
+                                            <a href="booking-list" id="view_checin" class="btn btn-primary btn-sm">
+                                                Booking List
+                                            </a>
+                                        </small>
+                                    </h6>
+                                </div>
+                                <hr class="m-0" />
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-4 mb-3">
+                                            <div class="form-group mb-0">
+                                                <label class="form-label font-weight-600 mb-1">Check In <span class="text-danger">*</span></label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
+                                                    <input type="date" @bind="model.CheckIn" name="datefilter" class="form-control datefilter" id="datefilter1" placeholder="mm/dd/yyyy --:-- --">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <div class="form-group mb-0">
+                                                <label class="form-label font-weight-600 mb-1">Check Out <span class="text-danger">*</span></label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
+                                                    <input type="date" @bind="model.CheckOut" name="datefilter" class="form-control datefilter" id="datefilter2" placeholder="mm/dd/yyyy --:-- --">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <div class="form-group mb-0">
+                                                <label class="form-label font-weight-600 mb-1">Arrival From</label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text"><i class="fas fa-plane-arrival"></i></span>
+                                                    <input type="text" @bind="model.ArrivalFrom" class="form-control" id="arrival_from" placeholder="Arrival From">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <div class="form-group mb-0">
+                                                <label class="form-label font-weight-600 mb-1">Booking Type</label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text"><i class="fas fa-hotel"></i></span>
+                                                    <select class="form-select" @bind="model.BookingType" data-live-search="true" data-width="100%" id="booking_type">
+                                                        <option selected>Choose Reference Type</option>
+                                                        @foreach (var val in Enum.GetValues(typeof(BookingReferenceType)))
+                                                        {
+                                                            <option value="@val">@val</option>
+                                                        }
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
 
-
-                    <div id="reservation">
-                        <div class="card mb-4">
-                            <div class="card-header py-2 ">
-                                <h6 class="fs-17 font-weight-600 mb-0">
-                                    Reservation Details <span id="msg" class="red-message"></span>
-                                    <small class="float-end">
-                                        <a href="booking-list" id="view_checin" class="btn btn-primary btn-sm">
-                                            Booking List
-                                        </a>
-                                    </small>
-                                </h6>
-                            </div>
-                            <hr class="m-0" />
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col-md-4 mb-3">
-                                        <div class="form-group mb-0">
-                                            <label class="form-label font-weight-600 mb-1">Check In <span class="text-danger">*</span></label>
-                                            <div class="input-group">
-                                                <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
-                                                <input type="date" name="datefilter" class="form-control datefilter" id="datefilter1" placeholder="mm/dd/yyyy --:-- --" value="">
+                                        <div class="col-md-4 mb-3">
+                                            <div class="form-group mb-0">
+                                                <label class="form-label font-weight-600 mb-1">Booking Reference No</label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text"><i class="fas fa-sort-numeric-up-alt"></i></span>
+                                                    <input type="text" @bind="model.BookingReferenceNo" class="form-control" id="bsorurce_no" placeholder="Booking Reference No.">
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div class="col-md-4 mb-3">
-                                        <div class="form-group mb-0">
-                                            <label class="form-label font-weight-600 mb-1">Check Out <span class="text-danger">*</span></label>
-                                            <div class="input-group">
-                                                <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
-                                                <input type="date" name="datefilter" class="form-control datefilter" id="datefilter2" placeholder="mm/dd/yyyy --:-- --" value="">
+                                        <div class="col-md-4 mb-3">
+                                            <div class="form-group mb-0">
+                                                <label class="form-label font-weight-600 mb-1">Purpose of Visit</label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text"><i class="fas fa-eye"></i></span>
+                                                    <input type="text" @bind="model.PurposeOfVisit" class="form-control" id="pof_visit" placeholder="Purpose of Visit">
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div class="col-md-4 mb-3">
-                                        <div class="form-group mb-0">
-                                            <label class="form-label font-weight-600 mb-1">Arrival From</label>
-                                            <div class="input-group">
-                                                <span class="input-group-text"><i class="fas fa-plane-arrival"></i></span>
-                                                <input type="text" class="form-control" id="arrival_from" placeholder="Arrival From">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4 mb-3">
-                                        <div class="form-group mb-0">
-                                            <label class="form-label font-weight-600 mb-1">Booking Type</label>
-                                            <div class="input-group">
-                                                <span class="input-group-text"><i class="fas fa-hotel"></i></span>
-                                                <select class="form-select" data-live-search="true" data-width="100%" id="booking_type">
-                                                    <option value="" selected>Choose Booking Reference</option>
-                                                    <option value="11">Test Booking Type</option>
-                                                    <option value="10">Advance</option>
-                                                    <option value="9">Instant</option>
-                                                    <option value="8">Groups</option>
-                                                    <option value="7">Allocation</option>
-                                                    <option value="6">Business Seminar</option>
-                                                    <option value="5">Wedding</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4 mb-3">
-                                        <div class="form-group mb-0">
-                                            <label class="form-label font-weight-600 mb-1">Choose Booking Reference</label>
-                                            <div class="input-group">
-                                                <span class="input-group-text"><i class="fas fa-hotel"></i></span>
-                                                <select class="form-select" data-live-search="true" data-width="100%" disabled id="booking_source">
-                                                    <option value="" selected>Choose Booking Reference</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4 mb-3">
-                                        <div class="form-group mb-0">
-                                            <label class="form-label font-weight-600 mb-1">Booking Reference No</label>
-                                            <div class="input-group">
-                                                <span class="input-group-text"><i class="fas fa-sort-numeric-up-alt"></i></span>
-                                                <input type="text" class="form-control" id="bsorurce_no" placeholder="Booking Reference No.">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4 mb-3">
-                                        <div class="form-group mb-0">
-                                            <label class="form-label font-weight-600 mb-1">Purpose of Visit</label>
-                                            <div class="input-group">
-                                                <span class="input-group-text"><i class="fas fa-eye"></i></span>
-                                                <input type="text" class="form-control" id="pof_visit" placeholder="Purpose of Visit">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4 mb-3">
-                                        <div class="form-group mb-0">
-                                            <label class="form-label font-weight-600 mb-1">Remarks</label>
-                                            <div class="input-group">
-                                                <span class="input-group-text"><i class="fas fa-comment-dots"></i></span>
-                                                <input type="text" class="form-control" id="booking_remarks" placeholder="Remarks">
+                                        <div class="col-md-4 mb-3">
+                                            <div class="form-group mb-0">
+                                                <label class="form-label font-weight-600 mb-1">Remarks</label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text"><i class="fas fa-comment-dots"></i></span>
+                                                    <input type="text" @bind="model.Remarks" class="form-control" id="booking_remarks" placeholder="Remarks">
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <div class="card mb-4">
-                            <div class="card-header py-3">
-                                <h6 class="fs-17 font-weight-600 mb-0">Room Details</h6>
+                            <div class="card mb-4">
+                                <div class="card-header py-3">
+                                    <h6 class="fs-17 font-weight-600 mb-0">Room Details</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered white-space-nowrap mb-0 room-list">
+                                            <thead>
+                                                <tr>
+                                                    <th colspan="2">Room Info</th>
+                                                    <th>Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach (var roombook in roomBookings)
+                                                {
+                                                    <tr>
+                                                        <td colspan="2">
+                                                            <table class="table table-borderless mb-0">
+                                                                <tbody>
+                                                                    <tr>
+                                                                        <td class="border-0" style="width:35%">
+                                                                            <div class="form-group mb-0">
+                                                                                <label class="font-weight-600 mb-1">Room Type<span class="text-danger">*</span></label>
+                                                                                <select class="form-select" @bind="roombook.RoomType">
+                                                                                    <option selected>Choose Room Type</option>
+                                                                                    @foreach (var val in Enum.GetValues(typeof(RoomType)))
+                                                                                    {
+                                                                                        <option value="@val">@val</option>
+                                                                                    }
+                                                                                </select>
+                                                                            </div>
+                                                                        </td>
+                                                                        <td class="border-0" style="width:25%">
+                                                                            <div class="form-group mb-0">
+                                                                                <label class="font-weight-600 mb-1">Room No.<span class="text-danger">*</span></label>
+                                                                                <select class="form-select" @bind="roombook.RoomNo">
+                                                                                    <option selected>Choose Room </option>
+                                                                                    @foreach (var room in rooms)
+                                                                                    {
+                                                                                        <option value="@room.RoomNumber">@room.RoomNumber </option>
+                                                                                    }
+                                                                                </select>
+                                                                            </div>
+                                                                        </td>
+                                                                        <td class="border-0" style="width:20%">
+                                                                            <div class="form-group mb-0">
+                                                                                <label class="font-weight-600 mb-1">#Adults</label>
+                                                                                <input type="number" min="1" class="form-control" @bind="roombook.Adults" placeholder="Adults" />
+                                                                            </div>
+                                                                        </td>
+                                                                        <td class="border-0" style="width:20%">
+                                                                            <div class="form-group mb-0">
+                                                                                <label class="font-weight-600 mb-1">#Children</label>
+                                                                                <input type="number" min="0" class="form-control" @bind="roombook.Children" placeholder="Children" />
+                                                                            </div>
+                                                                        </td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                        </td>
+                                                        <td class="text-center">
+                                                            <button type="button" @onclick="() => DeleteRoom(roombook)" class="btn btn-danger btn-sm"><i class="far fa-trash-alt"></i></button>
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                        <button type="button" @onclick="AddRoom" class="btn btn-primary mt-2">Add Room</button>
+                                    </div>
+
+                                    <div class="card-body mt-4" style="border:1px solid">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div class="dropdown">
+                                                <button class="btn btn-sm btn-primary dropdown-toggle no-caret" type="button" id="custdetailbtn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                    <i class="fas fa-plus"></i>
+                                                </button>
+                                                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                    <a class="dropdown-item" href="javascript:void(0)" data-toggle="modal" data-target="#exampleModal">New Customer</a>
+                                                    <a class="dropdown-item" href="javascript:void(0)" data-toggle="modal" data-target="#exampleModal2">Old Customer</a>
+                                                </div>
+                                            </div>
+                                            <span>Customer Info</span>
+                                        </div>
+                                        <div class="table-responsive mt-3">
+                                            <table class="table table-bordered customerdetail w-100">
+                                                <thead>
+                                                    <tr style="text-align: center;">
+                                                        <th>SL</th>
+                                                        <th>Name</th>
+                                                        <th>Mobile No.</th>
+                                                        <th>Email</th>
+                                                        <th>Action</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @foreach (var customer in existingCustomers)
+                                                    {
+                                                        <tr>
+                                                            <td>@customer.Id</td>
+                                                            <td>@customer.FirstName</td>
+                                                            <td>@customer.MobileNo</td>
+                                                            <td>@customer.Email</td>
+                                                            <td>
+                                                                <button type="button" @onclick="() => RemoveExistingCustomer(customer)" class="btn btn-danger btn-sm">Remove</button>
+                                                            </td>
+                                                        </tr>
+                                                    }
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+
+
+                                </div>
+
                             </div>
-                            <div class="card-body">
-                                <div class="table-responsive">
-                                    <table class="table table-bordered white-space-nowrap mb-0 room-list">
-                                        <tbody>
-                                            <tr>
-                                                <th colspan="2">Room Info</th>
-                                                <th>Action</th>
-                                            </tr>
-                                            <tr>
-                                                <td colspan="2">
-                                                    <table class="table table-borderless mb-0">
-                                                        <tbody>
-                                                            <tr>
-                                                                <td class="border-0">
-                                                                    <div class="form-group mb-0">
-                                                                        <label class="font-weight-600 mb-1">Room Type                                                        <span class="text-danger">*</span></label>
-                                                                        <div class="icon-addon addon-md input-left-icon">
-                                                                            <div class="dropdown bootstrap-select form-select" style="width: 100%;">
-                                                                                <select class="selectpicker form-select" data-live-search="true" data-width="100%" onchange="getroomno()" id="room_type" tabindex="-98">
-                                                                                    <option value="" selected="">
-                                                                                        Choose
-                                                                                        Room Type
-                                                                                    </option>
-                                                                                    <option value="7">
-                                                                                        VIP-Guest
-                                                                                    </option>
-                                                                                    <option value="6">
-                                                                                        VIP
-                                                                                    </option>
-                                                                                    <option value="5">
-                                                                                        Triple Room
-                                                                                    </option>
-                                                                                    <option value="2">
-                                                                                        Single Room
-                                                                                    </option>
-                                                                                    <option value="1">
-                                                                                        Twin Room
-                                                                                    </option>
-                                                                                </select><button type="button" class="btn dropdown-toggle btn-light bs-placeholder" data-toggle="dropdown" role="button" data-id="room_type" title="Choose
-                                                                Room Type">
-                                                                                    <div class="filter-option">
-                                                                                        <div class="filter-option-inner">
-                                                                                            <div class="filter-option-inner-inner">
-                                                                                                Choose
-                                                                                                Room Type
-                                                                                            </div>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                </button><div class="dropdown-menu " role="combobox"><div class="bs-searchbox"><input type="text" class="form-control" autocomplete="off" role="textbox" aria-label="Search"></div><div class="inner show" role="listbox" aria-expanded="false" tabindex="-1"><ul class="dropdown-menu inner show"></ul></div></div>
-                                                                            </div>
-                                                                            <label class="fas fa-sort-amount-down"></label>
-                                                                        </div>
-                                                                    </div>
-                                                                </td>
-                                                                <td class="border-0">
-                                                                    <div class="form-group mb-0">
-                                                                        <label class="font-weight-600 mb-1">Room No.                                                        <span class="text-danger">*</span></label>
-                                                                        <div class="icon-addon addon-md input-left-icon">
-                                                                            <div class="dropdown bootstrap-select disabled form-select" style="width: 100%;">
-                                                                                <select name="roomno[]" class="selectpicker form-select" data-live-search="true" data-width="100%" onchange="getcapcity()" disabled="" id="roomno" tabindex="-98">
-                                                                                    <option value="" selected="">
-                                                                                        Choose
-                                                                                        Room No.
-                                                                                    </option>
-                                                                                </select><button type="button" class="btn dropdown-toggle disabled btn-light bs-placeholder" data-toggle="dropdown" role="button" data-id="roomno" tabindex="-1" aria-disabled="true" title="Choose
-                                                                Room No.">
-                                                                                    <div class="filter-option">
-                                                                                        <div class="filter-option-inner">
-                                                                                            <div class="filter-option-inner-inner">
-                                                                                                Choose
-                                                                                                Room No.
-                                                                                            </div>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                </button><div class="dropdown-menu " role="combobox"><div class="bs-searchbox"><input type="text" class="form-control" autocomplete="off" role="textbox" aria-label="Search"></div><div class="inner show" role="listbox" aria-expanded="false" tabindex="-1"><ul class="dropdown-menu inner show"></ul></div></div>
-                                                                            </div>
-                                                                            <label class="fas fa-sort-numeric-down"></label>
-                                                                        </div>
-                                                                    </div>
-                                                                </td>
-                                                                <td class="border-0">
-                                                                    <div class="form-group mb-0">
-                                                                        <label class="font-weight-600 mb-1">#Adults</label>
-                                                                        <div class="icon-addon addon-md input-left-icon">
-                                                                            <input type="number" min="1" disabled="" class="form-control" id="adults" placeholder="Adults">
-                                                                            <label class="fas fa-restroom"></label>
-                                                                        </div>
-                                                                    </div>
-                                                                </td>
-                                                                <td class="border-0">
-                                                                    <div class="form-group mb-0">
-                                                                        <label class="font-weight-600 mb-1">#Children</label>
-                                                                        <div class="icon-addon addon-md input-left-icon">
-                                                                            <input type="number" disabled="" min="0" class="form-control" id="children" placeholder="Children" value="0">
-                                                                            <label class="fas fa-child"></label>
-                                                                        </div>
-                                                                    </div>
-                                                                </td>
-                                                            </tr>
-                                                        </tbody>
-                                                    </table>
-                                                </td>
-                                                <td rowspan="3" class="text-center">
-                                                    <button type="button" onclick="rdel(0)" class="btn btn-danger btn-sm rdel0"><i class="far fa-trash-alt"></i></button>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <th>
-                                                    <div class="d-flex justify-content-between align-items-center">
-                                                        <span>Customer Info</span>
-                                                        <div class="dropdown">
-                                                            <button class="btn btn-sm btn-primary dropdown-toggle no-caret" type="button" id="custdetailbtn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                                <i class="fas fa-plus"></i>
-                                                            </button>
-                                                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                                                <a class="dropdown-item" href="javascript:void(0)" data-toggle="modal" data-target="#exampleModal">New Customer</a>
-                                                                <a class="dropdown-item" href="javascript:void(0)" data-toggle="modal" data-target="#exampleModal2">Old Customer</a>
-                                                            </div>
+
+                            <div class="row">
+                                <!-- Payments Details Card -->
+                                <div class="col-lg-6 mb-3 mb-lg-0 d-flex">
+                                    <div class="card flex-fill w-100">
+                                        <div class="card-header py-3">
+                                            <h6 class="fs-17 font-weight-600 mb-0">
+                                                Payments Details <span id="msg2" class="red-message"></span>
+                                            </h6>
+                                        </div>
+                                        <hr class="m-0" />
+                                        <div class="card-body">
+                                            <div class="row">
+                                                <div class="col-6 mb-3">
+                                                    <div class="form-group mb-0">
+                                                        <label class="font-weight-600 mb-1">Discount Reason</label>
+                                                        <div class="input-group">
+                                                            <span class="input-group-text"><i class="fas fa-tags"></i></span>
+                                                            <input type="text" class="form-control" @bind="model.PaymentDetails.DiscountReason" placeholder="Discount Reason">
                                                         </div>
                                                     </div>
-
-
-                                                </th>
-                                                <th>Rent Info</th>
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                    <table class="table table-borderless customerdetail">
-                                                        <thead>
-                                                            <tr>
-                                                                <th class="pl-0" width="20">SL</th>
-                                                                <th>Name</th>
-                                                                <th>Mobile No.</th>
-                                                                <th class="text-right pr-0">Action</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                        </tbody>
-                                                    </table>
-                                                </td>
-                                                <td>
-                                                    <table class="table table-borderless mb-0 order-list">
-                                                        <tbody>
-                                                            <tr>
-                                                                <td class="border-0">
-                                                                    <div class="form-group mb-0">
-                                                                        <label class="font-weight-600 mb-1">Check In</label>
-                                                                        <div class="icon-addon addon-md">
-                                                                            <input type="text" disabled="" class="form-control form-control datefilter3" id="from_date1" placeholder="mm/dd/yyyy" value="">
-                                                                        </div>
-                                                                    </div>
-                                                                </td>
-                                                                <td class="border-0">
-                                                                    <div class="form-group mb-0">
-                                                                        <label class="font-weight-600 mb-1">Check Out</label>
-                                                                        <div class="icon-addon addon-md">
-                                                                            <input type="text" disabled="" class="form-control form-control datefilter4" id="to_date1" placeholder="mm/dd/yyyy" value="">
-                                                                        </div>
-                                                                    </div>
-                                                                </td>
-                                                                <td class="border-0">
-                                                                    <div class="form-group mb-0">
-                                                                        <label class="font-weight-600 mb-1">Rent                                        </label>
-                                                                        <div class="icon-addon addon-md">
-                                                                            <input type="number" disabled="" class="form-control form-control" id="rent" value="0">
-                                                                        </div>
-                                                                    </div>
-                                                                </td>
-                                                                <td class="border-0">
-                                                                    <div class="form-group mb-0">
-                                                                        <label class="font-weight-600 mb-1">
-                                                                        </label>
-                                                                        <div class="d-flex">
-                                                                            <span class="p-2"><del class="text-danger" id="offer_price"></del></span>
-                                                                        </div>
-                                                                    </div>
-                                                                </td>
-                                                            </tr>
-                                                        </tbody>
-                                                    </table>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td class="p-0">
-                                                    <table class="table table-borderless mb-0 bg-light">
-                                                        <tbody>
-                                                            <tr>
-                                                                <td class="border-0">
-                                                                    <input type="text" disabled="" class="form-control ex-room datefilter3" id="from_date2" placeholder="yyyy/mm/dd" value="">
-                                                                </td>
-                                                                <td class="border-0">
-                                                                    <input type="text" disabled="" class="form-control ex-room datefilter4" id="to_date2" placeholder="yyyy/mm/dd" value="">
-                                                                </td>
-                                                                <td class="border-0">
-                                                                    <input type="number" min="0" onchange="bedprice()" disabled="" class="form-control ex-room" id="bed" value="" placeholder="Bed">
-                                                                </td>
-                                                                <td class="border-0">
-                                                                    <input type="number" disabled="" class="form-control ex-room" id="amount1" value="" placeholder="Amount">
-                                                                </td>
-                                                                <td class="border-0">
-                                                                    <input type="number" min="0" onchange="personprice()" disabled="" class="form-control ex-room" id="person" value="" placeholder="Person">
-                                                                </td>
-                                                                <td class="border-0">
-                                                                    <input type="number" disabled="" class="form-control ex-room" id="amount2" value="" placeholder="Amount">
-                                                                </td>
-                                                                <td class="border-0">
-                                                                    <input type="number" min="0" onchange="childprice()" disabled="" class="form-control ex-room" id="child1" value="" placeholder="Child">
-                                                                </td>
-                                                                <td class="border-0">
-                                                                    <input type="number" disabled="" class="form-control ex-room" id="amount3" value="" placeholder="Amount">
-                                                                </td>
-                                                            </tr>
-                                                        </tbody>
-                                                    </table>
-                                                </td>
-                                                <td class="p-0">
-                                                    <table class="table table-borderless mb-0 bg-light">
-                                                        <tbody>
-                                                            <tr>
-                                                                <td class="border-0">
-                                                                    <div class="dropdown bootstrap-select disabled form-select" style="width: 100%;">
-                                                                        <select name="complementary" class="selectpicker form-select" data-live-search="true" data-width="100%" disabled="" id="complementary" tabindex="-98">
-                                                                            <option value="0" selected="">Choose Complementary                                        </option>
-                                                                        </select><button type="button" class="btn dropdown-toggle disabled btn-light" data-toggle="dropdown" role="button" data-id="complementary" tabindex="-1" aria-disabled="true" title="Choose Complementary"><div class="filter-option"><div class="filter-option-inner"><div class="filter-option-inner-inner">Choose Complementary</div></div> </div></button><div class="dropdown-menu " role="combobox"><div class="bs-searchbox"><input type="text" class="form-control" autocomplete="off" role="textbox" aria-label="Search"></div><div class="inner show" role="listbox" aria-expanded="false" tabindex="-1"><ul class="dropdown-menu inner show"></ul></div></div>
-                                                                    </div>
-                                                                    <div class="row">
-                                                                        <span class="ml-4" id="compamount" hidden=""></span>
-                                                                    </div>
-                                                                </td>
-                                                                <td class="border-0">
-                                                                    <input type="number" disabled="" value="1" class="form-control form-control" id="nofroom">
-                                                                </td>
-                                                            </tr>
-                                                        </tbody>
-                                                    </table>
-                                                </td>
-                                                <td class="text-center res-v-allign"><button type="button" disabled="" class="btn btn-primary btn-sm newroom0" onclick="room(0)" id="newroom"><i class="fas fa-plus"></i></button></td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <!-- Payments Details Card -->
-                            <div class="col-lg-6 mb-3 mb-lg-0 d-flex">
-                                <div class="card flex-fill w-100">
-                                    <div class="card-header py-3">
-                                        <h6 class="fs-17 font-weight-600 mb-0">
-                                            Payments Details <span id="msg2" class="red-message"></span>
-                                        </h6>
+                                                </div>
+                                                <div class="col-6 mb-3">
+                                                    <div class="form-group mb-0">
+                                                        <label class="font-weight-600 mb-1">Discount (Max-100%)</label>
+                                                        <div class="input-group">
+                                                            <span class="input-group-text"><i class="fas fa-tags"></i></span>
+                                                            <input type="number" class="form-control" @bind="model.PaymentDetails.DiscountRate" placeholder="Discount (Max-100%)">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-6 mb-3">
+                                                    <div class="form-group mb-0">
+                                                        <label class="font-weight-600 mb-1">Discount Amount</label>
+                                                        <div class="input-group">
+                                                            <span class="input-group-text">$</span>
+                                                            <input type="number" class="form-control" @bind="model.PaymentDetails.DiscountAmount">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-6 mb-3">
+                                                    <div class="form-group mb-0">
+                                                        <label class="font-weight-600 mb-1">Commission (%)</label>
+                                                        <div class="input-group">
+                                                            <span class="input-group-text"><i class="fas fa-percent"></i></span>
+                                                            <input type="number" class="form-control" @bind="model.PaymentDetails.CommissionRate" placeholder="Commission rate">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-6 mb-3">
+                                                    <div class="form-group mb-0">
+                                                        <label class="font-weight-600 mb-1">Commission Amount</label>
+                                                        <div class="input-group">
+                                                            <span class="input-group-text">$</span>
+                                                            <input type="number" class="form-control" @bind="model.PaymentDetails.CommissionAmount" placeholder="Commission amount">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <hr class="m-0" />
-                                    <div class="card-body">
-                                        <div class="row">
-                                            <div class="col-6 mb-3">
-                                                <div class="form-group mb-0">
-                                                    <label class="font-weight-600 mb-1">Discount Reason</label>
-                                                    <div class="input-group">
-                                                        <span class="input-group-text"><i class="fas fa-tags"></i></span>
-                                                        <input type="text" class="form-control" id="discountreason" placeholder="Discount Reason">
-                                                    </div>
+                                </div>
+
+                                <!-- Billing Details Card -->
+                                <div class="col-lg-6 d-flex">
+                                    <div class="card flex-fill w-100">
+                                        <div class="card-header py-3">
+                                            <h6 class="fs-17 font-weight-600 mb-0">Billing Details</h6>
+                                        </div>
+                                        <hr class="m-0" />
+                                        <div class="card-body">
+                                            <div class="row">
+                                                <div class="col-6 mb-3">
+                                                    <label class="font-weight-600 mb-0">Booking Charge</label>
+                                                    <input type="number" class="form-control" value="@model.BillingDetails.BookingCharge" @onchange="OnBookingChargeChanged" placeholder="Booking Charge">
                                                 </div>
-                                            </div>
-                                            <div class="col-6 mb-3">
-                                                <div class="form-group mb-0">
-                                                    <label class="font-weight-600 mb-1">Discount (Max-100%)</label>
-                                                    <div class="input-group">
-                                                        <span class="input-group-text"><i class="fas fa-tags"></i></span>
-                                                        <input type="number" disabled class="form-control" id="discountrate" placeholder="Discount (Max-100%)">
-                                                    </div>
+                                                <div class="col-6 mb-3">
+                                                    <label class="font-weight-600 mb-0">Tax</label>
+                                                    <input type="number" class="form-control" value="@model.BillingDetails.Tax" @onchange="OnTaxChanged" placeholder="Tax">
                                                 </div>
-                                            </div>
-                                            <div class="col-6 mb-3">
-                                                <div class="form-group mb-0">
-                                                    <label class="font-weight-600 mb-1">Discount Amount</label>
-                                                    <div class="input-group">
-                                                        <span class="input-group-text">$</span>
-                                                        <input type="number" disabled class="form-control" id="discountamount">
-                                                    </div>
+                                                <div class="col-6 mb-3">
+                                                    <label class="font-weight-600 mb-0">Service Charge</label>
+                                                    <input type="number" class="form-control" value="@model.BillingDetails.ServiceCharge" @onchange="OnServiceChargeChanged" placeholder="Service Charge">
                                                 </div>
-                                            </div>
-                                            <div class="col-6 mb-3">
-                                                <div class="form-group mb-0">
-                                                    <label class="font-weight-600 mb-1">Commission (%)</label>
-                                                    <div class="input-group">
-                                                        <span class="input-group-text"><i class="fas fa-percent"></i></span>
-                                                        <input type="text" disabled class="form-control" id="commissionrate" placeholder="Commission rate">
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-6 mb-3">
-                                                <div class="form-group mb-0">
-                                                    <label class="font-weight-600 mb-1">Commission Amount</label>
-                                                    <div class="input-group">
-                                                        <span class="input-group-text">$</span>
-                                                        <input type="text" disabled class="form-control" id="commissionamount" placeholder="Commission amount">
-                                                    </div>
+                                                <div class="col-6 mb-3">
+                                                    <label class="font-weight-600 mb-0"><b>Total</b></label>
+                                                    <input type="number" class="form-control" value="@model.BillingDetails.TotalCharge" readonly>
                                                 </div>
                                             </div>
                                         </div>
@@ -449,106 +340,84 @@
                                 </div>
                             </div>
 
-                            <!-- Billing Details Card -->
-                            <div class="col-lg-6 d-flex">
-                                <div class="card flex-fill w-100">
-                                    <div class="card-header py-3">
-                                        <h6 class="fs-17 font-weight-600 mb-0">Billing Details</h6>
-                                    </div>
-                                    <hr class="m-0" />
-                                    <div class="card-body">
-                                        <div class="row">
-                                            <div class="col-6 mb-3">
-                                                <label class="font-weight-600 mb-0">Booking Charge</label>
-                                                <label class="font-weight-600 mb-0" id="booking_charge">0</label>
+                            <div class="text-right mt-3">
+                                <button type="submit" class="btn btn-primary w-100p" id="bookingsave">Save</button>
+                            </div>
+
+                            <!-- Occupant Details Modal -->
+                            <div class="modal custom-modal" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                <div class="modal-dialog modal-xl">
+                                    <NewCustomerPage />
+                                </div>
+                            </div>
+                            <!-- Modal for Existing Customer -->
+                            <div class="modal fade" id="exampleModal2" tabindex="-1" aria-labelledby="exampleModalLabel2" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header px-4">
+                                            <h5 class="modal-title" id="exampleModalLabel">Old Customer</h5>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">×</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body p-4">
+                                            <div class="form-floating with-icon mb-3">
+                                                <label>Mobile No</label>
+                                                <div>
+                                                    <HxSelect TItem="CustomerDetailsDTO"
+                                                              TValue="int?"
+                                                              Data="customers"
+                                                              Value="@selectedCustomerId"
+                                                              ValueChanged="OnCustomerChanged"
+                                                              ValueExpression="() => selectedCustomerId"
+                                                              TextSelector="@(c => c.FirstName)"
+                                                              ValueSelector="@(c => c.Id)"
+                                                              Nullable="true"
+                                                              NullText="-select mobile number- "
+                                                              NullDataText="Loading categories..." />
+                                                </div>
                                             </div>
-                                            <div class="col-6 mb-3">
-                                                <label class="font-weight-600 mb-0">Tax</label>
-                                                <label class="font-weight-600 mb-0" id="tax_charge">0</label>
+                                            <div class="clear"></div>
+                                            <div class="col-12 mb-3 p-0">
+                                                <div class="form-group mb-0 p-0">
+                                                    <label class="form-label font-weight-600 mb-1">Customer Name</label>
+                                                    <div class="input-group">
+                                                        <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                                        <input type="text" class="form-control" @bind="selectedCustomerName" placeholder="Customer Name" disabled>
+                                                    </div>
+                                                </div>
                                             </div>
-                                            <div class="col-6 mb-3">
-                                                <label class="font-weight-600 mb-0">Service Charge</label>
-                                                <label class="font-weight-600 mb-0" id="service_charge">0</label>
-                                            </div>
-                                            <div class="col-6 mb-3">
-                                                <label class="font-weight-600 mb-0"><b>Total</b></label>
-                                                <label class="font-weight-600 mb-0" id="total_charge">0</label>
-                                            </div>
+                                        </div>
+                                        <div class="modal-footer py-2 px-4">
+                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                            <button type="button" @onclick="AddOldCustomer" class="btn btn-primary" disabled="@(!canAddCustomer)">Add</button>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-
                         </div>
-
-
-
-                        <div class="text-right mt-3">
-                            <button type="button" class="btn btn-primary w-100p" id="bookingsave">Save</button>
-                        </div>
-                        <!-- Occupant Details Modal -->
-                        <div class="modal custom-modal" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                            <div class="modal-dialog modal-xl">
-                               <NewCustomerPage />
-                            </div>
-                        </div>
-                        <div class="modal fade" id="exampleModal2" tabindex="-1" aria-labelledby="exampleModalLabel2" aria-hidden="true">
-                            <div class="modal-dialog">
-                                <div class="modal-content">
-                                    <div class="modal-header px-4">
-                                        <h5 class="modal-title" id="exampleModalLabel">Old Customer</h5>
-                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                            <span aria-hidden="true">×</span>
-                                        </button>
-                                    </div>
-                                    <div class="modal-body p-4">
-                                        <div class="form-floating with-icon mb-3">
-                                            <input type="number" class="form-control" id="existmobile" placeholder="Mobile No" value="">
-                                            <label>Mobile No</label>
-                                            <i class="fas fa-mobile"></i>
-                                        </div>
-                                        <ul id="searchResult"></ul>
-                                        <div class="clear"></div>
-                                        <div class="form-floating with-icon">
-                                            <input type="text" class="form-control" id="existname" placeholder="Customer Name" disabled="" value="">
-                                            <input type="hidden" class="form-control" id="existcustid" placeholder="Customer Name" disabled="" value="">
-                                            <label>Customer</label>
-                                            <i class="fas fa-user"></i>
-                                        </div>
-                                    </div>
-                                    <div class="modal-footer py-2 px-4">
-                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                        <button type="button" disabled="" id="addoldcustomer" class="btn btn-primary">Add</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-
+                    </EditForm>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
 <SimpleDailog Title="@Title" Show="@show" OnCloseDialog="ResetForm">
     @if (show)
     {
-        <EditForm Model="model" OnValidSubmit="OnSave">
-            <DataAnnotationsValidator />
-            <div>
+        @if (TaskCompleted)
+        {
+            <div style="text-align:center;">
+                @MessageBody
             </div>
-            @if (process)
-            {
-                <div style="text-align:center">
-                    <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
-                </div>
-            }
-            <UiAlert Model="alert"></UiAlert>
-            <hr />
-            <button type="submit" class="btn btn-primary float-right col-md-4">Add</button>
-        </EditForm>
-        <br />
+        }
+        else
+        {
+            <div style="text-align:center">
+                <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
+            </div>
+        }
     }
 </SimpleDailog>
 
@@ -559,17 +428,40 @@
     [CascadingParameter]
     protected AlertModel? alert { get; set; }
 
-    HallCategories model = new();
+    private ReservationDetailsDto model = new ReservationDetailsDto
+        {
+            PaymentDetails = new PaymentDetailsDto(),
+            BillingDetails = new BillingDetailsDto(),
+            CustomerInfo = new List<CustomerInfoDto>(),
+            RoomBookings = new List<RoomBookingDto>()
+        };
+
+    IEnumerable<Room> rooms = new List<Room>();
+    List<CustomerDetailsDTO> customers = new List<CustomerDetailsDTO>();
+    private List<CustomerDetailsDTO> existingCustomers = new List<CustomerDetailsDTO>();
     public string Title = "Booking";
     bool show = false;
     bool process = false;
     private Timer _timer;
     private int _delay = 2500;
+    string MessageBody = "Thank you!";
+    string message = string.Empty;
+    bool TaskCompleted = false;
+    bool IsError = false;
+    bool IsSuccess = false;
 
+    private int? selectedCustomerId;
+    private string selectedCustomerName;
+    private string selectedCustomerIdString;
+    private string mobileNumber;
+    private bool canAddCustomer = false;
 
     protected override async Task OnInitializedAsync()
     {
         alert?.Clear();
+        AddRoom();
+        rooms = await client.GetAllRoom();
+        customers = (await client.GetAllCustomer()).ToList();
         if (Id > 0)
         {
             var roomModel = await client.GetRoomById(Id);
@@ -580,17 +472,55 @@
     {
         process = true;
         alert?.Clear();
-
-        var response = await client.UpsertHallCategoryAsync(model);
-        if (response.IsSuccess)
+        message = string.Empty;
+        MessageBody = "Thank you!";
+        IsError = false;
+        IsSuccess = false;
+        show = true;
+        TaskCompleted = false;
+        message = "Please wait";
+        try
         {
-            // model = response.Result;
-            await HallCategoryGrid.RefreshGridAsync();
-            alert?.SetSuccess(response.Message);
-            model = new();
+            // Update room details in model
+            model.RoomBookings = roomBookings.Select(rb => new RoomBookingDto
+                {
+                    RoomType = Enum.TryParse<RoomType>(rb.RoomType, out var roomTypeEnum) ? roomTypeEnum : RoomType.SingleRoom,
+                    RoomNo = rb.RoomNo,
+                    Adults = rb.Adults,
+                    Children = rb.Children
+                }).ToList();
+
+            // Update customer information in model
+            model.CustomerInfo = existingCustomers.Select(ec => new CustomerInfoDto
+                {
+                    SL = ec.Id,
+                    Name = ec.FirstName,
+                    MobileNo = ec.MobileNo,
+                    Email = ec.Email
+                }).ToList();
+
+
+            // var response = await client.UpsertHallCategoryAsync(model);
+            // if (response.IsSuccess)
+            // {
+            //     // model = response.Result;
+            //     await HallCategoryGrid.RefreshGridAsync();
+            //     alert?.SetSuccess(response.Message);
+            //     model = new();
+            // }
+            // else
+            //     alert?.SetError(response.Message);
+
+            message = Id > 0 ? "Successfully Updated" : "Successfully Added";
+            TaskCompleted = true;
         }
-        else
-            alert?.SetError(response.Message);
+        catch (Exception ex)
+        {
+            IsError = true;
+            message = "Error!";
+            MessageBody = ex.Message;
+            TaskCompleted = true;
+        }
 
         process = false;
         StateHasChanged();
@@ -606,13 +536,113 @@
 
     private void ResetForm()
     {
-        model = new();
+        model = new ReservationDetailsDto
+            {
+                PaymentDetails = new PaymentDetailsDto(),
+                BillingDetails = new BillingDetailsDto(),
+                CustomerInfo = new List<CustomerInfoDto>(),
+                RoomBookings = new List<RoomBookingDto>()
+            };
         show = false;
         process = false;
     }
 
     public void OnClose()
     {
-        model = new();
+        ResetForm();
+    }
+
+    private List<RoomBooking> roomBookings = new List<RoomBooking>();
+
+    private void AddRoom()
+    {
+        roomBookings.Add(new RoomBooking());
+    }
+
+    private void DeleteRoom(RoomBooking roomBooking)
+    {
+        roomBookings.Remove(roomBooking);
+    }
+
+    private void OnCustomerChanged(int? newCustomerId)
+    {
+        selectedCustomerId = newCustomerId;
+        var selectedCustomer = customers.FirstOrDefault(c => c.Id == selectedCustomerId);
+        if (selectedCustomer != null)
+        {
+            selectedCustomerName = selectedCustomer.FirstName;
+            selectedCustomerIdString = selectedCustomer.Id.ToString();
+            canAddCustomer = true;
+        }
+        else
+        {
+            selectedCustomerName = string.Empty;
+            canAddCustomer = false;
+        }
+    }
+
+    private async Task AddOldCustomer()
+    {
+        if (model.CustomerInfo == null)
+        {
+            model.CustomerInfo = new List<CustomerInfoDto>();
+        }
+
+        var selectedCustomer = customers.FirstOrDefault(c => c.Id == selectedCustomerId);
+        if (selectedCustomer != null)
+        {
+            model.CustomerInfo.Add(new CustomerInfoDto
+                {
+                    SL = model.CustomerInfo.Count + 1,
+                    Name = selectedCustomer.FirstName,
+                    MobileNo = selectedCustomer.MobileNo,
+                    Email = selectedCustomer.Email
+                });
+            existingCustomers.Add(selectedCustomer);
+
+            // Trigger UI update
+            StateHasChanged();
+        }
+    }
+
+    private void RemoveExistingCustomer(CustomerDetailsDTO customer)
+    {
+        existingCustomers.Remove(customer);
+        StateHasChanged();
+    }
+
+    private void AddExistingCustomer(CustomerInfoDto customer)
+    {
+        model.CustomerInfo.Add(customer);
+    }
+
+    private void RemoveCustomer(CustomerInfoDto customer)
+    {
+        model.CustomerInfo.Remove(customer);
+    }
+
+    private void CalculateTotalCharge()
+    {
+        model.BillingDetails.TotalCharge = model.BillingDetails.BookingCharge +
+                                           model.BillingDetails.Tax +
+                                           model.BillingDetails.ServiceCharge;
+    }
+
+    private void OnBookingChargeChanged(ChangeEventArgs e)
+    {
+        model.BillingDetails.BookingCharge = Convert.ToDecimal(e.Value);
+        CalculateTotalCharge();
+    }
+
+    private void OnTaxChanged(ChangeEventArgs e)
+    {
+        model.BillingDetails.Tax = Convert.ToDecimal(e.Value);
+        CalculateTotalCharge();
+    }
+
+    private void OnServiceChargeChanged(ChangeEventArgs e)
+    {
+        model.BillingDetails.ServiceCharge = Convert.ToDecimal(e.Value);
+        CalculateTotalCharge();
     }
 }

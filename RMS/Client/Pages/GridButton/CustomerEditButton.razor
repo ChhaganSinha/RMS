@@ -1,0 +1,64 @@
+﻿@using GridShared
+@using GridShared.Columns
+@using GridShared.Utility
+@using Microsoft.Extensions.Primitives
+@using RMS.Client.Pages.GridComponent
+@using RMS.Client.Shared.Popup
+@using RMS.Client.Client
+@using System.ComponentModel.DataAnnotations
+@inject AppClient client
+@implements ICustomGridComponent<CustomerDetailsDTO>
+@inject NavigationManager NavigationManager
+
+<button class='btn btn-sm btn-warning' style="border-radius:15px" @onclick="MyClickHandler" title="Edit"><i class="fa fa-pencil-square-o"></i></button>
+<PageDialog Title="@Title" Show="@show" ClosePageDialog="ResetForm">
+    @if (show)
+    {
+     
+    }
+</PageDialog>
+@code {
+    [Parameter]
+    public CustomerDetailsDTO Item { get; set; }
+
+
+    private int? variantsid;
+
+    [Parameter]
+    public CGrid<CustomerDetailsDTO> Grid { get; set; }
+
+    [CascadingParameter]
+    protected AlertModel? alert { get; set; }
+
+    private Timer _timer;
+    private int _delay = 2500;
+    bool show = false;
+    bool process = false;
+    string Title = "Update Customer Details";
+
+    private string imageDataUrl;
+
+    CustomerDetailsDTO model = new();
+
+
+    private async Task MyClickHandler(MouseEventArgs e)
+    {
+        show = true;
+        model = Item;
+        alert?.Clear();
+
+    }
+    private void TimerCallback(Object o)
+    {
+        alert?.Clear();
+        _timer.Dispose();
+        StateHasChanged();
+    }
+
+    private void ResetForm()
+    {
+        model = new();
+        show = false;
+        process = false;
+    }
+}

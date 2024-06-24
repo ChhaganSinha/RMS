@@ -6,7 +6,7 @@
 @using RMS.Client.Shared.Popup
 @using RMS.Client.Client
 @inject AppClient client
-@implements ICustomGridComponent<BookingList>
+@implements ICustomGridComponent<ReservationDetailsDto>
 @inject NavigationManager NavigationManager
 
 <button class='btn btn-sm btn-warning' style="border-radius:15px" @onclick="MyClickHandler" title="Edit"><i class="fa fa-pencil-square-o"></i></button>
@@ -36,10 +36,10 @@
 </SimpleDailog>
 @code {
     [Parameter]
-    public BookingList Item { get; set; }
+    public ReservationDetailsDto Item { get; set; }
 
     [Parameter]
-    public CGrid<BookingList> Grid { get; set; }
+    public CGrid<ReservationDetailsDto> Grid { get; set; }
 
     [CascadingParameter]
     protected AlertModel? alert { get; set; }
@@ -50,7 +50,7 @@
     bool process = false;
     string Title = "Update Category";
 
-    BookingList model = new();
+    ReservationDetailsDto model = new();
 
     private async Task MyClickHandler(MouseEventArgs e)
     {

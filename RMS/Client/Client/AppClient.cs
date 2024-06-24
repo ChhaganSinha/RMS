@@ -2275,16 +2275,16 @@ namespace RMS.Client.Client
 
 
 
-        public async Task<BookingList> GetBookingListById(int id)
+        public async Task<ReservationDetailsDto> GetReservationDetailsDtoById(int id)
         {
-            BookingList data = null;
+            ReservationDetailsDto data = null;
             try
             {
-                var res = await HttpClient.GetAsync($"api/App/BookingList/{id}");
+                var res = await HttpClient.GetAsync($"api/App/ReservationDetails/{id}");
 
                 res.EnsureSuccessStatusCode();
 
-                data = await res.Content.ReadFromJsonAsync<BookingList>();
+                data = await res.Content.ReadFromJsonAsync<ReservationDetailsDto>();
 
             }
             catch (Exception ex)
@@ -2295,16 +2295,16 @@ namespace RMS.Client.Client
 
             return data;
         }
-        public async Task<IEnumerable<BookingList>> GetAllBookingList()
+        public async Task<IEnumerable<ReservationDetailsDto>> GetAllReservationDetailsDto()
         {
-            IEnumerable<BookingList> details = null;
+            IEnumerable<ReservationDetailsDto> details = null;
             try
             {
-                var res = await HttpClient.GetAsync($"api/App/all-BookingList");
+                var res = await HttpClient.GetAsync($"api/App/all-ReservationDetails");
 
                 res.EnsureSuccessStatusCode();
 
-                details = await res.Content.ReadFromJsonAsync<IEnumerable<BookingList>>();
+                details = await res.Content.ReadFromJsonAsync<IEnumerable<ReservationDetailsDto>>();
 
             }
             catch (Exception ex)
@@ -2316,15 +2316,15 @@ namespace RMS.Client.Client
             return details;
         }
 
-        public async Task<ApiResponse<BookingList>> BookRoomAsync(BookingList data)
+        public async Task<ApiResponse<ReservationDetailsDto>> BookRoomAsync(ReservationDetailsDto data)
         {
-            var result = new ApiResponse<BookingList>();
+            var result = new ApiResponse<ReservationDetailsDto>();
 
             try
             {
-                var res = await HttpClient.PostAsJsonAsync($"api/App/UpsertBookingList", data);
+                var res = await HttpClient.PostAsJsonAsync($"api/App/UpsertReservationDetails", data);
                 res.EnsureSuccessStatusCode();
-                var json = await res.Content.ReadFromJsonAsync<ApiResponse<BookingList>>();
+                var json = await res.Content.ReadFromJsonAsync<ApiResponse<ReservationDetailsDto>>();
                 return json;
 
             }
@@ -2338,14 +2338,14 @@ namespace RMS.Client.Client
 
 
         }
-        public async Task<ApiResponse<BookingList>> DeleteBookingList(int id)
+        public async Task<ApiResponse<ReservationDetailsDto>> DeleteReservationDetailsDto(int id)
         {
-            var result = new ApiResponse<BookingList>();
+            var result = new ApiResponse<ReservationDetailsDto>();
             try
             {
-                var res = await HttpClient.PostAsJsonAsync($"api/App/DeleteBookingList/{id}", new { });
+                var res = await HttpClient.PostAsJsonAsync($"api/App/DeleteReservationDetails/{id}", new { });
                 res.EnsureSuccessStatusCode();
-                var json = await res.Content.ReadFromJsonAsync<ApiResponse<BookingList>>();
+                var json = await res.Content.ReadFromJsonAsync<ApiResponse<ReservationDetailsDto>>();
                 return json;
             }
             catch (Exception ex)
@@ -2846,5 +2846,87 @@ namespace RMS.Client.Client
         }
         #endregion
 
+        #region POS Section
+        public async Task<PosDTO> GetPosById(int id)
+        {
+            PosDTO data = null;
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/App/Pos/{id}");
+
+                res.EnsureSuccessStatusCode();
+
+                data = await res.Content.ReadFromJsonAsync<PosDTO>();
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return data;
+        }
+        public async Task<IEnumerable<PosDTO>> GetAllPos()
+        {
+            IEnumerable<PosDTO> details = null;
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/App/all-Pos");
+
+                res.EnsureSuccessStatusCode();
+
+                details = await res.Content.ReadFromJsonAsync<IEnumerable<PosDTO>>();
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return details;
+        }
+
+        public async Task<ApiResponse<PosDTO>> UpsertPosAsync(PosDTO data)
+        {
+            var result = new ApiResponse<PosDTO>();
+
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/App/UpsertPos", data);
+                res.EnsureSuccessStatusCode();
+                var json = await res.Content.ReadFromJsonAsync<ApiResponse<PosDTO>>();
+                return json;
+
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+
+
+
+        }
+        public async Task<ApiResponse<PosDTO>> DeletePos(int id)
+        {
+            var result = new ApiResponse<PosDTO>();
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/App/DeletePos/{id}", new { });
+                res.EnsureSuccessStatusCode();
+                var json = await res.Content.ReadFromJsonAsync<ApiResponse<PosDTO>>();
+                return json;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+        #endregion
     }
 }

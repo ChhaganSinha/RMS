@@ -6,66 +6,66 @@ using System.Threading.Tasks;
 
 namespace RMS.Dto
 {
-   
-        public class CustomerDetailsDTO : Auditable
-        {
-            // Guest Details
-            public string CountryCode { get; set; }
 
-            [Phone]
-            public string MobileNo { get; set; }
+    public class CustomerDetailsDTO : Auditable
+    {
+        // Guest Details
+        public string CountryCode { get; set; }
 
-            public string Title { get; set; }
+        //[Phone]
+        public string MobileNo { get; set; }
 
-            [Required]
-            public string FirstName { get; set; }
+        public string Title { get; set; }
 
-            public string LastName { get; set; }
+        [Required]
+        public string FirstName { get; set; }
 
-            public string FatherName { get; set; }
+        public string LastName { get; set; }
 
-            public string Gender { get; set; }
+        public string FatherName { get; set; }
 
-            public string Occupation { get; set; }
+        public string Gender { get; set; }
 
-            public DateTime? DateOfBirth { get; set; }
+        public string Occupation { get; set; }
 
-            public DateTime? Anniversary { get; set; }
+        public DateTime? DateOfBirth { get; set; }
 
-            public string Nationality { get; set; }
+        public DateTime? Anniversary { get; set; }
 
-            public bool IsVIP { get; set; }
+        public string Nationality { get; set; }
 
-            // Contact Details
-            public string ContactType { get; set; }
+        public bool IsVIP { get; set; }
 
-            [EmailAddress]
-            public string Email { get; set; }
+        // Contact Details
+        public string ContactType { get; set; }
 
-            public string Country { get; set; }
+        [EmailAddress]
+        public string Email { get; set; }
 
-            public string State { get; set; }
+        public string Country { get; set; }
 
-            public string City { get; set; }
+        public string State { get; set; }
 
-            public string Zipcode { get; set; }
+        public string City { get; set; }
 
-            public string Address { get; set; }
+        public string Zipcode { get; set; }
 
-            // Identity Details
-            public string IdentityType { get; set; }
+        public string Address { get; set; }
 
-            [Required]
-            public string IDNumber { get; set; }
+        // Identity Details
+        public string IdentityType { get; set; }
 
-            public byte[] FrontIdentityImage { get; set; }
+        [Required]
+        public string IDNumber { get; set; }
 
-            public byte[] BackIdentityImage { get; set; }
+        public byte[] FrontIdentityImage { get; set; } = new byte[0];
 
-            public string Comments { get; set; }
+        public byte[] BackIdentityImage { get; set; } = new byte[0];
 
-            // Guest Image
-            public byte[] GuestImage { get; set; }
-        }
+        public string Comments { get; set; }
+
+        // Guest Image
+        public byte[] GuestImage { get; set; } = new byte[0];
+    }
 
 }

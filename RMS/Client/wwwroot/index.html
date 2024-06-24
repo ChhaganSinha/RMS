@@ -66,7 +66,17 @@
     <script src="./_content/BlazingComponents.Summernote/summernote/summernote-lite.min.js"></script>
     <script src="js/SummerEditorHack.js"></script>
 
-
+    <script src="https://code.jquery.com/ui/1.11.3/jquery-ui.min.js"></script>
+    <script type="text/javascript">
+        function setModalDraggableAndResizable() {
+            $('.modal-content').resizable({
+                //alsoResize: ".modal-dialog",
+                minHeight: 300,
+                minWidth: 300
+            });
+            $('.modal-dialog').draggable();
+        }
+    </script>
 </body>
 
 </html>

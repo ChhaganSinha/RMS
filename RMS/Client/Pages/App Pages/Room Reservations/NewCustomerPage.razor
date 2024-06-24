@@ -19,9 +19,10 @@
     </div>
     
 
-    <EditForm Model="model" OnValidSubmit="OnSave"> 
+    <EditForm Model="model" OnValidSubmit="OnSave">
+        <DataAnnotationsValidator />
+        @* <ValidationSummary/> *@
         <div class="modal-body">
-
             <div class="row">
                 <div class="col-md-6 d-flex">
                     <div class="card flex-fill w-100 border mb-4">
@@ -37,6 +38,7 @@
                                         <div class="input-group">
                                             <span class="input-group-text"><i class="fas fa-globe-americas"></i></span>
                                             <input type="text" @bind ="model.CountryCode" class="form-control" id="code" placeholder="Country Code">
+                                            <ValidationMessage For="() => model.CountryCode" />
                                         </div>
                                     </div>
                                 </div>
@@ -46,6 +48,7 @@
                                         <div class="input-group">
                                             <span class="input-group-text"><i class="fas fa-mobile"></i></span>
                                             <input type="number" @bind="model.MobileNo" class="form-control" id="mobileNo" placeholder="Mobile No.">
+                                            <ValidationMessage For="() => model.MobileNo" />
                                         </div>
                                     </div>
                                 </div>
@@ -70,6 +73,7 @@
                                         <div class="input-group">
                                             <span class="input-group-text"><i class="fas fa-user-circle"></i></span>
                                             <input type="text" class="form-control" @bind="model.FirstName" id="firstname" placeholder="First Name">
+                                            <ValidationMessage For="() => model.FirstName" />
                                         </div>
                                     </div>
                                 </div>
@@ -79,6 +83,7 @@
                                         <div class="input-group">
                                             <span class="input-group-text"><i class="fas fa-user-circle"></i></span>
                                             <input type="text" class="form-control" @bind ="model.LastName" id="lastname" placeholder="Last Name">
+                                            <ValidationMessage For="() => model.LastName" />
                                         </div>
                                     </div>
                                 </div>
@@ -88,6 +93,7 @@
                                         <div class="input-group">
                                             <span class="input-group-text"><i class="fas fa-user-circle"></i></span>
                                             <input type="text" class="form-control" @bind="model.FatherName" id="fathername" placeholder="Father Name">
+                                            <ValidationMessage For="() => model.FatherName" />
                                         </div>
                                     </div>
                                 </div>
@@ -117,6 +123,7 @@
                                         <div class="input-group">
                                             <span class="input-group-text"><i class="fas fa-anchor"></i></span>
                                             <input type="text" @bind="model.Occupation" class="form-control" id="occupation" placeholder="Occupation">
+                                            <ValidationMessage For="() => model.Occupation" />
                                         </div>
                                     </div>
                                 </div>
@@ -126,6 +133,7 @@
                                         <div class="input-group">
                                             <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
                                             <input type="date" autocomplete="off" @bind="model.DateOfBirth" name="datefilter2" class="form-control datefilter2" id="dob" placeholder="mm/dd/yyyy">
+                                            <ValidationMessage For="() => model.DateOfBirth" />
                                         </div>
                                     </div>
                                 </div>
@@ -135,6 +143,7 @@
                                         <div class="input-group">
                                             <span class="input-group-text"><i class="" fas fa-calendar-alt"></i></span>
                                             <input type="date" name="datefilter2 "@bind="model.Anniversary" autocomplete="off" class="form-control datefilter2" id="anniversary" placeholder="mm/dd/yyyy">
+                                            <ValidationMessage For="() => model.Anniversary" />
                                         </div>
                                     </div>
                                 </div>
@@ -144,6 +153,7 @@
                                         <div class="input-group">
                                             <span class="input-group-text"><i class="fas fa-flag-usa"></i></span>
                                             <input type="text" name="datefilter2" @bind="model.Nationality" class="form-control" id="nationality" placeholder="Nationality" >
+                                            <ValidationMessage For="() => model.Nationality" />
                                         </div>
                                     </div>
                                 </div>
@@ -151,6 +161,7 @@
                                     <div class="custom-control custom-checkbox" style="margin-top: 24px;">
                                         <input type="checkbox" @bind="model.IsVIP" name="vip" value="vip" class="custom-control-input" id="vip">
                                        <label class="custom-control-label" for="vip">VIP?</label>
+                                        <ValidationMessage For="() => model.IsVIP" />
                                     </div>
                                 </div>
                             </div>
@@ -180,6 +191,7 @@
                                                     }
                                                 }
                                             </select>
+                                            <ValidationMessage For="() => model.ContactType" />
                                         </div>
                                     </div>
                                 </div>
@@ -189,6 +201,7 @@
                                         <div class="input-group">
                                             <span class="input-group-text"><i class="fas fa-envelope"></i></span>
                                             <input type="email" @bind="model.Email" class="form-control" id="email" placeholder="example@email.com">
+                                            <ValidationMessage For="() => model.Email" />
                                         </div>
                                     </div>
                                 </div>
@@ -198,6 +211,7 @@
                                         <div class="input-group">
                                             <span class="input-group-text"><i class="fas fa-globe-americas"></i></span>
                                             <input type="country" @bind="model.Country" class="form-control" id="country" placeholder="Country">
+                                            <ValidationMessage For="() => model.Country" />
                                         </div>
                                     </div>
                                 </div>
@@ -207,6 +221,7 @@
                                         <div class="input-group">
                                             <span class="input-group-text"><i class="fas fa-globe-americas"></i></span>
                                             <input type="state" @bind="model.State" class="form-control" id="state" placeholder="State">
+                                            <ValidationMessage For="() => model.State" />
                                         </div>
                                     </div>
                                 </div>
@@ -216,6 +231,7 @@
                                         <div class="input-group">
                                             <span class="input-group-text"><i class="fas fa-globe-americas"></i></span>
                                             <input type="city" @bind="model.City" class="form-control" id="city" placeholder="City">
+                                            <ValidationMessage For="() => model.City" />
                                         </div>
                                     </div>
                                 </div>
@@ -225,6 +241,7 @@
                                         <div class="input-group">
                                             <span class="input-group-text"><i class="fas fa-code-branch"></i></span>
                                             <input type="number" @bind="model.Zipcode" class="form-control" id="zipcode" placeholder="Zipcode">
+                                            <ValidationMessage For="() => model.Zipcode" />
                                         </div>
                                     </div>
                                 </div>
@@ -232,6 +249,7 @@
                                     <div class="input-group">
                                         <span class="input-group-text"><i class="fas fa-map-pin"></i></span>
                                         <textarea class="form-control" @bind="model.Address" placeholder="Address" id="address"></textarea>
+                                        <ValidationMessage For="() => model.Address" />
                                     </div>
                                 </div>
                             </div>
@@ -261,7 +279,7 @@
                                                     }
                                                 }
                                             </select>
-                            
+                                            <ValidationMessage For="() => model.IdentityType" />
                                         </div>
                                     </div>
                                 </div>
@@ -270,7 +288,8 @@
                                        <label class="form-label font-weight-600 mb-1" for="pid">ID # <span class="text-danger">*</span></label>
                                         <div class="input-group">
                                             <span class="input-group-text"><i class="fas fa-images"></i></span>
-                                            <input type="text" @bind="model.Id" class="form-control" id="pid" placeholder="ID">
+                                            <input type="text" @bind="model.IDNumber" class="form-control" id="pid" placeholder="ID">
+                                            <ValidationMessage For="() => model.IDNumber" />
                                         </div>
                                     </div>
                                 </div>
@@ -340,9 +359,10 @@
                 </div>
             </div>
         </div>
+        <UiAlert Model="alert"></UiAlert>
         <div class="modal-footer">
             <button type="button" class="btn btn-danger" @onclick="OnClose" data-dismiss="modal">Close</button>
-            <button type="submit" class="btn btn-primary" id="addcustomer">Add</button>
+            <button type="submit" class="btn btn-primary">Add</button>
         </div>
     </EditForm>
 </div>
@@ -367,15 +387,12 @@
     {
         process = true;
         alert?.Clear();
-
-        // model.CategoryId = categoriesId;
-        // if (categoriesId != null)
-        //     model.Category = Categories.Where(x => x.Id == categoriesId).Select(x => x.Name).First();
-
         var response = await client.UpsertCustomerAsync(model);
         if (response.IsSuccess)
         {
-            
+           // await CustomerGrid.RefreshGridAsync();
+            alert?.SetSuccess(response.Message);
+            model = new();
         }
         else
         {

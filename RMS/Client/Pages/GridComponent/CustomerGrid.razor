@@ -41,8 +41,8 @@ else
 
 
 
-        // c.Add().Encoded(false).Sanitized(false).RenderComponentAs<CustomerDetailsDTOEditButton>().SetWidth("10px").Titled("Edit");
-        // c.Add().Encoded(false).Sanitized(false).RenderComponentAs<CustomerDetailsDTODeleteButton>(new List<Action<object>> { RefreshGrid }).SetWidth("10px").Titled("Delete");
+        c.Add().Encoded(false).Sanitized(false).RenderComponentAs<CustomerEditButton>().SetWidth("10px").Titled("Edit");
+        c.Add().Encoded(false).Sanitized(false).RenderComponentAs<CustometDeleteButton>(new List<Action<object>> { RefreshGrid }).SetWidth("10px").Titled("Delete");
     };
 
     protected override async Task OnParametersSetAsync()

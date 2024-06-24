@@ -2407,27 +2407,27 @@ namespace RMS.Repositories
 
 
 
-        public async Task<BookingList> GetBookingListById(int id)
+        public async Task<ReservationDetailsDto> GetReservationDetailsById(int id)
         {
-            BookingList result = null;
+            ReservationDetailsDto result = null;
 
 #pragma warning disable CS8600
-            result = AppDbCxt.BookingList.FirstOrDefault(o => o.Id == id);
+            result = AppDbCxt.ReservationDetails.FirstOrDefault(o => o.Id == id);
 #pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
 
             return await Task.FromResult(result);
         }
 
-        public async Task<IEnumerable<BookingList>> GetAllBookingList()
+        public async Task<IEnumerable<ReservationDetailsDto>> GetAllReservationDetails()
         {
-            IEnumerable<BookingList> result = null;
+            IEnumerable<ReservationDetailsDto> result = null;
 
-            result = AppDbCxt.BookingList.ToList();
+            result = AppDbCxt.ReservationDetails.ToList();
             return result;
         }
-        public async Task<ApiResponse<BookingList>> UpsertBookingList(BookingList data)
+        public async Task<ApiResponse<ReservationDetailsDto>> UpsertReservationDetails(ReservationDetailsDto data)
         {
-            var result = new ApiResponse<BookingList>();
+            var result = new ApiResponse<ReservationDetailsDto>();
             try
             {
 
@@ -2440,12 +2440,12 @@ namespace RMS.Repositories
 
                 if (data.Id > 0)
                 {
-                    AppDbCxt.BookingList.Update(data);
+                    AppDbCxt.ReservationDetails.Update(data);
                     result.Message = "Data Successfully Updated.";
                 }
                 else
                 {
-                    AppDbCxt.BookingList.Add(data);
+                    AppDbCxt.ReservationDetails.Add(data);
                     result.Message = "Data Successfully Inserted.";
                 }
 
@@ -2462,12 +2462,12 @@ namespace RMS.Repositories
             }
         }
 
-        public async Task<ApiResponse<BookingList>> DeleteBookingList(int id)
+        public async Task<ApiResponse<ReservationDetailsDto>> DeleteReservationDetails(int id)
         {
-            var result = new ApiResponse<BookingList>();
+            var result = new ApiResponse<ReservationDetailsDto>();
             try
             {
-                var existing = AppDbCxt.BookingList.First(x => x.Id == id);
+                var existing = AppDbCxt.ReservationDetails.First(x => x.Id == id);
                 result.Result = existing;
                 if (existing == null)
                 {
@@ -2476,7 +2476,7 @@ namespace RMS.Repositories
                     return result;
                 }
 
-                AppDbCxt.BookingList.Remove(existing);
+                AppDbCxt.ReservationDetails.Remove(existing);
                 await AppDbCxt.SaveChangesAsync();
                 result.IsSuccess = true;
                 result.Message = "Successfully Deleted!";
@@ -3046,5 +3046,90 @@ namespace RMS.Repositories
             }
         }
         #endregion
+
+        #region POS Section
+        public async Task<PosDTO> GetPosById(int id)
+        {
+            PosDTO result = null;
+
+#pragma warning disable CS8600
+            result = AppDbCxt.PosDTO.FirstOrDefault(o => o.Id == id);
+#pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
+
+            return await Task.FromResult(result);
+        }
+
+        public async Task<IEnumerable<PosDTO>> GetAllPos()
+        {
+            IEnumerable<PosDTO> result = null;
+
+            result = AppDbCxt.PosDTO.ToList();
+            return result;
+        }
+        public async Task<ApiResponse<PosDTO>> UpsertPos(PosDTO data)
+        {
+            var result = new ApiResponse<PosDTO>();
+            try
+            {
+
+                if (data == null)
+                {
+                    result.IsSuccess = true;
+                    result.Message = "Invalid Pos Details data!";
+                    return result;
+                }
+
+                if (data.Id > 0)
+                {
+                    AppDbCxt.PosDTO.Update(data);
+                    result.Message = "Data Successfully Updated.";
+                }
+                else
+                {
+                    AppDbCxt.PosDTO.Add(data);
+                    result.Message = "Data Successfully Inserted.";
+                }
+
+                AppDbCxt.SaveChanges();
+                result.IsSuccess = true;
+                result.Result = data;
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+
+        public async Task<ApiResponse<PosDTO>> DeletePos(int id)
+        {
+            var result = new ApiResponse<PosDTO>();
+            try
+            {
+                var existing = AppDbCxt.PosDTO.First(x => x.Id == id);
+                result.Result = existing;
+                if (existing == null)
+                {
+                    result.IsSuccess = true;
+                    result.Message = "Pos Details not found!";
+                    return result;
+                }
+
+                AppDbCxt.PosDTO.Remove(existing);
+                await AppDbCxt.SaveChangesAsync();
+                result.IsSuccess = true;
+                result.Message = "Successfully Deleted!";
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+        #endregion 
     }
 }

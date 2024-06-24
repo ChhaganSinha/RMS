@@ -842,30 +842,30 @@ namespace RMS.Server.Controllers.Api
 
 
         [HttpGet]
-        [Route("BookingList/{id}")]
-        public async Task<BookingList> GetBookingListById(int id)
+        [Route("ReservationDetails/{id}")]
+        public async Task<ReservationDetailsDto> GetReservationDetailsById(int id)
         {
-            return await _appRepository.GetBookingListById(id);
+            return await _appRepository.GetReservationDetailsById(id);
         }
 
         [HttpGet]
-        [Route("all-BookingList")]
-        public async Task<IEnumerable<BookingList>> GetAllBookingList()
+        [Route("all-ReservationDetails")]
+        public async Task<IEnumerable<ReservationDetailsDto>> GetAllReservationDetails()
         {
-            return await _appRepository.GetAllBookingList();
+            return await _appRepository.GetAllReservationDetails();
         }
 
         [HttpPost]
-        [Route("UpsertBookingList")]
-        public async Task<ApiResponse<BookingList>> UpsertBookingList(BookingList data)
+        [Route("UpsertReservationDetails")]
+        public async Task<ApiResponse<ReservationDetailsDto>> UpsertReservationDetails(ReservationDetailsDto data)
         {
-            return await _appRepository.UpsertBookingList(data);
+            return await _appRepository.UpsertReservationDetails(data);
         }
         [HttpPost]
-        [Route("DeleteBookingList/{id}")]
-        public async Task<ApiResponse<BookingList>> DeleteBookingList(int id)
+        [Route("DeleteReservationDetails/{id}")]
+        public async Task<ApiResponse<ReservationDetailsDto>> DeleteReservationDetails(int id)
         {
-            return await _appRepository.DeleteBookingList(id);
+            return await _appRepository.DeleteReservationDetails(id);
         }
         #endregion
 
@@ -1064,6 +1064,35 @@ namespace RMS.Server.Controllers.Api
         public async Task<ApiResponse<CustomerDetailsDTO>> DeleteCustomer(int id)
         {
             return await _appRepository.DeleteCustomer(id);
+        }
+        #endregion
+
+        #region POS Section
+        [HttpGet]
+        [Route("Pos/{id}")]
+        public async Task<PosDTO> GetPosById(int id)
+        {
+            return await _appRepository.GetPosById(id);
+        }
+
+        [HttpGet]
+        [Route("all-Pos")]
+        public async Task<IEnumerable<PosDTO>> GetAllPos()
+        {
+            return await _appRepository.GetAllPos();
+        }
+
+        [HttpPost]
+        [Route("UpsertPos")]
+        public async Task<ApiResponse<PosDTO>> UpsertPos(PosDTO data)
+        {
+            return await _appRepository.UpsertPos(data);
+        }
+        [HttpPost]
+        [Route("DeletePos/{id}")]
+        public async Task<ApiResponse<PosDTO>> DeletePos(int id)
+        {
+            return await _appRepository.DeletePos(id);
         }
         #endregion
     }

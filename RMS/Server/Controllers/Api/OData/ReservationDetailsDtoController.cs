@@ -10,11 +10,11 @@ using RMS.Server.Intrastructure.ActionFilters;
 namespace RMS.Server.Controllers.Api.OData
 {
     [Authorize]
-    public class BookingListController : ODataController
+    public class ReservationDetailsDtoController : ODataController
     {
-        public ILogger<BookingListController> Logger { get; }
+        public ILogger<ReservationDetailsDtoController> Logger { get; }
         public AppDbContext DbContext { get; }
-        public BookingListController(ILogger<BookingListController> logger, AppDbContext dbContext)
+        public ReservationDetailsDtoController(ILogger<ReservationDetailsDtoController> logger, AppDbContext dbContext)
         {
             Logger = logger;  
             DbContext = dbContext;
@@ -22,9 +22,9 @@ namespace RMS.Server.Controllers.Api.OData
 
         [EnableQuery]
         [ODataAuthorize]
-        public IQueryable<BookingList> Get()
+        public IQueryable<ReservationDetailsDto> Get()
         {
-            var data = DbContext.BookingList.AsQueryable();
+            var data = DbContext.ReservationDetails.AsQueryable();
             return data;
         }
     }
