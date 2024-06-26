@@ -2316,7 +2316,7 @@ namespace RMS.Client.Client
             return details;
         }
 
-        public async Task<ApiResponse<ReservationDetailsDto>> BookRoomAsync(ReservationDetailsDto data)
+        public async Task<ApiResponse<ReservationDetailsDto>> UpsertReservationDetails(ReservationDetailsDto data)
         {
             var result = new ApiResponse<ReservationDetailsDto>();
 

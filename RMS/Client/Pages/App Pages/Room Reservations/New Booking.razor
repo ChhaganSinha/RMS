@@ -499,17 +499,17 @@
                     Email = ec.Email
                 }).ToList();
 
-
-            // var response = await client.UpsertHallCategoryAsync(model);
-            // if (response.IsSuccess)
-            // {
-            //     // model = response.Result;
-            //     await HallCategoryGrid.RefreshGridAsync();
-            //     alert?.SetSuccess(response.Message);
-            //     model = new();
-            // }
-            // else
-            //     alert?.SetError(response.Message);
+            
+            var response = await client.UpsertReservationDetails(model);
+            if (response.IsSuccess)
+            {
+                // model = response.Result;
+                await HallCategoryGrid.RefreshGridAsync();
+                alert?.SetSuccess(response.Message);
+                model = new();
+            }
+            else
+                alert?.SetError(response.Message);
 
             message = Id > 0 ? "Successfully Updated" : "Successfully Added";
             TaskCompleted = true;
