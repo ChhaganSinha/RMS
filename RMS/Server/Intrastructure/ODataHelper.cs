@@ -63,6 +63,7 @@ namespace RMS.Server.Intrastructure
             builder.EntitySet<Food>("Food");
             builder.EntitySet<CustomerDetailsDTO>("CustomerDetailsDTO");
             builder.EntitySet<ReservationDetailsDto>("ReservationDetailsDto");
+            builder.EntitySet<PosDTO>("PosDTO");
 
             return builder.GetEdmModel();
         }

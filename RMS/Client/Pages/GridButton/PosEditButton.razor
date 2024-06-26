@@ -1,0 +1,86 @@
+﻿@using GridShared
+@using GridShared.Columns
+@using GridShared.Utility
+@using Microsoft.Extensions.Primitives
+@using RMS.Client.Pages.GridComponent
+@using RMS.Client.Shared.Popup
+@using RMS.Client.Client
+@using System.ComponentModel.DataAnnotations
+@using RMS.Dto.Enum
+@inject AppClient client
+@implements ICustomGridComponent<PosDTO>
+@inject NavigationManager NavigationManager
+
+<button class='btn btn-sm btn-warning' style="border-radius:15px" @onclick="MyClickHandler" title="Edit"><i class="fa fa-pencil-square-o"></i></button>
+<PageDialog Title="@Title" Show="@show" ClosePageDialog="ResetForm">
+    @if (show)
+    {
+
+        <EditForm Model="model" OnValidSubmit="OnSave">
+            <DataAnnotationsValidator />
+
+            @if (process)
+            {
+                <div style="text-align:center">
+                    <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
+                </div>
+            }
+            <UiAlert Model="alert"></UiAlert>
+            <hr style="margin-bottom: 2px;" />
+            <button type="submit" class="btn btn-primary float-right col-md-4">Add</button>
+        </EditForm>
+        <br />
+    }
+</PageDialog>
+@code {
+    [Parameter]
+    public PosDTO Item { get; set; }
+
+    [Parameter]
+    public CGrid<PosDTO> Grid { get; set; }
+
+    [CascadingParameter]
+    protected AlertModel? alert { get; set; }
+
+    private Timer _timer;
+    private int _delay = 2500;
+    bool show = false;
+    bool process = false;
+    string Title = "Update PosDTO Details";
+
+    private int? categoriesId;
+    [Required]
+    private List<int> SelectedFacilities { get; set; } = new();
+    private bool IsError = false;
+
+    private string imageDataUrl;
+
+    PosDTO model = new();
+
+    private async Task MyClickHandler(MouseEventArgs e)
+    {
+       
+    }
+
+    public async Task OnSave()
+    {
+       
+
+    }
+
+    private void TimerCallback(Object o)
+    {
+        alert?.Clear();
+        _timer.Dispose();
+        StateHasChanged();
+    }
+
+    private void ResetForm()
+    {
+        model = new();
+        show = false;
+        process = false;
+    }
+
+}
+
