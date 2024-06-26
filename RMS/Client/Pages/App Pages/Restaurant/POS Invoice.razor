@@ -46,12 +46,13 @@
                 @if (topActiveTab == TopTab.NewOrder)
                 {
                     <form>
+                        <div class="row">
                         <!-- Left Column: Search and Food Categories -->
-                        <div class="col-md-12 p-0">
-                            <div class="card p-2">
+                            <div class="col-md-8 p-0" style="margin-top: -20px;">
+                                <div class="card p-2" style="margin: 16px;">
                                 <input type="text" placeholder="Search for food..." class="form-control mb-3" @bind="searchQuery" @oninput="FilterFoods" />
                                 <div class="row">
-                                    <div class="col-md-3">
+                                    <div class="col-md-4">
                                         <div class="nav flex-column nav-pills overflow-auto" style="height: 100vh; border:1px dashed; padding:10px; overflow:auto">
                                             <a style="font-size:16px; cursor:pointer;"
                                                class="nav-link mb-2 btn-success @GetVerticalTabClass(VerticalTab.AllFood)"
@@ -64,7 +65,7 @@
                                             }
                                         </div>
                                     </div>
-                                    <div class="col-md-9">
+                                    <div class="col-md-8">
                                         <div class="row">
                                             @foreach (var food in filteredFoods)
                                             {
@@ -96,10 +97,10 @@
                         </div>
 
                         <!-- Right Column: Customer and Order Details -->
-                        <div class="col-md-12 p-0">
-                            <div class="card p-2">
+                            <div class="col-md-4 p-0" style="margin-top: -20px;">
+                                <div class="card p-4" style="margin: 16px;">
                                 <div class="form-row">
-                                    <div class="form-group col-md-3">
+                                    <div class="form-group col-md-12">
                                         <label class="bold-font required-field" for="customerName">Customer Name</label>
                                         <HxSelect TItem="CustomerDetailsDTO"
                                                   TValue="int?"
@@ -111,7 +112,7 @@
                                                   NullText="-select-"
                                                   NullDataText="Loading..." />
                                     </div>
-                                    <div class="form-group col-md-3">
+                                    <div class="form-group col-md-12">
                                         <label class="bold-font" for="customerType">Customer Type</label>
                                         <select class="form-control" id="CustomerType">
                                             @foreach (var val in Enum.GetValues(typeof(CustomerType)))
@@ -120,7 +121,7 @@
                                             }
                                         </select>
                                     </div>
-                                    <div class="form-group col-md-3">
+                                    <div class="form-group col-md-12">
                                         <label class="bold-font" for="waiter">Waiter</label>
                                         <HxSelect TItem="Employee"
                                                   TValue="int?"
@@ -132,7 +133,7 @@
                                                   NullText="-select-"
                                                   NullDataText="Loading..." />
                                     </div>
-                                    <div class="form-group col-md-3">
+                                    <div class="form-group col-md-12">
                                         <label class="bold-font" for="table">Table</label>
                                         <select id="table" class="form-control">
                                             <option>Table 1</option>
@@ -141,14 +142,16 @@
                                     </div>
                                 </div>
                                 <div class="form-row">
-                                    <div class="form-group col-md-3">
+                                    <div class="form-group col-md-12">
                                         <label class="bold-font" for="cookingTime">Cooking Time</label>
                                         <input name="cookedtime" type="text" class="form-control timepicker3 hasDatepicker" id="cookedtime" placeholder="00:00:00" autocomplete="off">
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <!-- Right Column: food Order Details -->
+                        </div>
+
+                        <!-- food Order Details -->
                         <div class="table-responsive" id="addfoodlist">
                             <table class="table table-bordered" border="1" width="100%" id="addinvoice">
                                 <thead>
@@ -156,39 +159,38 @@
                                         <th>Item</th>
                                         <th>Variant Name</th>
                                         <th>Price</th>
+                                        <th>VAT</th>
                                         <th>Quantity</th>
                                         <th>Total</th>
                                         <th>Action</th>
                                     </tr>
                                 </thead>
                                 <tbody class="itemNumber">
-                                    <tr id="1">
-                                        <th id="product_name_MFU4E">
-                                            La Pigeon Burger<br>
-                                        </th>
-                                        <td>
-                                            Large
-                                        </td>
-
-                                        <td width="">
-                                            275
-                                        </td>
-                                        <td scope="row">
-                                            <a class="btn btn-info btn-sm btnleftalign" onclick="posupdatecart('4c74d497ab9a8034abb7f0fcfebdd4f8',9,18,1,'add')"><i class="fa fa-plus" aria-hidden="true"></i></a>
-                                            <span id="productionsetting-9-18"> 1                </span>
-                                            <a class="btn btn-danger btn-sm btnrightalign" onclick="posupdatecart('4c74d497ab9a8034abb7f0fcfebdd4f8',9,18,1,'del')"><i class="fa fa-minus" aria-hidden="true"></i></a>
-                                        </td>
-                                        <td width="">
-                                            137.5
-                                        </td>
-
-                                        <td width:"80"="">
-                                            <a class="btn btn-danger btn-sm btnrightalign" onclick="removecart('4c74d497ab9a8034abb7f0fcfebdd4f8')"><i class="ti-trash" aria-hidden="true"></i></a>
-                                        </td>
-                                    </tr>
-
-                                    <input name="grandtotal" id="grtotal" type="hidden" value="137.5">
-
+                                    @foreach (var item in order.OrderItems)
+                                    {
+                                        <tr>
+                                            <th>@item.ProductName</th>
+                                            <td>@item.VariantName</td>
+                                            <td>@item.Price.ToString("F2")</td>
+                                            <td>@item.VAT.ToString("F1")</td>
+                                            <td>
+                                                <a class="btn btn-info btn-sm" @onclick="() => UpdateQuantity(item, 1)">
+                                                    <i class="fa fa-plus" aria-hidden="true"></i>
+                                                </a>
+                                                <span>@item.Quantity</span>
+                                                <a class="btn btn-danger btn-sm" @onclick="() => UpdateQuantity(item, -1)">
+                                                    <i class="fa fa-minus" aria-hidden="true"></i>
+                                                </a>
+                                            </td>
+                                            <td>@item.Total.ToString("F2")</td>
+                                            <td>
+                                                <a class="btn btn-danger btn-sm" @onclick="() => RemoveItem(item)">
+                                                    <i class="fa fa-trash-o" aria-hidden="true"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    }
+                                    <input name="grandtotal" id="grtotal" type="hidden" value="@order.GrandTotal.ToString("F2")">
                                 </tbody>
                             </table>
                         </div>
@@ -196,20 +198,20 @@
                             <div class="col-sm-6 leftview">
                                 <input name="distype" id="distype" type="hidden" value="1" autocomplete="off">
                                 <input name="sdtype" id="sdtype" type="hidden" value="1" autocomplete="off">
-                                <input type="hidden" id="orginattotal" value="149.875" name="orginattotal" autocomplete="off">
-                                <input type="hidden" id="invoice_discount" class="form-control text-right" name="invoice_discount" value="137.5" autocomplete="off">
+                                <input type="hidden" id="orginattotal" value="@order.OriginalTotal.ToString("F2")" name="orginattotal" autocomplete="off">
+                                <input type="hidden" id="invoice_discount" class="form-control text-right" name="invoice_discount" value="@order.InvoiceDiscount" autocomplete="off">
                                 <table class="table table-bordered footersumtotal">
                                     <tbody>
                                         <tr>
                                             <td>
                                                 <div class="row m-0">
                                                     <label for="date" class="col-sm-8 mb-0">
-                                                        Vat/Tax(2%):
+                                                        Vat/Tax(@order.VatPercentage.ToString("F1")):
                                                     </label>
                                                     <label class="col-sm-4 mb-0">
-                                                        <input type="hidden" id="vat" name="vat" value="2.75" autocomplete="off">
+                                                        <input type="hidden" id="vat" name="vat" value="@order.VatTax.ToString("F2")" autocomplete="off">
                                                         <strong>
-                                                            $ <span id="calvat">2.75</span>
+                                                            $ <span id="calvat">@order.VatTax</span>
                                                         </strong>
                                                     </label>
                                                 </div>
@@ -218,12 +220,12 @@
                                                 <div class="row">
                                                     <label for="date" class="mb-0 col-sm-6">Grand Total:</label>
                                                     <label class="col-sm-6 p-0 mb-0">
-                                                        <input type="hidden" id="orggrandTotal" value="149.875" name="orggrandTotal" autocomplete="off">
-                                                        <input name="grandtotal" type="hidden" value="149.875" id="grandtotal" autocomplete="off">
+                                                        <input type="hidden" id="orggrandTotal" value="@order.GrandTotal.ToString("F2")" name="orggrandTotal" autocomplete="off">
+                                                        <input name="grandtotal" type="hidden" value="@order.GrandTotal.ToString("F2")" id="grandtotal" autocomplete="off">
                                                         <br />
                                                         <span class="badge badge-primary grandbg font-26">
                                                             <strong>
-                                                                $ <span id="caltotal">149.875</span>
+                                                                $ <span id="caltotal">@order.GrandTotal.ToString("F2")</span>
                                                             </strong>
                                                         </span>
                                                     </label>
@@ -238,7 +240,7 @@
                                                         :
                                                     </label>
                                                     <div class="col-sm-4 p-0">
-                                                        <input type="text" id="service_charge" style="margin:0 !important;" class="form-control text-right mb-5" value="7" name="service_charge" placeholder="0.00" autocomplete="off">
+                                                        <input type="text" id="service_charge" style="margin:0 !important;" class="form-control text-right mb-5" @bind-value="@order.ServiceCharge" @bind-value:event="oninput" placeholder="0.00" autocomplete="off">
                                                     </div>
                                                 </div>
                                             </td>
@@ -260,6 +262,14 @@
                         </div>
                     </form>
                 }
+                @if (topActiveTab == TopTab.OngoingOrder)
+                {
+                    <PosOnGoingGrid/>
+                }
+                @if (topActiveTab == TopTab.TodayOrder)
+                {
+                    <PosTodayGrid />
+                }
             </div>
         </div>
 
@@ -279,13 +289,15 @@
                     </tr>
                 </thead>
                 <tbody id="addItem">
-                    <td class="text-center">@selectedFood.FoodName</td>
-                    <td class="text-center">@selectedFood.Variant</td>
-                    <td class="text-center">@selectedFood.TaxPercentage.ToString("F2")</td>
-                    <td class="text-center">@selectedFood.Price.ToString("F2")</td>
+                <td class="text-center">@selectedFood.FoodName</td>
+                <td class="text-center">@selectedFood.Variant</td>
+                <td class="text-center">@selectedFood.TaxPercentage.ToString("F2")</td>
+                <td class="text-center">@selectedFood.Price.ToString("F2")</td>
                 </tbody>
                 <footer class="mt-1">
-                    <button class="btn btn-primary btn-sm"> <i class="fa fa-shopping-cart"></i> Add to Cart </button>
+                    <button class="btn btn-primary btn-sm" @onclick="AddToCart">
+                        <i class="fa fa-shopping-cart"></i> Add to Cart
+                    </button>
                 </footer>
             </table>
         }
@@ -327,10 +339,14 @@
 
 @code {
     bool showcart = false;
+    private PosDTO order = new PosDTO();
+    private Food selectedFood;
+
     private void ResetForm()
     {
         showcart = false;
     }
+
     private enum TopTab
     {
         NewOrder,
@@ -349,7 +365,6 @@
     private VerticalTab verticalActiveTab = VerticalTab.Category1;
     private string searchQuery = string.Empty;
     private List<Food> filteredFoods = new();
-
     public List<FoodCategory> foodCategories = new();
     public List<Food> foods = new();
     public List<AddVariants> Variants = new();
@@ -368,9 +383,25 @@
         return topActiveTab == tab ? "active" : string.Empty;
     }
 
+    private void AddToCart()
+    {
+        var orderItem = new OrderItemDTO
+            {
+                ProductName = selectedFood.FoodName,
+                VariantName = selectedFood.Variant,
+                Price = selectedFood.Price,
+                VAT = selectedFood.TaxPercentage,
+                Quantity = 1
+            };
+        order.OrderItems.Add(orderItem);
+        UpdateGrandTotal();
+        showcart = false;
+        StateHasChanged();
+    }
+
     private void CancelOrder()
     {
-        
+        // Implement logic to cancel the order
     }
 
     private void PlaceOrder()
@@ -413,8 +444,6 @@
         return "path/to/default/image.jpg";
     }
 
-
-
     private void FilterFoods()
     {
         if (string.IsNullOrWhiteSpace(searchQuery))
@@ -446,7 +475,6 @@
         }
     }
 
-    private Food selectedFood;
     private void ShowFoodDetailsModal(Food food)
     {
         selectedFood = food;
@@ -454,4 +482,32 @@
         StateHasChanged();
     }
 
+    private void UpdateQuantity(OrderItemDTO item, int change)
+    {
+        item.Quantity += change;
+        if (item.Quantity <= 0)
+        {
+            order.OrderItems.Remove(item);
+        }
+        UpdateGrandTotal();
+        StateHasChanged();
+    }
+
+    private void RemoveItem(OrderItemDTO item)
+    {
+        order.OrderItems.Remove(item);
+        UpdateGrandTotal();
+        StateHasChanged();
+    }
+
+    private void UpdateGrandTotal()
+    {
+        var originalTotal = order.OrderItems.Sum(item => item.Total);
+        //order.OriginalTotal = originalTotal;
+
+        order.VatTax = originalTotal * (order.VatPercentage / 100);
+        var serviceChargeAmount = originalTotal * (order.ServiceCharge / 100);
+
+        order.GrandTotal = originalTotal + order.VatTax + serviceChargeAmount;
+    }
 }

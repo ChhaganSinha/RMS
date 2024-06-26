@@ -3096,7 +3096,7 @@ namespace RMS.Repositories
                     result.Message = "Data Successfully Updated.";
                 }
                 else
-                {
+                {                  
                     AppDbCxt.PosDTO.Add(data);
                     result.Message = "Data Successfully Inserted.";
                 }
