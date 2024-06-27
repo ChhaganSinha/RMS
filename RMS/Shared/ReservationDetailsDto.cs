@@ -12,11 +12,11 @@ namespace RMS.Dto
 
         public DateTime CheckIn { get; set; }
         public DateTime CheckOut { get; set; }
-        public string ArrivalFrom { get; set; }
+        public string ArrivalFrom { get; set; } = string.Empty;
         public BookingReferenceType BookingType { get; set; }
-        public string BookingReferenceNo { get; set; }
-        public string PurposeOfVisit { get; set; }
-        public string Remarks { get; set; }
+        public string BookingReferenceNo { get; set; } = string.Empty;
+        public string PurposeOfVisit { get; set; } = string.Empty;
+        public string Remarks { get; set; } = string.Empty;
         public List<RoomBookingDto> RoomBookings { get; set; }
         public List<CustomerInfoDto> CustomerInfo { get; set; }
         public PaymentDetailsDto PaymentDetails { get; set; }
@@ -26,7 +26,7 @@ namespace RMS.Dto
     public class RoomBookingDto : BaseEntity
     {
         public RoomType RoomType { get; set; }
-        public string RoomNo { get; set; }
+        public string RoomNo { get; set; } = string.Empty;
         public int Adults { get; set; }
         public int Children { get; set; }
     }
@@ -34,14 +34,14 @@ namespace RMS.Dto
     public class CustomerInfoDto : BaseEntity
     {
         public int SL { get; set; }
-        public string Name { get; set; }
-        public string MobileNo { get; set; }
-        public string Email { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public string MobileNo { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
     }
 
     public class PaymentDetailsDto : BaseEntity
     {
-        public string DiscountReason { get; set; }
+        public string DiscountReason { get; set; } = string.Empty;
         public decimal DiscountRate { get; set; }
         public decimal DiscountAmount { get; set; }
         public decimal CommissionRate { get; set; }

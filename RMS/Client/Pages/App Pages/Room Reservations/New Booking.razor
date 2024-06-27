@@ -347,7 +347,7 @@
                             <!-- Occupant Details Modal -->
                             <div class="modal custom-modal" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                                 <div class="modal-dialog modal-xl">
-                                    <NewCustomerPage />
+                                    <NewCustomerPage OnCloseCustomer="SyncCustoomerDertails" />
                                 </div>
                             </div>
                             <!-- Modal for Existing Customer -->
@@ -466,6 +466,22 @@
         {
             var roomModel = await client.GetRoomById(Id);
         }
+    }
+
+    private async Task SyncCustoomerDertails(CustomerDetailsDTO customerDetailsDTO)
+    {
+        model.CustomerInfo.Add(new CustomerInfoDto
+            {
+                SL = model.CustomerInfo.Count + 1,
+                Name = customerDetailsDTO.FirstName,
+                MobileNo = customerDetailsDTO.MobileNo,
+                Email = customerDetailsDTO.Email
+            });
+        existingCustomers.Add(customerDetailsDTO);
+
+        customers = (await client.GetAllCustomer()).ToList();
+        // Trigger UI update
+        StateHasChanged();
     }
 
     public async Task OnSave()

@@ -90,7 +90,7 @@
         process = true;
         alert?.Clear();
 
-        var response = await client.BookRoomAsync(model);
+        var response = await client.UpsertReservationDetails(model);
         if (response.IsSuccess)
         {
             // model = response.Result;

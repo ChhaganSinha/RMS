@@ -369,6 +369,8 @@
 @code{
     [Parameter]
     public int Id { get; set; }
+    [Parameter]
+    public EventCallback<CustomerDetailsDTO> OnCloseCustomer  { get; set; }
 
     [CascadingParameter]
     protected AlertModel? alert { get; set; }
@@ -376,6 +378,7 @@
     private int? categoriesId;
 
     CustomerDetailsDTO model = new();
+    CustomerDetailsDTO customerDetailsDTO = new();
     public string Title = "Customer Details";
     bool show = false;
     bool process = false;
@@ -390,8 +393,10 @@
         var response = await client.UpsertCustomerAsync(model);
         if (response.IsSuccess)
         {
-           // await CustomerGrid.RefreshGridAsync();
+
+            // await CustomerGrid.RefreshGridAsync();
             alert?.SetSuccess(response.Message);
+            customerDetailsDTO = response.Result;
             model = new();
         }
         else
@@ -454,8 +459,10 @@
         return $"data:{file.ContentType};base64,{base64}";
     }
 
-    public void OnClose()
+    public async void OnClose()
     {
+
+        await OnCloseCustomer.InvokeAsync(customerDetailsDTO);
 
     }
 }
