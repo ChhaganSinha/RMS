@@ -11,6 +11,7 @@ using static System.Formats.Asn1.AsnWriter;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using System.Runtime.InteropServices;
 using System.Runtime.CompilerServices;
+using RMS.Dto.Enum;
 
 namespace RMS.Repositories
 {
@@ -2430,7 +2431,6 @@ namespace RMS.Repositories
             var result = new ApiResponse<ReservationDetailsDto>();
             try
             {
-
                 if (data == null)
                 {
                     result.IsSuccess = true;
@@ -2449,7 +2449,23 @@ namespace RMS.Repositories
                     result.Message = "Data Successfully Inserted.";
                 }
 
-                AppDbCxt.SaveChanges();
+                // Save changes to ReservationDetails first
+                await AppDbCxt.SaveChangesAsync();
+
+                // Update room status to Booked for each room in RoomBookings
+                foreach (var roomBooking in data.RoomBookings)
+                {
+                    var room = AppDbCxt.Room.FirstOrDefault(r => r.RoomNumber == roomBooking.RoomNo);
+                    if (room != null)
+                    {
+                        room.Status = RoomHallStatus.Booked;
+                        AppDbCxt.Room.Update(room);
+                    }
+                }
+
+                // Save changes to room status
+                await AppDbCxt.SaveChangesAsync();
+
                 result.IsSuccess = true;
                 result.Result = data;
                 return result;
@@ -2461,6 +2477,7 @@ namespace RMS.Repositories
                 return result;
             }
         }
+
 
         public async Task<ApiResponse<ReservationDetailsDto>> DeleteReservationDetails(int id)
         {

@@ -167,7 +167,7 @@
                                                                                 <label class="font-weight-600 mb-1">Room No.<span class="text-danger">*</span></label>
                                                                                 <select class="form-select" @bind="roombook.RoomNo">
                                                                                     <option selected>Choose Room </option>
-                                                                                    @foreach (var room in rooms)
+                                                                                    @foreach (var room in rooms.Where(x=>x.Status == RoomHallStatus.Available))
                                                                                     {
                                                                                         <option value="@room.RoomNumber">@room.RoomNumber </option>
                                                                                     }
@@ -370,7 +370,7 @@
                                                               Value="@selectedCustomerId"
                                                               ValueChanged="OnCustomerChanged"
                                                               ValueExpression="() => selectedCustomerId"
-                                                              TextSelector="@(c => c.FirstName)"
+                                                              TextSelector="@(c => c.MobileNo)"
                                                               ValueSelector="@(c => c.Id)"
                                                               Nullable="true"
                                                               NullText="-select mobile number- "
@@ -403,7 +403,7 @@
     </div>
 </div>
 
-<SimpleDailog Title="@Title" Show="@show" OnCloseDialog="ResetForm">
+<SimpleDailog Title="@message" Show="@show" OnCloseDialog="ResetForm">
     @if (show)
     {
         @if (TaskCompleted)
@@ -439,7 +439,7 @@
     IEnumerable<Room> rooms = new List<Room>();
     List<CustomerDetailsDTO> customers = new List<CustomerDetailsDTO>();
     private List<CustomerDetailsDTO> existingCustomers = new List<CustomerDetailsDTO>();
-    public string Title = "Booking";
+    public string Title = "Please wait..";
     bool show = false;
     bool process = false;
     private Timer _timer;
@@ -515,19 +515,26 @@
                     Email = ec.Email
                 }).ToList();
 
-            
+
             var response = await client.UpsertReservationDetails(model);
             if (response.IsSuccess)
             {
                 // model = response.Result;
-                await HallCategoryGrid.RefreshGridAsync();
+                //await HallCategoryGrid.RefreshGridAsync();
                 alert?.SetSuccess(response.Message);
                 model = new();
             }
             else
                 alert?.SetError(response.Message);
 
-            message = Id > 0 ? "Successfully Updated" : "Successfully Added";
+            message = response.Message;
+            model = new ReservationDetailsDto
+                {
+                    PaymentDetails = new PaymentDetailsDto(),
+                    BillingDetails = new BillingDetailsDto(),
+                    CustomerInfo = new List<CustomerInfoDto>(),
+                    RoomBookings = new List<RoomBookingDto>()
+                };
             TaskCompleted = true;
         }
         catch (Exception ex)
@@ -539,8 +546,9 @@
         }
 
         process = false;
+        rooms = await client.GetAllRoom();
         StateHasChanged();
-        _timer = new Timer(TimerCallback, null, _delay, Timeout.Infinite);
+        //_timer = new Timer(TimerCallback, null, _delay, Timeout.Infinite);
     }
 
     private void TimerCallback(Object o)
