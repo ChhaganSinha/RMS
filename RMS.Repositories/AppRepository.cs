@@ -2413,7 +2413,7 @@ namespace RMS.Repositories
             ReservationDetailsDto result = null;
 
 #pragma warning disable CS8600
-            result = AppDbCxt.ReservationDetails.FirstOrDefault(o => o.Id == id);
+            result = AppDbCxt.ReservationDetails.Include(o=> o.RoomBookings).Include(o=> o.CustomerInfo).Include(o=> o.PaymentDetails).Include(o=> o.BillingDetails).FirstOrDefault(o => o.Id == id);
 #pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
 
             return await Task.FromResult(result);

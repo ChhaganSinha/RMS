@@ -18,7 +18,7 @@
             <div class="col-md-12">
                 <div class="page-header-title">
                     <h5 class="m-b-10">
-                        New Booking
+                      @(Id>0? "UpdateBooking" : "New Booking")
                     </h5>
                 </div>
                 <ul class="breadcrumb">
@@ -165,13 +165,17 @@
                                                                         <td class="border-0" style="width:25%">
                                                                             <div class="form-group mb-0">
                                                                                 <label class="font-weight-600 mb-1">Room No.<span class="text-danger">*</span></label>
-                                                                                <select class="form-select" @bind="roombook.RoomNo">
+                                                                                <InputSelect class="form-select" @bind-Value="roombook.RoomNo">
                                                                                     <option selected>Choose Room </option>
-                                                                                    @foreach (var room in rooms.Where(x=>x.Status == RoomHallStatus.Available))
+                                                                                    @foreach (var room in rooms.Where(x => x.Status == RoomHallStatus.Available || x.RoomNumber == roombook.RoomNo))
                                                                                     {
-                                                                                        <option value="@room.RoomNumber">@room.RoomNumber </option>
+                                                                                        //@if (room.RoomNumber != roombook.RoomNo)
+                                                                                        {
+                                                                                        <option value="@room.RoomNumber">@room.RoomNumber</option>
+                                                                                            
+                                                                                        }
                                                                                     }
-                                                                                </select>
+                                                                                </InputSelect>
                                                                             </div>
                                                                         </td>
                                                                         <td class="border-0" style="width:20%">
@@ -228,7 +232,7 @@
                                                     @foreach (var customer in existingCustomers)
                                                     {
                                                         <tr>
-                                                            <td>@customer.Id</td>
+                                                            <td>@(++CustomerCount)</td>
                                                             <td>@customer.FirstName</td>
                                                             <td>@customer.MobileNo</td>
                                                             <td>@customer.Email</td>
@@ -424,6 +428,7 @@
 @code {
     [Parameter]
     public int Id { get; set; }
+    public int CustomerCount = 0;
 
     [CascadingParameter]
     protected AlertModel? alert { get; set; }
@@ -464,7 +469,25 @@
         customers = (await client.GetAllCustomer()).ToList();
         if (Id > 0)
         {
-            var roomModel = await client.GetRoomById(Id);
+            model = await client.GetReservationDetailsDtoById(Id);
+
+            foreach (var c in model.CustomerInfo)
+            {
+                existingCustomers.Add(new CustomerDetailsDTO
+                    {
+                        FirstName = c.Name,
+                        MobileNo = c.MobileNo,
+                        Email = c.Email
+                    });
+            }
+
+            roomBookings = model.RoomBookings.Select(rb => new RoomBooking
+                {
+                    RoomType = rb.RoomType.ToString(),
+                    RoomNo = rb.RoomNo,
+                    Adults = rb.Adults,
+                    Children = rb.Children
+                }).ToList();
         }
     }
 
@@ -509,7 +532,7 @@
             // Update customer information in model
             model.CustomerInfo = existingCustomers.Select(ec => new CustomerInfoDto
                 {
-                    SL = ec.Id,
+                   // SL = ec.Id,
                     Name = ec.FirstName,
                     MobileNo = ec.MobileNo,
                     Email = ec.Email

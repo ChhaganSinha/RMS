@@ -6,7 +6,6 @@ namespace RMS.Dto
 {
     public class PurchaseItem : Auditable
     {
-       
         public string SupplierName { get; set; } = string.Empty;
         public int? SupplierNameId { get; set; }
 
@@ -23,7 +22,12 @@ namespace RMS.Dto
 
         public List<ItemDto> Items { get; set; } = new List<ItemDto>();
 
-        public decimal GrandTotal { get; set; }
+        private decimal grandTotal;
+        public decimal GrandTotal
+        {
+            get => grandTotal;
+            set => grandTotal = Math.Round(value, 2);
+        }
 
         public bool IsPaid { get; set; } = false;
     }
@@ -36,23 +40,35 @@ namespace RMS.Dto
         //[Required]
         public string ItemName { get; set; } = string.Empty;
 
-        //[Required]
+        private decimal stock;
         [Range(0, double.MaxValue, ErrorMessage = "Stock must be a non-negative number")]
-        public decimal Stock { get; set; }
+        public decimal Stock
+        {
+            get => stock;
+            set => stock = Math.Round(value, 2);
+        }
 
-        //[Required]
+        private decimal quantity;
         [Range(0, double.MaxValue, ErrorMessage = "Quantity must be a non-negative number")]
-        public decimal Quantity { get; set; }
+        public decimal Quantity
+        {
+            get => quantity;
+            set => quantity = Math.Round(value, 2);
+        }
 
-        //[Required]
+        private decimal rate;
         [Range(0, double.MaxValue, ErrorMessage = "Rate must be a non-negative number")]
-        public decimal Rate { get; set; }
+        public decimal Rate
+        {
+            get => rate;
+            set => rate = Math.Round(value, 2);
+        }
 
-        public decimal Total => Quantity * Rate;
+        public decimal Total => Math.Round(Quantity * Rate, 2);
 
         public void UpdateTotal()
         {
-           
+            // Optional: Implement logic to update total if needed
         }
     }
 }

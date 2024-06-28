@@ -18,7 +18,12 @@ namespace RMS.Dto
         public int NumberOfBed { get; set; }
         public string Facilities { get; set; } = string.Empty;
         public string Descriptions { get; set; } = string.Empty;
-        public int Price { get; set; }
+        private decimal price;
+        public decimal Price
+        {
+            get => price;
+            set => price = Math.Round(value, 2);
+        }
         public string BedCharge { get; set; } = string.Empty;
         public string PersonCharge { get; set; } = string.Empty;
         public string Capacity { get; set; } = string.Empty;

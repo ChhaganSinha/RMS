@@ -13,7 +13,10 @@ namespace RMS.Dto
         public string ProductCategory { get; set; } = string.Empty;
         public int? ProductCategoryId { get; set; }
         public int Quantity { get; set; }
-        public double Price { get; set; }
+
+        private decimal price;
+        public decimal Price { get => price; set => price = Math.Round(value, 2); }
+
         public string Comments { get; set; } = string.Empty;
 
     }

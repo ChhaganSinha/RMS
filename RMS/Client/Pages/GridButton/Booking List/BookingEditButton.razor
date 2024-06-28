@@ -10,30 +10,7 @@
 @inject NavigationManager NavigationManager
 
 <button class='btn btn-sm btn-warning' style="border-radius:15px" @onclick="MyClickHandler" title="Edit"><i class="fa fa-pencil-square-o"></i></button>
-<SimpleDailog Title="@Title" Show="@show" OnCloseDialog="ResetForm">
-    @if (show)
-    {
 
-
-        <EditForm Model="model" OnValidSubmit="OnSave">
-            <DataAnnotationsValidator />
-            <div>
-              
-            </div>
-
-            @if (process || model == null)
-            {
-                <div style="text-align:center">
-                    <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
-                </div>
-            }
-            <UiAlert Model="alert"></UiAlert>
-            <hr />
-            <button type="submit" class="btn btn-primary float-right col-md-4">Add</button>
-        </EditForm>
-        <br />
-    }
-</SimpleDailog>
 @code {
     [Parameter]
     public ReservationDetailsDto Item { get; set; }
@@ -54,8 +31,7 @@
 
     private async Task MyClickHandler(MouseEventArgs e)
     {
-        show = true;
-       // model = await client.GetBookingListById(Item.Id);
+        NavigationManager.NavigateTo($"new-booking/{Item.Id}");
     }
 
     protected override async Task OnInitializedAsync()
