@@ -1036,6 +1036,34 @@ namespace RMS.Server.Controllers.Api
             return await _appRepository.DeleteFood(id);
         }
 
+        [HttpGet]
+        [Route("TableCon/{id}")]
+        public async Task<TableCon> GetTableConById(int id)
+        {
+            return await _appRepository.GetTableConById(id);
+        }
+
+        [HttpGet]
+        [Route("all-room-TableCon")]
+        public async Task<IEnumerable<TableCon>> GetAllTableCon()
+        {
+            return await _appRepository.GetAllTableCon();
+        }
+
+        [HttpPost]
+        [Route("UpsertTableCon")]
+        public async Task<ApiResponse<TableCon>> UpsertTableCon(TableCon data)
+        {
+            return await _appRepository.UpsertTableCon(data);
+        }
+        [HttpPost]
+        [Route("DeleteTableCon/{id}")]
+        public async Task<ApiResponse<TableCon>> DeleteTableCon(int id)
+        {
+            return await _appRepository.DeleteTableCon(id);
+        }
+
+
         #endregion
 
         #region Customer Section

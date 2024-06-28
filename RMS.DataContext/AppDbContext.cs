@@ -58,6 +58,7 @@ namespace RMS.DataContext
         public DbSet<FoodVarientMapping> FoodVarientMapping { get; set; }
         public DbSet<CustomerDetailsDTO> CustomerDetailsDTO { get; set; }
         public DbSet<PosDTO> PosDTO { get; set; }
+        public DbSet<TableCon> TableCon { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

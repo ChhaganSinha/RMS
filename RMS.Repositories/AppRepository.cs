@@ -3073,6 +3073,91 @@ namespace RMS.Repositories
                 return result;
             }
         }
+
+        public async Task<TableCon> GetTableConById(int id)
+        {
+            TableCon result = null;
+
+#pragma warning disable CS8600
+            result = AppDbCxt.TableCon.FirstOrDefault(o => o.Id == id);
+#pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
+
+            return await Task.FromResult(result);
+        }
+
+        public async Task<IEnumerable<TableCon>> GetAllTableCon()
+        {
+            IEnumerable<TableCon> result = null;
+
+            result = AppDbCxt.TableCon.ToList();
+            return result;
+        }
+        public async Task<ApiResponse<TableCon>> UpsertTableCon(TableCon data)
+        {
+            var result = new ApiResponse<TableCon>();
+            try
+            {
+
+                if (data == null)
+                {
+                    result.IsSuccess = true;
+                    result.Message = "Invalid TableConf data!";
+                    return result;
+                }
+
+                if (data.Id > 0)
+                {
+                    AppDbCxt.TableCon.Update(data);
+                    result.Message = "Data Successfully Updated.";
+                }
+                else
+                {
+                    AppDbCxt.TableCon.Add(data);
+                    result.Message = "Data Successfully Inserted.";
+                }
+
+                AppDbCxt.SaveChanges();
+                result.IsSuccess = true;
+                result.Result = data;
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+
+        public async Task<ApiResponse<TableCon>> DeleteTableCon(int id)
+        {
+            var result = new ApiResponse<TableCon>();
+            try
+            {
+                var existing = AppDbCxt.TableCon.First(x => x.Id == id);
+                result.Result = existing;
+                if (existing == null)
+                {
+                    result.IsSuccess = true;
+                    result.Message = "TableConf not found!";
+                    return result;
+                }
+
+                AppDbCxt.TableCon.Remove(existing);
+                await AppDbCxt.SaveChangesAsync();
+                result.IsSuccess = true;
+                result.Message = "Successfully Deleted!";
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+
+
         #endregion
 
         #region POS Section

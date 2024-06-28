@@ -2761,6 +2761,88 @@ namespace RMS.Client.Client
         }
 
 
+        public async Task<TableCon> GetTableConById(int id)
+        {
+            TableCon data = null;
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/App/TableCon/{id}");
+
+                res.EnsureSuccessStatusCode();
+
+                data = await res.Content.ReadFromJsonAsync<TableCon>();
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return data;
+        }
+        public async Task<IEnumerable<TableCon>> GetAllTableCon()
+        {
+            IEnumerable<TableCon> details = null;
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/App/all-TableCon");
+
+                res.EnsureSuccessStatusCode();
+
+                details = await res.Content.ReadFromJsonAsync<IEnumerable<TableCon>>();
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return details;
+        }
+
+        public async Task<ApiResponse<TableCon>> UpsertTableConAsync(TableCon data)
+        {
+            var result = new ApiResponse<TableCon>();
+
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/App/UpsertTableCon", data);
+                res.EnsureSuccessStatusCode();
+                var json = await res.Content.ReadFromJsonAsync<ApiResponse<TableCon>>();
+                return json;
+
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+
+
+
+        }
+        public async Task<ApiResponse<TableCon>> DeleteTableCon(int id)
+        {
+            var result = new ApiResponse<TableCon>();
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/App/DeleteTableCon/{id}", new { });
+                res.EnsureSuccessStatusCode();
+                var json = await res.Content.ReadFromJsonAsync<ApiResponse<TableCon>>();
+                return json;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+
+
         #endregion
 
         #region Customer Section
