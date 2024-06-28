@@ -94,9 +94,17 @@
                                                     <p class="m-0">Room Type: @room.Category</p>
                                                     <p class="m-0">Check Out: None</p>
                                                     <p class="m-0 text-c-green">Charge: @room.Price</p>
-                                                    <button type="button" style="width: 60%;align-self: center;" class="btn btn-success btn-sm mt-5 font-weight-bold" @onclick="() => BookRoom(room)">
-                                                        Available
-                                                    </button>
+                                                    @if(room.Status == RoomHallStatus.Booked){
+                                                        <button type="button" style="width: 60%;align-self: center;" class="btn btn-danger btn-sm mt-5 font-weight-bold" disabled>
+                                                        Booked
+                                                        </button>
+
+                                                    }else{
+                                                            <button type="button" style="width: 60%;align-self: center;" class="btn btn-success btn-sm mt-5 font-weight-bold" @onclick="() => BookRoom(room)">
+                                                                Available
+                                                            </button>
+                                                    }
+                                                    
                                                 </div>
                                             </div>
                                         </div>
