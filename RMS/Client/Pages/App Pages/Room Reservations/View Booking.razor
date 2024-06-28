@@ -1,0 +1,225 @@
+﻿@page "/view-booking/{Id:int}"
+@page "/view-booking"
+
+@using RMS.Client.Client
+@using RMS.Client.Pages.GridComponent
+@using RMS.Client.Shared.Popup
+@inject AppClient client
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
+@attribute [Authorize]
+
+<div class="page-header breadcumb-sticky">
+    <div class="page-block">
+        <div class="row align-items-center">
+            <div class="col-md-12">
+                <div class="page-header-title">
+                    <h5 class="m-b-10">
+                        Booking details
+                    </h5>
+                </div>
+                <ul class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a href="/"><i class="feather icon-home"></i></a>
+                    </li>
+                    <li class="breadcrumb-item"><a>Hall</a></li>
+                    <li class="breadcrumb-item"><a>Categories</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-sm-12 p-0">
+        <div class="card-body p-2 mt-n3">
+            <div class="card text">
+                <div class="card-body">
+
+                    <EditForm Model="model">
+                                <form>
+                                    <div class="row mb-2">
+                                        <div class="col-md-12">
+                                            <div class="form-group">
+                                                <h4 class="font-weight-700">Booking Information</h4>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-3 pr-md-1">
+                                            <div class="form-group">
+                                                <label class="font-weight-700">Booking Number</label>
+                                                <div>@model.BookingReferenceNo</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 pr-md-1">
+                                            <div class="form-group">
+                                                <label class="font-weight-700">Room Type</label>
+                                                <div></div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 pr-md-1">
+                                            <div class="form-group">
+                                                <label class="font-weight-700">Adults</label>
+                                                <div></div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 pr-md-1">
+                                            <div class="form-group">
+                                                <label class="font-weight-700">No of Room</label>
+                                                <div></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-3 pr-md-1">
+                                            <div class="form-group">
+                                                <label class="font-weight-700">Check In</label>
+                                                <div>@model.CheckIn</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 pr-md-1">
+                                            <div class="form-group">
+                                                <label class="font-weight-700">Check Out</label>
+                                                <div>@model.CheckOut</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 pr-md-1">
+                                            <div class="form-group">
+                                                <label class="font-weight-700">Children</label>
+                                                <div></div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 pr-md-1">
+                                            <div class="form-group">
+                                                <label class="font-weight-700">Room No.</label>
+                                                <div></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-3 pr-md-1">
+                                            <div class="form-group">
+                                                <label class="font-weight-700">Room Rate</label>
+                                                <div></div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 pr-md-1">
+                                            <div class="form-group">
+                                                <label class="font-weight-700">Paid Amount</label>
+                                                <div></div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 pr-md-1">
+                                            <div class="form-group">
+                                                <label class="font-weight-700">Discount</label>
+                                                <div></div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 pr-md-1">
+                                            <div class="form-group">
+                                                <label class="font-weight-700">Total Extra Price</label>
+                                                <div></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-3 pr-md-1">
+                                            <div class="form-group">
+                                                <label class="font-weight-700">Total Complementary Price</label>
+                                                <div></div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 pr-md-1">
+                                            <div class="form-group">
+                                                <label class="font-weight-700">Total Price</label>
+                                                <div></div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 pr-md-1">
+                                            <div class="form-group">
+                                                <label class="font-weight-700">Full Guest Name</label>
+                                                <div></div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 pr-md-1">
+                                            <div class="form-group">
+                                                <label class="font-weight-700">Special Requests</label>
+                                                <div></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row mt-2">
+                                        <div class="col-md-12">
+                                            <div class="form-group">
+                                                <h4 class="font-weight-700">Customer Information</h4>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-3 pr-md-1">
+                                            <div class="form-group">
+                                                <label class="font-weight-700">Account Name</label>
+                                                <div></div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 pr-md-1">
+                                            <div class="form-group">
+                                                <label class="font-weight-700">Email</label>
+                                                <div></div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 pr-md-1">
+                                            <div class="form-group">
+                                                <label class="font-weight-700">Address</label>
+                                                <div></div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 pr-md-1">
+                                            <div class="form-group">
+                                                <label class="font-weight-700">Phone</label>
+                                                <div></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                                <hr />
+                        <a href="booking-list" class="btn btn-secondry btn-sm">Close</a>
+
+                    </EditForm>
+
+                    
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    [CascadingParameter]
+    protected AlertModel? alert { get; set; }
+
+    private ReservationDetailsDto model = new ReservationDetailsDto
+        {
+            PaymentDetails = new PaymentDetailsDto(),
+            BillingDetails = new BillingDetailsDto(),
+            CustomerInfo = new List<CustomerInfoDto>(),
+            RoomBookings = new List<RoomBookingDto>()
+        };
+
+    IEnumerable<Room> rooms = new List<Room>();
+    List<CustomerDetailsDTO> customers = new List<CustomerDetailsDTO>();
+    private List<CustomerDetailsDTO> existingCustomers = new List<CustomerDetailsDTO>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        alert?.Clear();
+        rooms = await client.GetAllRoom();
+        customers = (await client.GetAllCustomer()).ToList();
+        model = await client.GetReservationDetailsDtoById(Id);
+    }
+}
