@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RMS.Dto.Enum;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -13,14 +14,38 @@ namespace RMS.Dto
         public string Employee { get; set; }
         public int TableId { get; set; }
         public int Table { get; set; }
+        public PosStatus Status { get; set; }
         public DateTime CookingTime { get; set; }
         public List<OrderItemDTO> OrderItems { get; set; } = new List<OrderItemDTO>();
 
-        // New properties added for calculations
-        public decimal VatPercentage { get; set; }  // VAT percentage
-        public decimal VatTax { get; set; }         // Calculated VAT tax
-        public decimal ServiceCharge { get; set; }  // Service charge percentage
-        public decimal GrandTotal { get; set; }     // Calculated grand total
+        private decimal vatPercentage;
+        public decimal VatPercentage
+        {
+            get => vatPercentage;
+            set => vatPercentage = Math.Round(value, 2);
+        }
+
+        private decimal vatTax;
+        public decimal VatTax
+        {
+            get => vatTax;
+            set => vatTax = Math.Round(value, 2);
+        }
+
+        private decimal serviceCharge;
+        public decimal ServiceCharge
+        {
+            get => serviceCharge;
+            set => serviceCharge = Math.Round(value, 2);
+        }
+
+        private decimal grandTotal;
+        public decimal GrandTotal
+        {
+            get => grandTotal;
+            set => grandTotal = Math.Round(value, 2);
+        }
+
         public decimal OriginalTotal
         {
             get
@@ -28,13 +53,20 @@ namespace RMS.Dto
                 return OrderItems.Sum(item => item.Total);
             }
         }
-        public decimal InvoiceDiscount { get; set; } // Assuming this is a discount amount
+
+        private decimal invoiceDiscount;
+        public decimal InvoiceDiscount
+        {
+            get => invoiceDiscount;
+            set => invoiceDiscount = Math.Round(value, 2);
+        }
 
         public void UpdateGrandTotal()
         {
             VatTax = OriginalTotal * (VatPercentage / 100);
             var serviceChargeAmount = OriginalTotal * (ServiceCharge / 100);
-            GrandTotal = OriginalTotal + VatTax + serviceChargeAmount;
+            GrandTotal = OriginalTotal + VatTax + serviceChargeAmount - InvoiceDiscount;
+            GrandTotal = Math.Round(GrandTotal, 2);  // Ensuring GrandTotal is rounded to 2 decimal places
         }
     }
 
@@ -43,14 +75,28 @@ namespace RMS.Dto
         public int ProductId { get; set; }
         public string ProductName { get; set; }
         public string VariantName { get; set; }
-        public decimal Price { get; set; }
-        public decimal VAT { get; set; }
+
+        private decimal price;
+        public decimal Price
+        {
+            get => price;
+            set => price = Math.Round(value, 2);
+        }
+
+        private decimal vat;
+        public decimal VAT
+        {
+            get => vat;
+            set => vat = Math.Round(value, 2);
+        }
+
         public int Quantity { get; set; }
+
         public decimal Total
         {
             get
             {
-                return Price * Quantity;
+                return Math.Round(Price * Quantity, 2);
             }
         }
     }

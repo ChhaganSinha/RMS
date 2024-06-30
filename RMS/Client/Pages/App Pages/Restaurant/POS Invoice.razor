@@ -47,114 +47,114 @@
                 {
                     <form>
                         <div class="row">
-                        <!-- Left Column: Search and Food Categories -->
+                            <!-- Left Column: Search and Food Categories -->
                             <div class="col-md-8 p-0" style="margin-top: -20px;">
                                 <div class="card p-2" style="margin: 16px;">
-                                <input type="text" placeholder="Search for food..." class="form-control mb-3" @bind="searchQuery" @oninput="FilterFoods" />
-                                <div class="row">
-                                    <div class="col-md-4">
-                                        <div class="nav flex-column nav-pills overflow-auto" style="height: 100vh; border:1px dashed; padding:10px; overflow:auto">
-                                            <a style="font-size:16px; cursor:pointer;"
-                                               class="nav-link mb-2 btn-success @GetVerticalTabClass(VerticalTab.AllFood)"
-                                               @onclick="() => SetVerticalActiveTab(VerticalTab.AllFood)">
-                                                All Food
-                                            </a>
-                                            @foreach (var category in foodCategories)
-                                            {
-                                                <a style="font-size:16px; cursor:pointer;" class="nav-link mb-2 @GetVerticalTabClass((VerticalTab)category.Id) btn-success" @onclick="() => SetVerticalActiveTab((VerticalTab)category.Id)">@category.Name</a>
-                                            }
+                                    <input type="text" placeholder="Search for food..." class="form-control mb-3" @bind="searchQuery" @oninput="FilterFoods" />
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="nav flex-column nav-pills overflow-auto" style="height: 100vh; border:1px dashed; padding:10px; overflow:auto">
+                                                <a style="font-size:16px; cursor:pointer;"
+                                                   class="nav-link mb-2 btn-success @GetVerticalTabClass(VerticalTab.AllFood)"
+                                                   @onclick="() => SetVerticalActiveTab(VerticalTab.AllFood)">
+                                                    All Food
+                                                </a>
+                                                @foreach (var category in foodCategories)
+                                                {
+                                                    <a style="font-size:16px; cursor:pointer;" class="nav-link mb-2 @GetVerticalTabClass((VerticalTab)category.Id) btn-success" @onclick="() => SetVerticalActiveTab((VerticalTab)category.Id)">@category.Name</a>
+                                                }
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="col-md-8">
-                                        <div class="row">
-                                            @foreach (var food in filteredFoods)
-                                            {
-                                                <div class="col-md-3">
-                                                    <div class="card mb-2" @onclick="() => ShowFoodDetailsModal(food)" style="cursor:pointer;">
-                                                        <img src="@GetImageSrc(food)" class="card-img-top" alt="@food.FoodName" width="100">
-                                                        <div class="card-body p-2">
-                                                            <h6 class="card-title m-0">@food.FoodName</h6>
-                                                            <p class="card-text m-0" style="font-size:8px">Price: @food.Price.ToString("0.00")</p>
-                                                            <!-- Hidden Inputs -->
-                                                            <input type="hidden" name="select_product_id" class="select_product_id" value="@food.Id">
-                                                            <input type="hidden" name="select_totalvarient" class="select_totalvarient" value="@food.VariantId.HasValue ? 1 : 0">
-                                                            <input type="hidden" name="select_iscustomeqty" class="select_iscustomeqty" value="">
-                                                            <input type="hidden" name="select_product_size" class="select_product_size" value="">
-                                                            <input type="hidden" name="select_product_isgroup" class="select_product_isgroup" value="">
-                                                            <input type="hidden" name="select_product_cat" class="select_product_cat" value="@food.FoodCategoryId">
-                                                            <input type="hidden" name="select_varient_name" class="select_varient_name" value="@food.Variant">
-                                                            <input type="hidden" name="select_product_name" class="select_product_name" value="@food.FoodName">
-                                                            <input type="hidden" name="select_product_price" class="select_product_price" value="@food.Price">
-                                                            <input type="hidden" name="select_addons" class="select_addons" value="">
+                                        <div class="col-md-8">
+                                            <div class="row">
+                                                @foreach (var food in filteredFoods)
+                                                {
+                                                    <div class="col-md-3">
+                                                        <div class="card mb-2" @onclick="() => ShowFoodDetailsModal(food)" style="cursor:pointer;">
+                                                            <img src="@GetImageSrc(food)" class="card-img-top" alt="@food.FoodName" width="100">
+                                                            <div class="card-body p-2">
+                                                                <h6 class="card-title m-0">@food.FoodName</h6>
+                                                                <p class="card-text m-0" style="font-size:8px">Price: @food.Price.ToString("0.00")</p>
+                                                                <!-- Hidden Inputs -->
+                                                                <input type="hidden" name="select_product_id" class="select_product_id" value="@food.Id">
+                                                                <input type="hidden" name="select_totalvarient" class="select_totalvarient" value="@food.VariantId.HasValue ? 1 : 0">
+                                                                <input type="hidden" name="select_iscustomeqty" class="select_iscustomeqty" value="">
+                                                                <input type="hidden" name="select_product_size" class="select_product_size" value="">
+                                                                <input type="hidden" name="select_product_isgroup" class="select_product_isgroup" value="">
+                                                                <input type="hidden" name="select_product_cat" class="select_product_cat" value="@food.FoodCategoryId">
+                                                                <input type="hidden" name="select_varient_name" class="select_varient_name" value="@food.Variant">
+                                                                <input type="hidden" name="select_product_name" class="select_product_name" value="@food.FoodName">
+                                                                <input type="hidden" name="select_product_price" class="select_product_price" value="@food.Price">
+                                                                <input type="hidden" name="select_addons" class="select_addons" value="">
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                </div>
-                                            }
+                                                }
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <!-- Right Column: Customer and Order Details -->
+                            <!-- Right Column: Customer and Order Details -->
                             <div class="col-md-4 p-0" style="margin-top: -20px;">
                                 <div class="card p-4" style="margin: 16px;">
-                                <div class="form-row">
-                                    <div class="form-group col-md-12">
-                                        <label class="bold-font required-field" for="customerName">Customer Name</label>
-                                        <HxSelect TItem="CustomerDetailsDTO"
-                                                  TValue="int?"
-                                                  Data="customerDetailsDTOs"
-                                                  @bind-Value="customerId"
-                                                  TextSelector="@(o => o.FirstName)"
-                                                  ValueSelector="@(o => o.Id)"
-                                                  Nullable="true"
-                                                  NullText="-select-"
-                                                  NullDataText="Loading..." />
-                                    </div>
-                                    <div class="form-group col-md-12">
-                                        <label class="bold-font" for="customerType">Customer Type</label>
-                                        <select class="form-control" id="CustomerType">
-                                            @foreach (var val in Enum.GetValues(typeof(CustomerType)))
-                                            {
-                                                <option value="@val">@val</option>
-                                            }
-                                        </select>
-                                    </div>
-                                    <div class="form-group col-md-12">
-                                        <label class="bold-font" for="waiter">Waiter</label>
-                                        <HxSelect TItem="Employee"
-                                                  TValue="int?"
-                                                  Data="employees"
-                                                  @bind-Value="employeeId"
-                                                  TextSelector="@(o => o.Name)"
-                                                  ValueSelector="@(o => o.Id)"
-                                                  Nullable="true"
-                                                  NullText="-select-"
-                                                  NullDataText="Loading..." />
-                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-group col-md-12">
+                                            <label class="bold-font required-field" for="customerName">Customer Name</label>
+                                            <HxSelect TItem="CustomerDetailsDTO"
+                                                      TValue="int?"
+                                                      Data="customerDetailsDTOs"
+                                                      @bind-Value="customerId"
+                                                      TextSelector="@(o => o.FirstName)"
+                                                      ValueSelector="@(o => o.Id)"
+                                                      Nullable="true"
+                                                      NullText="-select-"
+                                                      NullDataText="Loading..." />
+                                        </div>
+                                        <div class="form-group col-md-12">
+                                            <label class="bold-font" for="customerType">Customer Type</label>
+                                            <select class="form-control" id="CustomerType">
+                                                @foreach (var val in Enum.GetValues(typeof(CustomerType)))
+                                                {
+                                                    <option value="@val">@val</option>
+                                                }
+                                            </select>
+                                        </div>
+                                        <div class="form-group col-md-12">
+                                            <label class="bold-font" for="waiter">Waiter</label>
+                                            <HxSelect TItem="Employee"
+                                                      TValue="int?"
+                                                      Data="employees"
+                                                      @bind-Value="employeeId"
+                                                      TextSelector="@(o => o.Name)"
+                                                      ValueSelector="@(o => o.Id)"
+                                                      Nullable="true"
+                                                      NullText="-select-"
+                                                      NullDataText="Loading..." />
+                                        </div>
                                         <div class="form-group col-md-12">
                                             <label class="bold-font" for="table">TableNumber</label>
                                             <HxSelect TItem="TableCon"
                                                       TValue="int?"
                                                       Data="tables"
                                                       @bind-Value="tableId"
-                                                      TextSelector="@(tables => tables.TableNumber.ToString())"
+                                                      TextSelector="@(tables => tables.TableNumber)"
                                                       ValueSelector="@(tables => tables.Id)"
                                                       Nullable="true"
                                                       NullText="-select-"
                                                       NullDataText="Loading..." />
-                                            <ValidationMessage For="() => order.Table" />
+                                            
                                         </div>
-                                </div>
-                                <div class="form-row">
-                                    <div class="form-group col-md-12">
-                                        <label class="bold-font" for="cookingTime">Cooking Time</label>
-                                        <input name="cookedtime" type="text" class="form-control timepicker3 hasDatepicker" id="cookedtime" placeholder="00:00:00" autocomplete="off">
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-group col-md-12">
+                                            <label class="bold-font" for="cookingTime">Cooking Time</label>
+                                            <input name="cookedtime" type="text" class="form-control timepicker3 hasDatepicker" id="cookedtime" placeholder="00:00:00" autocomplete="off">
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
                         </div>
 
                         <!-- food Order Details -->
@@ -165,7 +165,7 @@
                                         <th>Item</th>
                                         <th>Variant Name</th>
                                         <th>Price</th>
-                                        <th>VAT</th>
+                                        <th>VAT(%)</th>
                                         <th>Quantity</th>
                                         <th>Total</th>
                                         <th>Action</th>
@@ -270,7 +270,7 @@
                 }
                 @if (topActiveTab == TopTab.OngoingOrder)
                 {
-                    <PosOnGoingGrid/>
+                    <PosOnGoingGrid />
                 }
                 @if (topActiveTab == TopTab.TodayOrder)
                 {
@@ -415,7 +415,7 @@
 
     private void PlaceOrder()
     {
-        // Implement logic to place the order
+       
     }
 
     protected override async Task OnInitializedAsync()

@@ -17,15 +17,19 @@
     {
         <EditForm Model="model" OnValidSubmit="OnSave">
             <DataAnnotationsValidator />
+            <ValidationSummary/>
             <div>
+                <label class="col-form-label bold-font required-field">Enter Table Number</label>
                 <input type="number" placeholder="Enter Table Number" @bind-value="model.TableNumber" class="form-control mb-2" />
                 <ValidationMessage For="() => model.TableNumber" />
             </div>
             <div>
+                <label class="col-form-label bold-font required-field">Enter Table Capacity</label>
                 <input type="number" placeholder="Enter Table Capacity" @bind-value="model.TableCapacity" class="form-control mb-2" />
                 <ValidationMessage For="() => model.TableCapacity" />
             </div>
             <div>
+                <label class="col-form-label bold-font">Status</label>
                 <select @bind="model.Status" class="form-control mb-2">
                     @foreach (var status in Enum.GetValues(typeof(TableStatus)).Cast<TableStatus>())
                     {

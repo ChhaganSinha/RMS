@@ -53,12 +53,12 @@
     bool process = false;
     bool TaskCompleted = false;
     string MessageBody = string.Empty;
-    string Title = "Delete Category";
+    string Title = "Delete Table";
 
     private async void Delete()
     {
         process = true;
-        var responce = await client.DeleteRoomCategory(Item.Id);
+        var responce = await client.DeleteTableCon(Item.Id);
         if (responce.IsSuccess == true)
         {
             MessageBody = responce.Message;
