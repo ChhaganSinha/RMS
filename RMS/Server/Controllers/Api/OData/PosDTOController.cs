@@ -9,12 +9,11 @@ using RMS.Server.Intrastructure.ActionFilters;
 
 namespace RMS.Server.Controllers.Api.OData
 {
-    [Authorize]
-    public class PosController : ODataController
+    public class PosDTOController : ODataController
     {
-        public ILogger<PosController> Logger { get; }
+        public ILogger<PosDTOController> Logger { get; }
         public AppDbContext DbContext { get; }
-        public PosController(ILogger<PosController> logger, AppDbContext dbContext)
+        public PosDTOController(ILogger<PosDTOController> logger, AppDbContext dbContext)
         {
             Logger = logger;
             DbContext = dbContext;

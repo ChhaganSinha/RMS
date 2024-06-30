@@ -1,5 +1,6 @@
 ﻿@page "/pos"
 @using RMS.Client.Client
+@using RMS.Client.Pages.App_Pages.Room_Reservations
 @using RMS.Client.Pages.GridComponent
 @using RMS.Client.Shared.Popup
 @inject AppClient client
@@ -102,6 +103,7 @@
                                     <div class="form-row">
                                         <div class="form-group col-md-12">
                                             <label class="bold-font required-field" for="customerName">Customer Name</label>
+                                            <a style="float: right;" href="javascript:void(0)" data-toggle="modal" data-target="#exampleModal">Add</a>
                                             <HxSelect TItem="CustomerDetailsDTO"
                                                       TValue="int?"
                                                       Data="customerDetailsDTOs"
@@ -279,8 +281,12 @@
             </div>
         </div>
 
-    </div>
-
+    </div> <!-- Occupant Details Modal -->
+                            <div class="modal custom-modal" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                <div class="modal-dialog modal-xl">
+                                    <NewCustomerPage OnCloseCustomer="SyncCustoomerDertails" />
+                                </div>
+                            </div>
     <!-- Add to cart Modal -->
     <PageDialog Show="@showcart" ClosePageDialog="ResetForm">
         @if (showcart)
@@ -324,7 +330,23 @@
         </div>
     </div>
 </div>
-
+<SimpleDailog Title="@message" Show="@show" OnCloseDialog="ResetForm2">
+    @if (show)
+    {
+        @if (TaskCompleted)
+        {
+            <div style="text-align:center;">
+                @MessageBody
+            </div>
+        }
+        else
+        {
+            <div style="text-align:center">
+                <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
+            </div>
+        }
+    }
+</SimpleDailog>
 
 <style>
     .fixedclasspos {
@@ -344,6 +366,15 @@
 </style>
 
 @code {
+    public string Title = "Please wait..";
+    bool show = false;
+    bool process = false;
+    string MessageBody = "Thank you!";
+    string message = string.Empty;
+    bool TaskCompleted = false;
+    bool IsError = false;
+    bool IsSuccess = false;
+
     bool showcart = false;
     private PosDTO order = new PosDTO();
     private Food selectedFood;
@@ -351,6 +382,12 @@
     private void ResetForm()
     {
         showcart = false;
+    }
+    private void ResetForm2()
+    {
+        //order = new PosDTO();
+        show = false;
+        process = false;
     }
 
     private enum TopTab
@@ -411,12 +448,53 @@
 
     private void CancelOrder()
     {
-        // Implement logic to cancel the order
+        order = new();
     }
 
-    private void PlaceOrder()
+    private async Task PlaceOrder()
     {
-       
+        process = true;
+        message = string.Empty;
+        MessageBody = "Thank you!";
+        show = true;
+        TaskCompleted = false;
+        message = "Please wait";
+        try
+        {
+            order.CustomerId = customerId;
+            if (customerId != null)
+                order.CustomerName = customerDetailsDTOs.Where(x => x.Id == customerId).Select(x => x.FirstName).First() + " " + customerDetailsDTOs.Where(x => x.Id == customerId).Select(x => x.LastName).First();
+            order.EmployeeId = employeeId;
+            if (employeeId != null)
+                order.Employee = employees.Where(x => x.Id == employeeId).Select(x => x.Name).First();
+            order.TableId = tableId;
+            if (tableId != null)
+                order.Table = tables.Where(x => x.Id == tableId).Select(x => x.TableNumber).First();
+
+            order.Status = PosStatus.OnGoing;
+            var response = await client.UpsertPosAsync(order);
+            if (response.IsSuccess)
+            {
+                message = "Order Placed!";
+                MessageBody = response.Message;
+                order = new();
+            }
+            else
+            {
+                message = "Error!";
+                MessageBody = response.Message;
+            }  
+
+        }
+        catch (Exception ex)
+        {
+            IsError = true;
+            message = "Error!";
+            MessageBody = ex.Message;
+            TaskCompleted = true;
+        }
+        process = false;
+        TaskCompleted = true;
     }
 
     protected override async Task OnInitializedAsync()
@@ -522,5 +600,10 @@
 
         order.GrandTotal = originalTotal + order.VatTax + serviceChargeAmount;
     }
-
+    private async Task SyncCustoomerDertails(CustomerDetailsDTO customerDetailsDTO)
+    {
+        order.CustomerId = customerDetailsDTO.Id;
+        order.CustomerName = customerDetailsDTO.FirstName +" "+ customerDetailsDTO.LastName;
+        StateHasChanged();
+    }
 }

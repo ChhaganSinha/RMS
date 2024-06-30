@@ -7,13 +7,13 @@ namespace RMS.Dto
 {
     public class PosDTO : Auditable
     {
-        public int CustomerId { get; set; }
-        public string CustomerName { get; set; }
-        public string CustomerType { get; set; }
-        public int EmployeeId { get; set; }
-        public string Employee { get; set; }
-        public int TableId { get; set; }
-        public int Table { get; set; }
+        public int ? CustomerId { get; set; }
+        public string CustomerName { get; set; } = string.Empty;
+        public string CustomerType { get; set; } = string.Empty;
+        public int ? EmployeeId { get; set; }
+        public string Employee { get; set; } = string.Empty;
+        public int ? TableId { get; set; }
+        public string Table { get; set; }
         public PosStatus Status { get; set; }
         public DateTime CookingTime { get; set; }
         public List<OrderItemDTO> OrderItems { get; set; } = new List<OrderItemDTO>();
@@ -60,14 +60,6 @@ namespace RMS.Dto
             set => grandTotal = Math.Round(value, 2);
         }
 
-        public decimal OriginalTotal
-        {
-            get
-            {
-                return OrderItems.Sum(item => item.Price * item.Quantity);
-            }
-        }
-
         private decimal invoiceDiscount;
         public decimal InvoiceDiscount
         {
@@ -82,20 +74,32 @@ namespace RMS.Dto
             }
         }
 
-        public void UpdateGrandTotal()
+        public decimal OriginalTotal
         {
-            VatTax = OriginalTotal * (VatPercentage / 100);
-            var serviceChargeAmount = OriginalTotal * (ServiceCharge / 100);
-            GrandTotal = OriginalTotal + VatTax + serviceChargeAmount - InvoiceDiscount;
-            GrandTotal = Math.Round(GrandTotal, 2);  // Ensuring GrandTotal is rounded to 2 decimal places
+            get
+            {
+                return OrderItems.Sum(item => item.Price * item.Quantity);
+            }
         }
+
+        private void UpdateGrandTotal()
+        {
+            var originalTotal = OrderItems.Sum(item => item.Price * item.Quantity);
+            var totalVAT = OrderItems.Sum(item => (item.Price * (item.VAT / 100)) * item.Quantity);
+
+            VatTax = totalVAT;
+            var serviceChargeAmount = originalTotal * (ServiceCharge / 100);
+
+            GrandTotal = originalTotal + VatTax + serviceChargeAmount;
+        }
+
     }
 
     public class OrderItemDTO : BaseEntity
     {
         public int ProductId { get; set; }
-        public string ProductName { get; set; }
-        public string VariantName { get; set; }
+        public string ProductName { get; set; } = string.Empty;
+        public string VariantName { get; set; } = string.Empty;
 
         private decimal price;
         public decimal Price
