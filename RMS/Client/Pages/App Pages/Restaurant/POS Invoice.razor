@@ -45,7 +45,7 @@
 
                 @if (topActiveTab == TopTab.NewOrder)
                 {
-                    <form>
+                    <EditForm Model="order" OnValidSubmit="PlaceOrder">
                         <div class="row">
                             <!-- Left Column: Search and Food Categories -->
                             <div class="col-md-8 p-0" style="margin-top: -20px;">
@@ -217,7 +217,7 @@
                                                     <label class="col-sm-4 mb-0">
                                                         <input type="hidden" id="vat" name="vat" value="@order.VatTax.ToString("F2")" autocomplete="off">
                                                         <strong>
-                                                            $ <span id="calvat">@order.VatTax</span>
+                                                            &#8377; <span id="calvat">@order.VatTax</span>
                                                         </strong>
                                                     </label>
                                                 </div>
@@ -231,7 +231,7 @@
                                                         <br />
                                                         <span class="badge badge-primary grandbg font-26">
                                                             <strong>
-                                                                $ <span id="caltotal">@order.GrandTotal.ToString("F2")</span>
+                                                                &#8377; <span id="caltotal">@order.GrandTotal.ToString("F2")</span>
                                                             </strong>
                                                         </span>
                                                     </label>
@@ -242,13 +242,13 @@
                                             <td>
                                                 <div class="row m-0">
                                                     <label for="date" class="col-sm-8 mb-0">
-                                                        Service Charge(%)
-                                                        :
+                                                        Service Charge(%):
                                                     </label>
                                                     <div class="col-sm-4 p-0">
-                                                        <input type="text" id="service_charge" style="margin:0 !important;" class="form-control text-right mb-5" @bind-value="@order.ServiceCharge" @bind-value:event="oninput" placeholder="0.00" autocomplete="off">
+                                                        <input type="text" id="service_charge" style="margin:0 !important;" class="form-control text-right mb-5" @bind="order.ServiceCharge" @bind:event="oninput" placeholder="0.00" autocomplete="off">
                                                     </div>
                                                 </div>
+
                                             </td>
                                         </tr>
                                     </tbody>
@@ -258,15 +258,15 @@
                                 <a class="btn btn-outline-secondary mr-2" data-toggle="modal" data-target="#calculatorModal">
                                     <i class="fas fa-calculator"></i>
                                 </a>
-                                <a class="btn btn-danger mr-2" @onclick="CancelOrder">
+                                <button class="btn btn-danger mr-2" @onclick="CancelOrder" type="button"> 
                                     <i class="fas fa-times"></i> Cancel Order
-                                </a>
-                                <a class="btn btn-success" @onclick="PlaceOrder">
+                                </button>
+                                <button class="btn btn-success" type="submit">
                                     <i class="fas fa-check"></i> Place Order
-                                </a>
+                                </button>
                             </div>
                         </div>
-                    </form>
+                    </EditForm>
                 }
                 @if (topActiveTab == TopTab.OngoingOrder)
                 {
@@ -408,6 +408,7 @@
         StateHasChanged();
     }
 
+
     private void CancelOrder()
     {
         // Implement logic to cancel the order
@@ -510,14 +511,16 @@
         StateHasChanged();
     }
 
+
     private void UpdateGrandTotal()
     {
-        var originalTotal = order.OrderItems.Sum(item => item.Total);
-        //order.OriginalTotal = originalTotal;
+        var originalTotal = order.OrderItems.Sum(item => item.Price * item.Quantity);
+        var totalVAT = order.OrderItems.Sum(item => (item.Price * (item.VAT / 100)) * item.Quantity);
 
-        order.VatTax = originalTotal * (order.VatPercentage / 100);
+        order.VatTax = totalVAT;
         var serviceChargeAmount = originalTotal * (order.ServiceCharge / 100);
 
         order.GrandTotal = originalTotal + order.VatTax + serviceChargeAmount;
     }
+
 }

@@ -20,7 +20,7 @@
             <ValidationSummary/>
             <div>
                 <label class="col-form-label bold-font required-field">Enter Table Number</label>
-                <input type="number" placeholder="Enter Table Number" @bind-value="model.TableNumber" class="form-control mb-2" />
+                <input type="text" placeholder="Enter Table Number" @bind-value="model.TableNumber" class="form-control mb-2" />
                 <ValidationMessage For="() => model.TableNumber" />
             </div>
             <div>
@@ -46,7 +46,7 @@
             }
             <UiAlert Model="alert"></UiAlert>
             <hr />
-            <button type="submit" class="btn btn-primary float-right col-md-4">Add</button>
+            <button type="submit" class="btn btn-primary float-right col-md-4">Update</button>
         </EditForm>
         <br />
     }

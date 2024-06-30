@@ -22,7 +22,14 @@ namespace RMS.Dto
         public decimal VatPercentage
         {
             get => vatPercentage;
-            set => vatPercentage = Math.Round(value, 2);
+            set
+            {
+                if (vatPercentage != value)
+                {
+                    vatPercentage = Math.Round(value, 2);
+                    UpdateGrandTotal();
+                }
+            }
         }
 
         private decimal vatTax;
@@ -36,7 +43,14 @@ namespace RMS.Dto
         public decimal ServiceCharge
         {
             get => serviceCharge;
-            set => serviceCharge = Math.Round(value, 2);
+            set
+            {
+                if (serviceCharge != value)
+                {
+                    serviceCharge = Math.Round(value, 2);
+                    UpdateGrandTotal();
+                }
+            }
         }
 
         private decimal grandTotal;
@@ -50,7 +64,7 @@ namespace RMS.Dto
         {
             get
             {
-                return OrderItems.Sum(item => item.Total);
+                return OrderItems.Sum(item => item.Price * item.Quantity);
             }
         }
 
@@ -58,7 +72,14 @@ namespace RMS.Dto
         public decimal InvoiceDiscount
         {
             get => invoiceDiscount;
-            set => invoiceDiscount = Math.Round(value, 2);
+            set
+            {
+                if (invoiceDiscount != value)
+                {
+                    invoiceDiscount = Math.Round(value, 2);
+                    UpdateGrandTotal();
+                }
+            }
         }
 
         public void UpdateGrandTotal()
@@ -96,7 +117,7 @@ namespace RMS.Dto
         {
             get
             {
-                return Math.Round(Price * Quantity, 2);
+                return (Price + (Price * (VAT / 100))) * Quantity;
             }
         }
     }

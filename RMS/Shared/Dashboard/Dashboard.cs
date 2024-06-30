@@ -40,6 +40,29 @@ namespace RMS.Dto.Dashboard
         public string[] Labels { get; set; }
 
     }
+    public class Statistic
+    {
+        public int TotalBokking { get; set; }
+        public int TodaysBokking { get; set; }
+        public int ThisMonthBokking { get; set; }
 
+        public int TotalAmount { get; set; }
+        public int TodaysAmount { get; set; }
+        public int ThisMonthAmount { get; set; }
 
+        public int TotalCustomer { get; set; }
+        public int TodaysCustomer { get; set; }
+        public int ThisMonthCustomer { get; set; }
+
+        public int TotalSales { get; set; }
+        public int TodaysSales { get; set; }
+        public int ThisMonthSales { get; set; }
+    }
+    public class CustomersEntry
+    {
+        public CustomerDetailsDTO Customers { get; set; }
+        public int Total { get; set; }
+        public int Today { get; set; }
+        public int Reported { get; set; }
+    }
 }
