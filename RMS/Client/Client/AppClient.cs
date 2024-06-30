@@ -2791,7 +2791,6 @@ namespace RMS.Client.Client
                 res.EnsureSuccessStatusCode();
 
                 details = await res.Content.ReadFromJsonAsync<IEnumerable<TableCon>>();
-
             }
             catch (Exception ex)
             {

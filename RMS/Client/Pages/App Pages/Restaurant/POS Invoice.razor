@@ -133,13 +133,19 @@
                                                   NullText="-select-"
                                                   NullDataText="Loading..." />
                                     </div>
-                                    <div class="form-group col-md-12">
-                                        <label class="bold-font" for="table">Table</label>
-                                        <select id="table" class="form-control">
-                                            <option>Table 1</option>
-                                            <option>Table 2</option>
-                                        </select>
-                                    </div>
+                                        <div class="form-group col-md-12">
+                                            <label class="bold-font" for="table">TableNumber</label>
+                                            <HxSelect TItem="TableCon"
+                                                      TValue="int?"
+                                                      Data="tables"
+                                                      @bind-Value="tableId"
+                                                      TextSelector="@(tables => tables.TableNumber.ToString())"
+                                                      ValueSelector="@(tables => tables.Id)"
+                                                      Nullable="true"
+                                                      NullText="-select-"
+                                                      NullDataText="Loading..." />
+                                            <ValidationMessage For="() => order.Table" />
+                                        </div>
                                 </div>
                                 <div class="form-row">
                                     <div class="form-group col-md-12">
@@ -370,8 +376,11 @@
     public List<AddVariants> Variants = new();
     public List<CustomerDetailsDTO> customerDetailsDTOs = new();
     public List<Employee> employees = new();
+    public List<TableCon> tables = new();
     private int? customerId;
     private int? employeeId;
+    private int? tableId;
+
 
     private void SetTopActiveTab(TopTab tab)
     {
@@ -415,6 +424,7 @@
         foods = (await client.GetAllFood()).ToList();
         customerDetailsDTOs = (await client.GetAllCustomer()).ToList();
         employees = (await client.GetAllEmployee()).ToList();
+        tables = (await client.GetAllTableCon()).ToList();
         Variants = (await client.GetAllAddVariants()).ToList();
         if (foodCategories.Count > 0)
         {

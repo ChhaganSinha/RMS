@@ -35,9 +35,14 @@ else
     {
 
         c.Add(o => o.Id).SetWidth("10%").Css("table-bordered").Titled("SN.").Filterable(filter);
-        c.Add(o => o.TableNumber).SetWidth("80%").Css("table-bordered").Titled("TableNumber").Filterable(filter);
-        c.Add(o => o.TableCapacity).SetWidth("80%").Css("table-bordered").Titled("Table Capacity").Filterable(filter);
-        c.Add(o => o.Status).SetWidth("80%").Css("table-bordered").Titled("Table Status").Filterable(filter);
+        c.Add(o => o.TableNumber).SetWidth("80%").Css("table-bordered").Titled("Supplier Name").Filterable(filter);
+        c.Add(o => o.TableCapacity).SetWidth("80%").Css("table-bordered").Titled("Email").Filterable(filter);
+        c.Add(o => o.Status).SetWidth("80%").Css("table-bordered").Titled("Mobile No.").Filterable(filter);
+        //c.Add(o => o.Address).SetWidth("80%").Css("table-bordered").Titled("Address").Filterable(filter);
+        // c.Add(o => o.TotalAmount).SetWidth("80%").Css("table-bordered").Titled("Total Amount").Filterable(filter);
+        // c.Add(o => o.Amount).SetWidth("80%").Css("table-bordered").Titled("Amount").Filterable(filter);
+        // c.Add(o => o.DueAmount).SetWidth("80%").Css("table-bordered").Titled("Due Amount").Filterable(filter);
+        // c.Add(o => o.PaidAmount).SetWidth("80%").Css("table-bordered").Titled("PaidAmount").Filterable(filter);
 
         c.Add().Encoded(false).Sanitized(false).RenderComponentAs<TableConfigEditButton>().SetWidth("10px").Titled("Edit");
         c.Add().Encoded(false).Sanitized(false).RenderComponentAs<TableConfigDeleteButton>(new List<Action<object>> { RefreshGrid }).SetWidth("10px").Titled("Delete");
@@ -57,7 +62,7 @@ else
             .SetStriped(true)
             .WithMultipleFilters()
             .WithGridItemsCount()
-            // .SetExcelExport(true, true, "RoomCategories.xlsx")
+
             .ChangePageSize(true)
             .EmptyText("No data available")
             .SetKeyboard(true)
@@ -79,12 +84,4 @@ else
             await Component.UpdateGrid();
         }
     }
-
-
-
-    protected override async Task OnInitializedAsync()
-    {
-
-    }
-
 }

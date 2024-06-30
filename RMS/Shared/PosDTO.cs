@@ -12,7 +12,7 @@ namespace RMS.Dto
         public int EmployeeId { get; set; }
         public string Employee { get; set; }
         public int TableId { get; set; }
-        public string Table { get; set; }
+        public int Table { get; set; }
         public DateTime CookingTime { get; set; }
         public List<OrderItemDTO> OrderItems { get; set; } = new List<OrderItemDTO>();
 

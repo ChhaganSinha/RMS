@@ -5,128 +5,54 @@
 @using RMS.Client.Pages.GridComponent
 @using RMS.Client.Shared.Popup
 @using RMS.Client.Client
-@using System.ComponentModel.DataAnnotations
+@using RMS.Dto
+@using RMS.Dto.Enum
 @inject AppClient client
-@implements ICustomGridComponent<Food>
+@implements ICustomGridComponent<TableCon>
 @inject NavigationManager NavigationManager
 
 <button class='btn btn-sm btn-warning' style="border-radius:15px" @onclick="MyClickHandler" title="Edit"><i class="fa fa-pencil-square-o"></i></button>
-<PageDialog Title="@Title" Show="@show" ClosePageDialog="ResetForm">
+<SimpleDailog Title="@Title" Show="@show" OnCloseDialog="ResetForm">
     @if (show)
     {
         <EditForm Model="model" OnValidSubmit="OnSave">
             <DataAnnotationsValidator />
-            <div class="form-group row">
-                <!-- Food Name -->
-                <div class="col-md-4">
-                    <label class="col-form-label bold-font required-field">Food Name</label>
-                    <InputText @bind-Value="@model.FoodName" id="FoodName" class="form-control"></InputText>
-                    <ValidationMessage For="() => model.FoodName" />
-                </div>
-
-                <!-- Price -->
-                <div class="col-md-4">
-                    <label class="col-form-label bold-font">Price</label>
-                    <InputNumber @bind-Value="@model.Price" id="Price" class="form-control"></InputNumber>
-                    <ValidationMessage For="() => model.Price" />
-                </div>
-
-                <!-- Tax Percentage -->
-                <div class="col-md-4">
-                    <label class="col-form-label bold-font">Tax %</label>
-                    <InputNumber @bind-Value="@model.TaxPercentage" id="TaxPercentage" class="form-control"></InputNumber>
-                    <ValidationMessage For="() => model.TaxPercentage" />
-                </div>
+            <div>
+                <input type="number" placeholder="Enter Table Number" @bind-value="model.TableNumber" class="form-control mb-2" />
+                <ValidationMessage For="() => model.TableNumber" />
             </div>
-
-            <div class="form-group row">
-                <!-- Select Menu Type -->
-                <div class="col-md-4">
-                    <label class="col-form-label bold-font">Select Menu Type</label>
-                    <HxMultiSelect TItem="MenuType"
-                                   AutoSort="false"
-                                   TValue="int"
-                                   Data="@menuTypes"
-                                   @bind-Value="@selectedMenuTypeid"
-                                   TextSelector="@(p => p.Name)"
-                                   ValueSelector="@(p => p.Id)"
-                                   EmptyText="- Select -"
-                                   NullDataText="Loading..." />
-                </div>
-
-                <!-- Select Food Category -->
-                <div class="col-md-4">
-                    <label class="col-form-label bold-font">Select Food Category</label>
-
-                    <HxSelect TItem="FoodCategory"
-                              TValue="int?"
-                              Data="Category"
-                              @bind-Value="foodcategoryid"
-                              TextSelector="@(Variants => Variants.Name)"
-                              ValueSelector="@(Variants => Variants.Id)"
-                              Nullable="true"
-                              NullText="- Select -"
-                              NullDataText="Loading variants..." />
-
-                </div>
-
-                <!-- Select Food Variants -->
-                <div class="col-md-4">
-                    <label class="col-form-label bold-font">Select Food Variants</label>
-                    <HxMultiSelect TItem="AddVariants"
-                                   AutoSort="false"
-                                   TValue="int"
-                                   Data="@Variants"
-                                   @bind-Value="@variantsid"
-                                   TextSelector="@(p => p.Name)"
-                                   ValueSelector="@(p => p.Id)"
-                                   EmptyText="- Select -"
-                                   NullDataText="Loading..." />
-                </div>
+            <div>
+                <input type="number" placeholder="Enter Table Capacity" @bind-value="model.TableCapacity" class="form-control mb-2" />
+                <ValidationMessage For="() => model.TableCapacity" />
             </div>
-
-            <div class="form-group row">
-                <!-- Cooking Time -->
-                <div class="col-md-4">
-                    <label class="col-form-label bold-font">Cooking Time</label>
-                    <InputText @bind-Value="@model.CookingTime" id="CookingTime" class="form-control"></InputText>
-                    <ValidationMessage For="() => model.CookingTime" />
-                </div>
-
-                <!-- Upload Image -->
-                <div class="col-md-4">
-                    <label class="col-form-label bold-font">Upload Image</label>
-                    <InputFile OnChange="HandleFileSelected" class="form-control" />
-                    <br />
-                    <img id="imgPreview" src="@imageDataUrl" style="max-width: 200px; max-height: 200px; display: @(imageDataUrl == null ? "none" : "block");" />
-                    <ValidationMessage For="() => model.ImageFile" />
-                </div>
+            <div>
+                <select @bind="model.Status" class="form-control mb-2">
+                    @foreach (var status in Enum.GetValues(typeof(TableStatus)).Cast<TableStatus>())
+                    {
+                        <option value="@status">@status</option>
+                    }
+                </select>
+                <ValidationMessage For="() => model.Status" />
             </div>
-
-            <!-- Loading Indicator and Alerts -->
             @if (process)
             {
                 <div style="text-align:center">
                     <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
                 </div>
             }
-
             <UiAlert Model="alert"></UiAlert>
-            <hr style="margin-bottom: 2px;" />
-            <button type="submit" class="btn btn-primary float-right col-md-4">Update</button>
+            <hr />
+            <button type="submit" class="btn btn-primary float-right col-md-4">Add</button>
         </EditForm>
         <br />
     }
-</PageDialog>
+</SimpleDailog>
 @code {
     [Parameter]
-    public Food Item { get; set; }
-
-   
-    private List<int> variantsid = new();
+    public TableCon Item { get; set; }
 
     [Parameter]
-    public CGrid<Food> Grid { get; set; }
+    public CGrid<TableCon> Grid { get; set; }
 
     [CascadingParameter]
     protected AlertModel? alert { get; set; }
@@ -135,59 +61,19 @@
     private int _delay = 2500;
     bool show = false;
     bool process = false;
-    string Title = "Update Food Details";
+    string Title = "Update Category";
 
-
-    [Required]
-    private List<int> selectedMenuTypeid { get; set; } = new();
-    private int? foodcategoryid;
-    private bool IsError = false;
-    private List<MenuType> menuTypes = new();
-    private List<FoodCategory> Category = new();
-    private List<AddVariants> Variants = new();
-    Dictionary<int, List<int>> FoodMenuTypeMap = new Dictionary<int, List<int>>();
-    Dictionary<int, List<int>> FoodVarientMap = new Dictionary<int, List<int>>();
-
-    private string imageDataUrl;
-
-    Food model = new();
-    private async Task HandleFileSelected(InputFileChangeEventArgs e)
-    {
-        var file = e.File;
-        if (file != null)
-        {
-            using (var memoryStream = new MemoryStream())
-            {
-                await file.OpenReadStream().CopyToAsync(memoryStream);
-                model.ImageFile = memoryStream.ToArray();
-                imageDataUrl = $"data:{file.ContentType};base64,{Convert.ToBase64String(model.ImageFile)}";
-            }
-        }
-    }
+    TableCon model = new();
 
     private async Task MyClickHandler(MouseEventArgs e)
     {
         show = true;
-        model = await client.GetFoodById(Item.Id);
+        model = await client.GetTableConById(Item.Id);
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
         alert?.Clear();
-
-        menuTypes = (await client.GetAllMenuType()).ToList();
-        Category = (await client.GetAllFoodCategory()).ToList();
-        Variants = (await client.GetAllAddVariants()).ToList();
-        // Convert existing image data to base64 string for preview
-        if (model.ImageFile != null && model.ImageFile.Length > 0)
-        {
-            imageDataUrl = $"data:image/png;base64,{Convert.ToBase64String(model.ImageFile)}";
-        }
-
-        
-        foodcategoryid = model.FoodCategoryId > 0 ? model.FoodCategoryId : null;
-
-        var foodMenuTypeMap = await client.GetFoodMenuTypeByFoodId(model.Id);
-        selectedMenuTypeid.AddRange(foodMenuTypeMap.Select(o => o.MenuTypeId));
-
-        var foodVarientMap = await client.GetFoodVarientByFoodId(model.Id);
-        variantsid.AddRange(foodVarientMap.Select(o => o.FoodVarientId));
     }
 
     public async Task OnSave()
@@ -195,55 +81,15 @@
         process = true;
         alert?.Clear();
 
-        model.FoodCategoryId = foodcategoryid;
-        if (foodcategoryid != null)
-            model.FoodCategory = Category.Where(x => x.Id == foodcategoryid).Select(x => x.Name).First();
-
-        //model.VariantId = variantsid;
-        if (variantsid.Count > 0)
-            model.Variant = string.Join(", ", Variants.Where(x => variantsid.Contains(x.Id)).Select(x => x.Name));
-
-        if (selectedMenuTypeid.Count > 0)
-            model.MenuType = string.Join(", ", menuTypes.Where(menuType => selectedMenuTypeid.Contains(menuType.Id)).Select(menuType => menuType.Name));
-
-        var response = await client.UpsertFoodAsync(model);
+        var response = await client.UpsertTableConAsync(model);
         if (response.IsSuccess)
         {
-            if (response.Result.Id > 0)
-            {
-                if (FoodMenuTypeMap.ContainsKey(model.Id))
-                {
-                    FoodMenuTypeMap[model.Id] = selectedMenuTypeid.Select(id => id).ToList();
-                }
-                else
-                {
-                    FoodMenuTypeMap.Add(model.Id, selectedMenuTypeid.Select(id => id).ToList());
-                }
-
-                var result = await client.UpsertFoodMenuTypeMapping(FoodMenuTypeMap);
-            }
-
-            if (response.Result.Id > 0)
-            {
-                if (FoodVarientMap.ContainsKey(model.Id))
-                {
-                    FoodVarientMap[model.Id] = variantsid.Select(id => id).ToList();
-                }
-                else
-                {
-                    FoodVarientMap.Add(model.Id, variantsid.Select(id => id).ToList());
-                }
-
-                var result = await client.UpsertFoodVarientMapping(FoodVarientMap);
-            }
-            await FoodGrid.RefreshGridAsync();
+            // model = response.Result;
             alert?.SetSuccess(response.Message);
-           
+            await TableGrid.RefreshGridAsync();
         }
         else
-        {
             alert?.SetError(response.Message);
-        }
 
         process = false;
         StateHasChanged();
@@ -263,4 +109,5 @@
         show = false;
         process = false;
     }
+
 }

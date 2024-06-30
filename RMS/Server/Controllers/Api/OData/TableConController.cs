@@ -10,11 +10,11 @@ using RMS.Server.Intrastructure.ActionFilters;
 namespace RMS.Server.Controllers.Api.OData
 {
     [Authorize]
-    public class TableConfController : ODataController
+    public class TableConController : ODataController
     {
-        public ILogger<TableConfController> Logger { get; }
+        public ILogger<TableConController> Logger { get; }
         public AppDbContext DbContext { get; }
-        public TableConfController(ILogger<TableConfController> logger, AppDbContext dbContext)
+        public TableConController(ILogger<TableConController> logger, AppDbContext dbContext)
         {
             Logger = logger;
             DbContext = dbContext;

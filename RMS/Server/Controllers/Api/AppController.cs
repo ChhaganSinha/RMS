@@ -1044,7 +1044,7 @@ namespace RMS.Server.Controllers.Api
         }
 
         [HttpGet]
-        [Route("all-room-TableCon")]
+        [Route("all-TableCon")]
         public async Task<IEnumerable<TableCon>> GetAllTableCon()
         {
             return await _appRepository.GetAllTableCon();
