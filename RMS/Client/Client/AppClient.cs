@@ -2274,6 +2274,42 @@ namespace RMS.Client.Client
         }
 
 
+        public async Task<List<ReservationDetailsDto>> GetTodaysBookingsAsync()
+        {
+            List<ReservationDetailsDto> details = null;
+            try
+            {
+                var res = await HttpClient.GetAsync("api/App/todays-bookings");
+                res.EnsureSuccessStatusCode();
+                details = await res.Content.ReadFromJsonAsync<List<ReservationDetailsDto>>();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return details;
+        }
+
+        public async Task<List<ReservationDetailsDto>> GetNextDaysBookingsAsync()
+        {
+            List<ReservationDetailsDto> details = null;
+            try
+            {
+                var res = await HttpClient.GetAsync("api/App/next-days-bookings");
+                res.EnsureSuccessStatusCode();
+                details = await res.Content.ReadFromJsonAsync<List<ReservationDetailsDto>>();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return details;
+        }
+
 
         public async Task<ReservationDetailsDto> GetReservationDetailsDtoById(int id)
         {
