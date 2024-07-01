@@ -3166,7 +3166,7 @@ namespace RMS.Repositories
             PosDTO result = null;
 
 #pragma warning disable CS8600
-            result = AppDbCxt.PosDTO.FirstOrDefault(o => o.Id == id);
+            result = AppDbCxt.PosDTO.Include(x=>x.OrderItems).FirstOrDefault(o => o.Id == id);
 #pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
 
             return await Task.FromResult(result);
@@ -3203,6 +3203,10 @@ namespace RMS.Repositories
                     result.Message = "Data Successfully Inserted.";
                 }
 
+                var table = AppDbCxt.TableCon.First(x => x.Id == data.TableId);
+                table.Status = TableStatus.Reserved;
+                AppDbCxt.TableCon.Update(table);
+
                 AppDbCxt.SaveChanges();
                 result.IsSuccess = true;
                 result.Result = data;
@@ -3234,6 +3238,39 @@ namespace RMS.Repositories
                 await AppDbCxt.SaveChangesAsync();
                 result.IsSuccess = true;
                 result.Message = "Successfully Deleted!";
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+
+        public async Task<ApiResponse<PosDTO>> CompletePos(int id)
+        {
+            var result = new ApiResponse<PosDTO>();
+            try
+            {
+                var existing = AppDbCxt.PosDTO.First(x => x.Id == id);
+                existing.Status = PosStatus.Complete;
+
+                var table = AppDbCxt.TableCon.First(x => x.Id == existing.TableId);
+                table.Status = TableStatus.Available;
+                AppDbCxt.TableCon.Update(table);
+                result.Result = existing;
+                if (existing == null)
+                {
+                    result.IsSuccess = true;
+                    result.Message = "Pos Details not found!";
+                    return result;
+                }
+
+                AppDbCxt.PosDTO.Update(existing);
+                await AppDbCxt.SaveChangesAsync();
+                result.IsSuccess = true;
+                result.Message = "Successfully Completed!";
                 return result;
             }
             catch (Exception ex)

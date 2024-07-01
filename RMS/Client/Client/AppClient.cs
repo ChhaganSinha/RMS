@@ -3008,6 +3008,23 @@ namespace RMS.Client.Client
                 return result;
             }
         }
+        public async Task<ApiResponse<PosDTO>> CompletePos(int id)
+        {
+            var result = new ApiResponse<PosDTO>();
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/App/CompletePos/{id}", new { });
+                res.EnsureSuccessStatusCode();
+                var json = await res.Content.ReadFromJsonAsync<ApiResponse<PosDTO>>();
+                return json;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
         #endregion
     }
 }

@@ -16,22 +16,231 @@
     @if (show)
     {
 
-        <EditForm Model="model" OnValidSubmit="OnSave">
-            <DataAnnotationsValidator />
-
-            @if (process)
-            {
-                <div style="text-align:center">
-                    <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
+        <EditForm Model="order" OnValidSubmit="PlaceOrder">
+            <div class="row">
+                <!-- Left Column: Search and Food Categories -->
+                <div class="col-md-8 p-0" style="margin-top: -20px;">
+                    <div class="card p-2" style="margin: 16px;">
+                        <input type="text" placeholder="Search for food..." class="form-control mb-3" @bind="searchQuery" @oninput="FilterFoods" />
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="nav flex-column nav-pills overflow-auto" style="height: 100vh; border:1px dashed; padding:10px; overflow:auto">
+                                    <a style="font-size:16px; cursor:pointer;"
+                                       class="nav-link mb-2 btn-success @GetVerticalTabClass(VerticalTab.AllFood)"
+                                       @onclick="() => SetVerticalActiveTab(VerticalTab.AllFood)">
+                                        All Food
+                                    </a>
+                                    @foreach (var category in foodCategories)
+                                    {
+                                        <a style="font-size:16px; cursor:pointer;" class="nav-link mb-2 @GetVerticalTabClass((VerticalTab)category.Id) btn-success" @onclick="() => SetVerticalActiveTab((VerticalTab)category.Id)">@category.Name</a>
+                                    }
+                                </div>
+                            </div>
+                            <div class="col-md-8">
+                                <div class="row">
+                                    @foreach (var food in filteredFoods)
+                                    {
+                                        <div class="col-md-3">
+                                            <div class="card mb-2" @onclick="() => ShowFoodDetailsModal(food)" style="cursor:pointer;">
+                                                <img src="@GetImageSrc(food)" class="card-img-top" alt="@food.FoodName" width="100">
+                                                <div class="card-body p-2">
+                                                    <h6 class="card-title m-0">@food.FoodName</h6>
+                                                    <p class="card-text m-0" style="font-size:8px">Price: @food.Price.ToString("0.00")</p>
+                                                    <!-- Hidden Inputs -->
+                                                    <input type="hidden" name="select_product_id" class="select_product_id" value="@food.Id">
+                                                    <input type="hidden" name="select_totalvarient" class="select_totalvarient" value="@food.VariantId.HasValue ? 1 : 0">
+                                                    <input type="hidden" name="select_iscustomeqty" class="select_iscustomeqty" value="">
+                                                    <input type="hidden" name="select_product_size" class="select_product_size" value="">
+                                                    <input type="hidden" name="select_product_isgroup" class="select_product_isgroup" value="">
+                                                    <input type="hidden" name="select_product_cat" class="select_product_cat" value="@food.FoodCategoryId">
+                                                    <input type="hidden" name="select_varient_name" class="select_varient_name" value="@food.Variant">
+                                                    <input type="hidden" name="select_product_name" class="select_product_name" value="@food.FoodName">
+                                                    <input type="hidden" name="select_product_price" class="select_product_price" value="@food.Price">
+                                                    <input type="hidden" name="select_addons" class="select_addons" value="">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            }
-            <UiAlert Model="alert"></UiAlert>
-            <hr style="margin-bottom: 2px;" />
-            <button type="submit" class="btn btn-primary float-right col-md-4">Add</button>
+
+                <!-- Right Column: Customer and Order Details -->
+                <div class="col-md-4 p-0" style="margin-top: -20px;">
+                    <div class="card p-4" style="margin: 16px;">
+                        <div class="form-row">
+                            <div class="form-group col-md-12">
+                                <label class="bold-font required-field" for="customerName">Customer Name</label>
+                                <a style="float: right;" href="javascript:void(0)" data-toggle="modal" data-target="#exampleModal">Add</a>
+                                <HxSelect TItem="CustomerDetailsDTO"
+                                          TValue="int?"
+                                          Data="customerDetailsDTOs"
+                                          @bind-Value="customerId"
+                                          TextSelector="@(o => o.FirstName)"
+                                          ValueSelector="@(o => o.Id)"
+                                          Nullable="true"
+                                          NullText="-select-"
+                                          NullDataText="Loading..." />
+                            </div>
+                            <div class="form-group col-md-12">
+                                <label class="bold-font" for="customerType">Customer Type</label>
+                                <select class="form-control" id="CustomerType">
+                                    @foreach (var val in Enum.GetValues(typeof(CustomerType)))
+                                    {
+                                        <option value="@val">@val</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="form-group col-md-12">
+                                <label class="bold-font" for="waiter">Waiter</label>
+                                <HxSelect TItem="Employee"
+                                          TValue="int?"
+                                          Data="employees"
+                                          @bind-Value="employeeId"
+                                          TextSelector="@(o => o.Name)"
+                                          ValueSelector="@(o => o.Id)"
+                                          Nullable="true"
+                                          NullText="-select-"
+                                          NullDataText="Loading..." />
+                            </div>
+                            <div class="form-group col-md-12">
+                                <label class="bold-font" for="table">TableNumber</label>
+                                <HxSelect TItem="TableCon"
+                                          TValue="int?"
+                                          Data="tables"
+                                          @bind-Value="tableId"
+                                          TextSelector="@(tables => tables.TableNumber)"
+                                          ValueSelector="@(tables => tables.Id)"
+                                          Nullable="true"
+                                          NullText="-select-"
+                                          NullDataText="Loading..." />
+
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-md-12">
+                                <label class="bold-font" for="cookingTime">Cooking Time</label>
+                                <input name="cookedtime" type="text" class="form-control timepicker3 hasDatepicker" id="cookedtime" placeholder="00:00:00" autocomplete="off">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- food Order Details -->
+            <div class="table-responsive" id="addfoodlist">
+                <table class="table table-bordered" border="1" width="100%" id="addinvoice">
+                    <thead>
+                        <tr>
+                            <th>Item</th>
+                            <th>Variant Name</th>
+                            <th>Price</th>
+                            <th>VAT(%)</th>
+                            <th>Quantity</th>
+                            <th>Total</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody class="itemNumber">
+                        @foreach (var item in order.OrderItems)
+                        {
+                            <tr>
+                                <th>@item.ProductName</th>
+                                <td>@item.VariantName</td>
+                                <td>@item.Price.ToString("F2")</td>
+                                <td>@item.VAT.ToString("F1")</td>
+                                <td>
+                                    <a class="btn btn-info btn-sm" @onclick="() => UpdateQuantity(item, 1)">
+                                        <i class="fa fa-plus" aria-hidden="true"></i>
+                                    </a>
+                                    <span>@item.Quantity</span>
+                                    <a class="btn btn-danger btn-sm" @onclick="() => UpdateQuantity(item, -1)">
+                                        <i class="fa fa-minus" aria-hidden="true"></i>
+                                    </a>
+                                </td>
+                                <td>@item.Total.ToString("F2")</td>
+                                <td>
+                                    <a class="btn btn-danger btn-sm" @onclick="() => RemoveItem(item)">
+                                        <i class="fa fa-trash-o" aria-hidden="true"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                        <input name="grandtotal" id="grtotal" type="hidden" value="@order.GrandTotal.ToString("F2")">
+                    </tbody>
+                </table>
+            </div>
+            <div class="row d-flex flex-wrap align-items-center">
+                <div class="col-sm-6 leftview">
+                    <input name="distype" id="distype" type="hidden" value="1" autocomplete="off">
+                    <input name="sdtype" id="sdtype" type="hidden" value="1" autocomplete="off">
+                    <input type="hidden" id="orginattotal" value="@order.OriginalTotal.ToString("F2")" name="orginattotal" autocomplete="off">
+                    <input type="hidden" id="invoice_discount" class="form-control text-right" name="invoice_discount" value="@order.InvoiceDiscount" autocomplete="off">
+                    <table class="table table-bordered footersumtotal">
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <div class="row m-0">
+                                        <label for="date" class="col-sm-8 mb-0">
+                                            Vat/Tax(@order.VatPercentage.ToString("F1")):
+                                        </label>
+                                        <label class="col-sm-4 mb-0">
+                                            <input type="hidden" id="vat" name="vat" value="@order.VatTax.ToString("F2")" autocomplete="off">
+                                            <strong>
+                                                &#8377; <span id="calvat">@order.VatTax</span>
+                                            </strong>
+                                        </label>
+                                    </div>
+                                </td>
+                                <td rowspan="2">
+                                    <div class="row">
+                                        <label for="date" class="mb-0 col-sm-6">Grand Total:</label>
+                                        <label class="col-sm-6 p-0 mb-0">
+                                            <input type="hidden" id="orggrandTotal" value="@order.GrandTotal.ToString("F2")" name="orggrandTotal" autocomplete="off">
+                                            <input name="grandtotal" type="hidden" value="@order.GrandTotal.ToString("F2")" id="grandtotal" autocomplete="off">
+                                            <br />
+                                            <span class="badge badge-primary grandbg font-26">
+                                                <strong>
+                                                    &#8377; <span id="caltotal">@order.GrandTotal.ToString("F2")</span>
+                                                </strong>
+                                            </span>
+                                        </label>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="row m-0">
+                                        <label for="date" class="col-sm-8 mb-0">
+                                            Service Charge(%):
+                                        </label>
+                                        <div class="col-sm-4 p-0">
+                                            <input type="text" id="service_charge" style="margin:0 !important;" class="form-control text-right mb-5" @bind="order.ServiceCharge" @bind:event="oninput" placeholder="0.00" autocomplete="off">
+                                        </div>
+                                    </div>
+
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="col-sm-6 text-right">
+                    <a class="btn btn-outline-secondary mr-2" data-toggle="modal" data-target="#calculatorModal">
+                        <i class="fas fa-calculator"></i>
+                    </a>
+                   
+                    <button class="btn btn-success" type="submit">
+                        <i class="fas fa-check"></i> Add On
+                    </button>
+                </div>
+            </div>
         </EditForm>
         <br />
     }
 </PageDialog>
+
 @code {
     [Parameter]
     public PosDTO Item { get; set; }
@@ -48,24 +257,83 @@
     bool process = false;
     string Title = "Update PosDTO Details";
 
+    private enum TopTab
+    {
+        NewOrder,
+        OngoingOrder,
+        TodayOrder
+    }
+
+    private enum VerticalTab
+    {
+        AllFood = -1,
+        Category1,
+        Category2,
+    }
+
+    string MessageBody = "Thank you!";
+    string message = string.Empty;
+    bool TaskCompleted = false;
+    bool IsError = false;
+    bool IsSuccess = false;
+    private TopTab topActiveTab = TopTab.NewOrder;
+    private VerticalTab verticalActiveTab = VerticalTab.Category1;
+    private string searchQuery = string.Empty;
+    private List<Food> filteredFoods = new();
+    public List<FoodCategory> foodCategories = new();
+    public List<Food> foods = new();
+    public List<AddVariants> Variants = new();
+    public List<CustomerDetailsDTO> customerDetailsDTOs = new();
+    public List<Employee> employees = new();
+    public List<TableCon> tables = new();
+    private int? customerId;
+    private int? employeeId;
+    private int? tableId;
+
     private int? categoriesId;
     [Required]
     private List<int> SelectedFacilities { get; set; } = new();
-    private bool IsError = false;
+    private Food selectedFood;
+    bool showcart = false;
 
     private string imageDataUrl;
 
-    PosDTO model = new();
+    private PosDTO order = new PosDTO();
 
     private async Task MyClickHandler(MouseEventArgs e)
     {
-       
+        show = true;
+        foodCategories = (await client.GetAllFoodCategory()).ToList();
+        foods = (await client.GetAllFood()).ToList();
+        customerDetailsDTOs = (await client.GetAllCustomer()).ToList();
+        employees = (await client.GetAllEmployee()).ToList();
+        tables = (await client.GetAllTableCon()).Where(x => x.Status == TableStatus.Available).ToList();
+        Variants = (await client.GetAllAddVariants()).ToList();
+        if (foodCategories.Count > 0)
+        {
+            verticalActiveTab = (VerticalTab)foodCategories[0].Id;
+        }
+        FilterFoods();
+        order = await client.GetPosById(Item.Id);
+        customerId = order.CustomerId;
+        employeeId = order.EmployeeId;
+        tableId = order.TableId;
     }
 
-    public async Task OnSave()
+    private void AddToCart()
     {
-       
-
+        var orderItem = new OrderItemDTO
+            {
+                ProductName = selectedFood.FoodName,
+                VariantName = selectedFood.Variant,
+                Price = selectedFood.Price,
+                VAT = selectedFood.TaxPercentage,
+                Quantity = 1
+            };
+        order.OrderItems.Add(orderItem);
+        UpdateGrandTotal();
+        showcart = false;
+        StateHasChanged();
     }
 
     private void TimerCallback(Object o)
@@ -77,10 +345,154 @@
 
     private void ResetForm()
     {
-        model = new();
+        order = new();
         show = false;
         process = false;
     }
+    private async Task PlaceOrder()
+    {
+        process = true;
+        message = string.Empty;
+        MessageBody = "Thank you!";
+        show = true;
+        TaskCompleted = false;
+        message = "Please wait";
+        try
+        {
+            order.CustomerId = customerId;
+            if (customerId != null)
+                order.CustomerName = customerDetailsDTOs.Where(x => x.Id == customerId).Select(x => x.FirstName).First() + " " + customerDetailsDTOs.Where(x => x.Id == customerId).Select(x => x.LastName).First();
+            order.EmployeeId = employeeId;
+            if (employeeId != null)
+                order.Employee = employees.Where(x => x.Id == employeeId).Select(x => x.Name).First();
+            order.TableId = tableId;
+            if (tableId != null)
+                order.Table = tables.Where(x => x.Id == tableId).Select(x => x.TableNumber).First();
 
+            order.Status = PosStatus.OnGoing;
+            var response = await client.UpsertPosAsync(order);
+            if (response.IsSuccess)
+            {
+                message = "Order Placed!";
+                MessageBody = response.Message;
+                order = new();
+                customerId = null;
+                employeeId = null;
+                tableId = null;
+            }
+            else
+            {
+                message = "Error!";
+                MessageBody = response.Message;
+            }
+
+        }
+        catch (Exception ex)
+        {
+            IsError = true;
+            message = "Error!";
+            MessageBody = ex.Message;
+            TaskCompleted = true;
+        }
+        process = false;
+        TaskCompleted = true;
+    }
+
+
+    private void SetVerticalActiveTab(VerticalTab categoryId)
+    {
+        verticalActiveTab = categoryId;
+        FilterFoods();
+    }
+
+    private string GetVerticalTabClass(VerticalTab categoryId)
+    {
+        return verticalActiveTab == categoryId ? "active" : string.Empty;
+    }
+
+    private string GetImageSrc(Food food)
+    {
+        if (food.ImageFile != null)
+        {
+            var base64 = Convert.ToBase64String(food.ImageFile);
+            return $"data:image/jpeg;base64,{base64}";
+        }
+        return "path/to/default/image.jpg";
+    }
+
+    private void FilterFoods()
+    {
+        if (string.IsNullOrWhiteSpace(searchQuery))
+        {
+            ApplyCategoryFilter(verticalActiveTab);
+        }
+        else
+        {
+            filteredFoods = foods
+                .Where(f => f.FoodName.Contains(searchQuery, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+            verticalActiveTab = VerticalTab.AllFood;
+        }
+
+        StateHasChanged();
+    }
+
+    private void ApplyCategoryFilter(VerticalTab categoryId)
+    {
+        if (categoryId == VerticalTab.AllFood)
+        {
+            filteredFoods = foods.ToList();
+        }
+        else
+        {
+            filteredFoods = foods
+                .Where(f => f.FoodCategoryId == (int)categoryId)
+                .ToList();
+        }
+    }
+
+    private void ShowFoodDetailsModal(Food food)
+    {
+        selectedFood = food;
+        showcart = true;
+        StateHasChanged();
+    }
+
+    private void UpdateQuantity(OrderItemDTO item, int change)
+    {
+        item.Quantity += change;
+        if (item.Quantity <= 0)
+        {
+            order.OrderItems.Remove(item);
+        }
+        UpdateGrandTotal();
+        StateHasChanged();
+    }
+
+    private void RemoveItem(OrderItemDTO item)
+    {
+        order.OrderItems.Remove(item);
+        UpdateGrandTotal();
+        StateHasChanged();
+    }
+
+
+    private void UpdateGrandTotal()
+    {
+        var originalTotal = order.OrderItems.Sum(item => item.Price * item.Quantity);
+        var totalVAT = order.OrderItems.Sum(item => (item.Price * (item.VAT / 100)) * item.Quantity);
+
+        order.VatTax = totalVAT;
+        var serviceChargeAmount = originalTotal * (order.ServiceCharge / 100);
+
+        order.GrandTotal = originalTotal + order.VatTax + serviceChargeAmount;
+    }
+    private async Task SyncCustoomerDertails(CustomerDetailsDTO customerDetailsDTO)
+    {
+        customerDetailsDTOs = (await client.GetAllCustomer()).ToList();
+        order.CustomerId = customerDetailsDTO.Id;
+        order.CustomerName = customerDetailsDTO.FirstName + " " + customerDetailsDTO.LastName;
+        StateHasChanged();
+    }
 }
 

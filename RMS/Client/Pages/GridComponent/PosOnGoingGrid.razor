@@ -38,7 +38,7 @@ else
         c.Add(o => o.CustomerName).Css("table-bordered").Filterable(filter);
         c.Add(o => o.Table).Css("table-bordered").Filterable(filter);
         c.Add(o => o.Status).Css("table-bordered").Filterable(filter);
-
+        c.Add(o => o.GrandTotal).Css("table-bordered").Filterable(filter);
 
         c.Add().Encoded(false).Sanitized(false).RenderComponentAs<PosEditButton>().SetWidth("10px").Titled("Edit");
         c.Add().Encoded(false).Sanitized(false).RenderComponentAs<PosDeleteButton>(new List<Action<object>> { RefreshGrid }).SetWidth("10px").Titled("Delete");

@@ -15,7 +15,7 @@ namespace RMS.Dto
         public int ? TableId { get; set; }
         public string Table { get; set; }
         public PosStatus Status { get; set; }
-        public DateTime CookingTime { get; set; }
+        public string CookingTime { get; set; }
         public List<OrderItemDTO> OrderItems { get; set; } = new List<OrderItemDTO>();
 
         private decimal vatPercentage;

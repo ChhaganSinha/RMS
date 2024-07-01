@@ -478,6 +478,9 @@
                 message = "Order Placed!";
                 MessageBody = response.Message;
                 order = new();
+                customerId = null;
+                employeeId = null;
+                tableId = null;
             }
             else
             {
@@ -503,7 +506,7 @@
         foods = (await client.GetAllFood()).ToList();
         customerDetailsDTOs = (await client.GetAllCustomer()).ToList();
         employees = (await client.GetAllEmployee()).ToList();
-        tables = (await client.GetAllTableCon()).ToList();
+        tables = (await client.GetAllTableCon()).Where(x => x.Status == TableStatus.Available).ToList();
         Variants = (await client.GetAllAddVariants()).ToList();
         if (foodCategories.Count > 0)
         {
@@ -602,6 +605,7 @@
     }
     private async Task SyncCustoomerDertails(CustomerDetailsDTO customerDetailsDTO)
     {
+        customerDetailsDTOs = (await client.GetAllCustomer()).ToList();
         order.CustomerId = customerDetailsDTO.Id;
         order.CustomerName = customerDetailsDTO.FirstName +" "+ customerDetailsDTO.LastName;
         StateHasChanged();

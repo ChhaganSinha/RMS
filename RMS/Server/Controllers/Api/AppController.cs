@@ -1131,6 +1131,13 @@ namespace RMS.Server.Controllers.Api
         public async Task<ApiResponse<PosDTO>> DeletePos(int id)
         {
             return await _appRepository.DeletePos(id);
+        } 
+        
+        [HttpPost]
+        [Route("CompletePos/{id}")]
+        public async Task<ApiResponse<PosDTO>> CompletePos(int id)
+        {
+            return await _appRepository.CompletePos(id);
         }
         #endregion
     }
