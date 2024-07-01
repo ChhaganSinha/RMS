@@ -112,10 +112,11 @@
                             @foreach (var booking in TodaysBookings)
                             {
                                 <tr>
-                                    <td>@booking.Name</td>
-                                    <td>@booking.Phone</td>
-                                    <td>@booking.Email</td>
-                                    <td>@booking.Address</td>
+                                    <td>@booking.CustomerInfo.FirstOrDefault()?.Name</td>
+                                    <td>@booking.CustomerInfo.FirstOrDefault()?.MobileNo</td>
+                                    <td>@booking.CustomerInfo.FirstOrDefault()?.Email</td>
+                                    <td>@booking.ArrivalFrom</td>
+                                    
                                 </tr>
                             }
                         </tbody>
@@ -142,10 +143,10 @@
                             @foreach (var booking in NextDaysBookings)
                             {
                                 <tr>
-                                    <td>@booking.Name</td>
-                                    <td>@booking.Phone</td>
-                                    <td>@booking.Email</td>
-                                    <td>@booking.Address</td>
+                                    <td>@booking.CustomerInfo.FirstOrDefault()?.Name</td>
+                                    <td>@booking.CustomerInfo.FirstOrDefault()?.MobileNo</td>
+                                    <td>@booking.CustomerInfo.FirstOrDefault()?.Email</td>
+                                    <td>@booking.ArrivalFrom</td>
                                 </tr>
                             }
                         </tbody>
@@ -196,23 +197,14 @@
     private string[] TrainingPieChartLabels = { "Booking Amount", "Total Booking" };
     private int[] TrainingPieChartIds = { 1, 2 };
 
-    private List<Booking> TodaysBookings = new List<Booking>
-    {
-        new Booking { Name = "John Doe", Phone = "123-456-7890", Email = "john.doe@example.com", Address = "123 Main St" },
-        new Booking { Name = "Jane Smith", Phone = "987-654-3210", Email = "jane.smith@example.com", Address = "456 Oak St" }
-    };
 
-    private List<Booking> NextDaysBookings = new List<Booking>
-    {
-        new Booking { Name = "Alice Johnson", Phone = "555-123-4567", Email = "alice.johnson@example.com", Address = "789 Pine St" },
-        new Booking { Name = "Bob Brown", Phone = "555-765-4321", Email = "bob.brown@example.com", Address = "101 Maple St" }
-    };
 
-    public class Booking
+    private List<ReservationDetailsDto> TodaysBookings = new List<ReservationDetailsDto>();
+    private List<ReservationDetailsDto> NextDaysBookings = new List<ReservationDetailsDto>();
+
+    protected override async Task OnInitializedAsync()
     {
-        public string Name { get; set; }
-        public string Phone { get; set; }
-        public string Email { get; set; }
-        public string Address { get; set; }
+        TodaysBookings = await client.GetTodaysBookingsAsync();
+        NextDaysBookings = await client.GetNextDaysBookingsAsync();
     }
 }

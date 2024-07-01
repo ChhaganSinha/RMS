@@ -2407,13 +2407,59 @@ namespace RMS.Repositories
         }
 
 
+        public async Task<List<ReservationDetailsDto>> GetTodaysBookingsAsync()
+        {
+            try
+            {
+                var todaysCustomerInfo = await AppDbCxt.ReservationDetails.Include(o=>o.CustomerInfo)
+                    .Where(r => r.CheckIn.Date == DateTime.Today.Date)
+                   // .SelectMany(r => r.CustomerInfo)
+                    .ToListAsync();
+
+                //return todaysCustomerInfo.Select(ci => new CustomerInfoDto
+                //{
+                //    SL = ci.SL,
+                //    Name = ci.Name,
+                //    MobileNo = ci.MobileNo,
+                //    Email = ci.Email
+                //}).ToList();
+                return todaysCustomerInfo;
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+        }
+
+        public async Task<List<ReservationDetailsDto>> GetNextDaysBookingsAsync()
+        {
+
+
+            try
+            {
+                var nextDaysCustomerInfo = await AppDbCxt.ReservationDetails.Include(o => o.CustomerInfo)
+                    .Where(r => r.CheckIn.Date == DateTime.Today.AddDays(1))
+                    
+                    .ToListAsync();
+
+                return nextDaysCustomerInfo;
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+        }
+
+
 
         public async Task<ReservationDetailsDto> GetReservationDetailsById(int id)
         {
             ReservationDetailsDto result = null;
 
 #pragma warning disable CS8600
-            result = AppDbCxt.ReservationDetails.Include(o=> o.RoomBookings).Include(o=> o.CustomerInfo).Include(o=> o.PaymentDetails).Include(o=> o.BillingDetails).FirstOrDefault(o => o.Id == id);
+            result = AppDbCxt.ReservationDetails.Include(o => o.RoomBookings).Include(o => o.CustomerInfo).Include(o => o.PaymentDetails).Include(o => o.BillingDetails).FirstOrDefault(o => o.Id == id);
 #pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
 
             return await Task.FromResult(result);
@@ -3198,7 +3244,7 @@ namespace RMS.Repositories
                     result.Message = "Data Successfully Updated.";
                 }
                 else
-                {                  
+                {
                     AppDbCxt.PosDTO.Add(data);
                     result.Message = "Data Successfully Inserted.";
                 }

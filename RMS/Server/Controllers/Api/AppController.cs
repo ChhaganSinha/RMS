@@ -840,6 +840,23 @@ namespace RMS.Server.Controllers.Api
         }
 
 
+        [HttpGet]
+        [Route("todays-bookings")]
+        public async Task<List<ReservationDetailsDto>> GetTodaysBookings()
+        {
+            return await _appRepository.GetTodaysBookingsAsync();
+           
+        }
+
+        [HttpGet]
+        [Route("next-days-bookings")]
+        public async Task<IActionResult> GetNextDaysBookings()
+        {
+            var nextDaysBookings = await _appRepository.GetNextDaysBookingsAsync();
+            return Ok(nextDaysBookings);
+        }
+
+
 
         [HttpGet]
         [Route("ReservationDetails/{id}")]
