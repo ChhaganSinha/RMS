@@ -42,6 +42,7 @@ else
 
 
         c.Add().Encoded(false).Sanitized(false).RenderComponentAs<PosEditButton>().SetWidth("10px").Titled("Edit");
+        c.Add().Encoded(false).Sanitized(false).RenderComponentAs<PosCompleteButton>().SetWidth("10px").Titled("Complete");
         c.Add().Encoded(false).Sanitized(false).RenderComponentAs<PosDeleteButton>(new List<Action<object>> { RefreshGrid }).SetWidth("10px").Titled("Delete");
     };
 
