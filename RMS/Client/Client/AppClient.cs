@@ -3045,5 +3045,22 @@ namespace RMS.Client.Client
             }
         }
         #endregion
+
+        #region Dashboard
+        public async Task<Statistic> GetBookingStatsAsync()
+        {
+            try
+            {
+                var response = await HttpClient.GetAsync("api/App/BookingStats");
+                response.EnsureSuccessStatusCode();
+                return await response.Content.ReadFromJsonAsync<Statistic>();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, "Error fetching booking stats");
+                throw;
+            }
+        }
+        #endregion
     }
 }

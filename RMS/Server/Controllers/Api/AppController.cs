@@ -1150,6 +1150,17 @@ namespace RMS.Server.Controllers.Api
             return await _appRepository.DeletePos(id);
         }
         #endregion
+
+        #region Dashboard
+        [HttpGet]
+        [Route("BookingStats")]
+        public async Task<ActionResult<Statistic>> GetBookingStats()
+        {
+            var bookingStats = await _appRepository.GetBookingStatsAsync();
+            return Ok(bookingStats);
+        }
+
+        #endregion
     }
 
 

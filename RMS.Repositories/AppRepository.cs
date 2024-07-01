@@ -12,6 +12,8 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 using System.Runtime.InteropServices;
 using System.Runtime.CompilerServices;
 using RMS.Dto.Enum;
+using System.Data.Entity;
+using RMS.Dto.Dashboard;
 
 namespace RMS.Repositories
 {
@@ -3289,6 +3291,36 @@ namespace RMS.Repositories
                 return result;
             }
         }
-        #endregion 
+        #endregion
+
+        #region DashBoard
+        public async Task<Statistic> GetBookingStatsAsync()
+        {
+            var today = DateTime.Today;
+            var startOfMonth = new DateTime(today.Year, today.Month, 1);
+
+            var totalBookings = await AppDbCxt.ReservationDetails
+                .SelectMany(r => r.RoomBookings)
+                .CountAsync();
+
+            var todaysBookings = await AppDbCxt.ReservationDetails
+                .Where(r => r.CheckIn.Date == today)
+                .SelectMany(r => r.RoomBookings)
+                .CountAsync();
+
+            var thisMonthsBookings = await AppDbCxt.ReservationDetails
+                .Where(r => r.CheckIn.Date >= startOfMonth)
+                .SelectMany(r => r.RoomBookings)
+                .CountAsync();
+
+            return new Statistic
+            {
+                TotalBookings = totalBookings,
+                TodaysBookings = todaysBookings,
+                ThisMonthBookings = thisMonthsBookings
+            };
+        }
+
+        #endregion
     }
 }

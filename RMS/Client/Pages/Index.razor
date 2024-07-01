@@ -8,13 +8,15 @@
 
 
 <div class="row">
-    <div class="col-md-6 col-xl-3">
-        <div class="card bg-c-blue order-card">
-            <div class="card-body" style="padding: 4px 25px;">
-                <h6 class="text-white">Total Bookings</h6>
-                <h2 class="text-right text-white"><i class="feather icon-shopping-cart float-left"></i><span>0</span></h2>
-                <p class="m-b-0">Today<span class="float-right">0</span></p>
-                <p class="m-b-0">This month<span class="float-right">0</span></p>
+    <div class="row">
+        <div class="col-md-6 col-xl-3">
+            <div class="card bg-c-blue order-card">
+                <div class="card-body" style="padding: 4px 25px;">
+                    <h6 class="text-white">Total Bookings</h6>
+                    <h2 class="text-right text-white"><i class="feather icon-shopping-cart float-left"></i><span>@bookingStats?.TotalBookings</span></h2>
+                    <p class="m-b-0">Today<span class="float-right">@bookingStats?.TodaysBookings</span></p>
+                    <p class="m-b-0">This month<span class="float-right">@bookingStats?.ThisMonthBookings</span></p>
+                </div>
             </div>
         </div>
     </div>
@@ -201,10 +203,12 @@
 
     private List<ReservationDetailsDto> TodaysBookings = new List<ReservationDetailsDto>();
     private List<ReservationDetailsDto> NextDaysBookings = new List<ReservationDetailsDto>();
+    private Statistic bookingStats;
 
     protected override async Task OnInitializedAsync()
     {
         TodaysBookings = await client.GetTodaysBookingsAsync();
         NextDaysBookings = await client.GetNextDaysBookingsAsync();
+        bookingStats = await client.GetBookingStatsAsync();
     }
 }

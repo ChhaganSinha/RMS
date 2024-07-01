@@ -42,9 +42,9 @@ namespace RMS.Dto.Dashboard
     }
     public class Statistic
     {
-        public int TotalBokking { get; set; }
-        public int TodaysBokking { get; set; }
-        public int ThisMonthBokking { get; set; }
+        public int TotalBookings { get; set; }
+        public int TodaysBookings { get; set; }
+        public int ThisMonthBookings { get; set; }
 
         public int TotalAmount { get; set; }
         public int TodaysAmount { get; set; }
