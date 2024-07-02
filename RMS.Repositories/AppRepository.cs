@@ -3428,9 +3428,9 @@ namespace RMS.Repositories
                 return result;
             }
         }
-        #endregion 
+        #endregion
 
-
+        #region Dashboard
         public async Task<MonthlyBarChart> GetReportData(int year)
         {
             MonthlyBarChart data = new MonthlyBarChart();
