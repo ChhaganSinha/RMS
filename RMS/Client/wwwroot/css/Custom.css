@@ -231,3 +231,8 @@ table.grid-table .grid-header {
         left: 20px;
         top: calc(50% - 0.5em);
     }
+
+.active-tab {
+    background-color: #343a40 !important; /* Example: Dark background color */
+    color: white !important; /* Example: White text color */
+}

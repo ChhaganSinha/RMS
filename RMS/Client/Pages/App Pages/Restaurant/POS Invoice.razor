@@ -56,7 +56,7 @@
                                     <input type="text" placeholder="Search for food..." class="form-control mb-3" @bind="searchQuery" @oninput="FilterFoods" />
                                     <div class="row">
                                         <div class="col-md-4">
-                                            <div class="nav flex-column nav-pills overflow-auto" style="height: 100vh; border:1px dashed; padding:10px; overflow:auto">
+                                            <div class="nav flex-column nav-pills overflow-auto" style="height: 390px; border:1px dashed; padding:10px; overflow:auto">
                                                 <a style="font-size:16px; cursor:pointer;"
                                                    class="nav-link mb-2 btn-success @GetVerticalTabClass(VerticalTab.AllFood)"
                                                    @onclick="() => SetVerticalActiveTab(VerticalTab.AllFood)">
@@ -274,7 +274,7 @@
                 }
                 @if (topActiveTab == TopTab.OngoingOrder)
                 {
-                    <PosOnGoingGrid />
+                    <PosOnGoingGrid OnRefresh="@ApiRefresh" />
                 }
                 @if (topActiveTab == TopTab.TodayOrder)
                 {
@@ -282,7 +282,7 @@
                 }
                 @if (topActiveTab == TopTab.CompletedOrder)
                 {
-                    <PosTodayGrid />
+                    <PosOnCompleteGrid />
                 }
             </div>
         </div>
@@ -495,6 +495,7 @@
                 message = "Error!";
                 MessageBody = response.Message;
             }  
+            tables = (await client.GetAllTableCon()).Where(x => x.Status == TableStatus.Available).ToList();
 
         }
         catch (Exception ex)
@@ -617,5 +618,10 @@
         order.CustomerId = customerDetailsDTO.Id;
         order.CustomerName = customerDetailsDTO.FirstName +" "+ customerDetailsDTO.LastName;
         StateHasChanged();
+    }
+
+    public async Task ApiRefresh()
+    {
+        tables = (await client.GetAllTableCon()).Where(x => x.Status == TableStatus.Available).ToList();
     }
 }

@@ -50,6 +50,8 @@ else
         authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         string url = $"odata/PosDTO";
         var query = new QueryDictionary<StringValues>();
+        var values = new string[] { $"Status__1__Complete" };
+        query.Add("grid-filter", new StringValues(values));
         query.Add("grid-sorting", "Id__1__1");
 
         var client = new GridODataClient<PosDTO>(HttpClient, url, query, false, "ordersGrid", columns, 5)

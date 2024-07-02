@@ -23,8 +23,9 @@ else
     </div>
 }
 
-@code
-{
+@code {
+    [Parameter] public EventCallback OnRefresh { get; set; }
+
     private CGrid<PosDTO> _grid;
     private Task _task;
     private static GridComponent<PosDTO> Component;
@@ -33,7 +34,6 @@ else
 
     Action<IGridColumnCollection<PosDTO>> columns = c =>
     {
-
         c.Add(o => o.Id).SetWidth("10%").Css("table-bordered").Titled("SN.").Filterable(filter);
         c.Add(o => o.CustomerName).Css("table-bordered").Filterable(filter);
         c.Add(o => o.Table).Css("table-bordered").Filterable(filter);
@@ -41,7 +41,7 @@ else
         c.Add(o => o.GrandTotal).Css("table-bordered").Filterable(filter);
 
         c.Add().Encoded(false).Sanitized(false).RenderComponentAs<PosEditButton>().SetWidth("10px").Titled("Edit");
-        c.Add().Encoded(false).Sanitized(false).RenderComponentAs<PosCompleteButton>().SetWidth("10px").Titled("Complete");
+        c.Add().Encoded(false).Sanitized(false).RenderComponentAs<PosCompleteButton>(new List<Action<object>> { RefreshGrid }).SetWidth("10px").SetWidth("10px").Titled("Complete");
         c.Add().Encoded(false).Sanitized(false).RenderComponentAs<PosDeleteButton>(new List<Action<object>> { RefreshGrid }).SetWidth("10px").Titled("Delete");
     };
 
@@ -50,10 +50,11 @@ else
         authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         string url = $"odata/PosDTO";
         var query = new QueryDictionary<StringValues>();
+        var values = new string[] { $"Status__1__OnGoing" };
+        query.Add("grid-filter", new StringValues(values));
         query.Add("grid-sorting", "Id__1__1");
 
         var client = new GridODataClient<PosDTO>(HttpClient, url, query, false, "ordersGrid", columns, 5)
-            // .Sortable(true)
             .Filterable(true)
             .ClearFiltersButton(true)
             .SetStriped(true)
@@ -73,12 +74,23 @@ else
     public static async void RefreshGrid(object item)
     {
         await Component.UpdateGrid();
+        await CallParentMethod();
     }
+
     public static async Task RefreshGridAsync()
     {
         if (Component != null)
         {
             await Component.UpdateGrid();
+        }
+        await CallParentMethod();
+    }
+
+    private async Task CallParentMethod()
+    {
+        if (OnRefresh.HasDelegate)
+        {
+            await OnRefresh.InvokeAsync();
         }
     }
 }
