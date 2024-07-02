@@ -1157,6 +1157,58 @@ namespace RMS.Server.Controllers.Api
             return await _appRepository.CompletePos(id);
         }
         #endregion
+
+        #region Dashboard
+        [HttpGet]
+        [Route("BookingStats")]
+        public async Task<ActionResult<Statistic>> GetBookingStats()
+        {
+            var bookingStats = await _appRepository.GetBookingStatsAsync();
+            return Ok(bookingStats);
+        }
+
+
+
+        [HttpGet]
+        [Route("CustomerStats")]
+        public async Task<ActionResult<CustomersEntry>> GetCustomerStats()
+        {
+            var bookingStats = await _appRepository.GetCustomerStatsAsync();
+            return Ok(bookingStats);
+        }
+
+        /* [HttpGet]
+         [Route("MonthlyBookings")]
+         public async Task<ActionResult<Dictionary<string, int>>> GetMonthlyBookings()
+         {
+             var monthlyBookings = await _appRepository.GetMonthlyBookingsAsync();
+             return Ok(monthlyBookings);
+         }*/
+
+
+        [HttpGet]
+        [Route("monthwise-data/{year}")]
+        public async Task<ApiResponse<MonthlyBarChart>> GetMonthwiseData(int year)
+        {
+            var result = new ApiResponse<MonthlyBarChart>();
+            try
+            {
+                var data = await _appRepository.GetReportData(year);
+                result.Result = data;
+                result.IsSuccess = true;
+                result.Message = String.Empty;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+               // Logger(ex, ex.Message);
+                throw;
+            }
+
+            return result;
+        }
+        #endregion
     }
 
 

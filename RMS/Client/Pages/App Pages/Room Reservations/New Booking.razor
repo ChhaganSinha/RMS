@@ -525,6 +525,7 @@
                 {
                     RoomType = Enum.TryParse<RoomType>(rb.RoomType, out var roomTypeEnum) ? roomTypeEnum : RoomType.SingleRoom,
                     RoomNo = rb.RoomNo,
+                    RoomId = rooms.Where(x => x.RoomNumber == rb.RoomNo).Select(x => x.Id).First(),
                     Adults = rb.Adults,
                     Children = rb.Children
                 }).ToList();

@@ -42,27 +42,44 @@ namespace RMS.Dto.Dashboard
     }
     public class Statistic
     {
-        public int TotalBokking { get; set; }
-        public int TodaysBokking { get; set; }
-        public int ThisMonthBokking { get; set; }
+        public int TotalBookings { get; set; }
+        public int TodaysBookings { get; set; }
+        public int ThisMonthBookings { get; set; }
 
-        public int TotalAmount { get; set; }
-        public int TodaysAmount { get; set; }
-        public int ThisMonthAmount { get; set; }
+        public decimal TotalAmount { get; set; }
+        public decimal TodaysAmount { get; set; }
+        public decimal ThisMonthAmount { get; set; }
 
         public int TotalCustomer { get; set; }
         public int TodaysCustomer { get; set; }
         public int ThisMonthCustomer { get; set; }
 
-        public int TotalSales { get; set; }
-        public int TodaysSales { get; set; }
-        public int ThisMonthSales { get; set; }
+        public decimal ResTotalAmount { get; set; }
+        public decimal ResTodaysAmount { get; set; }
+        public decimal ResThisMonthAmount { get; set; }
     }
     public class CustomersEntry
     {
         public CustomerDetailsDTO Customers { get; set; }
         public int Total { get; set; }
         public int Today { get; set; }
+        public int ThisMonth { get; set; }
+
         public int Reported { get; set; }
+    }
+
+    public class MonthlyReportData
+    {
+        public Months Month { get; set; }
+        public int Total { get; set; }
+        public int Ready { get; set; }
+        public int Booked { get; set; }
+       
+    }
+    public class MonthlyBarChart
+    {
+        public string Title { get; set; }
+        public int Year { get; set; }
+        public List<MonthlyReportData> MonthwiseEntry { get; set; }
     }
 }

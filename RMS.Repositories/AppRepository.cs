@@ -12,6 +12,7 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 using System.Runtime.InteropServices;
 using System.Runtime.CompilerServices;
 using RMS.Dto.Enum;
+using RMS.Dto.Dashboard;
 
 namespace RMS.Repositories
 {
@@ -2494,20 +2495,17 @@ namespace RMS.Repositories
                     AppDbCxt.ReservationDetails.Add(data);
                     result.Message = "Data Successfully Inserted.";
                 }
-
                 // Save changes to ReservationDetails first
                 await AppDbCxt.SaveChangesAsync();
-
                 // Update room status to Booked for each room in RoomBookings
-                foreach (var roomBooking in data.RoomBookings)
+                foreach(var roomBooking in data.RoomBookings)
                 {
-                    var room = AppDbCxt.Room.FirstOrDefault(r => r.RoomNumber == roomBooking.RoomNo);
-                    if (room != null)
-                    {
-                        room.Status = RoomHallStatus.Booked;
-                        AppDbCxt.Room.Update(room);
-                    }
+                    var room = AppDbCxt.Room.FirstOrDefault(r => r.Id == roomBooking.RoomId);
+                    if (room != null) { room.Status = RoomHallStatus.Booked; AppDbCxt.Room.Update(room); }
                 }
+      
+
+                
 
                 // Save changes to room status
                 await AppDbCxt.SaveChangesAsync();
@@ -3293,6 +3291,110 @@ namespace RMS.Repositories
                 return result;
             }
         }
+        #endregion
+
+        #region DashBoard
+        public async Task<Statistic> GetBookingStatsAsync()
+        {
+            try
+            {
+                var today = DateTime.Today;
+                var startOfMonth = new DateTime(today.Year, today.Month, 1);
+
+                var totalBookings = await AppDbCxt.ReservationDetails
+                    .SelectMany(r => r.RoomBookings)
+                    .CountAsync();
+
+                var todaysBookings = await AppDbCxt.ReservationDetails
+                    .Where(r => r.CheckIn.Date == today)
+                    .SelectMany(r => r.RoomBookings)
+                    .CountAsync();
+
+                var thisMonthsBookings = await AppDbCxt.ReservationDetails
+                    .Where(r => r.CheckIn.Date >= startOfMonth)
+                    .SelectMany(r => r.RoomBookings)
+                .CountAsync();
+
+                var totalCharge = await AppDbCxt.ReservationDetails
+                    .Select(r => r.BillingDetails)
+                    .SumAsync(b => b.TotalCharge);
+
+                var todaysTotalCharge = await AppDbCxt.ReservationDetails
+                    .Where(r => r.CheckIn.Date == today)
+                    .Select(r => r.BillingDetails.TotalCharge)
+                .SumAsync();
+
+                var thisMonthsTotalCharge = await AppDbCxt.ReservationDetails
+                    .Where(r => r.CheckIn.Date >= startOfMonth)
+                    .Select(r => r.BillingDetails.TotalCharge)
+                    .SumAsync();
+
+                var restotalCharge = await AppDbCxt.PosDTO
+                   //  .Select(r => r.BillingDetails)
+                   .SumAsync(b => b.GrandTotal);
+
+                var restodaysTotalCharge = await AppDbCxt.PosDTO
+                    .Where(r => r.CreatedOn.Date == today)
+                //.Select(r => r.BillingDetails.TotalCharge)
+                .SumAsync(b => b.GrandTotal);
+
+                var resthisMonthsTotalCharge = await AppDbCxt.PosDTO
+                    .Where(r => r.CreatedOn.Date >= startOfMonth)
+                    //.Select(r => r.BillingDetails.TotalCharge)
+                    .SumAsync(b => b.GrandTotal);
+
+                return new Statistic
+                {
+                    TotalBookings = totalBookings,
+                    TodaysBookings = todaysBookings,
+                    ThisMonthBookings = thisMonthsBookings,
+
+                    TotalAmount = totalCharge,
+                    TodaysAmount = todaysTotalCharge,
+                    ThisMonthAmount = thisMonthsTotalCharge,
+
+                    ResTotalAmount = restotalCharge,
+                    ResTodaysAmount = restodaysTotalCharge,
+                    ResThisMonthAmount = resthisMonthsTotalCharge
+
+                };
+            }
+            catch(Exception ex)
+            {
+                return null;
+            }
+
+        }
+
+
+        public async Task<CustomersEntry> GetCustomerStatsAsync()
+        {
+            var today = DateTime.Today;
+            var startOfMonth = new DateTime(today.Year, today.Month, 1);
+
+            var totalCustomers = await AppDbCxt.ReservationDetails
+                .SelectMany(r => r.CustomerInfo)
+                .CountAsync();
+
+            var todaysCustomers = await AppDbCxt.ReservationDetails
+                .Where(r => r.CheckIn.Date == today)
+                .SelectMany(r => r.CustomerInfo)
+                .CountAsync();
+
+            var thisMonthsCustomers = await AppDbCxt.ReservationDetails
+                .Where(r => r.CheckIn.Date >= startOfMonth)
+                .SelectMany(r => r.CustomerInfo)
+                .CountAsync();
+
+            return new CustomersEntry
+            {
+                Total = totalCustomers,
+                Today = todaysCustomers,
+                ThisMonth = thisMonthsCustomers
+            };
+
+
+        }
 
         public async Task<ApiResponse<PosDTO>> CompletePos(int id)
         {
@@ -3327,5 +3429,68 @@ namespace RMS.Repositories
             }
         }
         #endregion 
+
+
+        public async Task<MonthlyBarChart> GetReportData(int year)
+        {
+            MonthlyBarChart data = new MonthlyBarChart();
+            data.MonthwiseEntry = new List<MonthlyReportData>();
+            data.Year = year;
+            var start = new DateTime(year, 1, 1);
+            var end = new DateTime(year, 12, 31).AddHours(24).AddSeconds(-1);
+
+            try
+            {
+                var chartData = AppDbCxt.ReservationDetails
+                 .Where(i => i.CheckIn >= start && i.CheckIn < end);
+
+     
+
+
+                var trainingGroup = chartData.ToList().GroupBy(i => i.CheckIn.Month, (key, entries) => new
+                {
+                    Month = (Months)key,
+                    Total = entries.Count(),
+                    Ready = entries.Count(i => i.Status == (RoomStatus.Ready)),
+                    Booked = entries.Count(i => i.Status == (RoomStatus.Booked)),
+
+                });
+
+
+                foreach (Months month in Enum.GetValues(typeof(Months)))
+                {
+
+                    var log = trainingGroup.FirstOrDefault(i => i.Month == month);
+
+                    var entry = new MonthlyReportData
+                    {
+                        Month = month,
+                    };
+
+                    if (log != null)
+                    {
+                        entry.Total = log.Total;
+                        entry.Booked = log.Booked;
+                        entry.Ready = log.Ready;
+                        
+
+                    }
+
+
+                    data.MonthwiseEntry.Add(entry);
+                }
+
+
+
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+            }
+            return await Task.FromResult(data);
+        }
+
+        #endregion
     }
 }
