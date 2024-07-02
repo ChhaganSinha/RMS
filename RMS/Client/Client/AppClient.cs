@@ -3061,6 +3061,64 @@ namespace RMS.Client.Client
                 throw;
             }
         }
+
+
+        public async Task<CustomersEntry> GetCustomerStatsAsync()
+        {
+            try
+            {
+                var response = await HttpClient.GetAsync("api/App/CustomerStats");
+                response.EnsureSuccessStatusCode();
+                return await response.Content.ReadFromJsonAsync<CustomersEntry>();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, "Error fetching booking stats");
+                throw;
+            }
+        }
+
+
+        public async Task<Dictionary<string, int>> GetMonthlyBookingsAsync()
+        {
+            try
+            {
+                var response = await HttpClient.GetAsync("api/App/MonthlyBookings");
+                response.EnsureSuccessStatusCode();
+                return await response.Content.ReadFromJsonAsync<Dictionary<string, int>>();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, "Error fetching monthly bookings");
+                throw;
+            }
+        }
+
+
+        public async Task<MonthlyBarChart?> GetMonthwiseData(int year)
+        {
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/App/monthwise-data/{year}");
+                if (res.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                    return null;
+                res.EnsureSuccessStatusCode();
+
+
+                var json = await res.Content.ReadFromJsonAsync<ApiResponse<MonthlyBarChart>>();
+
+                if (json != null)
+                    return json.Result;
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return null;
+        }
         #endregion
     }
 }
