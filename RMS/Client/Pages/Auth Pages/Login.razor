@@ -11,7 +11,7 @@
     <div class="flex-grow-1">
         <div class="h-100 d-md-flex align-items-center auth-side-img">
             <div class="col-sm-10 auth-content w-auto">
-                <img src="assets/images/auth/auth-logo.png" width="150" alt="" class="img-fluid">
+                <img src="assets/images/auth/auth-logo.png" width="250" alt="" class="img-fluid">
                 <h1 class="text-white my-4">Welcome Back!</h1>
                 <h4 class="text-white font-weight-normal">
                     Sign in to your account and explore the features and amenities of our resort management system.
@@ -52,13 +52,6 @@
                     <button type="submit" class="btn btn-block btn-primary mb-0">Signin</button>
                     <label class="text-danger">@error</label>
 
-                    @if (userCount == 0)
-                    {
-                        <NavLink href="register">
-                            <h6 class="font-weight-normal text-center">Create account</h6>
-                        </NavLink>
-                    }
-
                     <div class="text-center">
                         <div class="saprator my-4"><span>OR</span></div>
                         <button class="btn text-white bg-facebook mb-2 mr-2  wid-40 px-0 hei-40 rounded-circle">
@@ -74,10 +67,13 @@
                             Forgot password? <a href="forgetpassword"
                                                 class="f-w-400">Reset</a>
                         </p>
-                        <p class="mb-0 text-muted">
-                            Don’t have an account? <a href="auth-signup-img-side.html"
-                                                      class="f-w-400">Signup</a>
-                        </p>
+                        @if (userCount == 0)
+                        {
+                            <p class="mb-0 text-muted">
+                                Don’t have an account? <a href="register"
+                                                          class="f-w-400">Signup</a>
+                            </p>
+                        }
                     </div>
                 </EditForm>
             </div>

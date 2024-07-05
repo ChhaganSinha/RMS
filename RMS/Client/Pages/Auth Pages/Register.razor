@@ -6,88 +6,90 @@
 @* @attribute [Authorize] *@
 @* @attribute [Authorize(Roles = "SuperAdmin,Admin")] *@
 
-
-<div class="auth-wrapper align-items-stretch aut-bg-img">
-    <div class="flex-grow-1">
-        <div class="h-100 d-md-flex align-items-center auth-side-img">
-            <div class="col-sm-10 auth-content w-auto">
-                <img src="assets/images/auth/auth-logo.png" alt="" class="img-fluid">
-                <h1 class="text-white my-4">Welcome you!</h1>
-                <h4 class="text-white font-weight-normal">
-                    Sign up to your account and explore the features and amenities of our resort management system.
-                    <br /> <br />
-                    Don't forget to manage bookings, track guest preferences, and optimize your resort operations.
-                </h4>
+@if (userCount == 0)
+{
+    <div class="auth-wrapper align-items-stretch aut-bg-img">
+        <div class="flex-grow-1">
+            <div class="h-100 d-md-flex align-items-center auth-side-img">
+                <div class="col-sm-10 auth-content w-auto">
+                    <img src="assets/images/auth/auth-logo.png" width="250" alt="" class="img-fluid">
+                    <h1 class="text-white my-4">Welcome you!</h1>
+                    <h4 class="text-white font-weight-normal">
+                        Sign up to your account and explore the features and amenities of our resort management system.
+                        <br /> <br />
+                        Don't forget to manage bookings, track guest preferences, and optimize your resort operations.
+                    </h4>
+                </div>
             </div>
-        </div>
-        <div class="auth-side-form">
-            <div class=" auth-content">
-                <img src="assets/images/auth/auth-logo-dark.png" alt=""
-                     class="img-fluid mb-4 d-block d-xl-none d-lg-none">
-                <h4 class="mb-3 f-w-400">Sign up</h4>
-                <EditForm class="form-signin" OnValidSubmit="OnSubmit" Model="registerParameters">
-                    <DataAnnotationsValidator />
-                    <div class="input-group mb-3">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text"><i class="feather icon-user"></i></span>
+            <div class="auth-side-form">
+                <div class=" auth-content">
+                    <img src="assets/images/auth/auth-logo-dark.png" alt=""
+                         class="img-fluid mb-4 d-block d-xl-none d-lg-none">
+                    <h4 class="mb-3 f-w-400">Sign up</h4>
+                    <EditForm class="form-signin" OnValidSubmit="OnSubmit" Model="registerParameters">
+                        <DataAnnotationsValidator />
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text"><i class="feather icon-user"></i></span>
+                            </div>
+                            <input type="text" class="form-control" placeholder="Username" @bind="registerParameters.UserName">
                         </div>
-                        <input type="text" class="form-control" placeholder="Username" @bind="registerParameters.UserName">
-                    </div>
-                    <ValidationMessage style="margin-top:-12px" For="@(() => registerParameters.UserName)" />
+                        <ValidationMessage style="margin-top:-12px" For="@(() => registerParameters.UserName)" />
 
-                    <div class="input-group mb-3">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text"><i class="feather icon-mail"></i></span>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text"><i class="feather icon-mail"></i></span>
+                            </div>
+                            <input type="email" class="form-control" placeholder="Email address" @bind="registerParameters.Email">
                         </div>
-                        <input type="email" class="form-control" placeholder="Email address" @bind="registerParameters.Email">
-                    </div>
-                    <ValidationMessage style="margin-top:-12px" For="@(() => registerParameters.Email)" />
-                    <div class="input-group mb-3">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text"><i class="feather icon-lock"></i></span>
+                        <ValidationMessage style="margin-top:-12px" For="@(() => registerParameters.Email)" />
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text"><i class="feather icon-lock"></i></span>
+                            </div>
+                            <input type="password" class="form-control" placeholder="Password" @bind="registerParameters.Password">
                         </div>
-                        <input type="password" class="form-control" placeholder="Password" @bind="registerParameters.Password">
-                    </div>
-                    <ValidationMessage style="margin-top:-12px" For="@(() => registerParameters.Password)" />
+                        <ValidationMessage style="margin-top:-12px" For="@(() => registerParameters.Password)" />
 
-                    <div class="input-group mb-4">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text"><i class="feather icon-lock"></i></span>
+                        <div class="input-group mb-4">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text"><i class="feather icon-lock"></i></span>
+                            </div>
+                            <input type="password" class="form-control" placeholder="Confirm Password" @bind="registerParameters.PasswordConfirm">
                         </div>
-                        <input type="password" class="form-control" placeholder="Confirm Password" @bind="registerParameters.PasswordConfirm">
-                    </div>
-                    <ValidationMessage style="margin-top:-16px" For="@(() => registerParameters.PasswordConfirm)" />
+                        <ValidationMessage style="margin-top:-16px" For="@(() => registerParameters.PasswordConfirm)" />
 
-                    <button type="submit" class="btn btn-primary btn-block mb-2">Sign up</button>
+                        <button type="submit" class="btn btn-primary btn-block mb-2">Sign up</button>
 
-                    <label class="text-danger">@error</label>
+                        <label class="text-danger">@error</label>
 
-                    <div class="text-center">
-                        <div class="saprator my-4"><span>OR</span></div>
-                        <button class="btn text-white bg-facebook mb-2 mr-2  wid-40 px-0 hei-40 rounded-circle">
-                            <i class="fab fa-facebook-f"></i>
-                        </button>
-                        <button class="btn text-white bg-googleplus mb-2 mr-2 wid-40 px-0 hei-40 rounded-circle">
-                            <i class="fab fa-google-plus-g"></i>
-                        </button>
-                        <button class="btn text-white bg-twitter mb-2  wid-40 px-0 hei-40 rounded-circle">
-                            <i class="fab fa-twitter"></i>
-                        </button>
-                        <p class="mt-4">
-                            Already have an account? <a href="login" class="f-w-400">Sign in</a>
-                        </p>
-                    </div>
-                </EditForm>
+                        <div class="text-center">
+                            <div class="saprator my-4"><span>OR</span></div>
+                            <button class="btn text-white bg-facebook mb-2 mr-2  wid-40 px-0 hei-40 rounded-circle">
+                                <i class="fab fa-facebook-f"></i>
+                            </button>
+                            <button class="btn text-white bg-googleplus mb-2 mr-2 wid-40 px-0 hei-40 rounded-circle">
+                                <i class="fab fa-google-plus-g"></i>
+                            </button>
+                            <button class="btn text-white bg-twitter mb-2  wid-40 px-0 hei-40 rounded-circle">
+                                <i class="fab fa-twitter"></i>
+                            </button>
+                            <p class="mt-4">
+                                Already have an account? <a href="login" class="f-w-400">Sign in</a>
+                            </p>
+                        </div>
+                    </EditForm>
+                </div>
             </div>
         </div>
     </div>
-</div>
-
+}
 
 @code {
 
     RegisterParameters registerParameters { get; set; } = new RegisterParameters();
     string error { get; set; }
+    int userCount = 1;
 
     async Task OnSubmit()
     {
@@ -101,5 +103,10 @@
         {
             error = ex.Message;
         }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        userCount = await authStateProvider.GetUserCount();
     }
 }

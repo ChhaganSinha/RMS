@@ -3313,35 +3313,35 @@ namespace RMS.Repositories
                 var thisMonthsBookings = await AppDbCxt.ReservationDetails
                     .Where(r => r.CheckIn.Date >= startOfMonth)
                     .SelectMany(r => r.RoomBookings)
-                .CountAsync();
+                    .CountAsync();
 
                 var totalCharge = await AppDbCxt.ReservationDetails
-                    .Select(r => r.BillingDetails)
-                    .SumAsync(b => b.TotalCharge);
+                    .Select(r => (double)r.BillingDetails.TotalCharge)
+                    .SumAsync();
 
                 var todaysTotalCharge = await AppDbCxt.ReservationDetails
                     .Where(r => r.CheckIn.Date == today)
-                    .Select(r => r.BillingDetails.TotalCharge)
-                .SumAsync();
+                    .Select(r => (double)r.BillingDetails.TotalCharge)
+                    .SumAsync();
 
                 var thisMonthsTotalCharge = await AppDbCxt.ReservationDetails
                     .Where(r => r.CheckIn.Date >= startOfMonth)
-                    .Select(r => r.BillingDetails.TotalCharge)
+                    .Select(r => (double)r.BillingDetails.TotalCharge)
                     .SumAsync();
 
                 var restotalCharge = await AppDbCxt.PosDTO
-                   //  .Select(r => r.BillingDetails)
-                   .SumAsync(b => b.GrandTotal);
+                    .Select(r => (double)r.GrandTotal)
+                    .SumAsync();
 
                 var restodaysTotalCharge = await AppDbCxt.PosDTO
                     .Where(r => r.CreatedOn.Date == today)
-                //.Select(r => r.BillingDetails.TotalCharge)
-                .SumAsync(b => b.GrandTotal);
+                    .Select(r => (double)r.GrandTotal)
+                    .SumAsync();
 
                 var resthisMonthsTotalCharge = await AppDbCxt.PosDTO
                     .Where(r => r.CreatedOn.Date >= startOfMonth)
-                    //.Select(r => r.BillingDetails.TotalCharge)
-                    .SumAsync(b => b.GrandTotal);
+                    .Select(r => (double)r.GrandTotal)
+                    .SumAsync();
 
                 return new Statistic
                 {
@@ -3349,22 +3349,22 @@ namespace RMS.Repositories
                     TodaysBookings = todaysBookings,
                     ThisMonthBookings = thisMonthsBookings,
 
-                    TotalAmount = totalCharge,
-                    TodaysAmount = todaysTotalCharge,
-                    ThisMonthAmount = thisMonthsTotalCharge,
+                    TotalAmount = (decimal)totalCharge,
+                    TodaysAmount = (decimal)todaysTotalCharge,
+                    ThisMonthAmount = (decimal)thisMonthsTotalCharge,
 
-                    ResTotalAmount = restotalCharge,
-                    ResTodaysAmount = restodaysTotalCharge,
-                    ResThisMonthAmount = resthisMonthsTotalCharge
-
+                    ResTotalAmount = (decimal)restotalCharge,
+                    ResTodaysAmount = (decimal)restodaysTotalCharge,
+                    ResThisMonthAmount = (decimal)resthisMonthsTotalCharge
                 };
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
+                // Log the exception (ex)
                 return null;
             }
-
         }
+
 
 
         public async Task<CustomersEntry> GetCustomerStatsAsync()
