@@ -3,9 +3,9 @@
 @inject NavigationManager navigationManager
 @inject IdentityAuthenticationStateProvider authStateProvider
 @using RMS.Dto.Auth
+@using RMS.Dto.Enum
 @* @attribute [Authorize] *@
 @* @attribute [Authorize(Roles = "SuperAdmin,Admin")] *@
-
 
 <div class="auth-wrapper align-items-stretch aut-bg-img">
     <div class="flex-grow-1">
@@ -21,12 +21,14 @@
             </div>
         </div>
         <div class="auth-side-form">
-            <div class=" auth-content">
+            <div class=" auth-content" style="overflow:auto">
                 <img src="assets/images/auth/auth-logo-dark.png" alt=""
                      class="img-fluid mb-4 d-block d-xl-none d-lg-none">
                 <h4 class="mb-3 f-w-400">Sign up</h4>
                 <EditForm class="form-signin" OnValidSubmit="OnSubmit" Model="registerParameters">
+                    <ValidationSummary />
                     <DataAnnotationsValidator />
+
                     <div class="input-group mb-3">
                         <div class="input-group-prepend">
                             <span class="input-group-text"><i class="feather icon-user"></i></span>
@@ -42,6 +44,15 @@
                         <input type="email" class="form-control" placeholder="Email address" @bind="registerParameters.Email">
                     </div>
                     <ValidationMessage style="margin-top:-12px" For="@(() => registerParameters.Email)" />
+
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="feather icon-user"></i></span>
+                        </div>
+                        <input type="text" class="form-control" placeholder="Mobile No." @bind="registerParameters.MobileNo">
+                    </div>
+                    <ValidationMessage style="margin-top:-12px" For="@(() => registerParameters.MobileNo)" />
+
                     <div class="input-group mb-3">
                         <div class="input-group-prepend">
                             <span class="input-group-text"><i class="feather icon-lock"></i></span>
@@ -57,6 +68,42 @@
                         <input type="password" class="form-control" placeholder="Confirm Password" @bind="registerParameters.PasswordConfirm">
                     </div>
                     <ValidationMessage style="margin-top:-16px" For="@(() => registerParameters.PasswordConfirm)" />
+
+                    <!-- Gender -->
+
+
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="feather icon-user"></i></span>
+                        </div>
+                        <select class="form-control" @bind="registerParameters.Gender">
+                            <option value="">Select Gender</option>
+                            @foreach (GenderEnum gender in Enum.GetValues(typeof(GenderEnum)))
+                            {
+                                <option value="@gender">@gender.ToString()</option>
+                            }
+                        </select>
+                    </div>
+
+                    <ValidationMessage style="margin-top:-12px" For="@(() => registerParameters.Gender)" />
+
+                    <!-- DOB -->
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="feather icon-calendar"></i></span>
+                        </div>
+                        <input type="date" class="form-control" placeholder="Date of Birth" @bind="registerParameters.Dob">
+                    </div>
+                    <ValidationMessage style="margin-top:-12px" For="@(() => registerParameters.Dob)" />
+
+                    <!-- Address -->
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="feather icon-map-pin"></i></span>
+                        </div>
+                        <input type="text" class="form-control" placeholder="Address" @bind="registerParameters.Address">
+                    </div>
+                    <ValidationMessage style="margin-top:-12px" For="@(() => registerParameters.Address)" />
 
                     <button type="submit" class="btn btn-primary btn-block mb-2">Sign up</button>
 
@@ -78,6 +125,7 @@
                         </p>
                     </div>
                 </EditForm>
+
             </div>
         </div>
     </div>

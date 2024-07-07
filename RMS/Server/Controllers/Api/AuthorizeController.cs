@@ -60,6 +60,11 @@ namespace RMS.Server.Controllers.Api
             {
                 UserName = parameters.UserName,
                 Email = parameters.Email,
+                PhoneNumber = parameters.MobileNo,
+                Dob = parameters.Dob,
+                Gender = parameters.Gender,
+                Address = parameters.Address,
+
                 IsActive = parameters.IsActive
 
             };
@@ -141,6 +146,12 @@ namespace RMS.Server.Controllers.Api
                 ExposedClaims = User.Claims
                     .ToDictionary(c => c.Type, c => c.Value),
                 Roles = userRoles.ToList(),
+                Email = user.Email,
+                MobileNo = user.PhoneNumber,
+                Dob = user.Dob,
+                Address = user.Address,
+                Gender = user.Gender
+                
             };
 
             return Ok(userInfo);
@@ -296,12 +307,13 @@ namespace RMS.Server.Controllers.Api
                     return BadRequest("User not found");
                 }
 
-                // Update username and email if provided
+                // Update username if provided
                 if (!string.IsNullOrEmpty(updateParameters.NewUserName))
                 {
                     user.UserName = updateParameters.NewUserName;
                 }
 
+                // Update email if provided
                 if (!string.IsNullOrEmpty(updateParameters.NewEmail))
                 {
                     // Check if the new email is unique
@@ -312,6 +324,30 @@ namespace RMS.Server.Controllers.Api
                     }
 
                     user.Email = updateParameters.NewEmail;
+                }
+
+                // Update mobile number if provided
+                if (!string.IsNullOrEmpty(updateParameters.NewMobileNo))
+                {
+                    user.PhoneNumber = updateParameters.NewMobileNo;
+                }
+
+                // Update gender if provided
+               if (!string.IsNullOrEmpty(updateParameters.NewGender.ToString()))
+                {
+                    user.Gender = updateParameters.NewGender;
+                }
+
+                // Update date of birth if provided
+                if (updateParameters.NewDob != default)
+                {
+                    user.Dob = updateParameters.NewDob; 
+                }
+
+                // Update address if provided
+                if (!string.IsNullOrEmpty(updateParameters.NewAddress))
+                {
+                    user.Address = updateParameters.NewAddress; 
                 }
 
                 // Update the user in the database
@@ -332,6 +368,7 @@ namespace RMS.Server.Controllers.Api
                 return BadRequest($"Failed to update user details: {ex.Message}");
             }
         }
+
 
 
         [HttpPost]

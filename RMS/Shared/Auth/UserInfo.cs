@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RMS.Dto.Enum;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -11,6 +12,14 @@ namespace RMS.Dto.Auth
         public Dictionary<string, string> ExposedClaims { get; set; }
 
         public List<string> Roles { get; set; }
+
+        public string Email {  get; set; } 
+        public string MobileNo {  get; set; } 
+        public GenderEnum Gender {  get; set; } 
+
+        public DateTime Dob {  get; set; }
+
+        public string Address { get; set; }
         public bool IsActive { get; set; }
 
     }
