@@ -1,0 +1,136 @@
+﻿@page "/add-application-user"
+@using RMS.Dto.Auth
+@inject IdentityAuthenticationStateProvider authStateProvider
+@inject NavigationManager navigationManager
+@inject IAuthorizeApi authorizeApi
+@* @attribute [Authorize(Roles = "SuperAdmin,Admin")] *@
+
+<div class="container">
+    <div class="row justify-content-md-center">
+        <div class="col-sm-6">
+            <h4 class="text-center">Create Account</h4>
+            <EditForm class="form-signin" OnValidSubmit="OnSubmit" Model="registerParameters">
+                <DataAnnotationsValidator />
+
+                <div class="row mb-3">
+                    <div class="col">
+                        <div class="form-floating">
+                            <InputText id="inputUsername" class="form-control" @bind-Value="registerParameters.UserName" placeholder="Username" />
+                            <label for="inputUsername">User Name</label>
+                            <ValidationMessage For="@(() => registerParameters.UserName)" />
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="form-floating">
+                            <InputText id="inputUserEmail" class="form-control" @bind-Value="registerParameters.Email" placeholder="Email" />
+                            <label for="inputUserEmail">User Email</label>
+                            <ValidationMessage For="@(() => registerParameters.Email)" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col">
+                        <div class="form-floating">
+                            <InputText type="password" id="inputPassword" class="form-control" placeholder="Password" @bind-Value="registerParameters.Password" />
+                            <label for="inputPassword">Password</label>
+                            <ValidationMessage For="@(() => registerParameters.Password)" />
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="form-floating">
+                            <InputText type="password" id="inputPasswordConfirm" class="form-control" placeholder="Password Confirmation" @bind-Value="registerParameters.PasswordConfirm" />
+                            <label for="inputPasswordConfirm">Password Confirmation</label>
+                            <ValidationMessage For="@(() => registerParameters.PasswordConfirm)" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" id="inputIsActive" @bind="registerParameters.IsActive" />
+                    <label class="form-check-label" for="inputIsActive">Is Active</label>
+                </div>
+
+                <div class="d-grid gap-2">
+                    <button class="btn btn-lg btn-primary btn-block" type="submit">Create account</button>
+                </div>
+
+                <label class="text-danger">@error</label>
+            </EditForm>
+        </div>
+    </div>
+</div>
+
+@code {
+    private List<UserViewModel> users;
+    private List<string> Roles;
+    string Title = "Admin Control Panel";
+    private bool show = false;
+    string Message = string.Empty;
+    string MessageBody = "Thank you!";
+    bool TaskCompleted = false;
+    int Tab = 1;
+
+    protected override async Task OnInitializedAsync()
+    {
+        users = await authorizeApi.GetUsers();
+        Roles = await authStateProvider.GetRoles();
+    }
+
+    private async Task UpdateUserRole(UserViewModel user)
+    {
+        try
+        {
+            Message = string.Empty;
+            MessageBody = "Thank you!";
+            show = true;
+            TaskCompleted = false;
+            Message = "Please wait";
+            await authorizeApi.UpdateUserRole(user);
+            Message = "Successfully Updated";
+            TaskCompleted = true;
+        }
+        catch (Exception ex)
+        {
+            Message = "Error";
+            Message = ex.Message;
+            TaskCompleted = true;
+        }
+    }
+
+    RegisterParameters registerParameters { get; set; } = new RegisterParameters();
+    string error { get; set; }
+
+    async Task OnSubmit()
+    {
+        error = null;
+        Message = string.Empty;
+        MessageBody = "Thank you!";
+        show = true;
+        TaskCompleted = false;
+        try
+        {
+            Message = "Please wait";
+            await authorizeApi.Register(registerParameters);
+            Message = "Successfully Registered";
+            TaskCompleted = true;
+        }
+        catch (Exception ex)
+        {
+            Message = "Error";
+            Message = ex.Message;
+            TaskCompleted = true;
+        }
+    }
+
+    private async void ResetForm()
+    {
+        show = false;
+        if (Message.Contains("Successfully Registered"))
+        {
+            registerParameters = new();
+        }
+        users = await authorizeApi.GetUsers();
+        StateHasChanged();
+    }
+}
