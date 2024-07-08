@@ -1,9 +1,33 @@
 ﻿@page "/add-application-user"
 @using RMS.Dto.Auth
+@using RMS.Dto.Enum
 @inject IdentityAuthenticationStateProvider authStateProvider
 @inject NavigationManager navigationManager
 @inject IAuthorizeApi authorizeApi
-@* @attribute [Authorize(Roles = "SuperAdmin,Admin")] *@
+@attribute [Authorize(Roles = "SuperAdmin,Admin")]
+
+<div class="page-header breadcumb-sticky">
+    <div class="page-block">
+        <div class="row align-items-center">
+            <div class="col-md-12">
+                <div class="page-header-title">
+                    <h5 class="m-b-10">
+                        Add User
+                        <a @onclick="() => show = true" style="cursor:pointer">
+                            <i class="fa fa-plus-circle fa-lg text-primary" aria-hidden="true" title="Add Hall"></i>
+                        </a>
+                    </h5>
+                </div>
+                <ul class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a href="/"><i class="feather icon-home"></i></a>
+                    </li>
+                    <li class="breadcrumb-item"><a>Add User</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
 
 <div class="container">
     <div class="row justify-content-md-center">
@@ -14,48 +38,65 @@
 
                 <div class="row mb-3">
                     <div class="col">
-                        <div class="form-floating">
-                            <InputText id="inputUsername" class="form-control" @bind-Value="registerParameters.UserName" placeholder="Username" />
-                            <label for="inputUsername">User Name</label>
-                            <ValidationMessage For="@(() => registerParameters.UserName)" />
-                        </div>
+                        <label for="inputUsername">Username</label>
+                        <input type="text" id="inputUsername" class="form-control" placeholder="Username" @bind="registerParameters.UserName">
+                        <ValidationMessage For="@(() => registerParameters.UserName)" />
                     </div>
                     <div class="col">
-                        <div class="form-floating">
-                            <InputText id="inputUserEmail" class="form-control" @bind-Value="registerParameters.Email" placeholder="Email" />
-                            <label for="inputUserEmail">User Email</label>
-                            <ValidationMessage For="@(() => registerParameters.Email)" />
-                        </div>
+                        <label for="inputUserEmail">Email address</label>
+                        <input type="email" id="inputUserEmail" class="form-control" placeholder="Email address" @bind="registerParameters.Email">
+                        <ValidationMessage For="@(() => registerParameters.Email)" />
                     </div>
                 </div>
 
                 <div class="row mb-3">
                     <div class="col">
-                        <div class="form-floating">
-                            <InputText type="password" id="inputPassword" class="form-control" placeholder="Password" @bind-Value="registerParameters.Password" />
-                            <label for="inputPassword">Password</label>
-                            <ValidationMessage For="@(() => registerParameters.Password)" />
-                        </div>
+                        <label for="inputMobileNo">Mobile No.</label>
+                        <input type="text" id="inputMobileNo" class="form-control" placeholder="Mobile No." @bind="registerParameters.MobileNo">
+                        <ValidationMessage For="@(() => registerParameters.MobileNo)" />
                     </div>
                     <div class="col">
-                        <div class="form-floating">
-                            <InputText type="password" id="inputPasswordConfirm" class="form-control" placeholder="Password Confirmation" @bind-Value="registerParameters.PasswordConfirm" />
-                            <label for="inputPasswordConfirm">Password Confirmation</label>
-                            <ValidationMessage For="@(() => registerParameters.PasswordConfirm)" />
-                        </div>
+                        <label for="inputPassword">Password</label>
+                        <input type="password" id="inputPassword" class="form-control" placeholder="Password" @bind="registerParameters.Password">
+                        <ValidationMessage For="@(() => registerParameters.Password)" />
                     </div>
                 </div>
 
-                <div class="form-check mb-3">
-                    <input class="form-check-input" type="checkbox" id="inputIsActive" @bind="registerParameters.IsActive" />
-                    <label class="form-check-label" for="inputIsActive">Is Active</label>
+                <div class="row mb-4">
+                    <div class="col">
+                        <label for="inputPasswordConfirm">Confirm Password</label>
+                        <input type="password" id="inputPasswordConfirm" class="form-control" placeholder="Confirm Password" @bind="registerParameters.PasswordConfirm">
+                        <ValidationMessage For="@(() => registerParameters.PasswordConfirm)" />
+                    </div>
+                    <div class="col">
+                        <label for="inputGender">Gender</label>
+                        <select id="inputGender" class="form-control" @bind="registerParameters.Gender">                        
+                            @foreach (GenderEnum gender in Enum.GetValues(typeof(GenderEnum)))
+                            {
+                                <option value="@gender">@gender.ToString()</option>
+                            }
+                        </select>
+                        <ValidationMessage For="@(() => registerParameters.Gender)" />
+                    </div>
                 </div>
 
-                <div class="d-grid gap-2">
-                    <button class="btn btn-lg btn-primary btn-block" type="submit">Create account</button>
+                <div class="row mb-3">
+                    <div class="col">
+                        <label for="inputDob">Date of Birth</label>
+                        <input type="date" id="inputDob" class="form-control" placeholder="Date of Birth" @bind="registerParameters.Dob">
+                        <ValidationMessage For="@(() => registerParameters.Dob)" />
+                    </div>
+                    <div class="col">
+                        <label for="inputAddress">Address</label>
+                        <input type="text" id="inputAddress" class="form-control" placeholder="Address" @bind="registerParameters.Address">
+                        <ValidationMessage For="@(() => registerParameters.Address)" />
+                    </div>
                 </div>
+
+                <button type="submit" class="btn btn-primary btn-block mb-2">Register</button>
 
                 <label class="text-danger">@error</label>
+
             </EditForm>
         </div>
     </div>
@@ -114,11 +155,11 @@
             await authorizeApi.Register(registerParameters);
             Message = "Successfully Registered";
             TaskCompleted = true;
+            ResetForm(); // Reset the form after successful registration
         }
         catch (Exception ex)
         {
-            Message = "Error";
-            Message = ex.Message;
+            error = ex.Message;
             TaskCompleted = true;
         }
     }

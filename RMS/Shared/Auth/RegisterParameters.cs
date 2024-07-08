@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RMS.Dto.Enum;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
@@ -13,7 +14,14 @@ namespace RMS.Dto.Auth
         [Required]
         [EmailAddress]
         public string Email { get; set; }
+        [Required]
+        public string MobileNo { get; set; }
+        [Required]
+        public GenderEnum Gender { get; set; }
+        [Required]
+        public DateTime Dob { get; set; }
 
+        public string Address { get; set; }
         [Required]
         public string Password { get; set; }
 

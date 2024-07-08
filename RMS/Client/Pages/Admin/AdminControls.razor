@@ -40,27 +40,10 @@ else if (users.Count == 0)
 }
 else
 {
-
     <div class="bt-wizard">
         <ul class="nav nav-pills">
-            @if (Tab == 1)
-            {
-                <li class="nav-item"><a @onclick="()=>{Tab=1;}" style="cursor:pointer" class="nav-link rounded-0 active" data-toggle="tab">Manage Roles</a></li>
-                <li class="nav-item"><a @onclick="()=>{Tab=2;}" style="cursor:pointer" class="nav-link rounded-0" data-toggle="tab">Add User</a></li>
-                <li class="nav-item"><a @onclick="()=>{Tab=3;}" style="cursor:pointer" class="nav-link rounded-0" data-toggle="tab">Manage Password</a></li>
-            }
-            @if (Tab == 2)
-            {
-                <li class="nav-item"><a @onclick="()=>{Tab=1;}" style="cursor:pointer" class="nav-link rounded-0" data-toggle="tab">Manage Roles</a></li>
-                <li class="nav-item"><a @onclick="()=>{Tab=2;}" style="cursor:pointer" class="nav-link rounded-0 active" data-toggle="tab">Add User</a></li>
-                <li class="nav-item"><a @onclick="()=>{Tab=3;}" style="cursor:pointer" class="nav-link rounded-0" data-toggle="tab">Manage Password</a></li>
-            }
-            @if (Tab == 3)
-            {
-                <li class="nav-item"><a @onclick="()=>{Tab=1;}" style="cursor:pointer" class="nav-link rounded-0" data-toggle="tab">Manage Roles</a></li>
-                <li class="nav-item"><a @onclick="()=>{Tab=2;}" style="cursor:pointer" class="nav-link rounded-0" data-toggle="tab">Add User</a></li>
-                <li class="nav-item"><a @onclick="()=>{Tab=3;}" style="cursor:pointer" class="nav-link rounded-0 active" data-toggle="tab">Manage Password</a></li>
-            }
+            <li class="nav-item"><a @onclick="()=>{Tab=1;}" style="cursor:pointer" class="nav-link rounded-0 @(Tab == 1 ? "active" : "")" data-toggle="tab">Manage Roles</a></li>
+            <li class="nav-item"><a @onclick="()=>{Tab=3;}" style="cursor:pointer" class="nav-link rounded-0 @(Tab == 3 ? "active" : "")" data-toggle="tab">Manage Password</a></li>
         </ul>
         <div class="tab-content card">
             <div class="pt-1 bg-primary"></div>
@@ -109,63 +92,6 @@ else
                     </div>
                 </div>
             }
-            @if (Tab == 2)
-            {
-                <div class="tab-pane card-body pt-4 active show p-2">
-                    <div class="container">
-                        <div class="row justify-content-md-center">
-                            <div class="col-sm-6">
-                                <div class="card">
-                                    <div class="card-header">
-                                        <h4 class="text-center">Create Account</h4>
-                                    </div>
-                                    <div class="card-body">
-                                        <EditForm class="form-signin" OnValidSubmit="OnSubmit" Model="registerParameters">
-                                            <DataAnnotationsValidator />
-
-                                            <div class="form-floating mb-3">
-                                                <InputText id="inputUsername" class="form-control" @bind-Value="registerParameters.UserName" autofocus placeholder="Username" />
-                                                <label for="inputUsername">User Name</label>
-                                                <ValidationMessage For="@(() => registerParameters.UserName)" />
-                                            </div>
-
-                                            <div class="form-floating mb-3">
-                                                <InputText id="inputUserEmail" class="form-control" @bind-Value="registerParameters.Email" autofocus placeholder="Email" />
-                                                <label for="inputUserEmail">User Email</label>
-                                                <ValidationMessage For="@(() => registerParameters.Email)" />
-                                            </div>
-
-                                            <div class="form-floating mb-3">
-                                                <InputText type="password" id="inputPassword" class="form-control" placeholder="Password" @bind-Value="registerParameters.Password" />
-                                                <label for="inputPassword">Password</label>
-                                                <ValidationMessage For="@(() => registerParameters.Password)" />
-                                            </div>
-
-                                            <div class="form-floating mb-3">
-                                                <InputText type="password" id="inputPasswordConfirm" class="form-control" placeholder="Password Confirmation" @bind-Value="registerParameters.PasswordConfirm" />
-                                                <label for="inputPasswordConfirm">Password Confirmation</label>
-                                                <ValidationMessage For="@(() => registerParameters.PasswordConfirm)" />
-                                            </div>
-
-                                            <div class="form-check mb-3">
-                                                <input class="form-check-input" type="checkbox" id="inputIsActive" @bind="registerParameters.IsActive" />
-                                                <label class="form-check-label" for="inputIsActive">Is Active</label>
-                                            </div>
-
-                                            <div class="d-grid gap-2">
-                                                <button class="btn btn-lg btn-primary btn-block" type="submit">Create account</button>
-                                            </div>
-
-                                            <label class="text-danger">@error</label>
-                                        </EditForm>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            }
-
             @if (Tab == 3)
             {
                 <div class="tab-pane card-body pt-4 active show p-2">
@@ -173,7 +99,7 @@ else
                         <div class="row justify-content-md-center">
                             <div class="col-sm-6">
                                 <div class="card">
-                                    <i class="text-warning bg-secondary" style="text-align:center">You can change password of any user from here</i>
+                                    <i class="text-warning bg-secondary" style="text-align:center">You can change the password of any user from here</i>
                                     <ChangeUserPasswordByAdmin />
                                 </div>
                             </div>
@@ -181,14 +107,8 @@ else
                     </div>
                 </div>
             }
-
         </div>
     </div>
-
-
-
-
-
 
     <Dailog Title="@Message" Show="@show" OnCloseDialog="ResetForm">
         @if (show)
@@ -207,7 +127,6 @@ else
             }
         }
     </Dailog>
-
 }
 
 @code {
@@ -228,7 +147,6 @@ else
 
     private async Task UpdateUserRole(UserViewModel user)
     {
-
         try
         {
             Message = string.Empty;
@@ -248,41 +166,13 @@ else
         }
     }
 
-
     RegisterParameters registerParameters { get; set; } = new RegisterParameters();
     string error { get; set; }
 
-    async Task OnSubmit()
-    {
-        error = null;
-        Message = string.Empty;
-        MessageBody = "Thank you!";
-        show = true;
-        TaskCompleted = false;
-        try
-        {
-            Message = "Please wait";
-            await authorizeApi.Register(registerParameters);
-            Message = "Successfully Registered";
-            TaskCompleted = true;
-        }
-        catch (Exception ex)
-        {
-            Message = "Error";
-            Message = ex.Message;
-            TaskCompleted = true;
-        }
-
-    }
     private async void ResetForm()
     {
         show = false;
-        if (Message.Contains("Successfully Registered"))
-        {
-            registerParameters = new();
-        }
         users = await authorizeApi.GetUsers();
         StateHasChanged();
     }
-
 }
