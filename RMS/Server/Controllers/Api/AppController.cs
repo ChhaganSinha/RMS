@@ -1209,6 +1209,35 @@ namespace RMS.Server.Controllers.Api
             return result;
         }
         #endregion
+
+        #region Update Profilr images
+
+        [HttpPost]
+        [Route("UpsertProfilePic")]
+        public async Task<ApiResponse<UserProfilePicUpld>> UpsertProfilePic(UserProfilePicUpld data)
+        {
+
+           
+            return await _appRepository.UpsertProfilePic(data);
+        }
+
+        [HttpGet]
+        [Route("GetProfilePicByEmail/{email}")]
+        public async Task<UserProfilePicUpld> GetProfilePicByEmail(string email)
+        {
+         
+
+            return await _appRepository.GetProfilePicByEmail(email);
+        }
+
+        [HttpPost]
+        [Route("DeleteProfBgPic")]
+        public async Task<ApiResponse<UserProfilePicUpld>> DeleteProfBgPic(UserProfilePicUpld userProfilePicUpld)
+        {
+            userProfilePicUpld.Email = User.Identity.Name;
+            return await _appRepository.DeleteProfBgPic(userProfilePicUpld);
+        }
+        #endregion
     }
 
 
