@@ -24,10 +24,10 @@
 
 <div class="container mt-4">
     <div class="card">
-        <div class="card-header">
+        <div class="card-header" style="padding: 3px 28px;">
             <h5>Create New Role</h5>
         </div>
-        <div class="card-body">
+        <div class="card-body pb-0">
             <form @onsubmit="CreateRole" class="form-inline">
                 <div class="form-group mb-2">
                     <input type="text" @bind="newRoleName" class="form-control mr-2" placeholder="Enter role name" required />
@@ -52,7 +52,7 @@
                                 <th>Role Name</th>
                                 <th>General Permissions</th>
                                 <th>Page Permissions</th>
-                                <th>Actions</th>
+                                <th style="width: 100px;">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -70,7 +70,7 @@
                                     </td>
 
                                     <td>
-                                        <div style="max-height: 100px; overflow-y: auto;">
+                                        <div style="max-height: 70px; overflow-y: auto; padding: 4px;">
                                             @foreach (var page in allPages)
                                             {
                                                 <div class="form-check">
