@@ -1,18 +1,21 @@
-﻿
-using RMS.Dto.Auth;
+﻿using RMS.Dto.Auth;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using RMS.DataContext.Models;
 using Microsoft.EntityFrameworkCore;
-using Org.BouncyCastle.Asn1.Ocsp;
 using Microsoft.AspNetCore.WebUtilities;
 using System.Text.Encodings.Web;
 using System.Text;
 using RMS.Server.Controllers.Api.Abstraction;
 using Microsoft.Extensions.Logging;
-using Serilog.Core;
 using Microsoft.AspNetCore.Identity.UI.Services;
+using System.Linq;
+using System.Threading.Tasks;
+using RMS.Dto.RBAC;
+using System.Security.Claims;
+using RMS.DataContext;
+using DocumentFormat.OpenXml.InkML;
 
 namespace RMS.Server.Controllers.Api
 {
@@ -22,21 +25,29 @@ namespace RMS.Server.Controllers.Api
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
-        private readonly RoleManager<IdentityRole<Guid>> _roleManager;
+        private readonly RoleManager<ApplicationRole> _roleManager;
         private readonly IEmailSender _emailSender;
+        private readonly AuthDbContext _context;
 
-        public AuthorizeController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, RoleManager<IdentityRole<Guid>> roleManager, IEmailSender emailSender, ILogger<AuthorizeController> logger) : base(logger) 
+        public AuthorizeController(
+            UserManager<ApplicationUser> userManager,
+            SignInManager<ApplicationUser> signInManager,
+            RoleManager<ApplicationRole> roleManager,
+            IEmailSender emailSender,
+            AuthDbContext context,
+            ILogger<AuthorizeController> logger)
+            : base(logger)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _roleManager = roleManager;
             _emailSender = emailSender;
+            _context = context;
         }
 
         [HttpPost]
         public async Task<IActionResult> Login(LoginParameters parameters)
         {
-            //var user = await _userManager.FindByNameAsync(parameters.UserName);
             var user = await _userManager.FindByEmailAsync(parameters.UserEmail);
             if (user == null) return BadRequest("User does not exist");
             if (!user.IsActive)
@@ -44,79 +55,87 @@ namespace RMS.Server.Controllers.Api
                 return BadRequest("Your account is deactivated. Login denied.");
             }
 
-            var singInResult = await _signInManager.CheckPasswordSignInAsync(user, parameters.Password, false);
-            if (!singInResult.Succeeded) return BadRequest("Invalid password");
+            var signInResult = await _signInManager.CheckPasswordSignInAsync(user, parameters.Password, false);
+            if (!signInResult.Succeeded) return BadRequest("Invalid password");
 
             await _signInManager.SignInAsync(user, parameters.RememberMe);
 
             return Ok();
         }
-
-
         [HttpPost]
         public async Task<IActionResult> Register(RegisterParameters parameters)
         {
-            var user = new ApplicationUser
+            try
             {
-                UserName = parameters.UserName,
-                Email = parameters.Email,
-                PhoneNumber = parameters.MobileNo,
-                Dob = parameters.Dob,
-                Gender = parameters.Gender,
-                Address = parameters.Address,
+                var userCount = await _userManager.Users.CountAsync();
 
-                IsActive = parameters.IsActive
-
-            };
-
-            var userCount = await _userManager.Users.CountAsync();
-
-            if (userCount == 0)
-            {
-                var adminRole = await _roleManager.FindByNameAsync("Admin");
-                if (adminRole == null)
+                var user = new ApplicationUser
                 {
-                    adminRole = new IdentityRole<Guid>("Admin");
-                    var createAdminRoleResult = await _roleManager.CreateAsync(adminRole);
-                    if (!createAdminRoleResult.Succeeded)
-                        return BadRequest(createAdminRoleResult.Errors.FirstOrDefault()?.Description);
-                }
+                    UserName = parameters.UserName,
+                    Email = parameters.Email,
+                    PhoneNumber = parameters.MobileNo,
+                    Dob = parameters.Dob,
+                    Gender = parameters.Gender,
+                    Address = parameters.Address,
+                    IsActive = parameters.IsActive
+                };
 
-                var result = await _userManager.CreateAsync(user, parameters.Password);
-                if (!result.Succeeded)
-                    return BadRequest(result.Errors.FirstOrDefault()?.Description);
-
-                var addAdminRoleResult = await _userManager.AddToRoleAsync(user, "Admin");
-                if (!addAdminRoleResult.Succeeded)
-                    return BadRequest(addAdminRoleResult.Errors.FirstOrDefault()?.Description);
-            }
-            else
-            {
-                var userRole = await _roleManager.FindByNameAsync("User");
-                if (userRole == null)
+                if (userCount == 0)
                 {
-                    userRole = new IdentityRole<Guid>("User");
-                    var createUserRoleResult = await _roleManager.CreateAsync(userRole);
-                    if (!createUserRoleResult.Succeeded)
-                        return BadRequest(createUserRoleResult.Errors.FirstOrDefault()?.Description);
+                    var adminRole = await _roleManager.FindByNameAsync("Admin");
+                    if (adminRole == null)
+                    {
+                        adminRole = new ApplicationRole { Name = "Admin" };
+                        var createAdminRoleResult = await _roleManager.CreateAsync(adminRole);
+                        if (!createAdminRoleResult.Succeeded)
+                            return BadRequest(createAdminRoleResult.Errors.FirstOrDefault()?.Description);
+                    }
+
+                    var result = await _userManager.CreateAsync(user, parameters.Password);
+                    if (!result.Succeeded)
+                        return BadRequest(result.Errors.FirstOrDefault()?.Description);
+
+                    var addAdminRoleResult = await _userManager.AddToRoleAsync(user, "Admin");
+                    if (!addAdminRoleResult.Succeeded)
+                        return BadRequest(addAdminRoleResult.Errors.FirstOrDefault()?.Description);
+
+                    // Return to login for the first user
+                    return await Login(new LoginParameters
+                    {
+                        UserEmail = parameters.Email,
+                        Password = parameters.Password
+                    });
                 }
+                else
+                {
+                    var userRole = await _roleManager.FindByNameAsync("User");
+                    if (userRole == null)
+                    {
+                        userRole = new ApplicationRole { Name = "User" };
+                        var createUserRoleResult = await _roleManager.CreateAsync(userRole);
+                        if (!createUserRoleResult.Succeeded)
+                            return BadRequest(createUserRoleResult.Errors.FirstOrDefault()?.Description);
+                    }
 
-                var result = await _userManager.CreateAsync(user, parameters.Password);
-                if (!result.Succeeded)
-                    return BadRequest(result.Errors.FirstOrDefault()?.Description);
+                    var result = await _userManager.CreateAsync(user, parameters.Password);
+                    if (!result.Succeeded)
+                        return BadRequest(result.Errors.FirstOrDefault()?.Description);
 
-                var addUserRoleResult = await _userManager.AddToRoleAsync(user, "User");
-                if (!addUserRoleResult.Succeeded)
-                    return BadRequest(addUserRoleResult.Errors.FirstOrDefault()?.Description);
+                    var addUserRoleResult = await _userManager.AddToRoleAsync(user, "User");
+                    if (!addUserRoleResult.Succeeded)
+                        return BadRequest(addUserRoleResult.Errors.FirstOrDefault()?.Description);
+
+                    // Return success message for subsequent users
+                    return Ok("User registered successfully.");
+                }
             }
-
-            return await Login(new LoginParameters
+            catch (Exception ex)
             {
-                //UserName = parameters.UserName,
-                UserEmail = parameters.Email,
-                Password = parameters.Password
-            });
+                // Log the exception or handle it accordingly
+                return BadRequest($"Failed to register user: {ex.Message}");
+            }
         }
+
 
 
         [Authorize]
@@ -143,36 +162,18 @@ namespace RMS.Server.Controllers.Api
             {
                 IsAuthenticated = User.Identity.IsAuthenticated,
                 UserName = user.UserName,
-                ExposedClaims = User.Claims
-                    .ToDictionary(c => c.Type, c => c.Value),
+                ExposedClaims = User.Claims.ToDictionary(c => c.Type, c => c.Value),
                 Roles = userRoles.ToList(),
                 Email = user.Email,
                 MobileNo = user.PhoneNumber,
                 Dob = user.Dob,
                 Address = user.Address,
                 Gender = user.Gender
-                
             };
 
             return Ok(userInfo);
         }
 
-
-
-        private UserInfo BuildUserInfo()
-        {
-            return new UserInfo
-            {
-                IsAuthenticated = User.Identity.IsAuthenticated,
-                UserName = User.Identity.Name,
-                ExposedClaims = User.Claims
-                    //Optionally: filter the claims you want to expose to the client
-                    //.Where(c => c.Type == "test-claim")
-                    .ToDictionary(c => c.Type, c => c.Value)
-            };
-        }
-
-        //[Authorize(Roles = "SuperAdmin,Admin")]
         [HttpGet]
         [Authorize]
         public async Task<IActionResult> GetUsers()
@@ -185,7 +186,7 @@ namespace RMS.Server.Controllers.Api
                 UserName = u.UserName,
                 Email = u.Email,
                 Role = _userManager.GetRolesAsync(u).Result.FirstOrDefault(),
-                IsActive = u.IsActive,  
+                IsActive = u.IsActive,
             }).ToList();
 
             return Ok(userViewModels);
@@ -215,7 +216,7 @@ namespace RMS.Server.Controllers.Api
             var role = await _roleManager.FindByNameAsync(userViewModel.Role);
             if (role == null)
             {
-                role = new IdentityRole<Guid>(userViewModel.Role);
+                role = new ApplicationRole { Name = userViewModel.Role };
                 var createRoleResult = await _roleManager.CreateAsync(role);
                 if (!createRoleResult.Succeeded)
                 {
@@ -223,7 +224,7 @@ namespace RMS.Server.Controllers.Api
                 }
             }
 
-            // Update IsActive and AllowedBatches
+            // Update IsActive
             user.IsActive = userViewModel.IsActive;
 
             var addRoleResult = await _userManager.AddToRoleAsync(user, userViewModel.Role);
@@ -239,21 +240,33 @@ namespace RMS.Server.Controllers.Api
         public async Task<IActionResult> UserCount()
         {
             var userCount = await _userManager.Users.CountAsync();
-
             return Ok(new { Count = userCount });
         }
 
-
         [HttpGet]
-        public IActionResult GetRoles()
+        public async Task<IActionResult> GetRoles()
         {
-            var roles = _roleManager.Roles.Select(r => r.Name).ToList();
+            // Fetch roles and ensure properties are correctly set
+            var roles = await _roleManager.Roles
+                .Select(r => new RoleViewModel
+                {
+                    Name = r.Name,
+                    SelectedPermission = r.HasFullAccess ? "FullAccess" : r.CanEdit ? "Edit" : r.CanView ? "View" : string.Empty
+                })
+                .ToListAsync();
+
+            // Log roles for debugging
+            foreach (var role in roles)
+            {
+                Console.WriteLine($"Role: {role.Name}, Permission: {role.SelectedPermission}");
+            }
+
             return Ok(roles);
         }
 
 
-        /////////
-        ///
+
+
         [HttpPost]
         [Authorize]
         public async Task<IActionResult> ChangePassword(ResetPassword resetPassword)
@@ -292,7 +305,6 @@ namespace RMS.Server.Controllers.Api
                 return BadRequest($"Failed to change password: {ex.Message}");
             }
         }
-
 
         [HttpPost]
         [Authorize]
@@ -333,7 +345,7 @@ namespace RMS.Server.Controllers.Api
                 }
 
                 // Update gender if provided
-               if (!string.IsNullOrEmpty(updateParameters.NewGender.ToString()))
+                if (!string.IsNullOrEmpty(updateParameters.NewGender.ToString()))
                 {
                     user.Gender = updateParameters.NewGender;
                 }
@@ -341,13 +353,13 @@ namespace RMS.Server.Controllers.Api
                 // Update date of birth if provided
                 if (updateParameters.NewDob != default)
                 {
-                    user.Dob = updateParameters.NewDob; 
+                    user.Dob = updateParameters.NewDob;
                 }
 
                 // Update address if provided
                 if (!string.IsNullOrEmpty(updateParameters.NewAddress))
                 {
-                    user.Address = updateParameters.NewAddress; 
+                    user.Address = updateParameters.NewAddress;
                 }
 
                 // Update the user in the database
@@ -369,11 +381,8 @@ namespace RMS.Server.Controllers.Api
             }
         }
 
-
-
         [HttpPost]
         [Authorize]
-        //[Authorize(Roles = "Admin")] // Ensure only admins can access this endpoint
         public async Task<IActionResult> RequestPasswordResetByEmail(ResetPasswordByAdmin resetPasswordByAdmin)
         {
             var user = await _userManager.FindByEmailAsync(resetPasswordByAdmin.Email);
@@ -397,16 +406,14 @@ namespace RMS.Server.Controllers.Api
             }
         }
 
-
         [HttpPost]
         public async Task<IActionResult> ForgetPassword(ForgetPasswordRequest request)
         {
             var user = await _userManager.FindByEmailAsync(request.Email);
-            var state = await _userManager.IsEmailConfirmedAsync(user);
-            if (user == null)
+            if (user == null || !(await _userManager.IsEmailConfirmedAsync(user)))
             {
                 Logger.LogError($"{request.Email} - user not found or email is not confirmed");
-                return BadRequest("user not found or email is not confirmed"); // Return the message
+                return BadRequest("User not found or email is not confirmed");
             }
 
             try
@@ -460,7 +467,122 @@ namespace RMS.Server.Controllers.Api
         }
 
 
-    }
 
+
+        [HttpPost]
+       [Authorize(Roles = "Admin,SuperAdmin")]
+        public async Task<IActionResult> CreateRole([FromBody] RoleViewModel roleViewModel)
+        {
+            var role = new ApplicationRole { Name = roleViewModel.Name };
+            var result = await _roleManager.CreateAsync(role);
+
+            if (result.Succeeded)
+            {
+                return Ok();
+            }
+            return BadRequest(result.Errors.FirstOrDefault()?.Description);
+        }
+
+
+
+        [HttpPost]
+        [Authorize(Roles = "Admin,SuperAdmin")]
+        public async Task<IActionResult> AssignPermission([FromBody] RoleViewModel roleViewModel)
+        {
+            var role = await _roleManager.FindByNameAsync(roleViewModel.Name);
+            if (role == null)
+            {
+                return BadRequest("Role not found");
+            }
+
+            // Assign general permissions based on the SelectedPermission property
+            switch (roleViewModel.SelectedPermission)
+            {
+                case "View":
+                    role.CanView = true;
+                    role.CanEdit = false;
+                    role.HasFullAccess = false;
+                    break;
+                case "Edit":
+                    role.CanView = true;
+                    role.CanEdit = true;
+                    role.HasFullAccess = false;
+                    break;
+                case "FullAccess":
+                    role.CanView = true;
+                    role.CanEdit = true;
+                    role.HasFullAccess = true;
+                    break;
+                default:
+                    return BadRequest("Invalid permission");
+            }
+
+            // Clear existing page permissions and add new ones
+            role.PagePermissions.Clear();
+            foreach (var pagePermission in roleViewModel.PagePermissions)
+            {
+                role.PagePermissions.Add(new RMS.DataContext.Models.PagePermission
+                {
+                    PageName = pagePermission.PageName,
+                    CanView = pagePermission.CanView,
+                    CanEdit = pagePermission.CanEdit,
+                    HasFullAccess = pagePermission.HasFullAccess
+                });
+            }
+
+            var result = await _roleManager.UpdateAsync(role);
+
+            if (result.Succeeded)
+            {
+                return Ok();
+            }
+
+            return BadRequest(result.Errors.FirstOrDefault()?.Description);
+        }
+
+
+
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> GetUserPermissions([FromBody] PermissionRequest request)
+        {
+            try
+            {
+                Console.WriteLine($"Received request for permission: {request.Permission}");
+
+                // Get the user ID from claims
+                var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (userIdString == null)
+                {
+                    return BadRequest("User ID not found in claims.");
+                }
+
+                // Convert userIdString to Guid
+                var userId = new Guid(userIdString);
+
+                // Check if the user has the specified permission
+                var hasPermission = await _context.PagePermissions
+                    .Where(pp => pp.PageName == request.Permission && _context.UserRoles
+                        .Where(ur => ur.UserId == userId)
+                        .Any(ur => ur.RoleId == pp.ApplicationRoleId))
+                    .AnyAsync();
+
+                Console.WriteLine($"Permission check result: {hasPermission}");
+                return Ok(hasPermission);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error: {ex.Message}");
+                return BadRequest($"Failed to retrieve user permissions: {ex.Message}");
+            }
+        }
+
+
+
+    }
 }
 
+public class PermissionRequest
+{
+    public string Permission { get; set; } = string.Empty;
+}

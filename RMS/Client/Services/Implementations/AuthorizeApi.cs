@@ -1,8 +1,8 @@
-﻿
-using Microsoft.AspNetCore.Components;
+﻿using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using RMS.Client.Services.Contracts;
 using RMS.Dto.Auth;
+using RMS.Dto.RBAC;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,9 +27,9 @@ namespace RMS.Client.Services.Implementations
 
         public async Task Login(LoginParameters loginParameters)
         {
-            //var stringContent = new StringContent(JsonSerializer.Serialize(loginParameters), Encoding.UTF8, "application/json");
             var result = await _httpClient.PostAsJsonAsync("api/Authorize/Login", loginParameters);
-            if (result.StatusCode == System.Net.HttpStatusCode.BadRequest) throw new Exception(await result.Content.ReadAsStringAsync());
+            if (result.StatusCode == HttpStatusCode.BadRequest)
+                throw new Exception(await result.Content.ReadAsStringAsync());
             result.EnsureSuccessStatusCode();
         }
 
@@ -41,28 +41,27 @@ namespace RMS.Client.Services.Implementations
 
         public async Task Register(RegisterParameters registerParameters)
         {
-            //var stringContent = new StringContent(JsonSerializer.Serialize(registerParameters), Encoding.UTF8, "application/json");
             var result = await _httpClient.PostAsJsonAsync("api/Authorize/Register", registerParameters);
-            if (result.StatusCode == System.Net.HttpStatusCode.BadRequest) throw new Exception(await result.Content.ReadAsStringAsync());
+            if (result.StatusCode == HttpStatusCode.BadRequest)
+                throw new Exception(await result.Content.ReadAsStringAsync());
             result.EnsureSuccessStatusCode();
         }
 
         public async Task<UserInfo> GetUserInfo()
         {
-            var result = await _httpClient.GetFromJsonAsync<UserInfo>("api/Authorize/UserInfo");
-            return result;
+            return await _httpClient.GetFromJsonAsync<UserInfo>("api/Authorize/UserInfo");
         }
 
         public async Task<List<UserViewModel>> GetUsers()
         {
-            var result = await _httpClient.GetFromJsonAsync<List<UserViewModel>>("api/Authorize/GetUsers");
-            return result;
+            return await _httpClient.GetFromJsonAsync<List<UserViewModel>>("api/Authorize/GetUsers");
         }
 
         public async Task UpdateUserRole(UserViewModel userViewModel)
         {
             var result = await _httpClient.PostAsJsonAsync("api/Authorize/UpdateUserRole", userViewModel);
-            if (result.StatusCode == System.Net.HttpStatusCode.BadRequest) throw new Exception(await result.Content.ReadAsStringAsync());
+            if (result.StatusCode == HttpStatusCode.BadRequest)
+                throw new Exception(await result.Content.ReadAsStringAsync());
             result.EnsureSuccessStatusCode();
         }
 
@@ -81,39 +80,50 @@ namespace RMS.Client.Services.Implementations
             throw new Exception("Invalid response format");
         }
 
-        public async Task<List<string>> GetRoles()
+        public async Task<List<RoleViewModel>> GetRoles()
         {
-            var result = await _httpClient.GetFromJsonAsync<List<string>>("api/Authorize/GetRoles");
-            return result;
+            var result = await _httpClient.GetAsync("api/Authorize/GetRoles");
+            result.EnsureSuccessStatusCode();
+
+            var responseContent = await result.Content.ReadAsStringAsync();
+            Console.WriteLine("Response Content:");
+            Console.WriteLine(responseContent); // Log the JSON response for debugging
+
+            try
+            {
+                var roles = JsonSerializer.Deserialize<List<RoleViewModel>>(responseContent);
+                return roles;
+            }
+            catch (JsonException ex)
+            {
+                Console.WriteLine($"Error deserializing roles: {ex.Message}");
+                throw; // Rethrow the exception or handle it accordingly
+            }
         }
 
-        ////////
-        ///
+
+
         public async Task ChangePassword(ResetPassword resetPassword)
         {
             var result = await _httpClient.PostAsJsonAsync("api/Authorize/ChangePassword", resetPassword);
-            if (result.StatusCode == System.Net.HttpStatusCode.BadRequest)
-            {
+            if (result.StatusCode == HttpStatusCode.BadRequest)
                 throw new Exception(await result.Content.ReadAsStringAsync());
-            }
 
             result.EnsureSuccessStatusCode();
         }
+
         public async Task UpdateUserDetails(UserDetailsUpdateParameters updateParameters)
         {
             try
             {
                 var result = await _httpClient.PostAsJsonAsync("api/Authorize/UpdateUserDetails", updateParameters);
-                if (result.StatusCode == System.Net.HttpStatusCode.BadRequest)
-                {
+                if (result.StatusCode == HttpStatusCode.BadRequest)
                     throw new Exception(await result.Content.ReadAsStringAsync());
-                }
 
                 result.EnsureSuccessStatusCode();
             }
             catch (Exception ex)
             {
-                // Log the exception or handle it accordingly
                 throw new Exception($"Failed to update user details: {ex.Message}");
             }
         }
@@ -123,16 +133,13 @@ namespace RMS.Client.Services.Implementations
             try
             {
                 var result = await _httpClient.PostAsJsonAsync("api/Authorize/RequestPasswordResetByEmail", Parameters);
-                if (result.StatusCode == System.Net.HttpStatusCode.BadRequest)
-                {
+                if (result.StatusCode == HttpStatusCode.BadRequest)
                     throw new Exception(await result.Content.ReadAsStringAsync());
-                }
 
                 result.EnsureSuccessStatusCode();
             }
             catch (Exception ex)
             {
-                // Log the exception or handle it accordingly
                 throw new Exception($"Failed to reset the password: {ex.Message}");
             }
         }
@@ -148,23 +155,33 @@ namespace RMS.Client.Services.Implementations
             else if (result.StatusCode == HttpStatusCode.BadRequest)
             {
                 var errorMessage = await result.Content.ReadAsStringAsync();
-                Console.WriteLine(errorMessage); // Output the error message
-                return (false, errorMessage); // Return failure and the error message
+                Console.WriteLine(errorMessage);
+                return (false, errorMessage);
             }
             else
             {
-                // Handle other status codes
-                return (false, "Unexpected error occurred."); // Return failure with a generic error message
+                return (false, "Unexpected error occurred.");
             }
         }
 
         public async Task<bool> ResetPassword(ResetPasswordRequest param)
         {
             var result = await _httpClient.PostAsJsonAsync("api/Authorize/resetpassword", param);
-
             result.EnsureSuccessStatusCode();
-
             return result.IsSuccessStatusCode;
         }
+
+
+        public async Task<bool> HasPermission(string permission)
+        {
+            var response = await _httpClient.PostAsJsonAsync("api/Authorize/GetUserPermissions", new { Permission = permission });
+            response.EnsureSuccessStatusCode();
+            var hasPermission = await response.Content.ReadFromJsonAsync<bool>();
+            return hasPermission;
+        }
+
+
+
+
     }
 }

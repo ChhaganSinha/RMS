@@ -1,5 +1,6 @@
 ﻿
 using RMS.Dto.Auth;
+using RMS.Dto.RBAC;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,12 +17,13 @@ namespace RMS.Client.Services.Contracts
         Task<List<UserViewModel>> GetUsers();
         Task UpdateUserRole(UserViewModel userViewModel);
         Task<int> GetUserCount();
-        Task<List<string>> GetRoles();
+        Task<List<RoleViewModel>> GetRoles();
 
         Task ChangePassword(ResetPassword resetPassword);
         Task UpdateUserDetails(UserDetailsUpdateParameters updateParameters);
         Task RequestPasswordResetByEmail(ResetPasswordByAdmin Parameters);
         Task<(bool, string)> ForgetPassword(ForgetPasswordRequest param);
         Task<bool> ResetPassword(ResetPasswordRequest param);
+        Task<bool> HasPermission(string permission);
     }
 }

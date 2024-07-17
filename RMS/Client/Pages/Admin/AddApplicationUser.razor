@@ -1,10 +1,11 @@
 ﻿@page "/add-application-user"
 @using RMS.Dto.Auth
 @using RMS.Dto.Enum
+@using RMS.Dto.RBAC
 @inject IdentityAuthenticationStateProvider authStateProvider
 @inject NavigationManager navigationManager
 @inject IAuthorizeApi authorizeApi
-@attribute [Authorize(Roles = "SuperAdmin,Admin")]
+@* @attribute [Authorize(Roles = "SuperAdmin,Admin")] *@
 
 <div class="page-header breadcumb-sticky">
     <div class="page-block">
@@ -12,10 +13,7 @@
             <div class="col-md-12">
                 <div class="page-header-title">
                     <h5 class="m-b-10">
-                        Add User
-                        <a @onclick="() => show = true" style="cursor:pointer">
-                            <i class="fa fa-plus-circle fa-lg text-primary" aria-hidden="true" title="Add Hall"></i>
-                        </a>
+                        Add User                
                     </h5>
                 </div>
                 <ul class="breadcrumb">
@@ -31,7 +29,7 @@
 
 <div class="container">
     <div class="row justify-content-md-center">
-        <div class="col-sm-6">
+        <div class="col-sm-8">
             <h4 class="text-center">Create Account</h4>
             <EditForm class="form-signin" OnValidSubmit="OnSubmit" Model="registerParameters">
                 <DataAnnotationsValidator />
@@ -95,6 +93,7 @@
 
                 <button type="submit" class="btn btn-primary btn-block mb-2">Register</button>
 
+                <UiAlert Model="alert"></UiAlert>
                 <label class="text-danger">@error</label>
 
             </EditForm>
@@ -103,8 +102,13 @@
 </div>
 
 @code {
+    [CascadingParameter]
+    protected AlertModel? alert { get; set; }
+    private Timer _timer;
+    private int _delay = 2500;
+
     private List<UserViewModel> users;
-    private List<string> Roles;
+    private List<RoleViewModel> Roles;
     string Title = "Admin Control Panel";
     private bool show = false;
     string Message = string.Empty;
@@ -114,6 +118,7 @@
 
     protected override async Task OnInitializedAsync()
     {
+        alert?.Clear();
         users = await authorizeApi.GetUsers();
         Roles = await authStateProvider.GetRoles();
     }
@@ -152,14 +157,19 @@
         try
         {
             Message = "Please wait";
+            alert?.SetSuccess(Message);
             await authorizeApi.Register(registerParameters);
             Message = "Successfully Registered";
+            alert?.SetSuccess(Message);
             TaskCompleted = true;
             ResetForm(); // Reset the form after successful registration
+            StateHasChanged();
+            _timer = new Timer(TimerCallback, null, _delay, Timeout.Infinite);
         }
         catch (Exception ex)
         {
-            error = ex.Message;
+            //error = ex.Message;
+            alert?.SetSuccess(ex.Message);
             TaskCompleted = true;
         }
     }
@@ -172,6 +182,13 @@
             registerParameters = new();
         }
         users = await authorizeApi.GetUsers();
+        StateHasChanged();
+    }
+    
+    private void TimerCallback(Object o)
+    {
+        alert?.Clear();
+        _timer.Dispose();
         StateHasChanged();
     }
 }

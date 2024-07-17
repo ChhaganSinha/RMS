@@ -2,10 +2,11 @@
 @using RMS.Dto.Auth
 @using RMS.Client.Shared.Popup
 @using RMS.Client.Pages.Admin
+@using RMS.Dto.RBAC
 @inject IdentityAuthenticationStateProvider authStateProvider
 @inject NavigationManager navigationManager
 @inject IAuthorizeApi authorizeApi
-@attribute [Authorize(Roles = "SuperAdmin,Admin")]
+@* @attribute [Authorize(Roles = "SuperAdmin,Admin")] *@
 
 
 <div class="page-header breadcumb-sticky">
@@ -15,7 +16,6 @@
                 <div class="page-header-title">
                     <h5 class="m-b-10">
                         Access Control
-                        <a @onclick="()=>show=true" style="cursor:pointer"><i class="fa fa-plus-circle fa-lg text-primary" aria-hidden="true" title="Add Hall"></i></a>
                     </h5>
                 </div>
                 <ul class="breadcrumb">
@@ -42,8 +42,8 @@ else
 {
     <div class="bt-wizard">
         <ul class="nav nav-pills">
-            <li class="nav-item"><a @onclick="()=>{Tab=1;}" style="cursor:pointer" class="nav-link rounded-0 @(Tab == 1 ? "active" : "")" data-toggle="tab">Manage Roles</a></li>
-            <li class="nav-item"><a @onclick="()=>{Tab=3;}" style="cursor:pointer" class="nav-link rounded-0 @(Tab == 3 ? "active" : "")" data-toggle="tab">Manage Password</a></li>
+            <li class="nav-item"><a @onclick="()=>SwitchTab(1)" style="cursor:pointer" class="nav-link rounded-0 @(Tab == 1 ? "active" : "")" data-toggle="tab">Manage Roles</a></li>
+            <li class="nav-item"><a @onclick="()=>SwitchTab(3)" style="cursor:pointer" class="nav-link rounded-0 @(Tab == 3 ? "active" : "")" data-toggle="tab">Manage Password</a></li>
         </ul>
         <div class="tab-content card">
             <div class="pt-1 bg-primary"></div>
@@ -73,7 +73,7 @@ else
                                             <select @bind="user.Role" class="form-control">
                                                 @foreach (var role in Roles)
                                                 {
-                                                    <option value="@role">@role</option>
+                                                    <option value="@role.Name">@role.Name</option>
                                                 }
                                             </select>
                                         </td>
@@ -131,7 +131,7 @@ else
 
 @code {
     private List<UserViewModel> users;
-    private List<string> Roles;
+    private List<RoleViewModel> Roles;
     string Title = "Admin Control Panel";
     private bool show = false;
     string Message = string.Empty;
@@ -141,33 +141,40 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        users = await authorizeApi.GetUsers();
-        Roles = await authStateProvider.GetRoles();
+        try
+        {
+            users = await authorizeApi.GetUsers();
+            Roles = await authStateProvider.GetRoles();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Error loading data: " + ex.Message);
+            // Handle error loading initial data
+        }
     }
 
     private async Task UpdateUserRole(UserViewModel user)
     {
         try
         {
-            Message = string.Empty;
-            MessageBody = "Thank you!";
-            show = true;
-            TaskCompleted = false;
             Message = "Please wait";
             await authorizeApi.UpdateUserRole(user);
             Message = "Successfully Updated";
             TaskCompleted = true;
+            // Refresh user list after update
+            users = await authorizeApi.GetUsers();
         }
         catch (Exception ex)
         {
-            Message = "Error";
-            Message = ex.Message;
+            Message = "Error: " + ex.Message;
             TaskCompleted = true;
         }
     }
 
-    RegisterParameters registerParameters { get; set; } = new RegisterParameters();
-    string error { get; set; }
+    private void SwitchTab(int tabNumber)
+    {
+        Tab = tabNumber;
+    }
 
     private async void ResetForm()
     {

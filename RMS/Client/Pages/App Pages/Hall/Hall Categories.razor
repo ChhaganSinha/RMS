@@ -6,6 +6,7 @@
 @inject AppClient client
 @inject IJSRuntime JSRuntime
 @inject NavigationManager NavigationManager
+@inject PermissionService PermissionService
 @attribute [Authorize]
 
 <div class="page-header breadcumb-sticky">
@@ -15,7 +16,10 @@
                 <div class="page-header-title">
                     <h5 class="m-b-10">
                         Hall Categories
-                        <a @onclick="()=>show=true" style="cursor:pointer"><i class="fa fa-plus-circle fa-lg text-primary" aria-hidden="true" title="Add Hall"></i></a>
+                        @if (canAddHallCategory)
+                        {
+                            <a @onclick="()=>show=true" style="cursor:pointer"><i class="fa fa-plus-circle fa-lg text-primary" aria-hidden="true" title="Add Hall"></i></a>
+                        }
                     </h5>
                 </div>
                 <ul class="breadcrumb">
@@ -35,7 +39,7 @@
         <div class="card-body p-2 mt-n3">
             <div class="card text">
                 <div class="card-body">
-                    <HallCategoryGrid/>
+                    <HallCategoryGrid />
                 </div>
             </div>
         </div>
@@ -45,8 +49,6 @@
 <SimpleDailog Title="@Title" Show="@show" OnCloseDialog="ResetForm">
     @if (show)
     {
-
-
         <EditForm Model="model" OnValidSubmit="OnSave">
             <DataAnnotationsValidator />
             <div>
@@ -81,10 +83,12 @@
     private Timer _timer;
     private int _delay = 2500;
 
+    private bool canAddHallCategory = false;
 
     protected override async Task OnInitializedAsync()
     {
         alert?.Clear();
+        canAddHallCategory = await PermissionService.HasPermission("AddHallCategory");
     }
 
     public async Task OnSave()
@@ -95,13 +99,14 @@
         var response = await client.UpsertHallCategoryAsync(model);
         if (response.IsSuccess)
         {
-            // model = response.Result;
             await HallCategoryGrid.RefreshGridAsync();
             alert?.SetSuccess(response.Message);
             model = new();
         }
         else
+        {
             alert?.SetError(response.Message);
+        }
 
         process = false;
         StateHasChanged();
@@ -127,4 +132,3 @@
         model = new();
     }
 }
-

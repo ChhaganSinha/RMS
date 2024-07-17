@@ -10,7 +10,6 @@ using System;
 using RMS.Server.Services;
 using Microsoft.AspNetCore.Identity.UI.Services;
 
-
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Configuration.AddEnvironmentVariables(prefix: "ASPNETCORE_");
@@ -32,8 +31,6 @@ builder.Services.AddControllers()
     .AddODataControllers()
     .AddNewtonsoftJson();
 
-
-
 builder.Services.AddHttpContextAccessor();
 
 var useSqlLite = builder.Configuration.GetValue<bool>("UseSqlLite");
@@ -53,7 +50,6 @@ if (useSqlLite)
 }
 else
 {
-
     builder.Services.AddDbContext<AuthDbContext>(options =>
     {
         options.UseMySql(conStringAuth, ServerVersion.AutoDetect(conStringAuth));
@@ -64,7 +60,7 @@ else
     });
 }
 
-builder.Services.AddIdentity<ApplicationUser, IdentityRole<Guid>>()
+builder.Services.AddIdentity<ApplicationUser, ApplicationRole>()
     .AddEntityFrameworkStores<AuthDbContext>()
     .AddDefaultTokenProviders();
 
@@ -97,26 +93,20 @@ builder.Services.ConfigureApplicationCookie(options =>
     };
 });
 
-
-
-
-
 builder.Services.AddLogging();
 builder.Services.AddScoped<BaseRepository>();
 builder.Services.AddScoped<IAppRepository, AppRepository>();
 
-
 builder.Services.AddTransient<IEmailSender, EmailSender>();
-//builder.Services.AddControllersWithViews();
 builder.Services.AddControllers();
 builder.Services.AddRazorPages();
 
 var app = builder.Build();
 
 var defaultRoles = builder.Configuration.GetSection("DefaultRoles").Get<string[]>() ?? new string[] { "SuperAdmin", "Admin" };
-var defaultUsername = builder.Configuration.GetValue<string>("DefaultUser:Username") ?? "DefaultUser";
-var defaultUserId = builder.Configuration.GetValue<string>("DefaultUser:UserId") ?? "default@RMSapp.com";
-var defaultPassword = builder.Configuration.GetValue<string>("DefaultUser:Password") ?? "Asset@2023";
+//var defaultUsername = builder.Configuration.GetValue<string>("DefaultUser:Username") ?? "DefaultUser";
+//var defaultUserId = builder.Configuration.GetValue<string>("DefaultUser:UserId") ?? "default@RMSapp.com";
+//var defaultPassword = builder.Configuration.GetValue<string>("DefaultUser:Password") ?? "Asset@2023";
 
 var scopeFactory = app.Services.GetRequiredService<IServiceScopeFactory>();
 using (var scope = scopeFactory.CreateScope())
@@ -128,8 +118,8 @@ using (var scope = scopeFactory.CreateScope())
         // seed data if a single tenant application
     }
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
-    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole<Guid>>>();
-    // Check if the default admin user exists
+    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<ApplicationRole>>();
+
     //var adminUser = await userManager.FindByNameAsync("Admin");
     //if (adminUser == null)
     //{
@@ -137,7 +127,6 @@ using (var scope = scopeFactory.CreateScope())
     //    {
     //        UserName = defaultUsername,
     //        Email = defaultUserId
-    //        // Set other properties for the admin user as needed
     //    };
     //    var result = await userManager.CreateAsync(adminUser, defaultPassword);
     //    if (result.Succeeded)
@@ -147,21 +136,15 @@ using (var scope = scopeFactory.CreateScope())
     //            var roleExists = await roleManager.RoleExistsAsync(roleName);
     //            if (!roleExists)
     //            {
-    //                var role = new IdentityRole<Guid>(roleName);
+    //                var role = new ApplicationRole { Name = roleName };
     //                await roleManager.CreateAsync(role);
     //            }
     //        }
-    //        // Create the "Admin" role if it doesn't exist
-    //        var adminRole = new IdentityRole<Guid>("SuperAdmin");
-    //        var createRoleResult = await roleManager.CreateAsync(adminRole);
-
-    //        // Assign the admin user to the "Admin" role
     //        var addUserRoleResult = await userManager.AddToRoleAsync(adminUser, "SuperAdmin");
     //    }
     //}
 }
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseWebAssemblyDebugging();
@@ -169,7 +152,6 @@ if (app.Environment.IsDevelopment())
 else
 {
     app.UseExceptionHandler("/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
@@ -180,15 +162,12 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
-
 app.MapRazorPages();
 
 app.UseEndpoints(endpoints =>
 {
     endpoints.MapControllers();
-
     endpoints.MapFallbackToFile("index.html");
 });
-
 
 app.Run();

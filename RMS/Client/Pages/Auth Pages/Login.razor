@@ -21,7 +21,7 @@
             </div>
         </div>
         <div class="auth-side-form">
-            <div class=" auth-content">
+            <div class="auth-content">
                 <img src="assets/images/auth/auth-logo-dark.png" alt=""
                      class="img-fluid mb-4 d-block d-xl-none d-lg-none">
                 <h3 class="mb-4 f-w-400">Signin</h3>
@@ -31,7 +31,7 @@
                         <div class="input-group-prepend">
                             <span class="input-group-text"><i class="feather icon-mail"></i></span>
                         </div>
-                        <input type="email" @bind="loginParameters.UserEmail" class="form-control" placeholder="Email address">
+                        <input type="email" @bind="loginParameters.UserEmail" class="form-control" placeholder="Email address" required>
                     </div>
                     <ValidationMessage style="margin-top:-12px" For="@(() => loginParameters.UserEmail)" />
 
@@ -39,7 +39,7 @@
                         <div class="input-group-prepend">
                             <span class="input-group-text"><i class="feather icon-lock"></i></span>
                         </div>
-                        <input type="password" @bind="loginParameters.Password" class="form-control" placeholder="Password">
+                        <input type="password" @bind="loginParameters.Password" class="form-control" placeholder="Password" required>
                     </div>
                     <ValidationMessage style="margin-top:-16px" For="@(() => loginParameters.Password)" />
 
@@ -83,11 +83,11 @@
 
 
 @code {
-    LoginParameters loginParameters { get; set; } = new LoginParameters();
-    string error { get; set; }
-    int userCount = 1;
+    private LoginParameters loginParameters { get; set; } = new LoginParameters();
+    private string error { get; set; }
+    private int userCount = 1;
 
-    async Task OnSubmit()
+    private async Task OnSubmit()
     {
         error = null;
         try
@@ -100,6 +100,7 @@
             error = ex.Message;
         }
     }
+
     protected override async Task OnInitializedAsync()
     {
         userCount = await authStateProvider.GetUserCount();

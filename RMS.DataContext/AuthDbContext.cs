@@ -1,18 +1,15 @@
-﻿
-using RMS.DataContext.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿// AuthDbContext.cs
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-
+using RMS.DataContext.Models;
 
 namespace RMS.DataContext
 {
-    public class AuthDbContext : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>
+    public class AuthDbContext : IdentityDbContext<ApplicationUser, ApplicationRole, Guid>
     {
+        public DbSet<PagePermission> PagePermissions { get; set; }
+        public DbSet<UserPermission> UserPermissions { get; set; } // Add this DbSet
+
         public AuthDbContext(DbContextOptions<AuthDbContext> options, bool ensureCreated = true)
             : base(options)
         {
@@ -20,20 +17,24 @@ namespace RMS.DataContext
                 Database.EnsureCreated();
         }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            base.OnConfiguring(optionsBuilder);
-        }
-
         protected override void OnModelCreating(ModelBuilder builder)
         {
-
             base.OnModelCreating(builder);
-            // Customize the ASP.NET Identity model and override the defaults if needed.
-            // For example, you can rename the ASP.NET Identity table names and more.
-            // Add your customizations after calling base.OnModelCreating(builder);
 
+            // Configure relationships and other mappings
+            builder.Entity<PagePermission>()
+                .HasOne(pp => pp.ApplicationRole)
+                .WithMany(ar => ar.PagePermissions)
+                .HasForeignKey(pp => pp.ApplicationRoleId)
+                .IsRequired();
+
+            // Configure UserPermission relationships if needed
+            // Example:
+            // builder.Entity<UserPermission>()
+            //     .HasOne(up => up.User)
+            //     .WithMany()
+            //     .HasForeignKey(up => up.UserId)
+            //     .IsRequired();
         }
-
     }
 }

@@ -15,7 +15,7 @@ namespace RMS.DataContext.Models
        
         public DateTime Dob { get; set; }
 
-        public string Address { get; set; }
+        public string Address { get; set; } = string.Empty;
 
         [Required]
         //[DataType(DataType.Password)]

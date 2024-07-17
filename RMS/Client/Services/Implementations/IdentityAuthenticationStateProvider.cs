@@ -10,6 +10,7 @@ using System.Net.Http;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components.Authorization;
+using RMS.Dto.RBAC;
 
 
 namespace RMS.Client.States
@@ -73,7 +74,7 @@ namespace RMS.Client.States
         {
             return await _authorizeApi.GetUserCount();
         }
-        public async Task<List<string>> GetRoles()
+        public async Task<List<RoleViewModel>> GetRoles()
         {
             return await _authorizeApi.GetRoles();
         }
