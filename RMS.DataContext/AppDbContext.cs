@@ -59,6 +59,7 @@ namespace RMS.DataContext
         public DbSet<CustomerDetailsDTO> CustomerDetailsDTO { get; set; }
         public DbSet<PosDTO> PosDTO { get; set; }
         public DbSet<TableCon> TableCon { get; set; }
+        public DbSet<UserProfilePicUpld> UserProfilePicUpld { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

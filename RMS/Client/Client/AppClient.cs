@@ -3137,5 +3137,78 @@ namespace RMS.Client.Client
             return null;
         }
         #endregion
+
+        #region UserProfile Pic Upload
+        public async Task<ApiResponse<UserProfilePicUpld>> UpsertProfilePicAsync(UserProfilePicUpld data)
+        {
+            var result = new ApiResponse<UserProfilePicUpld>();
+
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/App/UpsertProfilePic", data);
+                res.EnsureSuccessStatusCode();
+                var json = await res.Content.ReadFromJsonAsync<ApiResponse<UserProfilePicUpld>>();
+                return json;
+
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+
+
+        }
+
+
+        public async Task<UserProfilePicUpld> GetProfilePicByEmail(string email)
+        {
+            UserProfilePicUpld data = null;
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/App/GetProfilePicByEmail/{email}");
+               if(res.IsSuccessStatusCode)
+                {
+                data = await res.Content.ReadFromJsonAsync<UserProfilePicUpld>();
+
+                }
+                else
+                {
+                    // Handle the case when user is not found or other errors
+                    var errorMessage = await res.Content.ReadAsStringAsync();
+                    Logger.LogError($"Error fetching profile pic: {errorMessage}");
+                }
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return data;
+        }
+
+
+        public async Task<ApiResponse<UserProfilePicUpld>> DeleteProfBgPic(UserProfilePicUpld profilePic)
+        {
+            var result = new ApiResponse<UserProfilePicUpld>();
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/tenant/DeleteProfBgPic", profilePic);
+                res.EnsureSuccessStatusCode();
+                var json = await res.Content.ReadFromJsonAsync<ApiResponse<UserProfilePicUpld>>();
+                return json;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+
+        }
+        #endregion
     }
 }
