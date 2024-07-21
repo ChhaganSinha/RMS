@@ -6,11 +6,12 @@
 @using System.Drawing
 @inject AppClient client
 @inject NavigationManager NavigationManager
+@inject PermissionService PermissionService
 @attribute [Authorize]
 
-
-<div class="row">
-    
+@if (canView || canEdit || hasFullAccess)
+{
+    <div class="row">
         <div class="col-md-6 col-xl-3">
             <div class="card bg-c-blue order-card">
                 <div class="card-body" style="padding: 4px 25px;">
@@ -21,131 +22,135 @@
                 </div>
             </div>
         </div>
-    
-    <div class="col-md-6 col-xl-3">
-        <div class="card bg-c-green order-card">
-            <div class="card-body" style="padding: 4px 25px;">
-                <h6 class="text-white">Hotel's Total Amount</h6>
-                <h2 class="text-right text-white"><i class="feather icon-tag float-left"></i><span>&#8377;@bookingStats?.TotalAmount.ToString("F2")</span></h2>
-                <p class="m-b-0">Today<span class="float-right">&#8377;@bookingStats?.TodaysAmount.ToString("F2")</span></p>
-                <p class="m-b-0">This Month<span class="float-right">&#8377;@bookingStats?.ThisMonthAmount.ToString("F2")</span></p>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-6 col-xl-3">
-        <div class="card bg-c-red order-card">
-            <div class="card-body" style="padding: 4px 25px;">
-                <h6 class="text-white" style="font-size: 12px">Restaurant's Total Amount</h6>
-                <h2 class="text-right text-white"><i class="feather icon-award float-left"></i> <span>&#8377;@bookingStats?.ResTotalAmount.ToString("F2")</span></h2>
-                <p class="m-b-0">Today<span class="float-right">&#8377,@bookingStats?.ResTodaysAmount.ToString("F2")</span></p>
-                <p class="m-b-0">This Month<span class="float-right">&#8377;@bookingStats?.ResThisMonthAmount.ToString("F2")</span></p>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-6 col-xl-3">
-        <div class="card bg-c-yellow order-card">
-            <div class="card-body" style="padding: 4px 25px;">
-                <h6 class="text-white">Total Customer</h6>
-                <h2 class="text-right text-white"><i class="feather icon-repeat float-left"></i><span>@customerStats?.Total</span></h2>
-                <p class="m-b-0">Today<span class="float-right">@customerStats?.Today</span></p>
-                <p class="m-b-0">This Month<span class="float-right">@customerStats?.ThisMonth</span></p>
-            </div>
-        </div>
-    </div>
 
-    
-    @* dummy chart *@
-   
-    <div class="row">
-        @* <div class="col-xl-6 col-md-6">
-            <div class="card" style="height: 500px;">
-                <div class="card-header" style="text-align:center">
-                    <h5>Clicks % by Department </h5>
-                </div>
-                <div class="card-body" style="height: calc(100% - 56px);">
-                    <Chart Id="TrainingPie" Type="@ChartType.pie" Datasets="@TrainingPieChartData" AspectRatio="false"
-                           Labels="@TrainingPieChartLabels" Ids="@TrainingPieChartIds" IsStacked="false">
-                    </Chart>
+        <div class="col-md-6 col-xl-3">
+            <div class="card bg-c-green order-card">
+                <div class="card-body" style="padding: 4px 25px;">
+                    <h6 class="text-white">Hotel's Total Amount</h6>
+                    <h2 class="text-right text-white"><i class="feather icon-tag float-left"></i><span>&#8377;@bookingStats?.TotalAmount.ToString("F2")</span></h2>
+                    <p class="m-b-0">Today<span class="float-right">&#8377;@bookingStats?.TodaysAmount.ToString("F2")</span></p>
+                    <p class="m-b-0">This Month<span class="float-right">&#8377;@bookingStats?.ThisMonthAmount.ToString("F2")</span></p>
                 </div>
             </div>
+        </div>
+        <div class="col-md-6 col-xl-3">
+            <div class="card bg-c-red order-card">
+                <div class="card-body" style="padding: 4px 25px;">
+                    <h6 class="text-white" style="font-size: 12px">Restaurant's Total Amount</h6>
+                    <h2 class="text-right text-white"><i class="feather icon-award float-left"></i> <span>&#8377;@bookingStats?.ResTotalAmount.ToString("F2")</span></h2>
+                    <p class="m-b-0">Today<span class="float-right">&#8377,@bookingStats?.ResTodaysAmount.ToString("F2")</span></p>
+                    <p class="m-b-0">This Month<span class="float-right">&#8377;@bookingStats?.ResThisMonthAmount.ToString("F2")</span></p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-xl-3">
+            <div class="card bg-c-yellow order-card">
+                <div class="card-body" style="padding: 4px 25px;">
+                    <h6 class="text-white">Total Customer</h6>
+                    <h2 class="text-right text-white"><i class="feather icon-repeat float-left"></i><span>@customerStats?.Total</span></h2>
+                    <p class="m-b-0">Today<span class="float-right">@customerStats?.Today</span></p>
+                    <p class="m-b-0">This Month<span class="float-right">@customerStats?.ThisMonth</span></p>
+                </div>
+            </div>
+        </div>
+
+
+        @* dummy chart *@
+
+        <div class="row">
+            @* <div class="col-xl-6 col-md-6">
+        <div class="card" style="height: 500px;">
+        <div class="card-header" style="text-align:center">
+        <h5>Clicks % by Department </h5>
+        </div>
+        <div class="card-body" style="height: calc(100% - 56px);">
+        <Chart Id="TrainingPie" Type="@ChartType.pie" Datasets="@TrainingPieChartData" AspectRatio="false"
+        Labels="@TrainingPieChartLabels" Ids="@TrainingPieChartIds" IsStacked="false">
+        </Chart>
+        </div>
+        </div>
         </div> *@
-        <div class="col-xl-6 col-md-6">
-            <div class="card">
-                <div class="card-header text-center">
-                    <h5>Month wise Customer Reservation</h5>
+            <div class="col-xl-6 col-md-6">
+                <div class="card">
+                    <div class="card-header text-center">
+                        <h5>Month wise Customer Reservation</h5>
+                    </div>
+                    <div class="card-body">
+                        <div style="width: 100%;">
+                            <Chart Id="TrainingBar" Type="@ChartType.bar" Datasets="@TrainingBarChartData" AspectRatio="false"
+                                   Labels="@TrainingBarChartLabels" Ids="@TrainingBarChartIds" IsStacked="false">
+                            </Chart>
+                        </div>
+                    </div>
                 </div>
-                <div class="card-body">
-                    <div style="width: 100%;">
-                        <Chart Id="TrainingBar" Type="@ChartType.bar" Datasets="@TrainingBarChartData" AspectRatio="false"
-                               Labels="@TrainingBarChartLabels" Ids="@TrainingBarChartIds" IsStacked="false">
-                        </Chart>
+            </div>
+            <div class="col-xl-6 col-md-6">
+                @* <div class="card" style="height: 500px;"> *@
+                <div class="card">
+                    <div class="card-header text-center">
+                        <h5>Trend of Customer Reservation</h5>
+                    </div>
+                    <div class="card-body" style="height: calc(100% - 56px);">
+                        <div style="width: 100%;">
+                            <Chart Id="TrainingLine" Type="@ChartType.line" Datasets="@TrainingLineChartData" AspectRatio="false"
+                                   Labels="@TrainingBarChartLabels" Ids="@TrainingBarChartIds" IsStacked="false">
+                            </Chart>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-xl-6 col-md-6">
-            @* <div class="card" style="height: 500px;"> *@
-            <div class="card">
-                <div class="card-header text-center">
-                    <h5>Trend of Customer Reservation</h5>
+        <div class="row">
+            <div class="col-xl-6 col-md-6">
+                <div class="card">
+                    <div class="card-header" style="text-align:center">
+                        <h5>Today's Bookings</h5>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-group">
+                            @foreach (var booking in TodaysBookings)
+                            {
+                                <li class="list-group-item">
+                                    <strong>Name:</strong> @booking.CustomerInfo.FirstOrDefault()?.Name<br />
+                                    <strong>Mobile No.:</strong> @booking.CustomerInfo.FirstOrDefault()?.MobileNo<br />
+                                    <strong>Email:</strong> @booking.CustomerInfo.FirstOrDefault()?.Email<br />
+                                    <strong>Address:</strong> @booking.ArrivalFrom
+                                </li>
+                            }
+                        </ul>
+                    </div>
                 </div>
-                <div class="card-body" style="height: calc(100% - 56px);">
-                    <div style="width: 100%;">
-                         <Chart Id="TrainingLine" Type="@ChartType.line" Datasets="@TrainingLineChartData" AspectRatio="false"
-                               Labels="@TrainingBarChartLabels" Ids="@TrainingBarChartIds" IsStacked="false">
-                        </Chart> 
+            </div>
+            <div class="col-xl-6 col-md-6">
+                <div class="card">
+                    <div class="card-header" style="text-align:center">
+                        <h5>Next Day's Bookings</h5>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-group">
+                            @foreach (var booking in NextDaysBookings)
+                            {
+                                <li class="list-group-item">
+                                    <strong>Name:</strong> @booking.CustomerInfo.FirstOrDefault()?.Name<br />
+                                    <strong>Mobile No.:</strong> @booking.CustomerInfo.FirstOrDefault()?.MobileNo<br />
+                                    <strong>Email:</strong> @booking.CustomerInfo.FirstOrDefault()?.Email<br />
+                                    <strong>Address:</strong> @booking.ArrivalFrom
+                                </li>
+                            }
+                        </ul>
                     </div>
                 </div>
             </div>
         </div>
+
+
     </div>
-    <div class="row">
-        <div class="col-xl-6 col-md-6">
-            <div class="card">
-                <div class="card-header" style="text-align:center">
-                    <h5>Today's Bookings</h5>
-                </div>
-                <div class="card-body">
-                    <ul class="list-group">
-                        @foreach (var booking in TodaysBookings)
-                        {
-                            <li class="list-group-item">
-                                <strong>Name:</strong> @booking.CustomerInfo.FirstOrDefault()?.Name<br />
-                                <strong>Mobile No.:</strong> @booking.CustomerInfo.FirstOrDefault()?.MobileNo<br />
-                                <strong>Email:</strong> @booking.CustomerInfo.FirstOrDefault()?.Email<br />
-                                <strong>Address:</strong> @booking.ArrivalFrom
-                            </li>
-                        }
-                    </ul>
-                </div>
-            </div>
-        </div>
-        <div class="col-xl-6 col-md-6">
-            <div class="card">
-                <div class="card-header" style="text-align:center">
-                    <h5>Next Day's Bookings</h5>
-                </div>
-                <div class="card-body">
-                    <ul class="list-group">
-                        @foreach (var booking in NextDaysBookings)
-                        {
-                            <li class="list-group-item">
-                                <strong>Name:</strong> @booking.CustomerInfo.FirstOrDefault()?.Name<br />
-                                <strong>Mobile No.:</strong> @booking.CustomerInfo.FirstOrDefault()?.MobileNo<br />
-                                <strong>Email:</strong> @booking.CustomerInfo.FirstOrDefault()?.Email<br />
-                                <strong>Address:</strong> @booking.ArrivalFrom
-                            </li>
-                        }
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </div>
-
-
-</div>
-
+}
 @code {
+    private bool canView = false;
+    private bool canEdit = false;
+    private bool hasFullAccess = false;
+
     public List<ChartJsDataset> TrainingBarChartData { get; set; } = new List<ChartJsDataset>();
     public string[] TrainingBarChartLabels { get; set; }
     public int[] TrainingBarChartIds { get; set; }
@@ -182,6 +187,20 @@
 
     protected override async Task OnInitializedAsync()
     {
+        var permissions = await PermissionService.HasPermission("Dashboard");
+        if (permissions != null)
+        {
+            canView = permissions.CanView;
+            canEdit = permissions.CanEdit;
+            hasFullAccess = permissions.HasFullAccess;
+        }
+        if (!canView)
+        {
+            // Redirect or handle unauthorized access
+            NavigationManager.NavigateTo("/unauthorized");
+            return;
+        }
+
         StartDate = new DateTime(DateTime.Now.Year, 1, 1);
         EndDate = new DateTime(DateTime.Now.Year, 12, 31).AddHours(24).AddSeconds(-1);
 
@@ -214,31 +233,31 @@
         //var monthlyBookings = await client.GetMonthlyBookingsAsync();
 
         // Initialize all months with 0 bookings
-       //  var allMonths = new Dictionary<string, int>();
-       //  foreach (var month in Enum.GetNames(typeof(Months)))
-       //  {
-       //      allMonths[month] = 0;
-       //  }
+        //  var allMonths = new Dictionary<string, int>();
+        //  foreach (var month in Enum.GetNames(typeof(Months)))
+        //  {
+        //      allMonths[month] = 0;
+        //  }
 
-       //  // Update the months with actual booking data
-       //  foreach (var booking in monthlyBookings)
-       //  {
-       //      allMonths[booking.Key] = booking.Value;
-       //  }
+        //  // Update the months with actual booking data
+        //  foreach (var booking in monthlyBookings)
+        //  {
+        //      allMonths[booking.Key] = booking.Value;
+        //  }
 
 
-       //  var bookingCounts = monthlyBookings.Values.Select(v => v.ToString()).ToArray();
+        //  var bookingCounts = monthlyBookings.Values.Select(v => v.ToString()).ToArray();
 
-       // // TrainingBarChartLabels = monthlyBookings.Keys.ToArray();
+        // // TrainingBarChartLabels = monthlyBookings.Keys.ToArray();
 
-       //  TrainingBarChartData = new List<ChartJsDataset>
-       //  {
-       //      new ChartJsDataset
-       //      {
-       //          Label = "Bookings",
-       //          Data = bookingCounts,
-       //          BackgroundColor = new string[] { "rgba(75, 192, 192, 0.2)" }
-       //      }
-       //  };
+        //  TrainingBarChartData = new List<ChartJsDataset>
+        //  {
+        //      new ChartJsDataset
+        //      {
+        //          Label = "Bookings",
+        //          Data = bookingCounts,
+        //          BackgroundColor = new string[] { "rgba(75, 192, 192, 0.2)" }
+        //      }
+        //  };
     }
 }
