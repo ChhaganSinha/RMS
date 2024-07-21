@@ -5,6 +5,7 @@
 @inject AppClient client
 @inject IJSRuntime JSRuntime
 @inject NavigationManager NavigationManager
+@inject PermissionService PermissionService
 @attribute [Authorize]
 
 <div class="page-header breadcumb-sticky">
@@ -14,7 +15,10 @@
                 <div class="page-header-title">
                     <h5 class="m-b-10">
                         Room Facilities
-                        <a @onclick="()=>show=true" style="cursor:pointer"><i class="fa fa-plus-circle fa-lg text-primary" aria-hidden="true" title="Add Facility"></i></a>
+                        @if (canEdit)
+                        {
+                            <a @onclick="()=>show=true" style="cursor:pointer"><i class="fa fa-plus-circle fa-lg text-primary" aria-hidden="true" title="Add Facility"></i></a>
+                        }
                     </h5>
                 </div>
                 <ul class="breadcrumb">
@@ -52,12 +56,12 @@
                 <input type="text" placeholder="Enter Category" @bind-value="model.Name" class="form-control mb-2" />
                 <ValidationMessage For="() => model.Name" />
             </div>
-                @if (process)
-                {
+            @if (process)
+            {
                 <div style="text-align:center">
                     <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
                 </div>
-                }
+            }
             <UiAlert Model="alert"></UiAlert>
             <hr />
             <button type="submit" class="btn btn-primary float-right col-md-4">Add</button>
@@ -79,11 +83,23 @@
     bool process = false;
     private Timer _timer;
     private int _delay = 2500;
-   
+    static AuthenticationState authState;
+    private static bool canView = false;
+    private static bool canEdit = false;
+    private static bool hasFullAccess = false;
 
     protected override async Task OnInitializedAsync()
     {
         alert?.Clear();
+
+        // Check permissions
+        var permissions = await PermissionService.HasPermission("RoomFacilities");
+        if (permissions != null)
+        {
+            canView = permissions.CanView;
+            canEdit = permissions.CanEdit;
+            hasFullAccess = permissions.HasFullAccess;
+        }
     }
 
     public async Task OnSave()

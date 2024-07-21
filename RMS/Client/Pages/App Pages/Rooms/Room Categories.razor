@@ -2,9 +2,11 @@
 @using RMS.Client.Client
 @using RMS.Client.Pages.GridComponent
 @using RMS.Client.Shared.Popup
+@using Microsoft.AspNetCore.Components.Authorization
 @inject AppClient client
 @inject IJSRuntime JSRuntime
 @inject NavigationManager NavigationManager
+@inject PermissionService PermissionService
 @attribute [Authorize]
 
 <div class="page-header breadcumb-sticky">
@@ -14,7 +16,12 @@
                 <div class="page-header-title">
                     <h5 class="m-b-10">
                         Room Categories
-                        <a @onclick="()=>show=true" style="cursor:pointer"><i class="fa fa-plus-circle fa-lg text-primary" aria-hidden="true" title="Add Room"></i></a>
+                        @if (canEdit || hasFullAccess)
+                        {
+                            <a @onclick="()=>show=true" style="cursor:pointer">
+                                <i class="fa fa-plus-circle fa-lg text-primary" aria-hidden="true" title="Add Room"></i>
+                            </a>
+                        }
                     </h5>
                 </div>
                 <ul class="breadcrumb">
@@ -29,17 +36,26 @@
     </div>
 </div>
 
-<div class="row">
-    <div class="col-sm-12 p-0">
-        <div class="card-body p-2 mt-n3">
-            <div class="card text">
-                <div class="card-body">
-                    <RoomCategoryGrid />
+@if (canView)
+{
+    <div class="row">
+        <div class="col-sm-12 p-0">
+            <div class="card-body p-2 mt-n3">
+                <div class="card text">
+                    <div class="card-body">
+                        <RoomCategoryGrid />
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
+}
+else
+{
+    <div class="col-sm-12">
+        @* <p>You do not have permission to view this page.</p> *@
+    </div>
+}
 
 <SimpleDailog Title="@Title" Show="@show" OnCloseDialog="ResetForm">
     @if (show)
@@ -78,10 +94,33 @@
     private Timer _timer;
     private int _delay = 2500;
 
+    private static bool canView = false;
+    private static bool canEdit = false;
+    private static bool hasFullAccess = false;
 
     protected override async Task OnInitializedAsync()
     {
         alert?.Clear();
+
+        try
+        {
+            var permissions = await PermissionService.HasPermission("RoomCategories");
+            if (permissions != null)
+            {
+                canView = permissions.CanView;
+                canEdit = permissions.CanEdit;
+                hasFullAccess = permissions.HasFullAccess;
+            }
+
+            if (!canView) return;
+
+            // Initialization logic, if needed
+        }
+        catch (Exception ex)
+        {
+            // Log error and handle exception if needed
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 
     public async Task OnSave()
@@ -92,7 +131,6 @@
         var response = await client.UpsertRoomCategoryAsync(model);
         if (response.IsSuccess)
         {
-            // model = response.Result;
             await RoomCategoryGrid.RefreshGridAsync();
             alert?.SetSuccess(response.Message);
             model = new();

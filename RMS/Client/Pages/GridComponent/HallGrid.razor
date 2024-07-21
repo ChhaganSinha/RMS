@@ -1,14 +1,19 @@
-﻿@using GridBlazor
+﻿@page "/hallgrid"
+
+@using GridBlazor
 @using GridBlazor.Pages
 @using GridShared
 @using GridShared.Utility
 @using Microsoft.Extensions.Primitives
 @using RMS.Client.Pages.GridButton
+@using RMS.Client.Shared.Popup
+@using System.Security.Claims
 @inject NavigationManager NavigationManager
 @inject HttpClient HttpClient
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@inject PermissionService PermissionService
 
-@if (_task.IsCompleted)
+@if (_task?.IsCompleted ?? false)
 {
     <div class="row">
         <div class="col-sm-12">
@@ -30,10 +35,12 @@ else
     private static GridComponent<Hall> Component;
     static bool filter = true;
     static AuthenticationState authState;
+    static bool canView;
+    static bool canEdit;
+    static bool hasFullAccess;
 
     Action<IGridColumnCollection<Hall>> columns = c =>
     {
-
         c.Add(o => o.Id).SetWidth("10%").Css("table-bordered").Titled("SN.").Filterable(filter);
         c.Add(o => o.HallNumber).Css("table-bordered").Filterable(filter);
         c.Add(o => o.Price).Css("table-bordered").Filterable(filter);
@@ -42,25 +49,40 @@ else
         c.Add(o => o.Capacity).Css("table-bordered").Filterable(filter);
         c.Add(o => o.ExtraCapacity).Css("table-bordered").Filterable(filter);
 
-        c.Add().Encoded(false).Sanitized(false).RenderComponentAs<HallEditButton>().SetWidth("10px").Titled("Edit");
-        c.Add().Encoded(false).Sanitized(false).RenderComponentAs<HallDeleteButton>(new List<Action<object>> { RefreshGrid }).SetWidth("10px").Titled("Delete");
+        if (canEdit)
+        {
+            c.Add().Encoded(false).Sanitized(false).RenderComponentAs<HallEditButton>().SetWidth("10px").Titled("Edit");
+        }
+
+        if (hasFullAccess)
+        {
+            c.Add().Encoded(false).Sanitized(false).RenderComponentAs<HallDeleteButton>(new List<Action<object>> { RefreshGrid }).SetWidth("10px").Titled("Delete");
+        }
     };
 
     protected override async Task OnParametersSetAsync()
     {
         authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        // Check permissions
+        var permissions = await PermissionService.HasPermission("Hall");
+        if (permissions != null)
+        {
+            canView = permissions.CanView;
+            canEdit = permissions.CanEdit;
+            hasFullAccess = permissions.HasFullAccess;
+        }
+
         string url = $"odata/Hall";
         var query = new QueryDictionary<StringValues>();
         query.Add("grid-sorting", "Id__1__1");
 
         var client = new GridODataClient<Hall>(HttpClient, url, query, false, "ordersGrid", columns, 5)
             .Sortable(true)
-            // .Filterable(true)
-            // .ClearFiltersButton(true)
             .SetStriped(true)
             .WithMultipleFilters()
             .WithGridItemsCount()
-            // .SetExcelExport(true, true, "Hall.xlsx")
             .ChangePageSize(true)
             .EmptyText("No data available")
             .SetKeyboard(true)
@@ -75,6 +97,7 @@ else
     {
         await Component.UpdateGrid();
     }
+
     public static async Task RefreshGridAsync()
     {
         if (Component != null)

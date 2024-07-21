@@ -7,19 +7,29 @@
 @inject NavigationManager NavigationManager
 @inject HttpClient HttpClient
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@inject PermissionService PermissionService
 
-@if (_task.IsCompleted)
+@if (canView)
 {
-    <div class="row">
-        <div class="col-sm-12">
-            <GridComponent @ref="Component" T="RoomFacilities" Grid="@_grid"></GridComponent>
+    @if (_task?.IsCompleted == true)
+    {
+        <div class="row">
+            <div class="col-sm-12">
+                <GridComponent @ref="Component" T="RoomFacilities" Grid="@_grid"></GridComponent>
+            </div>
         </div>
-    </div>
+    }
+    else
+    {
+        <div class="col-sm-12" style="margin-top:40vh">
+            <div class="loader-progress"></div>
+        </div>
+    }
 }
 else
 {
-    <div class="col-sm-12" style="margin-top:40vh">
-        <div class="loader-progress"></div>
+    <div class="col-sm-12">
+        <p>You do not have permission to view this page.</p>
     </div>
 }
 
@@ -31,45 +41,82 @@ else
     static bool filter = true;
     static AuthenticationState authState;
 
+    private static bool canView = false;
+    private static bool canEdit = false;
+    private static bool hasFullAccess = false;
+
     Action<IGridColumnCollection<RoomFacilities>> columns = c =>
     {
-
         c.Add(o => o.Id).SetWidth("10%").Css("table-bordered").Titled("SN.").Filterable(filter);
         c.Add(o => o.Name).SetWidth("80%").Css("table-bordered").Titled("Room Facility Name").Filterable(filter);
 
-        c.Add().Encoded(false).Sanitized(false).RenderComponentAs<RoomFacilitiesEditButton>().SetWidth("10px").Titled("Edit");
-        c.Add().Encoded(false).Sanitized(false).RenderComponentAs<RoomFacilitiesDeleteButton>(new List<Action<object>> { RefreshGrid }).SetWidth("10px").Titled("Delete");
+        if (canEdit || hasFullAccess)
+        {
+            c.Add().Encoded(false).Sanitized(false)
+                .RenderComponentAs<RoomFacilitiesEditButton>()
+                .SetWidth("10px").Titled("Edit");
+        }
+
+        if (hasFullAccess)
+        {
+            c.Add().Encoded(false).Sanitized(false)
+                .RenderComponentAs<RoomFacilitiesDeleteButton>(new List<Action<object>> { RefreshGrid })
+                .SetWidth("10px").Titled("Delete");
+        }
     };
 
     protected override async Task OnParametersSetAsync()
     {
-        authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        string url = $"odata/RoomFacilities";
-        var query = new QueryDictionary<StringValues>();
-        query.Add("grid-sorting", "Id__1__1");
+        try
+        {
+            authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
 
-        var client = new GridODataClient<RoomFacilities>(HttpClient, url, query, false, "ordersGrid", columns, 5)
-            .Sortable(true)
-            // .Filterable(true)
-            // .ClearFiltersButton(true)
-            .SetStriped(true)
-            .WithMultipleFilters()
-            .WithGridItemsCount()
-            // .SetExcelExport(true, true, "RoomCategories.xlsx")
-            .ChangePageSize(true)
-            .EmptyText("No data available")
-            .SetKeyboard(true)
-            .Searchable(true, false, false);
+            var permissions = await PermissionService.HasPermission("RoomFacilities");
+            if (permissions != null)
+            {
+                canView = permissions.CanView;
+                canEdit = permissions.CanEdit;
+                hasFullAccess = permissions.HasFullAccess;
+            }
 
-        _grid = client.Grid;
-        _task = client.UpdateGrid();
-        await _task;
+            if (!canView) return;
+
+            string url = $"odata/RoomFacilities";
+            var query = new QueryDictionary<StringValues>();
+            query.Add("grid-sorting", "Id__1__1");
+
+            var client = new GridODataClient<RoomFacilities>(HttpClient, url, query, false, "ordersGrid", columns, 5)
+                .Sortable(true)
+                // .Filterable(true)
+                // .ClearFiltersButton(true)
+                .SetStriped(true)
+                .WithMultipleFilters()
+                .WithGridItemsCount()
+                // .SetExcelExport(true, true, "RoomFacilities.xlsx")
+                .ChangePageSize(true)
+                .EmptyText("No data available")
+                .SetKeyboard(true)
+                .Searchable(true, false, false);
+
+            _grid = client.Grid;
+            _task = client.UpdateGrid();
+            await _task;
+        }
+        catch (Exception ex)
+        {
+            // Log error and handle exception if needed
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 
     public static async void RefreshGrid(object item)
     {
-        await Component.UpdateGrid();
+        if (Component != null)
+        {
+            await Component.UpdateGrid();
+        }
     }
+
     public static async Task RefreshGridAsync()
     {
         if (Component != null)

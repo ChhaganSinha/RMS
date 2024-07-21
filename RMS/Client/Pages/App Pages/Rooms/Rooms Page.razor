@@ -2,13 +2,15 @@
 @using RMS.Client.Client
 @using RMS.Client.Pages.GridComponent
 @using RMS.Client.Shared.Popup
+@using Microsoft.AspNetCore.Components.Authorization
+@using Havit.Blazor.Components.Web
+@using Havit.Blazor.Components.Web.Bootstrap
+@using System.ComponentModel.DataAnnotations
+@using RMS.Dto.Enum
 @inject AppClient client
 @inject IJSRuntime JSRuntime
 @inject NavigationManager NavigationManager
-@using Havit.Blazor.Components.Web
-@using Havit.Blazor.Components.Web.Bootstrap
-@using System.ComponentModel.DataAnnotations;
-@using RMS.Dto.Enum
+@inject PermissionService PermissionService
 @attribute [Authorize]
 
 <div class="page-header breadcumb-sticky">
@@ -18,7 +20,12 @@
                 <div class="page-header-title">
                     <h5 class="m-b-10">
                         Room
-                        <a @onclick="OnAdd" style="cursor:pointer"><i class="fa fa-plus-circle fa-lg text-primary" aria-hidden="true" title="Add Room"></i></a>
+                        @if (canEdit || hasFullAccess)
+                        {
+                            <a @onclick="OnAdd" style="cursor:pointer">
+                                <i class="fa fa-plus-circle fa-lg text-primary" aria-hidden="true" title="Add Room"></i>
+                            </a>
+                        }
                     </h5>
                 </div>
                 <ul class="breadcrumb">
@@ -31,18 +38,27 @@
         </div>
     </div>
 </div>
-<div class="row">
-    <div class="col-sm-12 p-0">
-        <div class="card-body p-2 mt-n3">
-            <RoomGrid />
+
+@if (canView)
+{
+    <div class="row">
+        <div class="col-sm-12 p-0">
+            <div class="card-body p-2 mt-n3">
+                <RoomGrid />
+            </div>
         </div>
     </div>
-</div>
+}
+else
+{
+    <div class="col-sm-12">
+        <p>You do not have permission to view this page.</p>
+    </div>
+}
 
 <PageDialog Title="@Title" Show="@show" ClosePageDialog="ResetForm">
     @if (show)
     {
-       
         <EditForm Model="model" OnValidSubmit="OnSave">
             <DataAnnotationsValidator />
             <div class="form-group row">
@@ -66,23 +82,22 @@
                     </select>
                     <ValidationMessage For="() => model.floor" />
                 </div>
-               @*  <div class="col-md-3">
-                    <label class="col-form-label bold-font">Room Status</label>
-                    <select class="form-control" @bind="model.Status">
-                        @foreach (var status in Enum.GetValues(typeof(RoomHallStatus)).Cast<RoomHallStatus>())
-                        {
-                            <option value="@status">@status</option>
-                        }
-                    </select>
-                    <ValidationMessage For="() => model.Status" />
-                </div> *@
+                @*  <div class="col-md-3">
+            <label class="col-form-label bold-font">Room Status</label>
+            <select class="form-control" @bind="model.Status">
+            @foreach (var status in Enum.GetValues(typeof(RoomHallStatus)).Cast<RoomHallStatus>())
+            {
+            <option value="@status">@status</option>
+            }
+            </select>
+            <ValidationMessage For="() => model.Status" />
+            </div> *@
             </div>
             <div class="form-group row">
                 <div class="col-md-6">
                     <label class="col-form-label bold-font">Select Category</label>
                     <HxSelect TItem="RoomCategories"
                               TValue="int?"
-                             
                               Data="Categories"
                               @bind-Value="categoriesId"
                               TextSelector="@(Categories => Categories.Name)"
@@ -198,6 +213,11 @@
 
     private string imageDataUrl;
 
+    // Permission variables
+    private bool canView = false;
+    private bool canEdit = false;
+    private bool hasFullAccess = false;
+
     private async Task HandleFileSelected(InputFileChangeEventArgs e)
     {
         var file = e.File;
@@ -217,6 +237,21 @@
     protected override async Task OnInitializedAsync()
     {
         alert?.Clear();
+
+        var permissions = await PermissionService.HasPermission("Rooms");
+        if (permissions != null)
+        {
+            canView = permissions.CanView;
+            canEdit = permissions.CanEdit;
+            hasFullAccess = permissions.HasFullAccess;
+        }
+
+        if (!canView)
+        {
+            // Redirect or handle unauthorized access
+            NavigationManager.NavigateTo("/unauthorized");
+            return;
+        }
 
         // Load room categories and facilities
         Categories = (await client.GetAllRoomCategory()).ToList();
@@ -245,13 +280,19 @@
             IsError = true;
             return;
         }
+        if (!canEdit && !hasFullAccess)
+        {
+            alert?.SetError("You do not have permission to edit.");
+            return;
+        }
+
         process = true;
         alert?.Clear();
 
         model.CategoryId = categoriesId;
         if (categoriesId != null)
             model.Category = Categories.Where(x => x.Id == categoriesId).Select(x => x.Name).First();
-        // Ensure the model includes the selected facilities
+
         var response = await client.UpsertRoomAsync(model);
         if (response.IsSuccess)
         {
@@ -307,10 +348,15 @@
 
     public void OnAdd()
     {
+        if (!canEdit && !hasFullAccess)
+        {
+            alert?.SetError("You do not have permission to add.");
+            return;
+        }
+
         model = new Room();
         categoriesId = null;
         SelectedFacilities = new();
         show = true;
     }
 }
-

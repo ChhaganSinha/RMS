@@ -224,7 +224,7 @@
         Facilities = (await client.GetAllHallFacility()).ToList();
 
         // Fetch permissions
-        var permissions = await PermissionService.HasPermission("HallCategories");
+        var permissions = await PermissionService.HasPermission("Hall");
         if (permissions != null)
         {
             canView = permissions.CanView;
