@@ -5,10 +5,7 @@
 @inject AppClient client
 @inject IJSRuntime JSRuntime
 @inject NavigationManager NavigationManager
-@using Havit.Blazor.Components.Web
-@using Havit.Blazor.Components.Web.Bootstrap
-@using System.ComponentModel.DataAnnotations;
-@attribute [Authorize]
+@inject PermissionService PermissionService
 
 <div class="page-header breadcumb-sticky">
     <div class="page-block">
@@ -17,7 +14,6 @@
                 <div class="page-header-title">
                     <h5 class="m-b-10">
                         Cleaning Report
-
                     </h5>
                 </div>
                 <ul class="breadcrumb">
@@ -34,12 +30,33 @@
 <div class="row">
     <div class="col-sm-12 p-0">
         <div class="card-body p-2 mt-n3">
-            <CleaningReportGrid />
+            @if (canView)
+            {
+                <CleaningReportGrid />
+            }
+            else
+            {
+                <p>You do not have permission to view this report.</p>
+            }
         </div>
     </div>
 </div>
 
-
 @code {
+    private bool canView = false;
+    private bool canEdit = false;
+    private bool hasFullAccess = false;
 
+    protected override async Task OnInitializedAsync()
+    {
+        // Check permissions
+        var permissions = await PermissionService.HasPermission("CleaningReport");
+
+        if (permissions != null)
+        {
+            canView = permissions.CanView;
+            canEdit = permissions.CanEdit;
+            hasFullAccess = permissions.HasFullAccess;
+        }
+    }
 }

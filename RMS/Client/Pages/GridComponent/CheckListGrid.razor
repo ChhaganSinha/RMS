@@ -7,14 +7,22 @@
 @inject NavigationManager NavigationManager
 @inject HttpClient HttpClient
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@inject PermissionService PermissionService
 
-@if (_task.IsCompleted)
+@if (_task?.IsCompleted ?? false)
 {
-    <div class="row">
-        <div class="col-sm-12">
-            <GridComponent @ref="Component" T="CheckList" Grid="@_grid"></GridComponent>
+    @if (canView)
+    {
+        <div class="row">
+            <div class="col-sm-12">
+                <GridComponent @ref="Component" T="CheckList" Grid="@_grid"></GridComponent>
+            </div>
         </div>
-    </div>
+    }
+    else
+    {
+        <p>You do not have permission to view this grid.</p>
+    }
 }
 else
 {
@@ -31,32 +39,51 @@ else
     static bool filter = true;
     static AuthenticationState authState;
 
+    private static bool canView = false;
+    private static bool canEdit = false;
+    private static bool hasFullAccess = false;
+
     Action<IGridColumnCollection<CheckList>> columns = c =>
     {
-
         c.Add(o => o.Id).SetWidth("10%").Css("table-bordered").Titled("SN.").Filterable(filter);
         c.Add(o => o.Name).SetWidth("80%").Css("table-bordered").Titled("Type Name").Filterable(filter);
         c.Add(o => o.Type).SetWidth("80%").Css("table-bordered").Titled("Type").Filterable(filter);
 
-        c.Add().Encoded(false).Sanitized(false).RenderComponentAs<CheckListEditButton>().SetWidth("10px").Titled("Edit");
-        c.Add().Encoded(false).Sanitized(false).RenderComponentAs<CheckListDeleteButton>(new List<Action<object>> { RefreshGrid }).SetWidth("10px").Titled("Delete");
+        if (canEdit)
+        {
+            c.Add().Encoded(false).Sanitized(false).RenderComponentAs<CheckListEditButton>().SetWidth("10px").Titled("Edit");
+        }
+
+        if (canEdit || hasFullAccess)
+        {
+            c.Add().Encoded(false).Sanitized(false).RenderComponentAs<CheckListDeleteButton>(new List<Action<object>> { RefreshGrid }).SetWidth("10px").Titled("Delete");
+        }
     };
 
     protected override async Task OnParametersSetAsync()
     {
         authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        // Check permissions
+        var permissions = await PermissionService.HasPermission("CheckList");
+
+        if (permissions != null)
+        {
+            canView = permissions.CanView;
+            canEdit = permissions.CanEdit;
+            hasFullAccess = permissions.HasFullAccess;
+        }
+
         string url = $"odata/CheckList";
         var query = new QueryDictionary<StringValues>();
         query.Add("grid-sorting", "Id__1__1");
 
         var client = new GridODataClient<CheckList>(HttpClient, url, query, false, "ordersGrid", columns, 5)
             .Sortable(true)
-            // .Filterable(true)
-            // .ClearFiltersButton(true)
             .SetStriped(true)
             .WithMultipleFilters()
             .WithGridItemsCount()
-            // .SetExcelExport(true, true, "CheckList.xlsx")
             .ChangePageSize(true)
             .EmptyText("No data available")
             .SetKeyboard(true)
@@ -71,6 +98,7 @@ else
     {
         await Component.UpdateGrid();
     }
+
     public static async Task RefreshGridAsync()
     {
         if (Component != null)

@@ -9,6 +9,7 @@
 @using Havit.Blazor.Components.Web
 @using Havit.Blazor.Components.Web.Bootstrap
 @using System.ComponentModel.DataAnnotations;
+@inject PermissionService PermissionService
 @attribute [Authorize]
 
 <div class="page-header breadcumb-sticky">
@@ -18,7 +19,12 @@
                 <div class="page-header-title">
                     <h5 class="m-b-10">
                         Room Cleaning List
-                        <a @onclick="()=>show=true" style="cursor:pointer"><i class="fa fa-plus-circle fa-lg text-primary" aria-hidden="true" title="Add RoomCleaning"></i></a>
+                        @if (canEdit)
+                        {
+                            <a @onclick="()=>show=true" style="cursor:pointer">
+                                <i class="fa fa-plus-circle fa-lg text-primary" aria-hidden="true" title="Add RoomCleaning"></i>
+                            </a>
+                        }
                     </h5>
                 </div>
                 <ul class="breadcrumb">
@@ -31,6 +37,7 @@
         </div>
     </div>
 </div>
+
 <div class="row">
     <div class="col-sm-12 p-0">
         <div class="card-body p-2 mt-n3">
@@ -42,8 +49,6 @@
 <PageDialog Title="@Title" Show="@show" ClosePageDialog="ResetForm">
     @if (show)
     {
-
-
         <EditForm Model="@model" OnValidSubmit="OnSave">
             <DataAnnotationsValidator />
             <div class="form-group row">
@@ -54,13 +59,6 @@
                 </div>
                 <div class="col-md-6">
                     <label class="col-form-label bold-font required-field">Assign To</label>
-                    @* <select @bind="model.AssignTo" class="form-control" id="assignTo">
-                        <option>- Select -</option>
-                        @foreach (var employee in Employees)
-                        {
-                            <option value="@employee.Id">@employee.Name (@employee.EmpId)</option>
-                        }
-                    </select> *@
                     <HxSelect TItem="Employee"
                               TValue="int?"
                               Data="Employees"
@@ -72,7 +70,6 @@
                               NullDataText="Loading Employees..." />
 
                     <ValidationMessage For="() => model.AssignTo" />
-
                 </div>
             </div>
             <div class="form-group row">
@@ -87,12 +84,6 @@
                     <ValidationMessage For="() => model.DateEnd" />
                 </div>
             </div>
-            @* <div class="form-group row">
-        <div class="col-md-12">
-        <label class="col-form-label bold-font">Status</label>
-        <InputText @bind-Value="@model.Status" id="status" class="form-control"></InputText>
-        </div>
-        </div> *@
             <div class="form-group row">
                 <div class="col-md-12">
                     <label class="col-form-label bold-font required-field">Status</label>
@@ -110,20 +101,6 @@
                     <ValidationMessage For="() => model.Status" />
                 </div>
             </div>
-            @*        <div class="form-group row">
-        <div class="col-md-12">
-        <label class="col-form-label bold-font required-field">CheckList</label>
-        <div>
-        <input type="checkbox" id="clean" value="Clean" @onchange="OnCheckBoxChange" checked="@model.CheckList.Contains("Clean")" />
-        <label for="clean">Clean</label>
-        </div>
-        <div>
-        <input type="checkbox" id="floorCleaning" value="Floor Cleaning" @onchange="OnCheckBoxChange" checked="@model.CheckList.Contains("Floor Cleaning")" />
-        <label for="floorCleaning">Floor Cleaning</label>
-        </div>
-        <ValidationMessage For="() => model.CheckList" />
-        </div>
-        </div> *@
             @if (process)
             {
                 <div style="text-align:center">
@@ -132,13 +109,20 @@
             }
             <UiAlert Model="alert"></UiAlert>
             <hr />
-            <button type="submit" class="btn btn-primary float-right col-md-4">Add</button>
+            @if (canEdit)
+            {
+                <button type="submit" class="btn btn-primary float-right col-md-4">Add</button>
+            }
         </EditForm>
         <br />
     }
 </PageDialog>
 
 @code {
+    private static bool canView = false;
+    private static bool canEdit = false;
+    private static bool hasFullAccess = false;
+
     [Parameter]
     public int Id { get; set; }
     private int? empid;
@@ -156,12 +140,26 @@
 
     protected override async Task OnInitializedAsync()
     {
+        var permissions = await PermissionService.HasPermission("RoomCleaning");
+        if (permissions != null)
+        {
+            canView = permissions.CanView;
+            canEdit = permissions.CanEdit;
+            hasFullAccess = permissions.HasFullAccess;
+        }
+
         alert?.Clear();
         Employees = (await client.GetAllEmployee()).ToList();
     }
 
     public async Task OnSave()
     {
+        if (!canEdit)
+        {
+            // Handle lack of permission
+            return;
+        }
+
         process = true;
         alert?.Clear();
         model.EmployeeId = empid;
@@ -199,7 +197,6 @@
         _timer.Dispose();
         StateHasChanged();
     }
-
 
     private void ResetForm()
     {

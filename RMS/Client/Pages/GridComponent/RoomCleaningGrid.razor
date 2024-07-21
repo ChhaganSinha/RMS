@@ -7,8 +7,9 @@
 @inject NavigationManager NavigationManager
 @inject HttpClient HttpClient
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@inject PermissionService PermissionService
 
-@if (_task.IsCompleted)
+@if (_task?.IsCompleted ?? false)
 {
     <div class="row">
         <div class="col-sm-12">
@@ -28,27 +29,46 @@ else
     private CGrid<RoomCleaning> _grid;
     private Task _task;
     private static GridComponent<RoomCleaning> Component;
-    static bool filter = true;
+    private static bool canView = false;
+    private static bool canEdit = false;
+    private static bool hasFullAccess = false;
+
     static AuthenticationState authState;
 
     Action<IGridColumnCollection<RoomCleaning>> columns = c =>
     {
+        c.Add(o => o.Id).SetWidth("10%").Css("table-bordered").Titled("SN.").Filterable(true);
+        c.Add(o => o.EmpId).SetWidth("80%").Css("table-bordered").Titled("Employee Id").Filterable(true);
+        c.Add(o => o.Name).SetWidth("80%").Css("table-bordered").Titled("Name").Filterable(true);
+        c.Add(o => o.RoomNo).SetWidth("80%").Css("table-bordered").Titled("Room No.").Filterable(true);
+        c.Add(o => o.DateStart).SetWidth("80%").Css("table-bordered").Titled("Date Start").Filterable(true);
+        c.Add(o => o.DateEnd).SetWidth("80%").Css("table-bordered").Titled("Date End").Filterable(true);
+        c.Add(o => o.Status).SetWidth("80%").Css("table-bordered").Titled("Status").Filterable(true);
 
-        c.Add(o => o.Id).SetWidth("10%").Css("table-bordered").Titled("SN.").Filterable(filter);
-        c.Add(o => o.EmpId).SetWidth("80%").Css("table-bordered").Titled("Employee Id").Filterable(filter);
-        c.Add(o => o.Name).SetWidth("80%").Css("table-bordered").Titled("Name").Filterable(filter);
-        c.Add(o => o.RoomNo).SetWidth("80%").Css("table-bordered").Titled("Room No.").Filterable(filter);
-        c.Add(o => o.DateStart).SetWidth("80%").Css("table-bordered").Titled("Date Start").Filterable(filter);
-        c.Add(o => o.DateEnd).SetWidth("80%").Css("table-bordered").Titled("Date End").Filterable(filter);
-        c.Add(o => o.Status).SetWidth("80%").Css("table-bordered").Titled("Status").Filterable(filter);
+        if (canEdit)
+        {
+            c.Add().Encoded(false).Sanitized(false).RenderComponentAs<RoomCleaningEditButton>().SetWidth("10px").Titled("Edit");
+        }
 
-        c.Add().Encoded(false).Sanitized(false).RenderComponentAs<RoomCleaningEditButton>().SetWidth("10px").Titled("Edit");
-        c.Add().Encoded(false).Sanitized(false).RenderComponentAs<RoomCleaningDeleteButton>(new List<Action<object>> { RefreshGrid }).SetWidth("10px").Titled("Delete");
+        if (hasFullAccess)
+        {
+            c.Add().Encoded(false).Sanitized(false).RenderComponentAs<RoomCleaningDeleteButton>(new List<Action<object>> { RefreshGrid }).SetWidth("10px").Titled("Delete");
+        }
     };
 
     protected override async Task OnParametersSetAsync()
     {
         authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        var permissions = await PermissionService.HasPermission("RoomCleaning");
+        if (permissions != null)
+        {
+            canView = permissions.CanView;
+            canEdit = permissions.CanEdit;
+            hasFullAccess = permissions.HasFullAccess;
+        }
+
         string url = $"odata/RoomCleaning";
         var query = new QueryDictionary<StringValues>();
         query.Add("grid-sorting", "Id__1__1");
@@ -60,7 +80,6 @@ else
             .SetStriped(true)
             .WithMultipleFilters()
             .WithGridItemsCount()
-
             .ChangePageSize(true)
             .EmptyText("No data available")
             .SetKeyboard(true)
@@ -75,6 +94,7 @@ else
     {
         await Component.UpdateGrid();
     }
+
     public static async Task RefreshGridAsync()
     {
         if (Component != null)

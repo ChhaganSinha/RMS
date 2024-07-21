@@ -7,14 +7,24 @@
 @inject NavigationManager NavigationManager
 @inject HttpClient HttpClient
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@inject PermissionService PermissionService
 
-@if (_task.IsCompleted)
+@if (_task?.IsCompleted ?? false)
 {
-    <div class="row">
-        <div class="col-sm-12">
-            <GridComponent @ref="Component" T="CleaningReport" Grid="@_grid"></GridComponent>
+    @if (canView)
+    {
+        <div class="row">
+            <div class="col-sm-12">
+                <GridComponent @ref="Component" T="CleaningReport" Grid="@_grid"></GridComponent>
+            </div>
         </div>
-    </div>
+    }
+    else
+    {
+        <div class="col-sm-12">
+            <p>You do not have permission to view this report.</p>
+        </div>
+    }
 }
 else
 {
@@ -28,52 +38,66 @@ else
     private CGrid<CleaningReport> _grid;
     private Task _task;
     private static GridComponent<CleaningReport> Component;
+    private static bool canView = false;
+    private static bool canEdit = false;
+    private static bool hasFullAccess = false;
     static bool filter = true;
     static AuthenticationState authState;
 
     Action<IGridColumnCollection<CleaningReport>> columns = c =>
     {
-
         c.Add(o => o.Id).SetWidth("10%").Css("table-bordered").Titled("SN.").Filterable(filter);
         c.Add(o => o.EmpName).SetWidth("80%").Css("table-bordered").Titled("Employee Name").Filterable(filter);
         c.Add(o => o.EmpId).SetWidth("80%").Css("table-bordered").Titled("Employee Id").Filterable(filter);
         c.Add(o => o.Complete).SetWidth("80%").Css("table-bordered").Titled("Complete").Filterable(filter);
         c.Add(o => o.Pending).SetWidth("80%").Css("table-bordered").Titled("Pending").Filterable(filter);
         c.Add(o => o.Underprocess).SetWidth("80%").Css("table-bordered").Titled("Underprocess").Filterable(filter);
-        
-
     };
 
     protected override async Task OnParametersSetAsync()
     {
         authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        string url = $"odata/CleaningReport";
-        var query = new QueryDictionary<StringValues>();
-        query.Add("grid-sorting", "Id__1__1");
 
-        var client = new GridODataClient<CleaningReport>(HttpClient, url, query, false, "ordersGrid", columns, 5)
-            .Sortable(true)
-             .Filterable(true)
-            .ClearFiltersButton(true)
-            .SetStriped(true)
-            .WithMultipleFilters()
-            .WithGridItemsCount()
-            .SetExcelExport(true,true,"Report")
+        // Check permissions
+        var permissions = await PermissionService.HasPermission("CleaningReport");
 
-            .ChangePageSize(true)
-            .EmptyText("No data available")
-            .SetKeyboard(true)
-            .Searchable(true, false, false);
+        if (permissions != null)
+        {
+            canView = permissions.CanView;
+            canEdit = permissions.CanEdit;
+            hasFullAccess = permissions.HasFullAccess;
+        }
 
-        _grid = client.Grid;
-        _task = client.UpdateGrid();
-        await _task;
+        if (canView)
+        {
+            string url = $"odata/CleaningReport";
+            var query = new QueryDictionary<StringValues>();
+            query.Add("grid-sorting", "Id__1__1");
+
+            var client = new GridODataClient<CleaningReport>(HttpClient, url, query, false, "ordersGrid", columns, 5)
+                .Sortable(true)
+                .Filterable(true)
+                .ClearFiltersButton(true)
+                .SetStriped(true)
+                .WithMultipleFilters()
+                .WithGridItemsCount()
+                .SetExcelExport(true, true, "Report")
+                .ChangePageSize(true)
+                .EmptyText("No data available")
+                .SetKeyboard(true)
+                .Searchable(true, false, false);
+
+            _grid = client.Grid;
+            _task = client.UpdateGrid();
+            await _task;
+        }
     }
 
     public static async void RefreshGrid(object item)
     {
         await Component.UpdateGrid();
     }
+
     public static async Task RefreshGridAsync()
     {
         if (Component != null)

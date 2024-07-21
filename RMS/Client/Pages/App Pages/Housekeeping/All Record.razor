@@ -5,9 +5,8 @@
 @inject AppClient client
 @inject IJSRuntime JSRuntime
 @inject NavigationManager NavigationManager
-@using Havit.Blazor.Components.Web
-@using Havit.Blazor.Components.Web.Bootstrap
-@using System.ComponentModel.DataAnnotations;
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject PermissionService PermissionService
 @attribute [Authorize]
 
 <div class="page-header breadcumb-sticky">
@@ -17,7 +16,6 @@
                 <div class="page-header-title">
                     <h5 class="m-b-10">
                         All Records
-                        
                     </h5>
                 </div>
                 <ul class="breadcrumb">
@@ -31,18 +29,41 @@
     </div>
 </div>
 
-<div class="row">
-    <div class="col-sm-12 p-0">
-        <div class="card-body p-2 mt-n3">
-            <AllRecordsGrid />
+@if (canView)
+{
+    <div class="row">
+        <div class="col-sm-12 p-0">
+            <div class="card-body p-2 mt-n3">
+                <AllRecordsGrid />
+            </div>
         </div>
     </div>
-</div>
-
-
-
-
+}
+else
+{
+    <p>You do not have permission to view this page.</p>
+}
 
 @code {
+    private bool canView = false;
+    private bool canEdit = false;
+    private bool hasFullAccess = false;
 
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        // Check permissions
+        var permissions = await PermissionService.HasPermission("AllRecord");
+
+        if (permissions != null)
+        {
+            canView = permissions.CanView;
+            canEdit = permissions.CanEdit;
+            hasFullAccess = permissions.HasFullAccess;
+        }
+
+        // Perform additional initialization if needed
+    }
 }

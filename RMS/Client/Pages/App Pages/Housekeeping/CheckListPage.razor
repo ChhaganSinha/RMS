@@ -6,6 +6,8 @@
 @inject AppClient client
 @inject IJSRuntime JSRuntime
 @inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject PermissionService PermissionService
 @attribute [Authorize]
 
 <div class="page-header breadcumb-sticky">
@@ -15,7 +17,12 @@
                 <div class="page-header-title">
                     <h5 class="m-b-10">
                         Check List
-                        <a @onclick="()=>show=true" style="cursor:pointer"><i class="fa fa-plus-circle fa-lg text-primary" aria-hidden="true" title="Add Task"></i></a>
+                        @if (canEdit)
+                        {
+                            <a @onclick="()=>show=true" style="cursor:pointer">
+                                <i class="fa fa-plus-circle fa-lg text-primary" aria-hidden="true" title="Add Task"></i>
+                            </a>
+                        }
                     </h5>
                 </div>
                 <ul class="breadcrumb">
@@ -30,23 +37,28 @@
     </div>
 </div>
 
-<div class="row">
-    <div class="col-sm-12 p-0">
-        <div class="card-body p-2 mt-n3">
-            <div class="card text">
-                <div class="card-body">
-                    <CheckListGrid />
+@if (canView)
+{
+    <div class="row">
+        <div class="col-sm-12 p-0">
+            <div class="card-body p-2 mt-n3">
+                <div class="card text">
+                    <div class="card-body">
+                        <CheckListGrid />
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
+}
+else
+{
+    <p>You do not have permission to view this page.</p>
+}
 
 <SimpleDailog Title="@Title" Show="@show" OnCloseDialog="ResetForm">
     @if (show)
     {
-
-
         <EditForm Model="model" OnValidSubmit="OnSave">
             <DataAnnotationsValidator />
             <div>
@@ -54,7 +66,6 @@
                 <ValidationMessage For="() => model.Name" />
             </div>
             <div>
-               
                 <select @bind="model.Type" class="form-control mb-2">
                     <option value="">- Select Type -</option> <!-- Default option -->
                     <option value="House Keeper">House Keeper</option> <!-- Hardcoded option for House Keeper -->
@@ -71,13 +82,24 @@
             }
             <UiAlert Model="alert"></UiAlert>
             <hr />
-            <button type="submit" class="btn btn-primary float-right col-md-4">Add</button>
+            @if (canEdit)
+            {
+                <button type="submit" class="btn btn-primary float-right col-md-4">Add</button>
+            }
+            else
+            {
+                <p>You do not have permission to perform this action.</p>
+            }
         </EditForm>
         <br />
     }
 </SimpleDailog>
 
 @code {
+    private bool canView = false;
+    private bool canEdit = false;
+    private bool hasFullAccess = false;
+
     [Parameter]
     public int Id { get; set; }
 
@@ -91,21 +113,38 @@
     private Timer _timer;
     private int _delay = 2500;
 
-
     protected override async Task OnInitializedAsync()
     {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        // Check permissions
+        var permissions = await PermissionService.HasPermission("CheckList");
+
+        if (permissions != null)
+        {
+            canView = permissions.CanView;
+            canEdit = permissions.CanEdit;
+            hasFullAccess = permissions.HasFullAccess;
+        }
+
         alert?.Clear();
     }
 
     public async Task OnSave()
     {
+        if (!canEdit)
+        {
+            alert?.SetError("You do not have permission to perform this action.");
+            return;
+        }
+
         process = true;
         alert?.Clear();
 
         var response = await client.UpsertCheckListAsync(model);
         if (response.IsSuccess)
         {
-            // model = response.Result;
             await CheckListGrid.RefreshGridAsync();
             alert?.SetSuccess(response.Message);
             model = new();
