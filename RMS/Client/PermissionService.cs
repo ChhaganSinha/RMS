@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using RMS.Client.Services.Contracts;
+using RMS.Dto.RBAC;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -15,9 +16,18 @@ public class PermissionService
         _authorizeApi = authorizeApi;
     }
 
-    public async Task<bool> HasPermission(string permission)
+    public async Task<PagePermissionDto> HasPermission(string permission)
     {
-        var response = await _authorizeApi.HasPermission(permission);
-        return response;
+        // Call the GetPagePermissions method to get the detailed permissions
+        var permissions = await _authorizeApi.GetPagePermissions(permission);
+
+        // Return the permissions model
+        return new PagePermissionDto
+        {
+            CanView = permissions.CanView,
+            CanEdit = permissions.CanEdit,
+            HasFullAccess = permissions.HasFullAccess
+        };
     }
+
 }

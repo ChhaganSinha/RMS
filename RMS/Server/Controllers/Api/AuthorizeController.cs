@@ -489,7 +489,10 @@ namespace RMS.Server.Controllers.Api
         [Authorize(Roles = "Admin,SuperAdmin")]
         public async Task<IActionResult> AssignPermission([FromBody] RoleViewModel roleViewModel)
         {
-            var role = await _roleManager.FindByNameAsync(roleViewModel.Name);
+            var role = await _roleManager.Roles
+                .Include(r => r.PagePermissions)
+                .FirstOrDefaultAsync(r => r.Name == roleViewModel.Name);
+
             if (role == null)
             {
                 return BadRequest("Role not found");
@@ -517,28 +520,44 @@ namespace RMS.Server.Controllers.Api
                     return BadRequest("Invalid permission");
             }
 
-            // Clear existing page permissions and add new ones
-            role.PagePermissions.Clear();
+            // Update existing page permissions or add new ones if they don't exist
             foreach (var pagePermission in roleViewModel.PagePermissions)
             {
-                role.PagePermissions.Add(new RMS.DataContext.Models.PagePermission
+                var existingPermission = role.PagePermissions.FirstOrDefault(p => p.PageName == pagePermission.PageName);
+                if (existingPermission != null)
                 {
-                    PageName = pagePermission.PageName,
-                    CanView = pagePermission.CanView,
-                    CanEdit = pagePermission.CanEdit,
-                    HasFullAccess = pagePermission.HasFullAccess
-                });
+                    // Update existing permission
+                    existingPermission.CanView = pagePermission.CanView;
+                    existingPermission.CanEdit = pagePermission.CanEdit;
+                    existingPermission.HasFullAccess = pagePermission.HasFullAccess;
+                }
+                else
+                {
+                    // Add new permission if it doesn't exist
+                    role.PagePermissions.Add(new RMS.DataContext.Models.PagePermission
+                    {
+                        PageName = pagePermission.PageName,
+                        CanView = pagePermission.CanView,
+                        CanEdit = pagePermission.CanEdit,
+                        HasFullAccess = pagePermission.HasFullAccess
+                    });
+                }
             }
 
             var result = await _roleManager.UpdateAsync(role);
 
             if (result.Succeeded)
             {
+                // Optionally, persist the role changes to your database here
+                // Example: _context.SaveChanges();
+
                 return Ok();
             }
 
             return BadRequest(result.Errors.FirstOrDefault()?.Description);
         }
+
+
 
 
 
@@ -560,15 +579,28 @@ namespace RMS.Server.Controllers.Api
                 // Convert userIdString to Guid
                 var userId = new Guid(userIdString);
 
-                // Check if the user has the specified permission
-                var hasPermission = await _context.PagePermissions
+                // Retrieve user roles and associated permissions for the requested page
+                var permission = await _context.PagePermissions
                     .Where(pp => pp.PageName == request.Permission && _context.UserRoles
                         .Where(ur => ur.UserId == userId)
                         .Any(ur => ur.RoleId == pp.ApplicationRoleId))
-                    .AnyAsync();
+                    .Select(pp => new PagePermissionDto
+                    {
+                        CanView = pp.CanView,
+                        CanEdit = pp.CanEdit,
+                        HasFullAccess = pp.HasFullAccess
+                    })
+                    .FirstOrDefaultAsync();
 
-                Console.WriteLine($"Permission check result: {hasPermission}");
-                return Ok(hasPermission);
+                if (permission == null)
+                {
+                    // If no specific permissions found, return default permissions
+                    permission = new PagePermissionDto { CanView = false, CanEdit = false, HasFullAccess = false };
+                }
+
+                Console.WriteLine($"Permission check result: View={permission.CanView}, Edit={permission.CanEdit}, FullAccess={permission.HasFullAccess}");
+
+                return Ok(permission);
             }
             catch (Exception ex)
             {
@@ -576,6 +608,7 @@ namespace RMS.Server.Controllers.Api
                 return BadRequest($"Failed to retrieve user permissions: {ex.Message}");
             }
         }
+
 
 
 

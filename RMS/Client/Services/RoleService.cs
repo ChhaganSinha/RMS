@@ -34,4 +34,9 @@ public class RoleService : IRoleService
 
         await _httpClient.PostAsJsonAsync("api/Authorize/AssignPermission", roleViewModel);
     }
+
+    public async Task<List<RoleViewModel>> GetRolesWithPermissions()
+    {
+        return await _httpClient.GetFromJsonAsync<List<RoleViewModel>>("api/roles/with-permissions");
+    }
 }

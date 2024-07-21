@@ -3,8 +3,10 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 using RMS.DataContext.Models;
 using RMS.Dto.RBAC;
+using RMS.DataContext;
 
 namespace RMS.Server.Controllers.Api
 {
@@ -13,16 +15,18 @@ namespace RMS.Server.Controllers.Api
     public class RolesController : ControllerBase
     {
         private readonly RoleManager<ApplicationRole> _roleManager;
+        private readonly AuthDbContext _context;
 
-        public RolesController(RoleManager<ApplicationRole> roleManager)
+        public RolesController(RoleManager<ApplicationRole> roleManager, AuthDbContext context)
         {
             _roleManager = roleManager;
+            _context = context;
         }
 
         [HttpGet]
         public async Task<IActionResult> GetRoles()
         {
-            var roles = await Task.Run(() => _roleManager.Roles.ToList());
+            var roles = await _roleManager.Roles.ToListAsync();
             var roleViewModels = roles.Select(r => new RoleViewModel { Name = r.Name }).ToList();
             return Ok(roleViewModels);
         }
@@ -53,6 +57,52 @@ namespace RMS.Server.Controllers.Api
             return Ok();
         }
 
+        [HttpGet("with-permissions")]
+        public async Task<IActionResult> GetRolesWithPermissions()
+        {
+            var roles = await _roleManager.Roles.ToListAsync();
+            var roleViewModels = new List<RoleViewModel>();
+
+            foreach (var role in roles)
+            {
+                var roleViewModel = new RoleViewModel { Name = role.Name };
+
+                var permissions = await _context.PagePermissions
+                    .Where(p => p.ApplicationRoleId == role.Id)
+                    .Select(p => new PagePermissionViewModel
+                    {
+                        PageName = p.PageName,
+                        CanView = p.CanView,
+                        CanEdit = p.CanEdit,
+                        HasFullAccess = p.HasFullAccess
+                    })
+                    .ToListAsync();
+
+                roleViewModel.PagePermissions.AddRange(permissions);
+
+                // For demonstration, assuming `SelectedPermission` is a string.
+                // Adjust accordingly if it involves more complex logic.
+                roleViewModel.SelectedPermission = permissions.Any(p => p.HasFullAccess) ? "FullAccess" :
+                                                    permissions.Any(p => p.CanEdit) ? "Edit" : "View";
+
+                roleViewModels.Add(roleViewModel);
+            }
+
+            // Ensure that all roles have default false permissions if not set
+            foreach (var role in roleViewModels)
+            {
+                foreach (var page in allPages)
+                {
+                    if (!role.PagePermissions.Any(p => p.PageName == page))
+                    {
+                        role.PagePermissions.Add(new PagePermissionViewModel { PageName = page, CanView = false, CanEdit = false, HasFullAccess = false });
+                    }
+                }
+            }
+
+            return Ok(roleViewModels);
+        }
+
         public class CreateRoleRequest
         {
             public string Name { get; set; }
@@ -63,5 +113,7 @@ namespace RMS.Server.Controllers.Api
             public string RoleName { get; set; }
             public string Permission { get; set; }
         }
+
+        private List<string> allPages = new List<string> { "AddHallCategory", "RoleManagement", "OtherPage1", "OtherPage2" };
     }
 }

@@ -6,6 +6,7 @@
 @inject AppClient client
 @inject IJSRuntime JSRuntime
 @inject NavigationManager NavigationManager
+@inject PermissionService PermissionService
 @attribute [Authorize]
 
 <div class="page-header breadcumb-sticky">
@@ -15,7 +16,10 @@
                 <div class="page-header-title">
                     <h5 class="m-b-10">
                         Hall Facilities
-                        <a @onclick="()=>show=true" style="cursor:pointer"><i class="fa fa-plus-circle fa-lg text-primary" aria-hidden="true" title="Add Facility"></i></a>
+                        @if (canEdit || hasFullAccess)
+                        {
+                            <a @onclick="()=>show=true" style="cursor:pointer"><i class="fa fa-plus-circle fa-lg text-primary" aria-hidden="true" title="Add Facility"></i></a>
+                        }
                     </h5>
                 </div>
                 <ul class="breadcrumb">
@@ -34,7 +38,14 @@
         <div class="card-body p-2 mt-n3">
             <div class="card text">
                 <div class="card-body">
-                    <HallFacilitiesGrid />
+                    @if (canView)
+                    {
+                        <HallFacilitiesGrid />
+                    }
+                    else
+                    {
+                        <div>You do not have permission to view this content.</div>
+                    }
                 </div>
             </div>
         </div>
@@ -45,8 +56,6 @@
 <SimpleDailog Title="@Title" Show="@show" OnCloseDialog="ResetForm">
     @if (show)
     {
-
-
         <EditForm Model="model" OnValidSubmit="OnSave">
             <DataAnnotationsValidator />
             <div>
@@ -74,28 +83,44 @@
     [CascadingParameter]
     protected AlertModel? alert { get; set; }
 
-    HallFacilities model = new();
-    public string Title = "Add Hall Facility";
-    bool show = false;
-    bool process = false;
+    private HallFacilities model = new();
+    private string Title = "Add Hall Facility";
+    private bool show = false;
+    private bool process = false;
     private Timer _timer;
     private int _delay = 2500;
 
+    private bool canView = false;
+    private bool canEdit = false;
+    private bool hasFullAccess = false;
 
     protected override async Task OnInitializedAsync()
     {
         alert?.Clear();
+
+        var permissions = await PermissionService.HasPermission("HallFacilities");
+        if (permissions != null)
+        {
+            canView = permissions.CanView;
+            canEdit = permissions.CanEdit;
+            hasFullAccess = permissions.HasFullAccess;
+        }
     }
 
     public async Task OnSave()
     {
+        if (!canEdit && !hasFullAccess)
+        {
+            alert?.SetError("You do not have permission to add or edit facilities.");
+            return;
+        }
+
         process = true;
         alert?.Clear();
 
         var response = await client.UpsertHallFacilityAsync(model);
         if (response.IsSuccess)
         {
-            // model = response.Result;
             await HallFacilitiesGrid.RefreshGridAsync();
             alert?.SetSuccess(response.Message);
             model = new();
@@ -127,4 +152,3 @@
         model = new();
     }
 }
-

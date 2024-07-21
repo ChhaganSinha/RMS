@@ -6,6 +6,8 @@
 @inject AppClient client
 @inject IJSRuntime JSRuntime
 @inject NavigationManager NavigationManager
+@inject PermissionService PermissionService
+
 @using Havit.Blazor.Components.Web
 @using Havit.Blazor.Components.Web.Bootstrap
 @using System.ComponentModel.DataAnnotations;
@@ -19,7 +21,12 @@
                 <div class="page-header-title">
                     <h5 class="m-b-10">
                         Hall
-                        <a @onclick="OnAdd" style="cursor:pointer"><i class="fa fa-plus-circle fa-lg text-primary" aria-hidden="true" title="Add Hall"></i></a>
+                        @if (canEdit || hasFullAccess)
+                        {
+                            <a @onclick="OnAdd" style="cursor:pointer">
+                                <i class="fa fa-plus-circle fa-lg text-primary" aria-hidden="true" title="Add Hall"></i>
+                            </a>
+                        }
                     </h5>
                 </div>
                 <ul class="breadcrumb">
@@ -187,6 +194,11 @@
 
     private string imageDataUrl;
 
+    // Permission variables
+    private static bool canView = false;
+    private static bool canEdit = false;
+    private static bool hasFullAccess = false;
+
     private async Task HandleFileSelected(InputFileChangeEventArgs e)
     {
         var file = e.File;
@@ -210,6 +222,15 @@
         // Load Hall categories and facilities
         Categories = (await client.GetAllHallCategory()).ToList();
         Facilities = (await client.GetAllHallFacility()).ToList();
+
+        // Fetch permissions
+        var permissions = await PermissionService.HasPermission("HallCategories");
+        if (permissions != null)
+        {
+            canView = permissions.CanView;
+            canEdit = permissions.CanEdit;
+            hasFullAccess = permissions.HasFullAccess;
+        }
 
         // If Id is provided, load Hall details and populate form
         if (Id > 0)
@@ -296,11 +317,12 @@
 
     public void OnAdd()
     {
-        model = new Hall();
-        categoriesId = null;
-        SelectedFacilities = new();
-        show = true;
+        if (canEdit || hasFullAccess)
+        {
+            model = new Hall();
+            categoriesId = null;
+            SelectedFacilities = new();
+            show = true;
+        }
     }
 }
-
-

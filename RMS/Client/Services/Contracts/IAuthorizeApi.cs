@@ -24,6 +24,7 @@ namespace RMS.Client.Services.Contracts
         Task RequestPasswordResetByEmail(ResetPasswordByAdmin Parameters);
         Task<(bool, string)> ForgetPassword(ForgetPasswordRequest param);
         Task<bool> ResetPassword(ResetPasswordRequest param);
-        Task<bool> HasPermission(string permission);
+        //Task<bool> HasPermission(string permission);
+        Task<PagePermissionDto> GetPagePermissions(string permission);
     }
 }

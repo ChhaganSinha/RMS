@@ -82,23 +82,7 @@ namespace RMS.Client.Services.Implementations
 
         public async Task<List<RoleViewModel>> GetRoles()
         {
-            var result = await _httpClient.GetAsync("api/Authorize/GetRoles");
-            result.EnsureSuccessStatusCode();
-
-            var responseContent = await result.Content.ReadAsStringAsync();
-            Console.WriteLine("Response Content:");
-            Console.WriteLine(responseContent); // Log the JSON response for debugging
-
-            try
-            {
-                var roles = JsonSerializer.Deserialize<List<RoleViewModel>>(responseContent);
-                return roles;
-            }
-            catch (JsonException ex)
-            {
-                Console.WriteLine($"Error deserializing roles: {ex.Message}");
-                throw; // Rethrow the exception or handle it accordingly
-            }
+            return await _httpClient.GetFromJsonAsync<List<RoleViewModel>>("api/Authorize/GetRoles");
         }
 
 
@@ -172,16 +156,31 @@ namespace RMS.Client.Services.Implementations
         }
 
 
-        public async Task<bool> HasPermission(string permission)
+        //public async Task<bool> HasPermission(string permission)
+        //{
+        //    var response = await _httpClient.PostAsJsonAsync("api/Authorize/GetUserPermissions", new { Permission = permission });
+        //    response.EnsureSuccessStatusCode();
+        //    var hasPermission = await response.Content.ReadFromJsonAsync<bool>();
+        //    return hasPermission;
+        //}
+
+        public async Task<PagePermissionDto> GetPagePermissions(string permission)
         {
             var response = await _httpClient.PostAsJsonAsync("api/Authorize/GetUserPermissions", new { Permission = permission });
             response.EnsureSuccessStatusCode();
-            var hasPermission = await response.Content.ReadFromJsonAsync<bool>();
-            return hasPermission;
+
+            // Deserialize the response into PagePermissionDto
+            var permissionDto = await response.Content.ReadFromJsonAsync<PagePermissionDto>();
+
+            // Ensure the permissionDto is not null before returning
+            return permissionDto ?? new PagePermissionDto { CanView = false, CanEdit = false, HasFullAccess = false };
         }
 
 
-
+        public async Task<List<RoleViewModel>> GetRolesWithPermissions()
+        {
+            return await _httpClient.GetFromJsonAsync<List<RoleViewModel>>("api/roles/with-permissions");
+        }
 
     }
 }

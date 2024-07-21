@@ -7,4 +7,5 @@ public interface IRoleService
     Task<List<RoleViewModel>> GetRoles();
     Task CreateRole(string roleName);
     Task AssignPermission(string roleName, string selectedPermission, List<PagePermissionViewModel> pagePermissions);
+    Task<List<RoleViewModel>> GetRolesWithPermissions();
 }

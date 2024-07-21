@@ -15,5 +15,9 @@ namespace RMS.Dto.RBAC
         public bool CanView { get; set; }
         public bool CanEdit { get; set; }
         public bool HasFullAccess { get; set; }
+
+        // Property to track manual overrides
+        public bool IsManuallySet { get; set; } = false;
+
     }
 }
