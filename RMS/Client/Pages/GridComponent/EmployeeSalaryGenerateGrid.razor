@@ -7,8 +7,9 @@
 @inject NavigationManager NavigationManager
 @inject HttpClient HttpClient
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@inject PermissionService PermissionService
 
-@if (_task.IsCompleted)
+@if (_task?.IsCompleted ?? false)
 {
     <div class="row">
         <div class="col-sm-12">
@@ -30,32 +31,49 @@ else
     private static GridComponent<EmployeePayroll> Component;
     static bool filter = true;
     static AuthenticationState authState;
+    // Permission flags
+    private static bool canView = false;
+    private static bool canEdit = false;
+    private static bool hasFullAccess = false;
 
     Action<IGridColumnCollection<EmployeePayroll>> columns = c =>
     {
 
-        c.Add(o => o.Id).SetWidth("10%").Css("table-bordered").Titled("SN.").Filterable(filter);
-        c.Add(o => o.EmployeeName).Css("table-bordered").Filterable(filter);
-        c.Add(o => o.BasicSalary).Format("{0:F2}").Css("table-bordered").Filterable(filter);
-        c.Add(o => o.TA).Format("{0:F2}").Css("table-bordered").Filterable(filter);
-        c.Add(o => o.DA).Format("{0:F2}").Css("table-bordered").Filterable(filter);
-        c.Add(o => o.HRA).Format("{0:F2}").Css("table-bordered").Filterable(filter);
-        c.Add(o => o.OtherAllowances).Format("{0:F2}").Css("table-bordered").Filterable(filter);
-        c.Add(o => o.GrossSalary).Format("{0:F2}").Css("table-bordered").Filterable(filter);
-        c.Add(o => o.Tax).Format("{0:F2}").Css("table-bordered").Filterable(filter);
-        c.Add(o => o.PF).Format("{0:F2}").Css("table-bordered").Filterable(filter);
-        c.Add(o => o.IncomeTax).Format("{0:F2}").Css("table-bordered").Filterable(filter);
-       // c.Add(o => o.NetSalary).Format("{0:F2}").Css("table-bordered").Filterable(filter);
-        c.Add(o => o.AdvanceAmount).Format("{0:F2}").Css("table-bordered").Filterable(filter);
-        c.Add(o => o.PayableSalary).Titled("Net Salary").Format("{0:F2}").Css("table-bordered").Filterable(filter);
-
-        // c.Add().Encoded(false).Sanitized(false).RenderComponentAs<EmployeePayrollEditButton>().SetWidth("10px").Titled("Edit");
-        c.Add().Encoded(false).Sanitized(false).RenderComponentAs<SalaryGenerateButton>(new List<Action<object>> { RefreshGrid }).SetWidth("10px").Titled("Salary Generate");
+        if (canView)
+        {
+            c.Add(o => o.Id).SetWidth("10%").Css("table-bordered").Titled("SN.").Filterable(filter);
+            c.Add(o => o.EmployeeName).Css("table-bordered").Filterable(filter);
+            c.Add(o => o.BasicSalary).Format("{0:F2}").Css("table-bordered").Filterable(filter);
+            c.Add(o => o.TA).Format("{0:F2}").Css("table-bordered").Filterable(filter);
+            c.Add(o => o.DA).Format("{0:F2}").Css("table-bordered").Filterable(filter);
+            c.Add(o => o.HRA).Format("{0:F2}").Css("table-bordered").Filterable(filter);
+            c.Add(o => o.OtherAllowances).Format("{0:F2}").Css("table-bordered").Filterable(filter);
+            c.Add(o => o.GrossSalary).Format("{0:F2}").Css("table-bordered").Filterable(filter);
+            c.Add(o => o.Tax).Format("{0:F2}").Css("table-bordered").Filterable(filter);
+            c.Add(o => o.PF).Format("{0:F2}").Css("table-bordered").Filterable(filter);
+            c.Add(o => o.IncomeTax).Format("{0:F2}").Css("table-bordered").Filterable(filter);
+            // c.Add(o => o.NetSalary).Format("{0:F2}").Css("table-bordered").Filterable(filter);
+            c.Add(o => o.AdvanceAmount).Format("{0:F2}").Css("table-bordered").Filterable(filter);
+            c.Add(o => o.PayableSalary).Titled("Net Salary").Format("{0:F2}").Css("table-bordered").Filterable(filter);
+        }
+        if (canEdit || hasFullAccess)
+        {
+            // c.Add().Encoded(false).Sanitized(false).RenderComponentAs<EmployeePayrollEditButton>().SetWidth("10px").Titled("Edit");
+            c.Add().Encoded(false).Sanitized(false).RenderComponentAs<SalaryGenerateButton>(new List<Action<object>> { RefreshGrid }).SetWidth("10px").Titled("Salary Generate");
+        }
     };
 
     protected override async Task OnParametersSetAsync()
     {
         authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var permissions = await PermissionService.HasPermission("SalaryGenerate");
+        if (permissions != null)
+        {
+            canView = permissions.CanView;
+            canEdit = permissions.CanEdit;
+            hasFullAccess = permissions.HasFullAccess;
+        }
+
         string url = $"odata/EmployeePayroll";
         var query = new QueryDictionary<StringValues>();
         query.Add("grid-sorting", "Id__1__1");

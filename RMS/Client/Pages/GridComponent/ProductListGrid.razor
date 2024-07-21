@@ -7,8 +7,9 @@
 @inject NavigationManager NavigationManager
 @inject HttpClient HttpClient
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@inject PermissionService PermissionService
 
-@if (_task.IsCompleted)
+@if (_task?.IsCompleted ?? false)
 {
     <div class="row">
         <div class="col-sm-12">
@@ -30,27 +31,48 @@ else
     private static GridComponent<ProductList> Component;
     static bool filter = true;
     static AuthenticationState authState;
+    // Permission flags
+    private static bool canView = false;
+    private static bool canEdit = false;
+    private static bool hasFullAccess = false;
 
     Action<IGridColumnCollection<ProductList>> columns = c =>
     {
+        if (canView)
+        {
+            c.Add(o => o.Id).SetWidth("10%").Css("table-bordered").Titled("SN.").Filterable(filter);
+            c.Add(o => o.ProductName).SetWidth("80%").Css("table-bordered").Titled("Product Name").Filterable(filter);
+            c.Add(o => o.ProductCategory).SetWidth("80%").Css("table-bordered").Titled("Product Category").Filterable(filter);
+            c.Add(o => o.UnitNames).SetWidth("80%").Css("table-bordered").Titled("Unit Names").Filterable(filter);
+            c.Add(o => o.Available).SetWidth("80%").Css("table-bordered").Titled("Available").Filterable(filter);
+            c.Add(o => o.Used).SetWidth("80%").Css("table-bordered").Titled("Used").Filterable(filter);
+            c.Add(o => o.Destroyed).SetWidth("80%").Css("table-bordered").Titled("Destroyed").Filterable(filter);
+            c.Add(o => o.Laundry).SetWidth("80%").Css("table-bordered").Titled("Laundry").Filterable(filter);
 
-        c.Add(o => o.Id).SetWidth("10%").Css("table-bordered").Titled("SN.").Filterable(filter);
-        c.Add(o => o.ProductName).SetWidth("80%").Css("table-bordered").Titled("Product Name").Filterable(filter);
-        c.Add(o => o.ProductCategory).SetWidth("80%").Css("table-bordered").Titled("Product Category").Filterable(filter);
-        c.Add(o => o.UnitNames).SetWidth("80%").Css("table-bordered").Titled("Unit Names").Filterable(filter);
-        c.Add(o => o.Available).SetWidth("80%").Css("table-bordered").Titled("Available").Filterable(filter);
-        c.Add(o => o.Used).SetWidth("80%").Css("table-bordered").Titled("Used").Filterable(filter);
-        c.Add(o => o.Destroyed).SetWidth("80%").Css("table-bordered").Titled("Destroyed").Filterable(filter);
-        c.Add(o => o.Laundry).SetWidth("80%").Css("table-bordered").Titled("Laundry").Filterable(filter);
+            if (canEdit || hasFullAccess)
+            {
+                c.Add().Encoded(false).Sanitized(false).RenderComponentAs<ProductListEditButton>().SetWidth("10px").Titled("Edit");
+            }
 
+            if (hasFullAccess)
+            {
+                c.Add().Encoded(false).Sanitized(false).RenderComponentAs<ProductListDeleteButton>(new List<Action<object>> { RefreshGrid }).SetWidth("10px").Titled("Delete");
 
-        c.Add().Encoded(false).Sanitized(false).RenderComponentAs<ProductListEditButton>().SetWidth("10px").Titled("Edit");
-        c.Add().Encoded(false).Sanitized(false).RenderComponentAs<ProductListDeleteButton>(new List<Action<object>> { RefreshGrid }).SetWidth("10px").Titled("Delete");
+            }
+        }
     };
 
     protected override async Task OnParametersSetAsync()
     {
         authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        // Check permissions
+        var permissions = await PermissionService.HasPermission("ProductList");
+        if (permissions != null)
+        {
+            canView = permissions.CanView;
+            canEdit = permissions.CanEdit;
+            hasFullAccess = permissions.HasFullAccess;
+        }
         string url = $"odata/ProductList";
         var query = new QueryDictionary<StringValues>();
         query.Add("grid-sorting", "Id__1__1");

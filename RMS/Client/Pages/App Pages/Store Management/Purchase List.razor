@@ -7,6 +7,7 @@
 @inject IJSRuntime JSRuntime
 @inject NavigationManager NavigationManager
 @using System.ComponentModel.DataAnnotations
+@inject PermissionService PermissionService
 @attribute [Authorize]
 
 <div class="page-header mb-0 breadcumb-sticky">
@@ -16,7 +17,10 @@
                 <div class="page-header-title">
                     <h5 class="m-b-10">
                         Purchase List
-                        <a @onclick="Show" style="cursor:pointer"><i class="fa fa-plus-circle fa-lg text-primary" aria-hidden="true" title="Add PurchaseItem"></i></a>
+                        @if (canEdit || hasFullAccess)
+                        {
+                            <a @onclick="Show" style="cursor:pointer"><i class="fa fa-plus-circle fa-lg text-primary" aria-hidden="true" title="Add PurchaseItem"></i></a>
+                        }
                     </h5>
                 </div>
                 <ul class="breadcrumb">
@@ -29,151 +33,159 @@
         </div>
     </div>
 </div>
-<div class="row">
-    <div class="col-sm-12 p-0">
-        <div class="card-body p-2 mt-n3">
-            <PurchaseItemGrid />
+
+@if (canView || canEdit || hasFullAccess)
+{
+    <div class="row">
+        <div class="col-sm-12 p-0">
+            <div class="card-body p-2 mt-n3">
+                <PurchaseItemGrid />
+            </div>
         </div>
     </div>
-</div>
 
-<PageDialog Title="@Title" Show="@show" ClosePageDialog="ResetForm">
-    @if (show)
-    {
-        <EditForm Model="@purchaseItem" OnValidSubmit="@HandleValidSubmit">
-            <DataAnnotationsValidator />
+    <PageDialog Title="@Title" Show="@show" ClosePageDialog="ResetForm">
+        @if (show)
+        {
+            <EditForm Model="@purchaseItem" OnValidSubmit="@HandleValidSubmit">
+                <DataAnnotationsValidator />
 
-            <div class="form-group row">
-                <div class="col-md-6">
-                    <label class="col-form-label bold-font required-field">Supplier Name</label>
-                    @* <select class="form-control" @bind="supplierlist">
-                        <option value="">-Select-</option>
-                        @foreach (var supplier in SupplierList)
+                <div class="form-group row">
+                    <div class="col-md-6">
+                        <label class="col-form-label bold-font required-field">Supplier Name</label>
+                        @* <select class="form-control" @bind="supplierlist">
+                <option value="">-Select-</option>
+                @foreach (var supplier in SupplierList)
+                {
+                <option value="@supplier.Id">@supplier.SupplierName</option>
+                }
+                </select>
+                <ValidationMessage For="() => purchaseItem.SupplierName" />
+                @if (supplierlist == null && submit)
+                {
+                <span style="color:red">Please select at least one</span>
+                } *@
+                        <HxSelect TItem="SupplierList"
+                                  TValue="int?"
+                                  Data="SupplierList"
+                                  @bind-Value="supplierlist"
+                                  TextSelector="@(SupplierList => SupplierList.SupplierName)"
+                                  ValueSelector="@(SupplierList => SupplierList.Id)"
+                                  Nullable="true"
+                                  NullText="-select-"
+                                  NullDataText="Loading categories..." />
+                        <ValidationMessage For="() => purchaseItem.SupplierName" />
+                        @if (supplierlist == null && submit)
                         {
-                            <option value="@supplier.Id">@supplier.SupplierName</option>
+                            <span style="color:red">Please select at least one</span>
                         }
-                    </select>
-                    <ValidationMessage For="() => purchaseItem.SupplierName" />
-                    @if (supplierlist == null && submit)
-                    {
-                        <span style="color:red">Please select at least one</span>
-                    } *@
-                    <HxSelect TItem="SupplierList"
-                              TValue="int?"
-                              Data="SupplierList"
-                              @bind-Value="supplierlist"
-                              TextSelector="@(SupplierList => SupplierList.SupplierName)"
-                              ValueSelector="@(SupplierList => SupplierList.Id)"
-                              Nullable="true"
-                              NullText="-select-"
-                              NullDataText="Loading categories..." />
-                    <ValidationMessage For="() => purchaseItem.SupplierName" />
-                    @if (supplierlist == null && submit)
-                    {
-                        <span style="color:red">Please select at least one</span>
-                    }
 
+                    </div>
+                    <div class="col-md-6">
+                        <label class="col-form-label bold-font required-field">Invoice No</label>
+                        <InputText @bind-Value="purchaseItem.InvoiceNo" class="form-control" disabled="@purchaseItem.IsPaid" />
+                        <ValidationMessage For="() => purchaseItem.InvoiceNo" />
+                    </div>
                 </div>
-                <div class="col-md-6">
-                    <label class="col-form-label bold-font required-field">Invoice No</label>
-                    <InputText @bind-Value="purchaseItem.InvoiceNo" class="form-control" disabled="@purchaseItem.IsPaid" />
-                    <ValidationMessage For="() => purchaseItem.InvoiceNo" />
-                </div>
-            </div>
 
-            <div class="form-group row">
-                <div class="col-md-6">
-                    <label class="col-form-label bold-font required-field">Purchase Date</label>
-                    <InputDate @bind-Value="purchaseItem.PurchaseDate" class="form-control" disabled="@purchaseItem.IsPaid" />
-                    <ValidationMessage For="() => purchaseItem.PurchaseDate" />
+                <div class="form-group row">
+                    <div class="col-md-6">
+                        <label class="col-form-label bold-font required-field">Purchase Date</label>
+                        <InputDate @bind-Value="purchaseItem.PurchaseDate" class="form-control" disabled="@purchaseItem.IsPaid" />
+                        <ValidationMessage For="() => purchaseItem.PurchaseDate" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="col-form-label bold-font required-field">Expiry Date</label>
+                        <InputDate @bind-Value="purchaseItem.ExpiryDate" class="form-control" disabled="@purchaseItem.IsPaid" />
+                        <ValidationMessage For="() => purchaseItem.ExpiryDate" />
+                    </div>
                 </div>
-                <div class="col-md-6">
-                    <label class="col-form-label bold-font required-field">Expiry Date</label>
-                    <InputDate @bind-Value="purchaseItem.ExpiryDate" class="form-control" disabled="@purchaseItem.IsPaid" />
-                    <ValidationMessage For="() => purchaseItem.ExpiryDate" />
+
+                <div class="form-group">
+                    <label class="col-form-label bold-font">Details</label>
+                    <InputTextArea @bind-Value="purchaseItem.Details" class="form-control" disabled="@purchaseItem.IsPaid" />
                 </div>
-            </div>
 
-            <div class="form-group">
-                <label class="col-form-label bold-font">Details</label>
-                <InputTextArea @bind-Value="purchaseItem.Details" class="form-control" disabled="@purchaseItem.IsPaid" />
-            </div>
-
-            <div class="table-responsive mt-3" style="width:">
-                <table class="table table-striped table-bordered">
-                    <thead>
-                        <tr>
-                            <th>Item Information</th>
-                            <th>Stock/Qnt</th>
-                            <th>Quantity</th>
-                            <th>Rate</th>
-                            <th>Total</th>
-                            @if (!purchaseItem.IsPaid)
-                            {
-                                <th>Action</th>
-                            }
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var item in purchaseItem.Items)
-                        {
+                <div class="table-responsive mt-3" style="width:">
+                    <table class="table table-striped table-bordered">
+                        <thead>
                             <tr>
-                                <td>
-                                    <select class="form-control" Value="item.PurchaseItemId" @onchange="async (e) => await OnProductChanged(item, e)">
-                                        <option value="">-Select-</option>
-                                        @foreach (var product in ProductList)
-                                        {
-                                            <option value="@product.Id">@product.ProductName</option>
-                                        }
-                                    </select>
-                                </td>
-                                <td>
-                                    <InputNumber @bind-Value="item.Stock" class="form-control" placeholder="Stock/Qnt" disabled="true" />
-                                </td>
-                                <td>
-                                    <InputNumber @bind-Value="item.Quantity" class="form-control" placeholder="Quantity" @oninput="(e) => { item.UpdateTotal(); CalculateGrandTotal(); }" disabled="@purchaseItem.IsPaid" />
-                                </td>
-                                <td>
-                                    <InputNumber @bind-Value="item.Rate" class="form-control" placeholder="Rate" @oninput="(e) => { item.UpdateTotal(); CalculateGrandTotal(); }" disabled="@purchaseItem.IsPaid" />
-                                </td>
-                                <td>
-                                    <input type="text" value="@item.Total.ToString("F2")" class="form-control" readonly />
-                                </td>
+                                <th>Item Information</th>
+                                <th>Stock/Qnt</th>
+                                <th>Quantity</th>
+                                <th>Rate</th>
+                                <th>Total</th>
                                 @if (!purchaseItem.IsPaid)
                                 {
-                                    <td class="text-center">
-                                        <button type="button" class="btn btn-danger" @onclick="() => RemoveItem(item)">Delete</button>
-                                    </td>
+                                    <th>Action</th>
                                 }
                             </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in purchaseItem.Items)
+                            {
+                                <tr>
+                                    <td>
+                                        <select class="form-control" Value="item.PurchaseItemId" @onchange="async (e) => await OnProductChanged(item, e)">
+                                            <option value="">-Select-</option>
+                                            @foreach (var product in ProductList)
+                                            {
+                                                <option value="@product.Id">@product.ProductName</option>
+                                            }
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <InputNumber @bind-Value="item.Stock" class="form-control" placeholder="Stock/Qnt" disabled="true" />
+                                    </td>
+                                    <td>
+                                        <InputNumber @bind-Value="item.Quantity" class="form-control" placeholder="Quantity" @oninput="(e) => { item.UpdateTotal(); CalculateGrandTotal(); }" disabled="@purchaseItem.IsPaid" />
+                                    </td>
+                                    <td>
+                                        <InputNumber @bind-Value="item.Rate" class="form-control" placeholder="Rate" @oninput="(e) => { item.UpdateTotal(); CalculateGrandTotal(); }" disabled="@purchaseItem.IsPaid" />
+                                    </td>
+                                    <td>
+                                        <input type="text" value="@item.Total.ToString("F2")" class="form-control" readonly />
+                                    </td>
+                                    @if (!purchaseItem.IsPaid)
+                                    {
+                                        <td class="text-center">
+                                            <button type="button" class="btn btn-danger" @onclick="() => RemoveItem(item)">Delete</button>
+                                        </td>
+                                    }
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                @if (!purchaseItem.IsPaid)
+                {
+                    <button type="button" class="btn btn-secondary" @onclick="AddNewItem">Add More Item</button>
+                }
+
+                <div class="form-group row mt-3">
+                    <div class="col-md-12 text-right">
+                        <h4>Grand Total: @purchaseItem.GrandTotal</h4>
+                    </div>
+                </div>
+                <UiAlert Model="alert"></UiAlert>
+                <div class="form-group row">
+                    <div class="col-md-12 text-right">
+                        @if (!purchaseItem.IsPaid)
+                        {
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                            <button type="button" class="btn btn-success" @onclick="MarkAsPaid">Mark as Paid</button>
                         }
-                    </tbody>
-                </table>
-            </div>
-
-            @if (!purchaseItem.IsPaid)
-            {
-                <button type="button" class="btn btn-secondary" @onclick="AddNewItem">Add More Item</button>
-            }
-
-            <div class="form-group row mt-3">
-                <div class="col-md-12 text-right">
-                    <h4>Grand Total: @purchaseItem.GrandTotal</h4>
+                    </div>
                 </div>
-            </div>
-            <UiAlert Model="alert"></UiAlert>
-            <div class="form-group row">
-                <div class="col-md-12 text-right">
-                    @if (!purchaseItem.IsPaid)
-                    {
-                        <button type="submit" class="btn btn-primary">Submit</button>
-                        <button type="button" class="btn btn-success" @onclick="MarkAsPaid">Mark as Paid</button>
-                    }
-                </div>
-            </div>
-        </EditForm>
-    }
-</PageDialog>
+            </EditForm>
+        }
+    </PageDialog>
+}
+else
+{
+    <div class="alert alert-danger">You do not have permission to view this page.</div>
+}
 
 @code {
     private PurchaseItem purchaseItem = new PurchaseItem();
@@ -190,9 +202,28 @@
     private Timer _timer;
     private int _delay = 2500;
 
+    private bool canView = false;
+    private bool canEdit = false;
+    private bool hasFullAccess = false;
+
     protected override async Task OnInitializedAsync()
     {
         alert?.Clear();
+        // Check permissions
+        var permissions = await PermissionService.HasPermission("Purchase");
+        if (permissions != null)
+        {
+            canView = permissions.CanView;
+            canEdit = permissions.CanEdit;
+            hasFullAccess = permissions.HasFullAccess;
+        }
+        if (!canView)
+        {
+            // Redirect or handle unauthorized access
+            NavigationManager.NavigateTo("/unauthorized");
+            return;
+        }
+
         SupplierList = (await client.GetAllSupplierList()).ToList();
         ProductList = (await client.GetAllProductList()).ToList();
         AddNewItem(); // Add a default item on initialization

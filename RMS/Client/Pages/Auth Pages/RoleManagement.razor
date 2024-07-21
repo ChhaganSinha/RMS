@@ -1,6 +1,7 @@
 ﻿@page "/role-management"
 @using RMS.Dto.RBAC
 @inject IRoleService RoleService
+@attribute [Authorize(Roles = "SuperAdmin,Admin")]
 
 <div class="page-header breadcumb-sticky">
     <div class="page-block">
@@ -126,9 +127,11 @@
         "DestroyProducts",
         "SaleProducts",
         "RoomStatus",
-        "RoomBooking",
+        "BookingList",
         "NewBooking",
         "BookingType",
+        "AddCustomer",
+        "CustomerList",
         "MenuType",
         "FoodCategory",
         "AddVariants",

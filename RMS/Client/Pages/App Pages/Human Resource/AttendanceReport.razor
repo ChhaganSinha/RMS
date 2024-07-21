@@ -5,6 +5,7 @@
 @inject AppClient client
 @inject IJSRuntime JSRuntime
 @inject NavigationManager NavigationManager
+@inject PermissionService PermissionService
 @attribute [Authorize]
 
 <div class="page-header breadcumb-sticky">
@@ -32,18 +33,23 @@
         <div class="card-body p-2 mt-n3">
             <div class="card text">
                 <div class="card-body">
-                    <AttendanceReportGrid />
+                    @if (canView)
+                    {
+                        <AttendanceReportGrid />
+                    }
+                    else
+                    {
+                        <p>You do not have permission to view this data.</p>
+                    }
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-
 <SimpleDailog Title="@Title" Show="@show" OnCloseDialog="ResetForm">
     @if (show)
     {
-
         <EditForm Model="model" OnValidSubmit="OnSave">
             <DataAnnotationsValidator />
             <div>
@@ -91,6 +97,11 @@
     private Timer _timer;
     private int _delay = 2500;
 
+    // Permission flags
+    private static bool canView = false;
+    private static bool canEdit = false;
+    private static bool hasFullAccess = false;
+
     public List<Employee> employees = new();
     private int? employeeId;
 
@@ -98,6 +109,21 @@
     {
         alert?.Clear();
         employees = (await client.GetAllEmployee()).ToList();
+
+        // Fetch permissions
+        var permissions = await PermissionService.HasPermission("AttendanceReport");
+        if (permissions != null)
+        {
+            canView = permissions.CanView;
+            canEdit = permissions.CanEdit;
+            hasFullAccess = permissions.HasFullAccess;
+        }
+        if (!canView)
+        {
+            // Redirect or handle unauthorized access
+            NavigationManager.NavigateTo("/unauthorized");
+            return;
+        }
     }
 
     public async Task OnSave()
@@ -114,9 +140,10 @@
         if (response.IsSuccess)
         {
             // model = response.Result;
-            await AttendanceReportGrid.RefreshGridAsync();
             alert?.SetSuccess(response.Message);
             model = new();
+            // Assuming AttendanceReportGrid has a RefreshGridAsync method
+            await AttendanceReportGrid.RefreshGridAsync();
         }
         else
             alert?.SetError(response.Message);
@@ -143,5 +170,11 @@
     public void OnClose()
     {
         model = new();
+    }
+
+    public void Show()
+    {
+        show = true;
+        employeeId = null;
     }
 }

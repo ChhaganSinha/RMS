@@ -100,9 +100,18 @@ else
 
         // Check permissions
         var permissions = await PermissionService.HasPermission("HallCategories");
-        canView = permissions.CanView;
-        canEdit = permissions.CanEdit;
-        hasFullAccess = permissions.HasFullAccess;
+        if (permissions != null)
+        {
+            canView = permissions.CanView;
+            canEdit = permissions.CanEdit;
+            hasFullAccess = permissions.HasFullAccess;
+        }
+        if (!canView)
+        {
+            // Redirect or handle unauthorized access
+            NavigationManager.NavigateTo("/unauthorized");
+            return;
+        }
     }
 
     public async Task OnSave()

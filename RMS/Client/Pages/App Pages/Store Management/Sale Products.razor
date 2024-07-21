@@ -10,6 +10,7 @@
 @using Havit.Blazor.Components.Web
 @using Havit.Blazor.Components.Web.Bootstrap
 @using System.ComponentModel.DataAnnotations;
+@inject PermissionService PermissionService
 @attribute [Authorize]
 
 <div class="page-header breadcumb-sticky">
@@ -19,7 +20,10 @@
                 <div class="page-header-title">
                     <h5 class="m-b-10">
                         Sale Products
-                        <a @onclick="Show" style="cursor:pointer"><i class="fa fa-plus-circle fa-lg text-primary" aria-hidden="true" title="Add SaleProducts"></i></a>
+                        @if (canEdit || hasFullAccess)
+                        {
+                            <a @onclick="Show" style="cursor:pointer"><i class="fa fa-plus-circle fa-lg text-primary" aria-hidden="true" title="Add SaleProducts"></i></a>
+                        }
                     </h5>
                 </div>
                 <ul class="breadcrumb">
@@ -32,100 +36,108 @@
         </div>
     </div>
 </div>
-<div class="row">
-    <div class="col-sm-12 p-0">
-        <div class="card-body p-2 mt-n3">
-            <SaleProductsGrid />
+
+@if (canView || canEdit || hasFullAccess)
+{
+    <div class="row">
+        <div class="col-sm-12 p-0">
+            <div class="card-body p-2 mt-n3">
+                <SaleProductsGrid />
+            </div>
         </div>
     </div>
-</div>
 
-<PageDialog Title="@Title" Show="@show" ClosePageDialog="ResetForm">
-    @if (show)
-    {
+    <PageDialog Title="@Title" Show="@show" ClosePageDialog="ResetForm">
+        @if (show)
+        {
 
 
-        <EditForm Model="model" OnValidSubmit="OnSave">
-            <DataAnnotationsValidator />
-            <div class="form-group row">
-                <div class="col-md-6">
-                    <label class="col-form-label bold-font required-field">Select Product Category</label>
-                    <HxSelect TItem="ProductCategories"
-                              TValue="int?"
-                              Value="prodcategoriesId"
-                              ValueChanged="OnProductCategoryChanged"
-                              ValueExpression="(() => prodcategoriesId)"
-                              Data="ProductCategories"
-                              TextSelector="@(ProductCategories => ProductCategories.Name)"
-                              ValueSelector="@(ProductCategories => ProductCategories.Id)"
-                              Nullable="true"
-                              NullText="-select-"
-                              NullDataText="Loading ProductCategories..." />
-                    <ValidationMessage For="() => model.ProductCategory" />
+            <EditForm Model="model" OnValidSubmit="OnSave">
+                <DataAnnotationsValidator />
+                <div class="form-group row">
+                    <div class="col-md-6">
+                        <label class="col-form-label bold-font required-field">Select Product Category</label>
+                        <HxSelect TItem="ProductCategories"
+                                  TValue="int?"
+                                  Value="prodcategoriesId"
+                                  ValueChanged="OnProductCategoryChanged"
+                                  ValueExpression="(() => prodcategoriesId)"
+                                  Data="ProductCategories"
+                                  TextSelector="@(ProductCategories => ProductCategories.Name)"
+                                  ValueSelector="@(ProductCategories => ProductCategories.Id)"
+                                  Nullable="true"
+                                  NullText="-select-"
+                                  NullDataText="Loading ProductCategories..." />
+                        <ValidationMessage For="() => model.ProductCategory" />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="col-form-label bold-font required-field">Price</label>
+                        <InputNumber @bind-Value="@model.Price" id="available" class="form-control"></InputNumber>
+                        <ValidationMessage For="() => model.Price" />
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-md-6">
+                        <label class="col-form-label bold-font required-field">Select Product Name</label>
+                        <HxSelect TItem="ProductList"
+                                  TValue="int?"
+                                  Value="prodlistid"
+                                  ValueChanged="OnProductNameChanged"
+                                  ValueExpression="(() => prodlistid)"
+                                  Data="FilteredProductList"
+                                  TextSelector="@(ProductList => ProductList.ProductName)"
+                                  ValueSelector="@(ProductList => ProductList.Id)"
+                                  Nullable="true"
+                                  NullText="-select-"
+                                  NullDataText="Loading ProductList..." />
+                        <ValidationMessage For="() => model.ProductName" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="col-form-label bold-font required-field">Quantity</label>
+                        <InputNumber @bind-Value="@model.Quantity" id="available" class="form-control"></InputNumber>
+                        <ValidationMessage For="() => model.Quantity" />
+                    </div>
+
+
+
+
+
+
+
+
                 </div>
 
-                <div class="col-md-6">
-                    <label class="col-form-label bold-font required-field">Price</label>
-                    <InputNumber @bind-Value="@model.Price" id="available" class="form-control"></InputNumber>
-                    <ValidationMessage For="() => model.Price" />
-                </div>
-            </div>
-            <div class="form-group row">
-                <div class="col-md-6">
-                    <label class="col-form-label bold-font required-field">Select Product Name</label>
-                    <HxSelect TItem="ProductList"
-                              TValue="int?"
-                              Value="prodlistid"
-                              ValueChanged="OnProductNameChanged"
-                              ValueExpression="(() => prodlistid)"
-                              Data="FilteredProductList"
-                              TextSelector="@(ProductList => ProductList.ProductName)"
-                              ValueSelector="@(ProductList => ProductList.Id)"
-                              Nullable="true"
-                              NullText="-select-"
-                              NullDataText="Loading ProductList..." />
-                    <ValidationMessage For="() => model.ProductName" />
-                </div>
-                <div class="col-md-6">
-                    <label class="col-form-label bold-font required-field">Quantity</label>
-                    <InputNumber @bind-Value="@model.Quantity" id="available" class="form-control"></InputNumber>
-                    <ValidationMessage For="() => model.Quantity" />
+
+
+                <div class="form-group row">
+                    <div class="col-md-12">
+                        <label class="col-form-label bold-font required-field">Comments</label>
+                        <InputTextArea @bind-Value="@model.Comments" id="name" class="form-control"></InputTextArea>
+                        <ValidationMessage For="() => model.Comments" />
+                    </div>
+
                 </div>
 
-                
 
 
-
-
-
-
-            </div>
-
-
-
-            <div class="form-group row">
-                <div class="col-md-12">
-                    <label class="col-form-label bold-font required-field">Comments</label>
-                    <InputTextArea @bind-Value="@model.Comments" id="name" class="form-control"></InputTextArea>
-                    <ValidationMessage For="() => model.Comments" />
-                </div>
-
-            </div>
-
-
-
-            @if (process)
-            {
-                <div style="text-align:center">
-                    <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
-                </div>
-            }
-            <UiAlert Model="alert"></UiAlert>
-            <hr style="margin-bottom: 2px;" />
-            <button type="submit" class="btn btn-primary float-right col-md-4">Add</button>
-        </EditForm>
-    }
-</PageDialog>
+                @if (process)
+                {
+                    <div style="text-align:center">
+                        <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
+                    </div>
+                }
+                <UiAlert Model="alert"></UiAlert>
+                <hr style="margin-bottom: 2px;" />
+                <button type="submit" class="btn btn-primary float-right col-md-4">Add</button>
+            </EditForm>
+        }
+    </PageDialog>
+}
+else
+{
+    <div class="alert alert-danger">You do not have permission to view this page.</div>
+}
 
 @code {
     [Parameter]
@@ -141,6 +153,9 @@
     bool process = false;
     private Timer _timer;
     private int _delay = 2500;
+    private bool canView = false;
+    private bool canEdit = false;
+    private bool hasFullAccess = false;
 
     private List<ProductCategories> ProductCategories = new();
     private List<ProductList> ProductList = new();
@@ -151,6 +166,21 @@
     protected override async Task OnInitializedAsync()
     {
         alert?.Clear();
+         // Check permissions
+        var permissions = await PermissionService.HasPermission("SaleProducts");
+        if (permissions != null)
+        {
+            canView = permissions.CanView;
+            canEdit = permissions.CanEdit;
+            hasFullAccess = permissions.HasFullAccess;
+        }
+        if (!canView)
+        {
+            // Redirect or handle unauthorized access
+            NavigationManager.NavigateTo("/unauthorized");
+            return;
+        }
+
         ProductCategories = (await client.GetAllProductCategory()).ToList();
         ProductList = (await client.GetAllProductList()).ToList();
 

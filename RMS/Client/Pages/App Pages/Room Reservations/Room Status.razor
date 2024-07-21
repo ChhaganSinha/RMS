@@ -8,6 +8,7 @@
 @inject AppClient client
 @inject IJSRuntime JSRuntime
 @inject NavigationManager NavigationManager
+@inject PermissionService PermissionService
 @attribute [Authorize]
 
 <div class="page-header breadcumb-sticky">
@@ -29,153 +30,171 @@
         </div>
     </div>
 </div>
+@if (canView || canEdit || hasFullAccess)
+{
+    <div class="row">
+        <div class="col-sm-12 p-0">
+            <div class="card-body p-2 mt-n3">
+                <div class="card text">
+                    <div class="card-body">
 
-<div class="row">
-    <div class="col-sm-12 p-0">
-        <div class="card-body p-2 mt-n3">
-            <div class="card text">
-                <div class="card-body">
-
-                    <div class="row mb-3">
-                        <div class="col-md-3">
-                            <select class="form-control" @bind="selectedRoomStatus">
-                                <option value="">All Statuses</option>
-                                @foreach (var status in roomStatuses)
-                                {
-                                    <option value="@status">@status</option>
-                                }
-                            </select>
-                        </div>
-                        <div class="col-md-3">
-                            <select class="form-control" @bind="selectedRoomType">
-                                <option value="">All Types</option>
-                                @foreach (var type in roomTypes)
-                                {
-                                    <option value="@type.Name">@type.Name</option>
-                                }
-                            </select>
-                        </div>
-                        <div class="col-md-3">
-                            <select class="form-control" @bind="selectedFloor">
-                                <option value="">All Floors</option>
-                                @foreach (var floor in floors)
-                                {
-                                    <option value="@floor">@floor</option>
-                                }
-                            </select>
-                        </div>
-                        <div class="col-md-3">
-                            <button class="btn btn-primary" @onclick="ApplyFilters">Search</button>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        @if (loading)
-                        {
-                            <div class="col-sm-12" style="margin-top:40vh">
-                                <div class="loader-progress"></div>
+                        <div class="row mb-3">
+                            <div class="col-md-3">
+                                <select class="form-control" @bind="selectedRoomStatus">
+                                    <option value="">All Statuses</option>
+                                    @foreach (var status in roomStatuses)
+                                    {
+                                        <option value="@status">@status</option>
+                                    }
+                                </select>
                             </div>
-                        }
-                        else
-                        {
-                            @if (filteredRooms.Count > 0)
-                            {
-                                @foreach (var room in filteredRooms)
-                                {
-                                    <div class="col-sm-6 col-lg-4 col-xl-3 col-xxl-2">
-                                        <div class="position-relative d-flex justify-content-center">
-                                            <div class="card shadow" style="width: 100%; border: 1px solid silver;">
-                                                <div class="hotel-image">
-                                                    <img src="data:image;base64,@Convert.ToBase64String(room.ImageFile)" class="image-inner card-img-top" alt="Room Image">
-                                                </div>
-                                                <div class="card-img-overlay d-flex flex-column justify-content-center text-center text-white" style="background-color: rgba(0, 0, 0, 0.5); margin: 2px; border: 1px solid firebrick;">
-                                                    @* <h4 class="fs-21 mt-2 font-weight-bold">Floor: @room.floor</h4> *@
-                                                    <h5 class="mt-2 font-weight-bold">Room No: @room.RoomNumber</h5>
-                                                    <p class="m-0">Room Type: @room.Category</p>
-                                                    <p class="m-0">Check Out: None</p>
-                                                    <p class="m-0 text-c-green">Charge: @room.Price</p>
-                                                    @if(room.Status == RoomHallStatus.Booked){
-                                                        <button type="button" style="width: 60%;align-self: center;" class="btn btn-danger btn-sm mt-5 font-weight-bold" disabled>
-                                                        Booked
-                                                        </button>
+                            <div class="col-md-3">
+                                <select class="form-control" @bind="selectedRoomType">
+                                    <option value="">All Types</option>
+                                    @foreach (var type in roomTypes)
+                                    {
+                                        <option value="@type.Name">@type.Name</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <select class="form-control" @bind="selectedFloor">
+                                    <option value="">All Floors</option>
+                                    @foreach (var floor in floors)
+                                    {
+                                        <option value="@floor">@floor</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <button class="btn btn-primary" @onclick="ApplyFilters">Search</button>
+                            </div>
+                        </div>
 
-                                                    }else{
-                                                            <button type="button" style="width: 60%;align-self: center;" class="btn btn-success btn-sm mt-5 font-weight-bold" @onclick="() => BookRoom(room)">
-                                                                Available
-                                                            </button>
-                                                    }
-                                                    
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                 }
+                        <div class="row">
+                            @if (loading)
+                            {
+                                <div class="col-sm-12" style="margin-top:40vh">
+                                    <div class="loader-progress"></div>
+                                </div>
                             }
                             else
                             {
-                                <p class="text-primary"> No Room Data Available!</p>
+                                @if (filteredRooms.Count > 0)
+                                {
+                                    @foreach (var room in filteredRooms)
+                                    {
+                                        <div class="col-sm-6 col-lg-4 col-xl-3 col-xxl-2">
+                                            <div class="position-relative d-flex justify-content-center">
+                                                <div class="card shadow" style="width: 100%; border: 1px solid silver;">
+                                                    <div class="hotel-image">
+                                                        <img src="data:image;base64,@Convert.ToBase64String(room.ImageFile)" class="image-inner card-img-top" alt="Room Image">
+                                                    </div>
+                                                    <div class="card-img-overlay d-flex flex-column justify-content-center text-center text-white" style="background-color: rgba(0, 0, 0, 0.5); margin: 2px; border: 1px solid firebrick;">
+                                                        @* <h4 class="fs-21 mt-2 font-weight-bold">Floor: @room.floor</h4> *@
+                                                        <h5 class="mt-2 font-weight-bold">Room No: @room.RoomNumber</h5>
+                                                        <p class="m-0">Room Type: @room.Category</p>
+                                                        <p class="m-0">Check Out: None</p>
+                                                        <p class="m-0 text-c-green">Charge: @room.Price</p>
+                                                        @if (room.Status == RoomHallStatus.Booked)
+                                                        {
+                                                            <button type="button" style="width: 60%;align-self: center;" class="btn btn-danger btn-sm mt-5 font-weight-bold" disabled>
+                                                                Booked
+                                                            </button>
+
+                                                        }
+                                                        else
+                                                        {
+                                                            @if (canEdit || hasFullAccess)
+                                                            {
+                                                                <button type="button" style="width: 60%;align-self: center;" class="btn btn-success btn-sm mt-5 font-weight-bold" @onclick="() => BookRoom(room)">
+                                                                    Available
+                                                                </button>
+                                                            }
+                                                            else
+                                                            {
+                                                                <button type="button" style="width: 60%;align-self: center;" class="btn btn-success btn-sm mt-5 font-weight-bold" disabled>
+                                                                    Available
+                                                                </button>
+                                                            }
+                                                        }
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                }
+                                else
+                                {
+                                    <p class="text-primary"> No Room Data Available!</p>
+                                }
                             }
-                        }
+                        </div>
+
+
+
                     </div>
-
-
-
                 </div>
             </div>
         </div>
     </div>
-</div>
 
-<SimpleDailog Title="@Title" Show="@show" OnCloseDialog="ResetForm">
-    @if (show)
-    {
-        <EditForm Model="roomModel" OnValidSubmit="OnSave">
-            <DataAnnotationsValidator />
-            <div>
-                <div class="form-group row mb-2">
-                    <label class="col-form-label col-md-6 bold-font" style="padding-right: 0;"><i class="fa fa-check-square"></i> Booking Status</label>
-                    <div class="col-md-6">
-                        <div class="form-control">@roomModel.Status.ToString()</div>
+    <SimpleDailog Title="@Title" Show="@show" OnCloseDialog="ResetForm">
+        @if (show)
+        {
+            <EditForm Model="roomModel" OnValidSubmit="OnSave">
+                <DataAnnotationsValidator />
+                <div>
+                    <div class="form-group row mb-2">
+                        <label class="col-form-label col-md-6 bold-font" style="padding-right: 0;"><i class="fa fa-check-square"></i> Booking Status</label>
+                        <div class="col-md-6">
+                            <div class="form-control">@roomModel.Status.ToString()</div>
+                        </div>
+                    </div>
+                    <div class="form-group row mb-2">
+                        <label class="col-form-label col-md-6 bold-font" style="padding-right: 0;"><i class="fa fa-sort-numeric-asc"></i> Room Number</label>
+                        <div class="col-md-6">
+                            <div class="form-control">@roomModel.RoomNumber.ToString()</div>
+                        </div>
+                    </div>
+                    <div class="form-group row mb-2">
+                        <label class="col-form-label col-md-6 bold-font" style="padding-right: 0;"><i class="fa fa-th-list"></i> Room Type</label>
+                        <div class="col-md-6">
+                            <div class="form-control">@roomModel.Category.ToString()</div>
+                        </div>
+                    </div>
+                    <div class="form-group row mb-2">
+                        <label class="col-form-label col-md-6 bold-font" style="padding-right: 0;"><i class="fa fa-usd"></i> Rent/Day</label>
+                        <div class="col-md-6">
+                            <div class="form-control">@roomModel.Price.ToString()</div>
+                        </div>
+                    </div>
+                    <div class="form-group row mb-2">
+                        <label class="col-form-label col-md-6 bold-font" style="padding-right: 0;"><i class="fa fa-user"></i> Extra Capacity</label>
+                        <div class="col-md-6">
+                            <div class="form-control">@(roomModel.ExtraCapacity ? "Yes" : "No")</div>
+                        </div>
                     </div>
                 </div>
-                <div class="form-group row mb-2">
-                    <label class="col-form-label col-md-6 bold-font" style="padding-right: 0;"><i class="fa fa-sort-numeric-asc"></i> Room Number</label>
-                    <div class="col-md-6">
-                        <div class="form-control">@roomModel.RoomNumber.ToString()</div>
+                @if (process)
+                {
+                    <div style="text-align:center">
+                        <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
                     </div>
-                </div>
-                <div class="form-group row mb-2">
-                    <label class="col-form-label col-md-6 bold-font" style="padding-right: 0;"><i class="fa fa-th-list"></i> Room Type</label>
-                    <div class="col-md-6">
-                        <div class="form-control">@roomModel.Category.ToString()</div>
-                    </div>
-                </div>
-                <div class="form-group row mb-2">
-                    <label class="col-form-label col-md-6 bold-font" style="padding-right: 0;"><i class="fa fa-usd"></i> Rent/Day</label>
-                    <div class="col-md-6">
-                        <div class="form-control">@roomModel.Price.ToString()</div>
-                    </div>
-                </div>
-                <div class="form-group row mb-2">
-                    <label class="col-form-label col-md-6 bold-font" style="padding-right: 0;"><i class="fa fa-user"></i> Extra Capacity</label>
-                    <div class="col-md-6">
-                        <div class="form-control">@(roomModel.ExtraCapacity ? "Yes" : "No")</div>
-                    </div>
-                </div>
-            </div>
-            @if (process)
-            {
-                <div style="text-align:center">
-                    <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
-                </div>
-            }
-            <UiAlert Model="alert"></UiAlert>
-            <hr />
-            <button type="submit" class="btn btn-primary float-right col-md-5">Book Now</button>
-        </EditForm>
-        <br />
-    }
-</SimpleDailog>
+                }
+                <UiAlert Model="alert"></UiAlert>
+                <hr />
+                <button type="submit" class="btn btn-primary float-right col-md-5">Book Now</button>
+            </EditForm>
+            <br />
+        }
+    </SimpleDailog>
+}
+else
+{
+    <div class="alert alert-danger">You do not have permission to view this page.</div>
+}
 
 @code {
     [Parameter]
@@ -201,10 +220,27 @@
     string selectedRoomType = string.Empty;
     Floor? selectedFloor = null;
     Room roomModel = new();
+    private bool canView = false;
+    private bool canEdit = false;
+    private bool hasFullAccess = false;
 
     protected override async Task OnInitializedAsync()
     {
         alert?.Clear();
+        // Check permissions
+        var permissions = await PermissionService.HasPermission("RoomStatus");
+        if (permissions != null)
+        {
+            canView = permissions.CanView;
+            canEdit = permissions.CanEdit;
+            hasFullAccess = permissions.HasFullAccess;
+        }
+        if (!canView)
+        {
+            // Redirect or handle unauthorized access
+            NavigationManager.NavigateTo("/unauthorized");
+            return;
+        }
         Rooms = (await client.GetAllRoom()).ToList();
         roomTypes = (await client.GetAllRoomCategory()).ToList();
         filteredRooms = Rooms;

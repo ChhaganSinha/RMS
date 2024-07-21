@@ -6,6 +6,7 @@
 @inject AppClient client
 @inject IJSRuntime JSRuntime
 @inject NavigationManager NavigationManager
+@inject PermissionService PermissionService
 @attribute [Authorize]
 
 <div class="page-header breadcumb-sticky">
@@ -15,7 +16,10 @@
                 <div class="page-header-title">
                     <h5 class="m-b-10">
                         Attendance List
-                        <a class="btn btn-success" @onclick="Show" style="cursor:pointer">Single CheckIn</a>
+                        @if (canEdit)
+                        {
+                            <a class="btn btn-success" @onclick="Show" style="cursor:pointer">Single CheckIn</a>
+                        }
                     </h5>
                 </div>
                 <ul class="breadcrumb">
@@ -34,7 +38,14 @@
         <div class="card-body p-2 mt-n3">
             <div class="card text">
                 <div class="card-body">
-                    <AttendanceGrid />
+                    @if (canView)
+                    {
+                        <AttendanceGrid />
+                    }
+                    else
+                    {
+                        <p>You do not have permission to view this data.</p>
+                    }
                 </div>
             </div>
         </div>
@@ -44,7 +55,6 @@
 <SimpleDailog Title="@Title" Show="@show" OnCloseDialog="ResetForm">
     @if (show)
     {
-
         <EditForm Model="model" OnValidSubmit="OnSave">
             <DataAnnotationsValidator />
             <div class="row mb-1">
@@ -95,10 +105,29 @@
     public List<Employee> employees = new();
     private int? employeeId;
 
+    private static bool canView = false;
+    private static bool canEdit = false;
+    private static bool hasFullAccess = false;
+
     protected override async Task OnInitializedAsync()
     {
         alert?.Clear();
         employees = (await client.GetAllEmployee()).ToList();
+
+        // Fetch permissions
+        var permissions = await PermissionService.HasPermission("AttendanceList");
+        if (permissions != null)
+        {
+            canView = permissions.CanView;
+            canEdit = permissions.CanEdit;
+            hasFullAccess = permissions.HasFullAccess;
+        }
+        if (!canView)
+        {
+            // Redirect or handle unauthorized access
+            NavigationManager.NavigateTo("/unauthorized");
+            return;
+        }
     }
 
     public async Task OnSave()
@@ -116,7 +145,6 @@
         var response = await client.EmployeeCheckInAsync(model);
         if (response.IsSuccess)
         {
-            // model = response.Result;
             alert?.SetSuccess(response.Message);
             employeeId = null;
             model = new();
@@ -151,7 +179,10 @@
 
     public void Show()
     {
-        show = true;
-        employeeId = null;
+        if (canEdit)
+        {
+            show = true;
+            employeeId = null;
+        }
     }
 }

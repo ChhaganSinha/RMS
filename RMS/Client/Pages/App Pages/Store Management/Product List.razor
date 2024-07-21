@@ -9,6 +9,7 @@
 @using Havit.Blazor.Components.Web
 @using Havit.Blazor.Components.Web.Bootstrap
 @using System.ComponentModel.DataAnnotations;
+@inject PermissionService PermissionService
 @attribute [Authorize]
 
 <div class="page-header breadcumb-sticky">
@@ -18,7 +19,10 @@
                 <div class="page-header-title">
                     <h5 class="m-b-10">
                         Product List
-                        <a @onclick="()=>show=true" style="cursor:pointer"><i class="fa fa-plus-circle fa-lg text-primary" aria-hidden="true" title="Add Product"></i></a>
+                        @if (canEdit || hasFullAccess)
+                        {
+                            <a @onclick="()=>show=true" style="cursor:pointer"><i class="fa fa-plus-circle fa-lg text-primary" aria-hidden="true" title="Add Product"></i></a>
+                        }
                     </h5>
                 </div>
                 <ul class="breadcrumb">
@@ -31,99 +35,107 @@
         </div>
     </div>
 </div>
-<div class="row">
-    <div class="col-sm-12 p-0">
-        <div class="card-body p-2 mt-n3">
-            <ProductListGrid />
+
+@if (canView || canEdit || hasFullAccess)
+{
+    <div class="row">
+        <div class="col-sm-12 p-0">
+            <div class="card-body p-2 mt-n3">
+                <ProductListGrid />
+            </div>
         </div>
     </div>
-</div>
 
-<PageDialog Title="@Title" Show="@show" ClosePageDialog="ResetForm">
-    @if (show)
-    {
-
-
-        <EditForm Model="model" OnValidSubmit="OnSave">
-            <DataAnnotationsValidator />
-
-            <div class="form-group row">
-                <div class="col-md-6">
-                    <label class="col-form-label bold-font required-field">Product Name</label>
-                    <InputText @bind-Value="@model.ProductName" id="name" class="form-control"></InputText>
-                    <ValidationMessage For="() => model.ProductName" />
-                </div>
-                <div class="col-md-6">
-                    <label class="col-form-label bold-font required-field">Laundry Item</label>
-                    <select @bind="model.Laundry" class="form-control" id="laundry">
-                        <option value="No">No</option>
-                        <option value="Yes">Yes</option>
-                    </select>
-                    <ValidationMessage For="() => model.Laundry" />
-                </div>
+    <PageDialog Title="@Title" Show="@show" ClosePageDialog="ResetForm">
+        @if (show)
+        {
 
 
-            </div>
-            <div class="form-group row">
-                <div class="col-md-6">
-                    <label class="col-form-label bold-font required-field">Select Product Category</label>
-                    <HxSelect TItem="ProductCategories"
-                              TValue="int?"
-                              Data="ProductCategories"
-                              @bind-Value="prodcategoriesId"
-                              TextSelector="@(ProductCategories => ProductCategories.Name)"
-                              ValueSelector="@(ProductCategories => ProductCategories.Id)"
-                              Nullable="true"
-                              NullText="-select-"
-                              NullDataText="Loading ProductCategories..." />
-                    <ValidationMessage For="() => model.ProductCategory" />
+            <EditForm Model="model" OnValidSubmit="OnSave">
+                <DataAnnotationsValidator />
+
+                <div class="form-group row">
+                    <div class="col-md-6">
+                        <label class="col-form-label bold-font required-field">Product Name</label>
+                        <InputText @bind-Value="@model.ProductName" id="name" class="form-control"></InputText>
+                        <ValidationMessage For="() => model.ProductName" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="col-form-label bold-font required-field">Laundry Item</label>
+                        <select @bind="model.Laundry" class="form-control" id="laundry">
+                            <option value="No">No</option>
+                            <option value="Yes">Yes</option>
+                        </select>
+                        <ValidationMessage For="() => model.Laundry" />
+                    </div>
+
+
                 </div>
-                <div class="col-md-6">
-                    <label class="col-form-label bold-font required-field">Select UnitName</label>
-                    <HxSelect TItem="UnitNames"
-                              TValue="int?"
-                              Data="UnitNames"
-                              @bind-Value="unitnames"
-                              TextSelector="@(UnitNames => UnitNames.Name)"
-                              ValueSelector="@(UnitNames => UnitNames.Id)"
-                              Nullable="true"
-                              NullText="-select-"
-                              NullDataText="Loading UnitNames..." />
-                    <ValidationMessage For="() => model.UnitNames" />
+                <div class="form-group row">
+                    <div class="col-md-6">
+                        <label class="col-form-label bold-font required-field">Select Product Category</label>
+                        <HxSelect TItem="ProductCategories"
+                                  TValue="int?"
+                                  Data="ProductCategories"
+                                  @bind-Value="prodcategoriesId"
+                                  TextSelector="@(ProductCategories => ProductCategories.Name)"
+                                  ValueSelector="@(ProductCategories => ProductCategories.Id)"
+                                  Nullable="true"
+                                  NullText="-select-"
+                                  NullDataText="Loading ProductCategories..." />
+                        <ValidationMessage For="() => model.ProductCategory" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="col-form-label bold-font required-field">Select UnitName</label>
+                        <HxSelect TItem="UnitNames"
+                                  TValue="int?"
+                                  Data="UnitNames"
+                                  @bind-Value="unitnames"
+                                  TextSelector="@(UnitNames => UnitNames.Name)"
+                                  ValueSelector="@(UnitNames => UnitNames.Id)"
+                                  Nullable="true"
+                                  NullText="-select-"
+                                  NullDataText="Loading UnitNames..." />
+                        <ValidationMessage For="() => model.UnitNames" />
+                    </div>
+
+                </div>
+                <div class="form-group row">
+                    <div class="col-md-4">
+                        <label class="col-form-label bold-font required-field">Available</label>
+                        <InputNumber @bind-Value="@model.Available" id="available" class="form-control"></InputNumber>
+                        <ValidationMessage For="() => model.Available" />
+                    </div>
+                    <div class="col-md-4">
+                        <label class="col-form-label bold-font required-field">Used</label>
+                        <InputNumber @bind-Value="@model.Used" id="used" class="form-control"></InputNumber>
+                        <ValidationMessage For="() => model.Used" />
+                    </div>
+                    <div class="col-md-4">
+                        <label class="col-form-label bold-font required-field">Destroyed</label>
+                        <InputNumber @bind-Value="@model.Destroyed" id="destroyed" class="form-control"></InputNumber>
+                        <ValidationMessage For="() => model.Destroyed" />
+                    </div>
                 </div>
 
-            </div>
-            <div class="form-group row">
-                <div class="col-md-4">
-                    <label class="col-form-label bold-font required-field">Available</label>
-                    <InputNumber @bind-Value="@model.Available" id="available" class="form-control"></InputNumber>
-                    <ValidationMessage For="() => model.Available" />
-                </div>
-                <div class="col-md-4">
-                    <label class="col-form-label bold-font required-field">Used</label>
-                    <InputNumber @bind-Value="@model.Used" id="used" class="form-control"></InputNumber>
-                    <ValidationMessage For="() => model.Used" />
-                </div>
-                <div class="col-md-4">
-                    <label class="col-form-label bold-font required-field">Destroyed</label>
-                    <InputNumber @bind-Value="@model.Destroyed" id="destroyed" class="form-control"></InputNumber>
-                    <ValidationMessage For="() => model.Destroyed" />
-                </div>
-            </div>
-
-            @if (process)
-            {
-                <div style="text-align:center">
-                    <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
-                </div>
-            }
-            <UiAlert Model="alert"></UiAlert>
-            <hr style="margin-bottom: 2px;" />
-            <button type="submit" class="btn btn-primary float-right col-md-4">Add</button>
-        </EditForm>
-        <br />
-    }
-</PageDialog>
+                @if (process)
+                {
+                    <div style="text-align:center">
+                        <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
+                    </div>
+                }
+                <UiAlert Model="alert"></UiAlert>
+                <hr style="margin-bottom: 2px;" />
+                <button type="submit" class="btn btn-primary float-right col-md-4">Add</button>
+            </EditForm>
+            <br />
+        }
+    </PageDialog>
+}
+else
+{
+    <div class="alert alert-danger">You do not have permission to view this page.</div>
+}
 
 @code {
     [Parameter]
@@ -142,11 +154,28 @@
 
     private List<ProductCategories> ProductCategories = new();
     private List<UnitNames> UnitNames = new();
-
+    private bool canView = false;
+    private bool canEdit = false;
+    private bool hasFullAccess = false;
 
     protected override async Task OnInitializedAsync()
     {
         alert?.Clear();
+        // Check permissions
+        var permissions = await PermissionService.HasPermission("ProductList");
+        if (permissions != null)
+        {
+            canView = permissions.CanView;
+            canEdit = permissions.CanEdit;
+            hasFullAccess = permissions.HasFullAccess;
+        }
+        if (!canView)
+        {
+            // Redirect or handle unauthorized access
+            NavigationManager.NavigateTo("/unauthorized");
+            return;
+        }
+
         ProductCategories = (await client.GetAllProductCategory()).ToList();
         UnitNames = (await client.GetAllUnitNames()).ToList();
     }
@@ -158,7 +187,7 @@
         model.ProductCategoryId = prodcategoriesId;
         if (prodcategoriesId != null)
             model.ProductCategory = ProductCategories.Where(x => x.Id == prodcategoriesId).Select(x => x.Name).First();
-         model.UnitNamesId = unitnames;
+        model.UnitNamesId = unitnames;
         if (unitnames != null)
             model.UnitNames = UnitNames.Where(x => x.Id == unitnames).Select(x => x.Name).First();
         var response = await client.UpsertProductListAsync(model);

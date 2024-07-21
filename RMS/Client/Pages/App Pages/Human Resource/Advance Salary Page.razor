@@ -5,6 +5,7 @@
 @inject AppClient client
 @inject IJSRuntime JSRuntime
 @inject NavigationManager NavigationManager
+@inject PermissionService PermissionService
 @attribute [Authorize]
 
 <div class="page-header breadcumb-sticky">
@@ -14,7 +15,12 @@
                 <div class="page-header-title">
                     <h5 class="m-b-10">
                         Advance Salary
-                        <a @onclick="()=>show=true" style="cursor:pointer"><i class="fa fa-plus-circle fa-lg text-primary" aria-hidden="true" title="Add Hall"></i></a>
+                        @if (canEdit)
+                        {
+                            <a @onclick="()=>show=true" style="cursor:pointer">
+                                <i class="fa fa-plus-circle fa-lg text-primary" aria-hidden="true" title="Add Advance Salary"></i>
+                            </a>
+                        }
                     </h5>
                 </div>
                 <ul class="breadcrumb">
@@ -42,10 +48,8 @@
 </div>
 
 <SimpleDailog Title="@Title" Show="@show" OnCloseDialog="ResetForm">
-    @if (show)
+    @if (show && canEdit)
     {
-
-
         <EditForm Model="model" OnValidSubmit="OnSave">
             <DataAnnotationsValidator />
             <div>
@@ -72,7 +76,6 @@
                         <InputNumber @bind-Value="model.AdvanceAmount" id="AdvanceAmount" class="form-control"></InputNumber>
                         <ValidationMessage For="() => model.AdvanceAmount" />
                     </div>
-
                 </div>
             </div>
             @if (process)
@@ -83,12 +86,14 @@
             }
             <UiAlert Model="alert"></UiAlert>
             <hr />
-            <button type="submit" class="btn btn-primary float-right col-md-4">Add</button>
+            @if (canEdit)
+            {
+                <button type="submit" class="btn btn-primary float-right col-md-4">Add</button>
+            }
         </EditForm>
         <br />
     }
 </SimpleDailog>
-
 
 @code {
     [Parameter]
@@ -107,10 +112,29 @@
     private List<Employee> Employees = new();
     private int? employeeId;
 
+    private static bool canView = false;
+    private static bool canEdit = false;
+    private static bool hasFullAccess = false;
+
     protected override async Task OnInitializedAsync()
     {
         alert?.Clear();
         Employees = (await client.GetAllEmployee()).ToList();
+
+        // Fetch permissions
+        var permissions = await PermissionService.HasPermission("AdvanceSalary");
+        if (permissions != null)
+        {
+            canView = permissions.CanView;
+            canEdit = permissions.CanEdit;
+            hasFullAccess = permissions.HasFullAccess;
+        }
+        if (!canView)
+        {
+            // Redirect or handle unauthorized access
+            NavigationManager.NavigateTo("/unauthorized");
+            return;
+        }
     }
 
     public async Task OnSave()
@@ -130,7 +154,6 @@
         var response = await client.UpsertAdvanceSalaryAsync(model);
         if (response.IsSuccess)
         {
-            // model = response.Result;
             await AdvanceSalaryGrid.RefreshGridAsync();
             alert?.SetSuccess(response.Message);
             model = new();

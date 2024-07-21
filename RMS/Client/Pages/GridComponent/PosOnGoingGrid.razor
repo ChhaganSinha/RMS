@@ -7,8 +7,9 @@
 @inject NavigationManager NavigationManager
 @inject HttpClient HttpClient
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@inject PermissionService PermissionService
 
-@if (_task.IsCompleted)
+@if (_task?.IsCompleted ?? false)
 {
     <div class="row">
         <div class="col-sm-12">
@@ -31,12 +32,25 @@ else
     private GridComponent<PosDTO> Component;
     static bool filter = true;
     static AuthenticationState authState;
+    // Permission flags
+    private static bool canView = false;
+    private static bool canEdit = false;
+    private static bool hasFullAccess = false;
 
     private Action<IGridColumnCollection<PosDTO>> columns;
 
     protected override async Task OnParametersSetAsync()
     {
         authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        // Check permissions
+        var permissions = await PermissionService.HasPermission("PosInvoice");
+        if (permissions != null)
+        {
+            canView = permissions.CanView;
+            canEdit = permissions.CanEdit;
+            hasFullAccess = permissions.HasFullAccess;
+        }
+
         string url = $"odata/PosDTO";
         var query = new QueryDictionary<StringValues>();
         var values = new string[] { $"Status__1__OnGoing" };
@@ -66,15 +80,24 @@ else
     {
         columns = c =>
         {
-            c.Add(o => o.Id).SetWidth("10%").Css("table-bordered").Titled("SN.").Filterable(filter);
-            c.Add(o => o.CustomerName).Css("table-bordered").Filterable(filter);
-            c.Add(o => o.Table).Css("table-bordered").Filterable(filter);
-            c.Add(o => o.Status).Css("table-bordered").Filterable(filter);
-            c.Add(o => o.GrandTotal).Css("table-bordered").Filterable(filter);
+            if (canView)
+            {
+                c.Add(o => o.Id).SetWidth("10%").Css("table-bordered").Titled("SN.").Filterable(filter);
+                c.Add(o => o.CustomerName).Css("table-bordered").Filterable(filter);
+                c.Add(o => o.Table).Css("table-bordered").Filterable(filter);
+                c.Add(o => o.Status).Css("table-bordered").Filterable(filter);
+                c.Add(o => o.GrandTotal).Css("table-bordered").Filterable(filter);
+                if (canEdit || hasFullAccess)
+                {
+                    c.Add().Encoded(false).Sanitized(false).RenderComponentAs<PosEditButton>().SetWidth("10px").Titled("Edit");
+                    c.Add().Encoded(false).Sanitized(false).RenderComponentAs<PosCompleteButton>(new List<Action<object>> { (item) => RefreshGrid(item) }).SetWidth("10px").Titled("Complete");
+                }
 
-            c.Add().Encoded(false).Sanitized(false).RenderComponentAs<PosEditButton>().SetWidth("10px").Titled("Edit");
-            c.Add().Encoded(false).Sanitized(false).RenderComponentAs<PosCompleteButton>(new List<Action<object>> { (item) => RefreshGrid(item) }).SetWidth("10px").Titled("Complete");
-            c.Add().Encoded(false).Sanitized(false).RenderComponentAs<PosDeleteButton>(new List<Action<object>> { (item) => RefreshGrid(item) }).SetWidth("10px").Titled("Delete");
+                if (hasFullAccess)
+                {
+                    c.Add().Encoded(false).Sanitized(false).RenderComponentAs<PosDeleteButton>(new List<Action<object>> { (item) => RefreshGrid(item) }).SetWidth("10px").Titled("Delete");
+                }
+            }
         };
     }
 

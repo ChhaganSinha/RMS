@@ -8,6 +8,7 @@
 @using Havit.Blazor.Components.Web
 @using Havit.Blazor.Components.Web.Bootstrap
 @using System.ComponentModel.DataAnnotations;
+@inject PermissionService PermissionService
 @attribute [Authorize]
 
 <div class="page-header breadcumb-sticky">
@@ -17,7 +18,10 @@
                 <div class="page-header-title">
                     <h5 class="m-b-10">
                         Add Food
-                        <a @onclick="OnAdd" style="cursor:pointer"><i class="fa fa-plus-circle fa-lg text-primary" aria-hidden="true" title="Add Food"></i></a>
+                        @if (canEdit || hasFullAccess)
+                        {
+                            <a @onclick="OnAdd" style="cursor:pointer"><i class="fa fa-plus-circle fa-lg text-primary" aria-hidden="true" title="Add Food"></i></a>
+                        }
                     </h5>
                 </div>
                 <ul class="breadcrumb">
@@ -30,121 +34,130 @@
         </div>
     </div>
 </div>
-<div class="row">
-    <div class="col-sm-12 p-0">
-        <div class="card-body p-2 mt-n3">
-            <FoodGrid />
+
+@if (canView || canEdit || hasFullAccess)
+{
+    <div class="row">
+        <div class="col-sm-12 p-0">
+            <div class="card-body p-2 mt-n3">
+                <FoodGrid />
+            </div>
         </div>
     </div>
-</div>
 
-<PageDialog Title="@Title" Show="@show" ClosePageDialog="ResetForm">
-    @if (show)
-    {
-        <EditForm Model="model" OnValidSubmit="OnSave">
-            <DataAnnotationsValidator />
-            <div class="form-group row">
-                <!-- Food Name -->
-                <div class="col-md-4">
-                    <label class="col-form-label bold-font required-field">Food Name</label>
-                    <InputText @bind-Value="@model.FoodName" id="FoodName" class="form-control"></InputText>
-                    <ValidationMessage For="() => model.FoodName" />
+    <PageDialog Title="@Title" Show="@show" ClosePageDialog="ResetForm">
+        @if (show)
+        {
+            <EditForm Model="model" OnValidSubmit="OnSave">
+                <DataAnnotationsValidator />
+                <div class="form-group row">
+                    <!-- Food Name -->
+                    <div class="col-md-4">
+                        <label class="col-form-label bold-font required-field">Food Name</label>
+                        <InputText @bind-Value="@model.FoodName" id="FoodName" class="form-control"></InputText>
+                        <ValidationMessage For="() => model.FoodName" />
+                    </div>
+
+                    <!-- Price -->
+                    <div class="col-md-4">
+                        <label class="col-form-label bold-font">Price</label>
+                        <InputNumber @bind-Value="@model.Price" id="Price" class="form-control"></InputNumber>
+                        <ValidationMessage For="() => model.Price" />
+                    </div>
+
+                    <!-- Tax Percentage -->
+                    <div class="col-md-4">
+                        <label class="col-form-label bold-font">Tax %</label>
+                        <InputNumber @bind-Value="@model.TaxPercentage" id="TaxPercentage" class="form-control"></InputNumber>
+                        <ValidationMessage For="() => model.TaxPercentage" />
+                    </div>
                 </div>
 
-                <!-- Price -->
-                <div class="col-md-4">
-                    <label class="col-form-label bold-font">Price</label>
-                    <InputNumber @bind-Value="@model.Price" id="Price" class="form-control"></InputNumber>
-                    <ValidationMessage For="() => model.Price" />
+                <div class="form-group row">
+                    <!-- Select Menu Type -->
+                    <div class="col-md-4">
+                        <label class="col-form-label bold-font">Select Menu Type</label>
+                        <HxMultiSelect TItem="MenuType"
+                                       AutoSort="false"
+                                       TValue="int"
+                                       Data="@menuTypes"
+                                       @bind-Value="@selectedMenuTypeid"
+                                       TextSelector="@(p => p.Name)"
+                                       ValueSelector="@(p => p.Id)"
+                                       EmptyText="- Select -"
+                                       NullDataText="Loading..." />
+                    </div>
+
+                    <!-- Select Food Category -->
+                    <div class="col-md-4">
+                        <label class="col-form-label bold-font">Select Food Category</label>
+
+                        <HxSelect TItem="FoodCategory"
+                                  TValue="int?"
+                                  Data="Category"
+                                  @bind-Value="foodcategoryid"
+                                  TextSelector="@(Variants => Variants.Name)"
+                                  ValueSelector="@(Variants => Variants.Id)"
+                                  Nullable="true"
+                                  NullText="- Select -"
+                                  NullDataText="Loading variants..." />
+
+                    </div>
+
+                    <!-- Select Food Variants -->
+                    <div class="col-md-4">
+                        <label class="col-form-label bold-font">Select Food Variants</label>
+                        <HxMultiSelect TItem="AddVariants"
+                                       AutoSort="false"
+                                       TValue="int"
+                                       Data="@Variants"
+                                       @bind-Value="@variantsid"
+                                       TextSelector="@(p => p.Name)"
+                                       ValueSelector="@(p => p.Id)"
+                                       EmptyText="- Select -"
+                                       NullDataText="Loading..." />
+                    </div>
                 </div>
 
-                <!-- Tax Percentage -->
-                <div class="col-md-4">
-                    <label class="col-form-label bold-font">Tax %</label>
-                    <InputNumber @bind-Value="@model.TaxPercentage" id="TaxPercentage" class="form-control"></InputNumber>
-                    <ValidationMessage For="() => model.TaxPercentage" />
-                </div>
-            </div>
+                <div class="form-group row">
+                    <!-- Cooking Time -->
+                    <div class="col-md-4">
+                        <label class="col-form-label bold-font">Cooking Time</label>
+                        <InputText @bind-Value="@model.CookingTime" id="CookingTime" class="form-control"></InputText>
+                        <ValidationMessage For="() => model.CookingTime" />
+                    </div>
 
-            <div class="form-group row">
-                <!-- Select Menu Type -->
-                <div class="col-md-4">
-                    <label class="col-form-label bold-font">Select Menu Type</label>
-                    <HxMultiSelect TItem="MenuType"
-                                   AutoSort="false"
-                                   TValue="int"
-                                   Data="@menuTypes"
-                                   @bind-Value="@selectedMenuTypeid"
-                                   TextSelector="@(p => p.Name)"
-                                   ValueSelector="@(p => p.Id)"
-                                   EmptyText="- Select -"
-                                   NullDataText="Loading..." />
+                    <!-- Upload Image -->
+                    <div class="col-md-4">
+                        <label class="col-form-label bold-font">Upload Image</label>
+                        <InputFile OnChange="HandleFileSelected" class="form-control" />
+                        <br />
+                        <img id="imgPreview" src="@imageDataUrl" style="max-width: 200px; max-height: 200px; display: @(imageDataUrl == null ? "none" : "block");" />
+                        <ValidationMessage For="() => model.ImageFile" />
+                    </div>
                 </div>
 
-                <!-- Select Food Category -->
-                <div class="col-md-4">
-                    <label class="col-form-label bold-font">Select Food Category</label>
+                <!-- Loading Indicator and Alerts -->
+                @if (process)
+                {
+                    <div style="text-align:center">
+                        <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
+                    </div>
+                }
 
-                    <HxSelect TItem="FoodCategory"
-                              TValue="int?"
-                              Data="Category"
-                              @bind-Value="foodcategoryid"
-                              TextSelector="@(Variants => Variants.Name)"
-                              ValueSelector="@(Variants => Variants.Id)"
-                              Nullable="true"
-                              NullText="- Select -"
-                              NullDataText="Loading variants..." />
-                    
-                </div>
+                <UiAlert Model="alert"></UiAlert>
+                <hr style="margin-bottom: 2px;" />
+                <button type="submit" class="btn btn-primary float-right col-md-4">Add</button>
+            </EditForm>
+            <br />
+        }
+    </PageDialog>
+}
+else
+{
+    <div class="alert alert-danger">You do not have permission to view this page.</div>
+}
 
-                <!-- Select Food Variants -->
-                <div class="col-md-4">
-                    <label class="col-form-label bold-font">Select Food Variants</label>
-                    <HxMultiSelect TItem="AddVariants"
-                                   AutoSort="false"
-                                   TValue="int"
-                                   Data="@Variants"
-                                   @bind-Value="@variantsid"
-                                   TextSelector="@(p => p.Name)"
-                                   ValueSelector="@(p => p.Id)"
-                                   EmptyText="- Select -"
-                                   NullDataText="Loading..." />
-                </div>
-            </div>
-
-            <div class="form-group row">
-                <!-- Cooking Time -->
-                <div class="col-md-4">
-                    <label class="col-form-label bold-font">Cooking Time</label>
-                    <InputText @bind-Value="@model.CookingTime" id="CookingTime" class="form-control"></InputText>
-                    <ValidationMessage For="() => model.CookingTime" />
-                </div>
-
-                <!-- Upload Image -->
-                <div class="col-md-4">
-                    <label class="col-form-label bold-font">Upload Image</label>
-                    <InputFile OnChange="HandleFileSelected" class="form-control" />
-                    <br />
-                    <img id="imgPreview" src="@imageDataUrl" style="max-width: 200px; max-height: 200px; display: @(imageDataUrl == null ? "none" : "block");" />
-                    <ValidationMessage For="() => model.ImageFile" />
-                </div>
-            </div>
-
-            <!-- Loading Indicator and Alerts -->
-            @if (process)
-            {
-                <div style="text-align:center">
-                    <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
-                </div>
-            }
-
-            <UiAlert Model="alert"></UiAlert>
-            <hr style="margin-bottom: 2px;" />
-            <button type="submit" class="btn btn-primary float-right col-md-4">Add</button>
-        </EditForm>
-        <br />
-    }
-</PageDialog>
 
 @code {
     [Parameter]
@@ -162,6 +175,9 @@
     bool process = false;
     private Timer _timer;
     private int _delay = 2500;
+    private bool canView = false;
+    private bool canEdit = false;
+    private bool hasFullAccess = false;
 
     [Required]
     private List<int> selectedMenuTypeid { get; set; } = new();
@@ -194,6 +210,20 @@
     protected override async Task OnInitializedAsync()
     {
         alert?.Clear();
+        // Check permissions
+        var permissions = await PermissionService.HasPermission("AddFood");
+        if (permissions != null)
+        {
+            canView = permissions.CanView;
+            canEdit = permissions.CanEdit;
+            hasFullAccess = permissions.HasFullAccess;
+        }
+        if (!canView)
+        {
+            // Redirect or handle unauthorized access
+            NavigationManager.NavigateTo("/unauthorized");
+            return;
+        }
 
         // Load room categories and facilities
         menuTypes = (await client.GetAllMenuType()).ToList();
@@ -241,11 +271,11 @@
         //model.VariantId = variantsid;
         if (variantsid.Count > 0)
             model.Variant = string.Join(", ", Variants.Where(x => variantsid.Contains(x.Id)).Select(x => x.Name));
-       
+
         if (selectedMenuTypeid.Count > 0)
             model.MenuType = string.Join(", ", menuTypes.Where(menuType => selectedMenuTypeid.Contains(menuType.Id)).Select(menuType => menuType.Name));
 
-       
+
         var response = await client.UpsertFoodAsync(model);
         if (response.IsSuccess)
         {

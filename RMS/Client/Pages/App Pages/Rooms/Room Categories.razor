@@ -112,9 +112,12 @@ else
                 hasFullAccess = permissions.HasFullAccess;
             }
 
-            if (!canView) return;
-
-            // Initialization logic, if needed
+            if (!canView)
+            {
+                // Redirect or handle unauthorized access
+                NavigationManager.NavigateTo("/unauthorized");
+                return;
+            }
         }
         catch (Exception ex)
         {

@@ -7,8 +7,9 @@
 @inject NavigationManager NavigationManager
 @inject HttpClient HttpClient
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@inject PermissionService PermissionService
 
-@if (_task.IsCompleted)
+@if (_task?.IsCompleted ?? false)
 {
     <div class="row">
         <div class="col-sm-12">
@@ -30,27 +31,48 @@ else
     private static GridComponent<TableCon> Component;
     static bool filter = true;
     static AuthenticationState authState;
+    // Permission flags
+    private static bool canView = false;
+    private static bool canEdit = false;
+    private static bool hasFullAccess = false;
 
     Action<IGridColumnCollection<TableCon>> columns = c =>
     {
+        if (canView)
+        {
+            c.Add(o => o.Id).SetWidth("10%").Css("table-bordered").Titled("SN.").Filterable(filter);
+            c.Add(o => o.TableNumber).SetWidth("80%").Css("table-bordered").Titled("Table Number").Filterable(filter);
+            c.Add(o => o.TableCapacity).SetWidth("80%").Css("table-bordered").Titled("Table Capacity").Filterable(filter);
+            c.Add(o => o.Status).SetWidth("80%").Css("table-bordered").Titled("Status").Filterable(filter);
+            //c.Add(o => o.Address).SetWidth("80%").Css("table-bordered").Titled("Address").Filterable(filter);
+            // c.Add(o => o.TotalAmount).SetWidth("80%").Css("table-bordered").Titled("Total Amount").Filterable(filter);
+            // c.Add(o => o.Amount).SetWidth("80%").Css("table-bordered").Titled("Amount").Filterable(filter);
+            // c.Add(o => o.DueAmount).SetWidth("80%").Css("table-bordered").Titled("Due Amount").Filterable(filter);
+            // c.Add(o => o.PaidAmount).SetWidth("80%").Css("table-bordered").Titled("PaidAmount").Filterable(filter);
+            if (canEdit || hasFullAccess)
+            {
+                c.Add().Encoded(false).Sanitized(false).RenderComponentAs<TableConfigEditButton>().SetWidth("10px").Titled("Edit");
+            }
 
-        c.Add(o => o.Id).SetWidth("10%").Css("table-bordered").Titled("SN.").Filterable(filter);
-        c.Add(o => o.TableNumber).SetWidth("80%").Css("table-bordered").Titled("Table Number").Filterable(filter);
-        c.Add(o => o.TableCapacity).SetWidth("80%").Css("table-bordered").Titled("Table Capacity").Filterable(filter);
-        c.Add(o => o.Status).SetWidth("80%").Css("table-bordered").Titled("Status").Filterable(filter);
-        //c.Add(o => o.Address).SetWidth("80%").Css("table-bordered").Titled("Address").Filterable(filter);
-        // c.Add(o => o.TotalAmount).SetWidth("80%").Css("table-bordered").Titled("Total Amount").Filterable(filter);
-        // c.Add(o => o.Amount).SetWidth("80%").Css("table-bordered").Titled("Amount").Filterable(filter);
-        // c.Add(o => o.DueAmount).SetWidth("80%").Css("table-bordered").Titled("Due Amount").Filterable(filter);
-        // c.Add(o => o.PaidAmount).SetWidth("80%").Css("table-bordered").Titled("PaidAmount").Filterable(filter);
-
-        c.Add().Encoded(false).Sanitized(false).RenderComponentAs<TableConfigEditButton>().SetWidth("10px").Titled("Edit");
-        c.Add().Encoded(false).Sanitized(false).RenderComponentAs<TableConfigDeleteButton>(new List<Action<object>> { RefreshGrid }).SetWidth("10px").Titled("Delete");
+            if (hasFullAccess)
+            {
+                c.Add().Encoded(false).Sanitized(false).RenderComponentAs<TableConfigDeleteButton>(new List<Action<object>> { RefreshGrid }).SetWidth("10px").Titled("Delete");
+            }
+        }
     };
 
     protected override async Task OnParametersSetAsync()
     {
         authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        // Check permissions
+        var permissions = await PermissionService.HasPermission("TableConfig");
+        if (permissions != null)
+        {
+            canView = permissions.CanView;
+            canEdit = permissions.CanEdit;
+            hasFullAccess = permissions.HasFullAccess;
+
+        }
         string url = $"odata/TableCon";
         var query = new QueryDictionary<StringValues>();
         query.Add("grid-sorting", "Id__1__1");

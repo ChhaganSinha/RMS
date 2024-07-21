@@ -33,48 +33,56 @@
         </div>
     </div>
 </div>
-<div class="row">
-    <div class="col-sm-12 p-0">
-        <div class="card-body p-2 mt-n3">
-            <div class="card text">
-                <div class="card-body">
-                    @if (canView)
-                    {
-                        <HallFacilitiesGrid />
-                    }
-                    else
-                    {
-                        <div>You do not have permission to view this content.</div>
-                    }
+@if (canView || canEdit || hasFullAccess)
+{
+    <div class="row">
+        <div class="col-sm-12 p-0">
+            <div class="card-body p-2 mt-n3">
+                <div class="card text">
+                    <div class="card-body">
+                        @if (canView)
+                        {
+                            <HallFacilitiesGrid />
+                        }
+                        else
+                        {
+                            <div>You do not have permission to view this content.</div>
+                        }
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
 
-<SimpleDailog Title="@Title" Show="@show" OnCloseDialog="ResetForm">
-    @if (show)
-    {
-        <EditForm Model="model" OnValidSubmit="OnSave">
-            <DataAnnotationsValidator />
-            <div>
-                <input type="text" placeholder="Enter Category" @bind-value="model.Name" class="form-control mb-2" />
-                <ValidationMessage For="() => model.Name" />
-            </div>
-            @if (process)
-            {
-                <div style="text-align:center">
-                    <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
+    <SimpleDailog Title="@Title" Show="@show" OnCloseDialog="ResetForm">
+        @if (show)
+        {
+            <EditForm Model="model" OnValidSubmit="OnSave">
+                <DataAnnotationsValidator />
+                <div>
+                    <input type="text" placeholder="Enter Category" @bind-value="model.Name" class="form-control mb-2" />
+                    <ValidationMessage For="() => model.Name" />
                 </div>
-            }
-            <UiAlert Model="alert"></UiAlert>
-            <hr />
-            <button type="submit" class="btn btn-primary float-right col-md-4">Add</button>
-        </EditForm>
-        <br />
-    }
-</SimpleDailog>
+                @if (process)
+                {
+                    <div style="text-align:center">
+                        <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
+                    </div>
+                }
+                <UiAlert Model="alert"></UiAlert>
+                <hr />
+                <button type="submit" class="btn btn-primary float-right col-md-4">Add</button>
+            </EditForm>
+            <br />
+        }
+    </SimpleDailog>
+}
+else
+{
+    <div class="alert alert-danger">You do not have permission to view this page.</div>
+}
+
 
 @code {
     [Parameter]
@@ -104,6 +112,12 @@
             canView = permissions.CanView;
             canEdit = permissions.CanEdit;
             hasFullAccess = permissions.HasFullAccess;
+        }
+        if (!canView)
+        {
+            // Redirect or handle unauthorized access
+            NavigationManager.NavigateTo("/unauthorized");
+            return;
         }
     }
 

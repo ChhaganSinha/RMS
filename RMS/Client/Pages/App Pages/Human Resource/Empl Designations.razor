@@ -2,9 +2,11 @@
 @using RMS.Client.Client
 @using RMS.Client.Pages.GridComponent
 @using RMS.Client.Shared.Popup
+@using System.Threading.Tasks
 @inject AppClient client
 @inject IJSRuntime JSRuntime
 @inject NavigationManager NavigationManager
+@inject PermissionService PermissionService
 @attribute [Authorize]
 
 <div class="page-header breadcumb-sticky">
@@ -14,7 +16,10 @@
                 <div class="page-header-title">
                     <h5 class="m-b-10">
                         Employee Designations
-                        <a @onclick="()=>show=true" style="cursor:pointer"><i class="fa fa-plus-circle fa-lg text-primary" aria-hidden="true" title="Add Designation"></i></a>
+                        @if (canEdit)
+                        {
+                            <a @onclick="()=>show=true" style="cursor:pointer"><i class="fa fa-plus-circle fa-lg text-primary" aria-hidden="true" title="Add Designation"></i></a>
+                        }
                     </h5>
                 </div>
                 <ul class="breadcrumb">
@@ -44,7 +49,6 @@
 <SimpleDailog Title="@Title" Show="@show" OnCloseDialog="ResetForm">
     @if (show)
     {
-
         <EditForm Model="model" OnValidSubmit="OnSave">
             <DataAnnotationsValidator />
             <div>
@@ -60,7 +64,7 @@
 
             <UiAlert Model="alert"></UiAlert>
             <hr />
-            <button type="submit" class="btn btn-primary float-right col-md-4">Add</button>
+            <button type="submit" class="btn btn-primary float-right col-md-4" disabled="@( !canEdit )">Add</button>
         </EditForm>
         <br />
     }
@@ -80,27 +84,48 @@
     private Timer _timer;
     private int _delay = 2500;
 
+    // Permission flags
+    private static bool canView = false;
+    private static bool canEdit = false;
+    private static bool hasFullAccess = false;
 
     protected override async Task OnInitializedAsync()
     {
         alert?.Clear();
+
+        var permissions = await PermissionService.HasPermission("EmployeeDesignation");
+        if (permissions != null)
+        {
+            canView = permissions.CanView;
+            canEdit = permissions.CanEdit;
+            hasFullAccess = permissions.HasFullAccess;
+        }
+        if (!canView)
+        {
+            // Redirect or handle unauthorized access
+            NavigationManager.NavigateTo("/unauthorized");
+            return;
+        }
     }
 
     public async Task OnSave()
     {
+        if (!canEdit) return; // Check permission before proceeding
+
         process = true;
         alert?.Clear();
 
         var response = await client.UpsertEmployeeDesignationAsync(model);
         if (response.IsSuccess)
         {
-            // model = response.Result;
             await EmployeeDesignationGrid.RefreshGridAsync();
             alert?.SetSuccess(response.Message);
             model = new();
         }
         else
+        {
             alert?.SetError(response.Message);
+        }
 
         process = false;
         StateHasChanged();

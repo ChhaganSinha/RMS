@@ -8,8 +8,9 @@
 @inject NavigationManager NavigationManager
 @inject HttpClient HttpClient
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@inject PermissionService PermissionService
 
-@if (_task.IsCompleted)
+@if (_task?.IsCompleted ?? false)
 {
     <div class="row">
         <div class="col-sm-12">
@@ -31,28 +32,47 @@ else
     private static GridComponent<ReservationDetailsDto> Component;
     static bool filter = true;
     static AuthenticationState authState;
+    // Permission flags
+    private static bool canView = false;
+    private static bool canEdit = false;
+    private static bool hasFullAccess = false;
 
     Action<IGridColumnCollection<ReservationDetailsDto>> columns = c =>
     {
+        if (canView)
+        {
+            c.Add(o => o.Id).SetWidth("10%").Css("table-bordered").Titled("SN.").Filterable(filter);
+            c.Add(o => o.BookingReferenceNo).Css("table-bordered").Titled("booking No.").Filterable(filter);
+            c.Add(o => o.BookingType).Css("table-bordered").Titled("Room No.").Filterable(filter);
+            c.Add(o => o.CheckOut).Css("table-bordered").Filterable(filter);
+            c.Add(o => o.CheckIn).Css("table-bordered").Filterable(filter);
 
-        c.Add(o => o.Id).SetWidth("10%").Css("table-bordered").Titled("SN.").Filterable(filter);
-        c.Add(o => o.BookingReferenceNo).Css("table-bordered").Titled("booking No.").Filterable(filter);
-        c.Add(o => o.BookingType).Css("table-bordered").Titled("Room No.").Filterable(filter);
-        c.Add(o => o.CheckOut).Css("table-bordered").Filterable(filter);
-        c.Add(o => o.CheckIn).Css("table-bordered").Filterable(filter);
-    
-    
-
-        c.Add().Encoded(false).Sanitized(false).RenderComponentAs<BookingEditButton>().SetWidth("1px");
-        c.Add().Encoded(false).Sanitized(false).RenderComponentAs<BookingCheckInButton>().SetWidth("1px");
-        c.Add().Encoded(false).Sanitized(false).RenderComponentAs<BookingViewButton>().SetWidth("1px");
-        c.Add().Encoded(false).Sanitized(false).RenderComponentAs<BookingPrintButton>().SetWidth("1px");
-        c.Add().Encoded(false).Sanitized(false).RenderComponentAs<BookingCancelButton>(new List<Action<object>> { RefreshGrid }).SetWidth("10px");
+            c.Add().Encoded(false).Sanitized(false).RenderComponentAs<BookingViewButton>().SetWidth("1px");
+            if (canEdit || hasFullAccess)
+            {
+                c.Add().Encoded(false).Sanitized(false).RenderComponentAs<BookingEditButton>().SetWidth("1px");
+                c.Add().Encoded(false).Sanitized(false).RenderComponentAs<BookingCheckInButton>().SetWidth("1px");
+                c.Add().Encoded(false).Sanitized(false).RenderComponentAs<BookingPrintButton>().SetWidth("1px");
+            }
+            if (hasFullAccess)
+            {
+                c.Add().Encoded(false).Sanitized(false).RenderComponentAs<BookingCancelButton>(new List<Action<object>> { RefreshGrid }).SetWidth("10px");
+            }
+        }
     };
 
     protected override async Task OnParametersSetAsync()
     {
         authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        // Check permissions
+        var permissions = await PermissionService.HasPermission("BookingList");
+        if (permissions != null)
+        {
+            canView = permissions.CanView;
+            canEdit = permissions.CanEdit;
+            hasFullAccess = permissions.HasFullAccess;
+        }
+
         string url = $"odata/ReservationDetailsDto";
         var query = new QueryDictionary<StringValues>();
         query.Add("grid-sorting", "Id__1__1");

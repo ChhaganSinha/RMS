@@ -7,12 +7,20 @@
 @inject NavigationManager NavigationManager
 @inject HttpClient HttpClient
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@inject PermissionService PermissionService
 
-@if (_task.IsCompleted)
+@if (_task?.IsCompleted ?? false)
 {
     <div class="row">
         <div class="col-sm-12">
-            <GridComponent @ref="Component" T="EmployeeAttendance" Grid="@_grid"></GridComponent>
+            @if (canView)
+            {
+                <GridComponent @ref="Component" T="EmployeeAttendance" Grid="@_grid"></GridComponent>
+            }
+            else
+            {
+                <p>You do not have permission to view this data.</p>
+            }
         </div>
     </div>
 }
@@ -23,42 +31,58 @@ else
     </div>
 }
 
-@code
-{
+@code {
     private CGrid<EmployeeAttendance> _grid;
     private Task _task;
     private static GridComponent<EmployeeAttendance> Component;
     static bool filter = true;
     static AuthenticationState authState;
 
+    // Permission flags
+    private static bool canView = false;
+    private static bool canEdit = false;
+    private static bool hasFullAccess = false;
+
     Action<IGridColumnCollection<EmployeeAttendance>> columns = c =>
-     {
-         c.Add(o => o.Id).Css("table-bordered").Titled("SN.").Filterable(filter);
-         c.Add(o => o.EmployeeName).Css("table-bordered").Titled("Name").Filterable(filter);
-         c.Add(o => o.EmpId).Css("table-bordered").Titled("Empl. Id").Filterable(filter);
-         c.Add(o => o.Date).Css("table-bordered").Filterable(filter);
-         c.Add(o => o.CheckIn)
+    {
+        c.Add(o => o.Id).Css("table-bordered").Titled("SN.").Filterable(filter);
+        c.Add(o => o.EmployeeName).Css("table-bordered").Titled("Name").Filterable(filter);
+        c.Add(o => o.EmpId).Css("table-bordered").Titled("Empl. Id").Filterable(filter);
+        c.Add(o => o.Date).Css("table-bordered").Filterable(filter);
+        c.Add(o => o.CheckIn)
             .Css("table-bordered")
             .Filterable(filter)
             .RenderValueAs(o => o.CheckIn.ToString("HH:mm"));
 
-         c.Add(o => o.CheckOut)
-             .Css("table-bordered")
-             .Filterable(filter)
-             .RenderValueAs(o => o.CheckOut.ToString("HH:mm"));
+        c.Add(o => o.CheckOut)
+            .Css("table-bordered")
+            .Filterable(filter)
+            .RenderValueAs(o => o.CheckOut.ToString("HH:mm"));
 
-         c.Add(o => o.StayTime)
-           .Css("table-bordered")
-           .Filterable(filter)
-           .RenderValueAs(o => o.StayTime.ToString(@"hh\:mm\:ss"));
+        c.Add(o => o.StayTime)
+            .Css("table-bordered")
+            .Filterable(filter)
+            .RenderValueAs(o => o.StayTime.ToString(@"hh\:mm\:ss"));
 
-         c.Add().Encoded(false).Sanitized(false).RenderComponentAs<AttendanceCheckout>(new List<Action<object>> { RefreshGrid }).SetWidth("10px");
-     };
-
+        if (canEdit)
+        {
+            c.Add().Encoded(false).Sanitized(false).RenderComponentAs<AttendanceCheckout>(new List<Action<object>> { RefreshGrid }).SetWidth("10px");
+        }
+    };
 
     protected override async Task OnParametersSetAsync()
     {
         authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+
+        // Fetch permissions
+        var permissions = await PermissionService.HasPermission("EmployeeAttendance");
+        if (permissions != null)
+        {
+            canView = permissions.CanView;
+            canEdit = permissions.CanEdit;
+            hasFullAccess = permissions.HasFullAccess;
+        }
+
         string url = $"odata/EmployeeAttendance";
         var query = new QueryDictionary<StringValues>();
         query.Add("grid-sorting", "Id__1__1");
@@ -85,6 +109,7 @@ else
     {
         await Component.UpdateGrid();
     }
+
     public static async Task RefreshGridAsync()
     {
         if (Component != null)

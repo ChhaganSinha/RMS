@@ -100,6 +100,12 @@
             canEdit = permissions.CanEdit;
             hasFullAccess = permissions.HasFullAccess;
         }
+        if (!canView)
+        {
+            // Redirect or handle unauthorized access
+            NavigationManager.NavigateTo("/unauthorized");
+            return;
+        }
     }
 
     public async Task OnSave()

@@ -9,6 +9,7 @@
 @using Havit.Blazor.Components.Web
 @using Havit.Blazor.Components.Web.Bootstrap
 @using System.ComponentModel.DataAnnotations;
+@inject PermissionService PermissionService
 @attribute [Authorize]
 
 <div class="page-header breadcumb-sticky">
@@ -18,7 +19,10 @@
                 <div class="page-header-title">
                     <h5 class="m-b-10">
                         Payrolls
-                        <a @onclick="()=>show=true" style="cursor:pointer"><i class="fa fa-plus-circle fa-lg text-primary" aria-hidden="true" title="Payroll Setup"></i></a>
+                        @if (canEdit || hasFullAccess)
+                        {
+                            <a @onclick="()=>show=true" style="cursor:pointer"><i class="fa fa-plus-circle fa-lg text-primary" aria-hidden="true" title="Payroll Setup"></i></a>
+                        }
                     </h5>
                 </div>
                 <ul class="breadcrumb">
@@ -31,112 +35,119 @@
         </div>
     </div>
 </div>
-<div class="row">
-    <div class="col-sm-12 p-0">
-        <div class="card-body p-2 mt-n3">
-            <EmployeePayrollGrid />
+
+@if (canView || canEdit || hasFullAccess)
+{
+    <div class="row">
+        <div class="col-sm-12 p-0">
+            <div class="card-body p-2 mt-n3">
+                <EmployeePayrollGrid />
+            </div>
         </div>
     </div>
-</div>
 
-<PageDialog Title="@Title" Show="@show" ClosePageDialog="ResetForm">
-    @if (show)
-    {
-        <EditForm Model="model" OnValidSubmit="OnSave">
-            <DataAnnotationsValidator />
+    <PageDialog Title="@Title" Show="@show" ClosePageDialog="ResetForm">
+        @if (show)
+        {
+            <EditForm Model="model" OnValidSubmit="OnSave">
+                <DataAnnotationsValidator />
 
-            <div class="form-group row">
-                <div class="col-md-6">
-                    <label class="col-form-label bold-font">Employee</label>
-                    <HxSelect TItem="Employee"
-                              TValue="int?"
-                              Data="Employees"
-                              @bind-Value="employeeId"
-                              TextSelector="@(e => e.Name)"
-                              ValueSelector="@(e => e.Id)"
-                              Nullable="true"
-                              NullText="-select-"
-                              NullDataText="Loading..." />
+                <div class="form-group row">
+                    <div class="col-md-6">
+                        <label class="col-form-label bold-font">Employee</label>
+                        <HxSelect TItem="Employee"
+                                  TValue="int?"
+                                  Data="Employees"
+                                  @bind-Value="employeeId"
+                                  TextSelector="@(e => e.Name)"
+                                  ValueSelector="@(e => e.Id)"
+                                  Nullable="true"
+                                  NullText="-select-"
+                                  NullDataText="Loading..." />
 
-                    @if (employeeId == null && submit)
-                    {
-                        <p class="text-danger">Please select one</p>
-                    }
+                        @if (employeeId == null && submit)
+                        {
+                            <p class="text-danger">Please select one</p>
+                        }
+                    </div>
+                    <div class="col-md-6">
+                        <label class="col-form-label bold-font">Basic Salary</label>
+                        <InputNumber @bind-Value="model.BasicSalary" id="BasicSalary" class="form-control"></InputNumber>
+                        <ValidationMessage For="() => model.BasicSalary" />
+                    </div>
                 </div>
-                <div class="col-md-6">
-                    <label class="col-form-label bold-font">Basic Salary</label>
-                    <InputNumber @bind-Value="model.BasicSalary" id="BasicSalary" class="form-control"></InputNumber>
-                    <ValidationMessage For="() => model.BasicSalary" />
+                <div class="form-group row">
+                    <div class="col-md-4">
+                        <label class="col-form-label bold-font">TA Amount</label>
+                        <InputNumber @bind-Value="model.TA" id="TA" class="form-control"></InputNumber>
+                        <ValidationMessage For="() => model.TA" />
+                    </div>
+                    <div class="col-md-4">
+                        <label class="col-form-label bold-font">DA Amount</label>
+                        <InputNumber @bind-Value="model.DA" id="DA" class="form-control"></InputNumber>
+                        <ValidationMessage For="() => model.DA" />
+                    </div>
+                    <div class="col-md-4">
+                        <label class="col-form-label bold-font">HRA Amount</label>
+                        <InputNumber @bind-Value="model.HRA" id="HRA" class="form-control"></InputNumber>
+                        <ValidationMessage For="() => model.HRA" />
+                    </div>
                 </div>
-            </div>
-            <div class="form-group row">
-                <div class="col-md-4">
-                    <label class="col-form-label bold-font">TA Amount</label>
-                    <InputNumber @bind-Value="model.TA" id="TA" class="form-control"></InputNumber>
-                    <ValidationMessage For="() => model.TA" />
+                <div class="form-group row">
+                    <div class="col-md-6">
+                        <label class="col-form-label bold-font">Other Allowances</label>
+                        <InputNumber @bind-Value="model.OtherAllowances" id="OtherAllowances" class="form-control"></InputNumber>
+                        <ValidationMessage For="() => model.OtherAllowances" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="col-form-label bold-font">Gross Salary</label>
+                        <div class="form-control-plaintext">@model.GrossSalary.ToString("F2")</div>
+                        <ValidationMessage For="() => model.GrossSalary" />
+                    </div>
                 </div>
-                <div class="col-md-4">
-                    <label class="col-form-label bold-font">DA Amount</label>
-                    <InputNumber @bind-Value="model.DA" id="DA" class="form-control"></InputNumber>
-                    <ValidationMessage For="() => model.DA" />
+                <div class="form-group row">
+                    <div class="col-md-4">
+                        <label class="col-form-label bold-font">Tax (%)</label>
+                        <InputNumber @bind-Value="model.TaxPercentage" id="TaxPercentage" class="form-control"></InputNumber>
+                        <ValidationMessage For="() => model.TaxPercentage" />
+                    </div>
+                    <div class="col-md-4">
+                        <label class="col-form-label bold-font">PF (%)</label>
+                        <InputNumber @bind-Value="model.PFPercentage" id="PFPercentage" class="form-control"></InputNumber>
+                        <ValidationMessage For="() => model.PFPercentage" />
+                    </div>
+                    <div class="col-md-4">
+                        <label class="col-form-label bold-font">Income Tax (%)</label>
+                        <InputNumber @bind-Value="model.IncomeTaxPercentage" id="IncomeTaxPercentage" class="form-control"></InputNumber>
+                        <ValidationMessage For="() => model.IncomeTaxPercentage" />
+                    </div>
                 </div>
-                <div class="col-md-4">
-                    <label class="col-form-label bold-font">HRA Amount</label>
-                    <InputNumber @bind-Value="model.HRA" id="HRA" class="form-control"></InputNumber>
-                    <ValidationMessage For="() => model.HRA" />
+                <div class="form-group row">
+                    <div class="col-md-6">
+                        <label class="col-form-label bold-font">Net Salary</label>
+                        <div class="form-control-plaintext">@model.NetSalary.ToString("F2")</div>
+                        <ValidationMessage For="() => model.NetSalary" />
+                    </div>
                 </div>
-            </div>
-            <div class="form-group row">
-                <div class="col-md-6">
-                    <label class="col-form-label bold-font">Other Allowances</label>
-                    <InputNumber @bind-Value="model.OtherAllowances" id="OtherAllowances" class="form-control"></InputNumber>
-                    <ValidationMessage For="() => model.OtherAllowances" />
-                </div>
-                <div class="col-md-6">
-                    <label class="col-form-label bold-font">Gross Salary</label>
-                    <div class="form-control-plaintext">@model.GrossSalary.ToString("F2")</div>
-                    <ValidationMessage For="() => model.GrossSalary" />
-                </div>
-            </div>
-            <div class="form-group row">
-                <div class="col-md-4">
-                    <label class="col-form-label bold-font">Tax (%)</label>
-                    <InputNumber @bind-Value="model.TaxPercentage" id="TaxPercentage" class="form-control"></InputNumber>
-                    <ValidationMessage For="() => model.TaxPercentage" />
-                </div>
-                <div class="col-md-4">
-                    <label class="col-form-label bold-font">PF (%)</label>
-                    <InputNumber @bind-Value="model.PFPercentage" id="PFPercentage" class="form-control"></InputNumber>
-                    <ValidationMessage For="() => model.PFPercentage" />
-                </div>
-                <div class="col-md-4">
-                    <label class="col-form-label bold-font">Income Tax (%)</label>
-                    <InputNumber @bind-Value="model.IncomeTaxPercentage" id="IncomeTaxPercentage" class="form-control"></InputNumber>
-                    <ValidationMessage For="() => model.IncomeTaxPercentage" />
-                </div>
-            </div>
-            <div class="form-group row">
-                <div class="col-md-6">
-                    <label class="col-form-label bold-font">Net Salary</label>
-                    <div class="form-control-plaintext">@model.NetSalary.ToString("F2")</div>
-                    <ValidationMessage For="() => model.NetSalary" />
-                </div>
-            </div>
 
-            @if (process)
-            {
-                <div style="text-align:center">
-                    <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
-                </div>
-            }
-            <UiAlert Model="alert"></UiAlert>
-            <hr style="margin-bottom: 2px;" />
-            <button type="submit" class="btn btn-primary float-right col-md-4">Add</button>
-        </EditForm>
-        <br />
-    }
-</PageDialog>
-
+                @if (process)
+                {
+                    <div style="text-align:center">
+                        <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
+                    </div>
+                }
+                <UiAlert Model="alert"></UiAlert>
+                <hr style="margin-bottom: 2px;" />
+                <button type="submit" class="btn btn-primary float-right col-md-4">Add</button>
+            </EditForm>
+            <br />
+        }
+    </PageDialog>
+}
+else
+{
+    <div class="alert alert-danger">You do not have permission to view this page.</div>
+}
 
 
 @code {
@@ -156,9 +167,28 @@
     private int? employeeId;
     private List<Employee> Employees = new();
 
+
+    private bool canView = false;
+    private bool canEdit = false;
+    private bool hasFullAccess = false;
+
     protected override async Task OnInitializedAsync()
     {
         alert?.Clear();
+        // Check permissions
+        var permissions = await PermissionService.HasPermission("SalarySetup");
+        if (permissions != null)
+        {
+            canView = permissions.CanView;
+            canEdit = permissions.CanEdit;
+            hasFullAccess = permissions.HasFullAccess;
+        }
+        if (!canView)
+        {
+            // Redirect or handle unauthorized access
+            NavigationManager.NavigateTo("/unauthorized");
+            return;
+        }
         Employees = (await client.GetAllEmployee()).ToList();
     }
 

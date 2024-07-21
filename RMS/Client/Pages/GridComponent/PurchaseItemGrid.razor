@@ -7,8 +7,9 @@
 @inject NavigationManager NavigationManager
 @inject HttpClient HttpClient
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@inject PermissionService PermissionService
 
-@if (_task.IsCompleted)
+@if (_task?.IsCompleted ?? false)
 {
     <div class="row">
         <div class="col-sm-12">
@@ -30,24 +31,44 @@ else
     private static GridComponent<PurchaseItem> Component;
     static bool filter = true;
     static AuthenticationState authState;
+    // Permission flags
+    private static bool canView = false;
+    private static bool canEdit = false;
+    private static bool hasFullAccess = false;
 
     Action<IGridColumnCollection<PurchaseItem>> columns = c =>
     {
+        if (canView)
+        {
+            c.Add(o => o.Id).SetWidth("10%").Css("table-bordered").Titled("SN.").Filterable(filter);
+            c.Add(o => o.InvoiceNo).SetWidth("80%").Css("table-bordered").Titled("InvoiceNo").Filterable(filter);
+            c.Add(o => o.SupplierName).SetWidth("80%").Css("table-bordered").Titled("SupplierName").Filterable(filter);
+            c.Add(o => o.PurchaseDate).SetWidth("80%").Css("table-bordered").Titled("Date").Filterable(filter);
+            c.Add(o => o.GrandTotal).SetWidth("80%").Css("table-bordered").Titled("Price").Filterable(filter).Format("{0:F2}");
+            c.Add(o => o.IsPaid).SetWidth("80%").Css("table-bordered").Titled("Payment Status").Filterable(filter).RenderValueAs(o => o.IsPaid ? "Paid" : "UnPaid");
+            if (canEdit || hasFullAccess)
+            {
+                c.Add().Encoded(false).Sanitized(false).RenderComponentAs<PurchaseItemEditButton>().SetWidth("10px").Titled("Edit");
+            }
 
-        c.Add(o => o.Id).SetWidth("10%").Css("table-bordered").Titled("SN.").Filterable(filter);
-        c.Add(o => o.InvoiceNo).SetWidth("80%").Css("table-bordered").Titled("InvoiceNo").Filterable(filter);
-        c.Add(o => o.SupplierName).SetWidth("80%").Css("table-bordered").Titled("SupplierName").Filterable(filter);
-        c.Add(o => o.PurchaseDate).SetWidth("80%").Css("table-bordered").Titled("Date").Filterable(filter);
-        c.Add(o => o.GrandTotal).SetWidth("80%").Css("table-bordered").Titled("Price").Filterable(filter).Format("{0:F2}");
-        c.Add(o => o.IsPaid).SetWidth("80%").Css("table-bordered").Titled("Payment Status").Filterable(filter).RenderValueAs(o => o.IsPaid ? "Paid" : "UnPaid");
-
-        c.Add().Encoded(false).Sanitized(false).RenderComponentAs<PurchaseItemEditButton>().SetWidth("10px").Titled("Edit");
-        c.Add().Encoded(false).Sanitized(false).RenderComponentAs<PurchaseItemDeleteButton>(new List<Action<object>> { RefreshGrid }).SetWidth("10px").Titled("Delete");
+            if (hasFullAccess)
+            {
+                c.Add().Encoded(false).Sanitized(false).RenderComponentAs<PurchaseItemDeleteButton>(new List<Action<object>> { RefreshGrid }).SetWidth("10px").Titled("Delete");
+            }
+        }
     };
 
     protected override async Task OnParametersSetAsync()
     {
         authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        // Check permissions
+        var permissions = await PermissionService.HasPermission("Purchase");
+        if (permissions != null)
+        {
+            canView = permissions.CanView;
+            canEdit = permissions.CanEdit;
+            hasFullAccess = permissions.HasFullAccess;
+        }
         string url = $"odata/PurchaseItem";
         var query = new QueryDictionary<StringValues>();
         query.Add("grid-sorting", "Id__1__1");

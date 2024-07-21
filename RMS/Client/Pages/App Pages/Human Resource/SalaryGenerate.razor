@@ -9,6 +9,7 @@
 @using Havit.Blazor.Components.Web
 @using Havit.Blazor.Components.Web.Bootstrap
 @using System.ComponentModel.DataAnnotations;
+@inject PermissionService PermissionService
 @attribute [Authorize]
 
 <div class="page-header breadcumb-sticky">
@@ -31,14 +32,21 @@
         </div>
     </div>
 </div>
-<div class="row">
-    <div class="col-sm-12 p-0">
-        <div class="card-body p-2 mt-n3">
-            <EmployeeSalaryGenerateGrid />
+
+@if (canView || canEdit || hasFullAccess)
+{
+    <div class="row">
+        <div class="col-sm-12 p-0">
+            <div class="card-body p-2 mt-n3">
+                <EmployeeSalaryGenerateGrid />
+            </div>
         </div>
     </div>
-</div>
-
+}
+else
+{
+    <div class="alert alert-danger">You do not have permission to view this page.</div>
+}
 
 @code {
     [Parameter]
@@ -56,9 +64,28 @@
 
     private List<Employee> Employees = new();
 
+    private bool canView = false;
+    private bool canEdit = false;
+    private bool hasFullAccess = false;
+
     protected override async Task OnInitializedAsync()
     {
         alert?.Clear();
+
+        // Check permissions
+        var permissions = await PermissionService.HasPermission("SalaryGenerate");
+        if (permissions != null)
+        {
+            canView = permissions.CanView;
+            canEdit = permissions.CanEdit;
+            hasFullAccess = permissions.HasFullAccess;
+        }
+        if (!canView)
+        {
+            // Redirect or handle unauthorized access
+            NavigationManager.NavigateTo("/unauthorized");
+            return;
+        }
         Employees = (await client.GetAllEmployee()).ToList();
     }
 

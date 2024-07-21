@@ -7,12 +7,20 @@
 @inject NavigationManager NavigationManager
 @inject HttpClient HttpClient
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@inject PermissionService PermissionService
 
-@if (_task.IsCompleted)
+@if (_task?.IsCompleted ?? false)
 {
     <div class="row">
         <div class="col-sm-12">
-            <GridComponent @ref="Component" T="AdvanceSalary" Grid="@_grid"></GridComponent>
+            @if (canView)
+            {
+                <GridComponent @ref="Component" T="AdvanceSalary" Grid="@_grid"></GridComponent>
+            }
+            else
+            {
+                <p>You do not have permission to view this data.</p>
+            }
         </div>
     </div>
 }
@@ -31,48 +39,71 @@ else
     static bool filter = true;
     static AuthenticationState authState;
 
+    private static bool canView = false;
+    private static bool canEdit = false;
+    private static bool hasFullAccess = false;
+
     Action<IGridColumnCollection<AdvanceSalary>> columns = c =>
     {
-
         c.Add(o => o.Id).SetWidth("10%").Css("table-bordered").Titled("SN.").Filterable(filter);
         c.Add(o => o.EmployeeName).Css("table-bordered").Filterable(filter);
         c.Add(o => o.AdvanceAmount).Format("{0:F2}").Css("table-bordered").Filterable(filter);
         c.Add(o => o.PaymentDate).Css("table-bordered").Filterable(filter);
-    
 
-        // c.Add().Encoded(false).Sanitized(false).RenderComponentAs<AdvanceSalaryEditButton>().SetWidth("10px").Titled("Edit");
-        // c.Add().Encoded(false).Sanitized(false).RenderComponentAs<AdvanceSalaryDeleteButton>(new List<Action<object>> { RefreshGrid }).SetWidth("10px").Titled("Delete");
+        if (canEdit)
+        {
+            // c.Add().Encoded(false).Sanitized(false).RenderComponentAs<AdvanceSalaryEditButton>().SetWidth("10px").Titled("Edit");
+          
+        }
+        if (hasFullAccess)
+        {
+            // c.Add().Encoded(false).Sanitized(false).RenderComponentAs<AdvanceSalaryDeleteButton>(new List<Action<object>> { RefreshGrid }).SetWidth("10px").Titled("Delete");
+        }
     };
 
     protected override async Task OnParametersSetAsync()
     {
         authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        string url = $"odata/AdvanceSalary";
-        var query = new QueryDictionary<StringValues>();
-        query.Add("grid-sorting", "Id__1__1");
 
-        var client = new GridODataClient<AdvanceSalary>(HttpClient, url, query, false, "ordersGrid", columns, 5)
-            .Sortable(true)
-            // .Filterable(true)
-            // .ClearFiltersButton(true)
-            .SetStriped(true)
-            .WithMultipleFilters()
-            .WithGridItemsCount()
-            // .SetExcelExport(true, true, "AdvanceSalary.xlsx")
-            .ChangePageSize(true)
-            .EmptyText("No data available")
-            .SetKeyboard(true)
-            .Searchable(true, false, false);
+        // Fetch permissions
+        var permissions = await PermissionService.HasPermission("AdvanceSalary");
+        if (permissions != null)
+        {
+            canView = permissions.CanView;
+            canEdit = permissions.CanEdit;
+            hasFullAccess = permissions.HasFullAccess;
+        }
 
-        _grid = client.Grid;
-        _task = client.UpdateGrid();
-        await _task;
+        if (canView)
+        {
+            string url = $"odata/AdvanceSalary";
+            var query = new QueryDictionary<StringValues>();
+            query.Add("grid-sorting", "Id__1__1");
+
+            var client = new GridODataClient<AdvanceSalary>(HttpClient, url, query, false, "ordersGrid", columns, 5)
+                .Sortable(true)
+                // .Filterable(true)
+                // .ClearFiltersButton(true)
+                .SetStriped(true)
+                .WithMultipleFilters()
+                .WithGridItemsCount()
+                // .SetExcelExport(true, true, "AdvanceSalary.xlsx")
+                .ChangePageSize(true)
+                .EmptyText("No data available")
+                .SetKeyboard(true)
+                .Searchable(true, false, false);
+
+            _grid = client.Grid;
+            _task = client.UpdateGrid();
+            await _task;
+        }
     }
 
     public static async void RefreshGrid(object item)
     {
         await Component.UpdateGrid();
     }
+
     public static async Task RefreshGridAsync()
     {
         if (Component != null)

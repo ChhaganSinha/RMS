@@ -2,12 +2,13 @@
 @using RMS.Client.Client
 @using RMS.Client.Pages.GridComponent
 @using RMS.Client.Shared.Popup
-@inject AppClient client
-@inject IJSRuntime JSRuntime
-@inject NavigationManager NavigationManager
 @using Havit.Blazor.Components.Web
 @using Havit.Blazor.Components.Web.Bootstrap
 @using System.ComponentModel.DataAnnotations;
+@inject AppClient client
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
+@inject PermissionService PermissionService
 @attribute [Authorize]
 
 <div class="page-header breadcumb-sticky">
@@ -17,7 +18,12 @@
                 <div class="page-header-title">
                     <h5 class="m-b-10">
                         Employee
-                        <a @onclick="()=>show=true" style="cursor:pointer"><i class="fa fa-plus-circle fa-lg text-primary" aria-hidden="true" title="Add Employee"></i></a>
+                        @if (canEdit)
+                        {
+                            <a @onclick="()=>show=true" style="cursor:pointer">
+                                <i class="fa fa-plus-circle fa-lg text-primary" aria-hidden="true" title="Add Employee"></i>
+                            </a>
+                        }
                     </h5>
                 </div>
                 <ul class="breadcrumb">
@@ -30,6 +36,7 @@
         </div>
     </div>
 </div>
+
 <div class="row">
     <div class="col-sm-12 p-0">
         <div class="card-body p-2 mt-n3">
@@ -41,8 +48,6 @@
 <PageDialog Title="@Title" Show="@show" ClosePageDialog="ResetForm">
     @if (show)
     {
-
-
         <EditForm Model="model" OnValidSubmit="OnSave">
             <DataAnnotationsValidator />
             <div class="form-group row">
@@ -91,7 +96,6 @@
                 </div>
             </div>
             <div class="form-group row">
-
                 <div class="col-md-6">
                     <label class="col-form-label bold-font">Email</label>
                     <InputText @bind-Value="@model.Email" id="Email" class="form-control"></InputText>
@@ -132,7 +136,7 @@
                     <ValidationMessage For="() => model.Salary" />
                 </div>
                 <div class="col-md-4">
-                    <label class="col-form-label bold-font required-field">joining Date</label>
+                    <label class="col-form-label bold-font required-field">Joining Date</label>
                     <InputDate @bind-Value="@model.joiningDate" id="joiningDate" class="form-control"></InputDate>
                     <ValidationMessage For="() => model.joiningDate" />
                 </div>
@@ -146,7 +150,10 @@
             }
             <UiAlert Model="alert"></UiAlert>
             <hr style="margin-bottom: 2px;" />
-            <button type="submit" class="btn btn-primary float-right col-md-4">Add</button>
+            @if (canEdit)
+            {
+                <button type="submit" class="btn btn-primary float-right col-md-4">Add</button>
+            }
         </EditForm>
         <br />
     }
@@ -170,16 +177,42 @@
     private List<EmployeeDepartment> Departments = new();
     private List<EmployeeDesignation> Designations = new();
 
+    // Permission flags
+    private static bool canView = false;
+    private static bool canEdit = false;
+    private static bool hasFullAccess = false;
 
     protected override async Task OnInitializedAsync()
     {
         alert?.Clear();
         Departments = (await client.GetAllEmployeeDepartment()).ToList();
         Designations = (await client.GetAllEmployeeDesignation()).ToList();
+
+        // Check permissions
+        var permissions = await PermissionService.HasPermission("Employees");
+        if (permissions != null)
+        {
+            canView = permissions.CanEdit || permissions.HasFullAccess;
+            canEdit = permissions.CanEdit;
+            hasFullAccess = permissions.HasFullAccess;
+        }
+        if (!canView)
+        {
+            // Redirect or handle unauthorized access
+            NavigationManager.NavigateTo("/unauthorized");
+            return;
+        }
     }
 
     public async Task OnSave()
     {
+        if (!canEdit && !hasFullAccess)
+        {
+            // Handle unauthorized action (e.g., show an error message)
+            alert?.SetError("You do not have permission to perform this action.");
+            return;
+        }
+
         process = true;
         alert?.Clear();
 
@@ -194,8 +227,6 @@
         var response = await client.UpsertEmployeeAsync(model);
         if (response.IsSuccess)
         {
-
-            // model = response.Result;
             alert?.SetSuccess(response.Message);
             model = new();
             departmentId = null;
@@ -206,7 +237,6 @@
             alert?.SetError(response.Message);
 
         process = false;
-
         StateHasChanged();
         _timer = new Timer(TimerCallback, null, _delay, Timeout.Infinite);
     }

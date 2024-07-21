@@ -6,6 +6,7 @@
 @inject AppClient client
 @inject IJSRuntime JSRuntime
 @inject NavigationManager NavigationManager
+@inject PermissionService PermissionService
 @attribute [Authorize]
 
 <div class="page-header breadcumb-sticky">
@@ -15,7 +16,10 @@
                 <div class="page-header-title">
                     <h5 class="m-b-10">
                         Booking List
-                        <a href="new-booking" style="cursor:pointer"><i class="fa fa-plus-circle fa-lg text-primary" aria-hidden="true" title="New Booking"></i></a>
+                        @if (canEdit || hasFullAccess)
+                        {
+                            <a href="new-booking" style="cursor:pointer"><i class="fa fa-plus-circle fa-lg text-primary" aria-hidden="true" title="New Booking"></i></a>
+                        }
                     </h5>
                 </div>
                 <ul class="breadcrumb">
@@ -28,42 +32,49 @@
         </div>
     </div>
 </div>
-<div class="row">
-    <div class="col-sm-12 p-0">
-        <div class="card-body p-2 mt-n3">
-            <div class="card text">
-                <div class="card-body">
-                    <BookingGrid />
+@if (canView || canEdit || hasFullAccess)
+{
+    <div class="row">
+        <div class="col-sm-12 p-0">
+            <div class="card-body p-2 mt-n3">
+                <div class="card text">
+                    <div class="card-body">
+                        <BookingGrid />
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
 
-<SimpleDailog Title="@Title" Show="@show" OnCloseDialog="ResetForm">
-    @if (show)
-    {
+    <SimpleDailog Title="@Title" Show="@show" OnCloseDialog="ResetForm">
+        @if (show)
+        {
 
 
-        <EditForm Model="model" OnValidSubmit="OnSave">
-            <DataAnnotationsValidator />
-            <div>
-
-            </div>
-            @if (process)
-            {
-                <div style="text-align:center">
-                    <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
+            <EditForm Model="model" OnValidSubmit="OnSave">
+                <DataAnnotationsValidator />
+                <div>
                 </div>
-            }
-            <UiAlert Model="alert"></UiAlert>
-            <hr />
-            <button type="submit" class="btn btn-primary float-right col-md-4">Add</button>
-        </EditForm>
-        <br />
-    }
-</SimpleDailog>
+                @if (process)
+                {
+                    <div style="text-align:center">
+                        <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
+                    </div>
+                }
+                <UiAlert Model="alert"></UiAlert>
+                <hr />
+                <button type="submit" class="btn btn-primary float-right col-md-4">Add</button>
+            </EditForm>
+            <br />
+        }
+    </SimpleDailog>
+}
+else
+{
+    <div class="alert alert-danger">You do not have permission to view this page.</div>
+}
+
 
 @code {
     [Parameter]
@@ -79,10 +90,27 @@
     private Timer _timer;
     private int _delay = 2500;
 
+    private bool canView = false;
+    private bool canEdit = false;
+    private bool hasFullAccess = false;
 
     protected override async Task OnInitializedAsync()
     {
         alert?.Clear();
+        // Check permissions
+        var permissions = await PermissionService.HasPermission("BookingList");
+        if (permissions != null)
+        {
+            canView = permissions.CanView;
+            canEdit = permissions.CanEdit;
+            hasFullAccess = permissions.HasFullAccess;
+        }
+        if (!canView)
+        {
+            // Redirect or handle unauthorized access
+            NavigationManager.NavigateTo("/unauthorized");
+            return;
+        }
     }
 
     public async Task OnSave()

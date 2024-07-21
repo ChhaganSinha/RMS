@@ -7,8 +7,9 @@
 @using RMS.Dto
 @inject AppClient client
 @inject IJSRuntime JSRuntime
-@using System.ComponentModel.DataAnnotations;
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@inject PermissionService PermissionService
+@inject NavigationManager NavigationManager
 
 <div class="page-header breadcumb-sticky">
     <div class="page-block">
@@ -17,7 +18,10 @@
                 <div class="page-header-title">
                     <h5 class="m-b-10">
                         Leave
-                        <a @onclick="Show" style="cursor:pointer"><i class="fa fa-plus-circle fa-lg text-primary" aria-hidden="true" title="Add Leave"></i></a>
+                        @if (canEdit || hasFullAccess)
+                        {
+                            <a @onclick="Show" style="cursor:pointer"><i class="fa fa-plus-circle fa-lg text-primary" aria-hidden="true" title="Add Leave"></i></a>
+                        }
                     </h5>
                 </div>
                 <ul class="breadcrumb">
@@ -31,122 +35,127 @@
     </div>
 </div>
 
-<div class="row">
-    <div class="col-sm-12 p-0">
-        <div class="card-body p-2 mt-n3">
-            <LeaveGrid />
+@if (canView || canEdit || hasFullAccess)
+{
+    <div class="row">
+        <div class="col-sm-12 p-0">
+            <div class="card-body p-2 mt-n3">
+                <LeaveGrid />
+            </div>
         </div>
     </div>
-</div>
 
-<PageDialog Title="@Title" Show="@show" ClosePageDialog="ResetForm">
-    @if (show)
-    {
+    <PageDialog Title="@Title" Show="@show" ClosePageDialog="ResetForm">
+        @if (show)
+        {
+            <EditForm Model="model" OnValidSubmit="OnSave">
+                <DataAnnotationsValidator />
+                @* <ValidationSummary/> *@
+                <div class="form-group row">
+                    <div class="col-md-6">
+                        <label class="col-form-label bold-font">Select Employee</label>
+                        <HxSelect TItem="Employee"
+                                  TValue="int?"
+                                  Data="Employees"
+                                  @bind-Value="employeeId"
+                                  TextSelector="@(e => e.Name)"
+                                  ValueSelector="@(e => e.Id)"
+                                  Nullable="true"
+                                  NullText="-select-"
+                                  NullDataText="Loading..." />
 
-        <EditForm Model="model" OnValidSubmit="OnSave">
-            <DataAnnotationsValidator />
-            @* <ValidationSummary/> *@
-            <div class="form-group row">
-                <div class="col-md-6">
-                    <label class="col-form-label bold-font">Select Employee</label>
-                    <HxSelect TItem="Employee"
-                              TValue="int?"
-                              Data="Employees"
-                              @bind-Value="employeeId"
-                              TextSelector="@(e => e.Name)"
-                              ValueSelector="@(e => e.Id)"
-                              Nullable="true"
-                              NullText="-select-"
-                              NullDataText="Loading..." />
-
-                    @if (employeeId == null && submit)
-                    {
-                        <p class="text-danger">Please select one</p>
-                    }
-                </div>
-                <div class="col-md-6">
-                    <label class="col-form-label bold-font">Select Leave Type</label>
-                    <select @bind="model.LeaveTypeId" class="form-control" id="LeaveType">
-                        <option value="">- Select -</option>
-                        @foreach (var leaveType in LeaveTypes)
+                        @if (employeeId == null && submit)
                         {
-                            <option value="@leaveType.Id">@leaveType.TypeName</option>
+                            <p class="text-danger">Please select one</p>
                         }
-                    </select>
-                    <ValidationMessage For="() => model.LeaveType" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="col-form-label bold-font">Select Leave Type</label>
+                        <select @bind="model.LeaveTypeId" class="form-control" id="LeaveType">
+                            <option value="">- Select -</option>
+                            @foreach (var leaveType in LeaveTypes)
+                            {
+                                <option value="@leaveType.Id">@leaveType.TypeName</option>
+                            }
+                        </select>
+                        <ValidationMessage For="() => model.LeaveType" />
+                    </div>
                 </div>
-            </div>
 
-            <div class="form-group row">
-                <div class="col-md-6">
-                    <label class="col-form-label bold-font required-field">Application Start Date</label>
-                    <input type="date" @bind-Value="@model.ApplicationStartDate" id="ApplicationStartDate" class="form-control" @bind-Value:event="oninput" @onchange="CalculateApplyDays"></input>
-                    <ValidationMessage For="() => model.ApplicationStartDate" />
+                <div class="form-group row">
+                    <div class="col-md-6">
+                        <label class="col-form-label bold-font required-field">Application Start Date</label>
+                        <input type="date" @bind-Value="@model.ApplicationStartDate" id="ApplicationStartDate" class="form-control" @bind-Value:event="oninput" @onchange="CalculateApplyDays"></input>
+                        <ValidationMessage For="() => model.ApplicationStartDate" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="col-form-label bold-font">Application End Date</label>
+                        <input type="date" @bind-Value="@model.ApplicationEndDate" id="ApplicationEndDate" class="form-control" @bind-Value:event="oninput" @onchange="CalculateApplyDays"></input>
+                        <ValidationMessage For="() => model.ApplicationEndDate" />
+                    </div>
                 </div>
-                <div class="col-md-6">
-                    <label class="col-form-label bold-font">Application End Date</label>
-                    <input type="date" @bind-Value="@model.ApplicationEndDate" id="ApplicationEndDate" class="form-control" @bind-Value:event="oninput" @onchange="CalculateApplyDays"></input>
 
-                    <ValidationMessage For="() => model.ApplicationEndDate" />
+                <div class="form-group row">
+                    <div class="col-md-6">
+                        <label class="col-form-label bold-font required-field">Apply Days</label>
+                        <InputNumber @bind-Value="@model.ApplyDaysCount" id="ApplyDaysCount" class="form-control" disabled></InputNumber>
+                        <ValidationMessage For="() => model.ApplyDaysCount" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="col-form-label bold-font">Application Hard Copy</label>
+                        <InputFile OnChange="HandleFileSelection" />
+                        <ValidationMessage For="() => model.ApplicationHardCopy" />
+                        @if (!string.IsNullOrWhiteSpace(model.ApplicationHardCopy))
+                        {
+                            <img src="data:image;base64,@(Convert.ToBase64String(model.ApplicationHardCopyByteData))" style="max-width: 100%; max-height: 200px;" />
+                        }
+                    </div>
                 </div>
-            </div>
 
-            <div class="form-group row">
-                <div class="col-md-6">
-                    <label class="col-form-label bold-font required-field">Apply Days</label>
-                    <InputNumber @bind-Value="@model.ApplyDaysCount" id="ApplyDaysCount" class="form-control" disabled></InputNumber>
-                    <ValidationMessage For="() => model.ApplyDaysCount" />
+                <div class="form-group row">
+                    <div class="col-md-6">
+                        <label class="col-form-label bold-font required-field">Approve Start Date</label>
+                        <input type="date" @bind-Value="@model.ApproveStartDate" id="ApproveStartDate" class="form-control" @bind-Value:event="oninput" @onchange="CalculateApproveDays"></input>
+                        <ValidationMessage For="() => model.ApproveStartDate" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="col-form-label bold-font">Approve End Date</label>
+                        <input type="date" @bind-Value="@model.ApproveEndDate" id="ApproveEndDate" class="form-control" @bind-Value:event="oninput" @onchange="CalculateApproveDays"></input>
+                        <ValidationMessage For="() => model.ApproveEndDate" />
+                    </div>
                 </div>
-                <div class="col-md-6">
-                    <label class="col-form-label bold-font">Application Hard Copy</label>
-                    <InputFile OnChange="HandleFileSelection" />
-                    <ValidationMessage For="() => model.ApplicationHardCopy" />
-                    @if (!string.IsNullOrWhiteSpace(model.ApplicationHardCopy))
-                    {
-                        <img src="data:image;base64,@(Convert.ToBase64String(model.ApplicationHardCopyByteData))" style="max-width: 100%; max-height: 200px;" />
-                    }
-                </div>
-            </div>
 
-            <div class="form-group row">
-                <div class="col-md-6">
-                    <label class="col-form-label bold-font required-field">Approve Start Date</label>
-                    <input type="date" @bind-Value="@model.ApproveStartDate" id="ApproveStartDate" class="form-control" @bind-Value:event="oninput" @onchange="CalculateApproveDays"></input>
-                    <ValidationMessage For="() => model.ApproveStartDate" />
+                <div class="form-group row">
+                    <div class="col-md-6">
+                        <label class="col-form-label bold-font required-field">Approve Days</label>
+                        <InputNumber @bind-Value="@model.ApproveDaysCount" id="ApproveDaysCount" class="form-control" disabled></InputNumber>
+                        <ValidationMessage For="() => model.ApproveDaysCount" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="col-form-label bold-font">Approved By</label>
+                        <InputText @bind-Value="@model.ApprovedBy" id="ApprovedBy" class="form-control" disabled></InputText>
+                        <ValidationMessage For="() => model.ApprovedBy" />
+                    </div>
                 </div>
-                <div class="col-md-6">
-                    <label class="col-form-label bold-font">Approve End Date</label>
-                    <input type="date" @bind-Value="@model.ApproveEndDate" id="ApproveEndDate" class="form-control" @bind-Value:event="oninput" @onchange="CalculateApproveDays"></input>
-                    <ValidationMessage For="() => model.ApproveEndDate" />
-                </div>
-            </div>
 
-            <div class="form-group row">
-                <div class="col-md-6">
-                    <label class="col-form-label bold-font required-field">Approve Days</label>
-                    <InputNumber @bind-Value="@model.ApproveDaysCount" id="ApproveDaysCount" class="form-control" disabled></InputNumber>
-                    <ValidationMessage For="() => model.ApproveDaysCount" />
-                </div>
-                <div class="col-md-6">
-                    <label class="col-form-label bold-font">Approved By</label>
-                    <InputText @bind-Value="@model.ApprovedBy" id="ApprovedBy" class="form-control" disabled></InputText>
-                    <ValidationMessage For="() => model.ApprovedBy" />
-                </div>
-            </div>
-
-            @if (process)
-            {
-                <div style="text-align:center">
-                    <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
-                </div>
-            }
-            <UiAlert Model="alert"></UiAlert>
-            <hr style="margin-bottom: 2px;" />
-            <button type="submit" class="btn btn-primary float-right col-md-4">Add</button>
-        </EditForm>
-        <br />
-    }
-</PageDialog>
+                @if (process)
+                {
+                    <div style="text-align:center">
+                        <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
+                    </div>
+                }
+                <UiAlert Model="alert"></UiAlert>
+                <hr style="margin-bottom: 2px;" />
+                <button type="submit" class="btn btn-primary float-right col-md-4">Add</button>
+            </EditForm>
+            <br />
+        }
+    </PageDialog>
+}
+else
+{
+    <div class="alert alert-danger">You do not have permission to view this page.</div>
+}
 
 @code {
     [Parameter]
@@ -170,9 +179,29 @@
 
     private AuthenticationState authState;
 
+    private bool canView = false;
+    private bool canEdit = false;
+    private bool hasFullAccess = false;
+
     protected override async Task OnInitializedAsync()
     {
         alert?.Clear();
+
+        // Retrieve permissions in bulk
+        var permissions = await PermissionService.HasPermission("Leave");
+        if (permissions != null)
+        {
+            canView = permissions.CanView;
+            canEdit = permissions.CanEdit;
+            hasFullAccess = permissions.HasFullAccess;
+        }
+        if (!canView)
+        {
+            // Redirect or handle unauthorized access
+            NavigationManager.NavigateTo("/unauthorized");
+            return;
+        }
+
         LeaveTypes = (await client.GetAllLeaveTypeAsync()).ToList();
         Employees = (await client.GetAllEmployee()).ToList();
         authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
@@ -182,12 +211,11 @@
 
     private void CalculateApplyDays()
     {
-
         if (model.ApplicationStartDate != default && model.ApplicationEndDate != default)
         {
             if (model.ApplicationStartDate <= model.ApplicationEndDate)
             {
-                model.ApplyDaysCount = (model.ApplicationEndDate - model.ApplicationStartDate).Days+1;
+                model.ApplyDaysCount = (model.ApplicationEndDate - model.ApplicationStartDate).Days + 1;
             }
             else
             {
@@ -235,6 +263,12 @@
 
     public async Task OnSave()
     {
+        if (!canEdit && !hasFullAccess)
+        {
+            alert?.SetError("You do not have permission to perform this action.");
+            return;
+        }
+
         submit = true;
         if (employeeId == null)
             return;
@@ -245,10 +279,6 @@
         model.EmployeeId = employeeId;
         if (employeeId != null)
             model.EmployeeName = Employees.Where(x => x.Id == employeeId).Select(x => x.Name).First();
-
-        // model.LeaveTypeId = leaveTypeId;
-        // if (leaveTypeId != null)
-        //     model.LeaveType = LeaveTypes.Where(x => x.Id == leaveTypeId).Select(x => x.TypeName).First();
 
         model.LeaveType = LeaveTypes.Where(x => x.Id == model.LeaveTypeId).Select(x => x.TypeName).First();
 
@@ -285,6 +315,12 @@
 
     private void Show()
     {
+        if (!canEdit && !hasFullAccess)
+        {
+            alert?.SetError("You do not have permission to perform this action.");
+            return;
+        }
+
         show = true;
         employeeId = null;
     }
