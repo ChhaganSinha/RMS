@@ -11,6 +11,23 @@
 @inject PermissionService PermissionService
 @attribute [Authorize]
 
+<style>
+    .active-line {
+        position: relative;
+    }
+
+        .active-line::after {
+            content: "";
+            display: block;
+            width: 100%;
+            height: 4px;
+            background-color: currentColor;
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+        }
+
+</style>
 <div class="page-header breadcumb-sticky">
     <div class="page-block">
         <div class="row align-items-center">
@@ -41,10 +58,18 @@
                         <a href="/" class="btn btn-primary mr-2">
                             <i class="fa fa-home fa-2x" aria-hidden="true"></i>
                         </a>
-                        <button class="btn btn-success mr-2 @GetTopTabClass(TopTab.NewOrder)" @onclick="() => SetTopActiveTab(TopTab.NewOrder)">New Order</button>
-                        <button class="btn btn-warning mr-2 @GetTopTabClass(TopTab.OngoingOrder)" @onclick="() => SetTopActiveTab(TopTab.OngoingOrder)">Ongoing Order</button>
-                        <button class="btn btn-info mr-2 @GetTopTabClass(TopTab.TodayOrder)" @onclick="() => SetTopActiveTab(TopTab.TodayOrder)">Today Order</button>
-                        <button class="btn btn-secondary @GetTopTabClass(TopTab.CompletedOrder)" @onclick="() => SetTopActiveTab(TopTab.CompletedOrder)">Completed Order</button>
+                        <button class="@GetTopTabClass(TopTab.NewOrder)" @onclick="() => SetTopActiveTab(TopTab.NewOrder)">
+                            New Order
+                        </button>
+                        <button class="@GetTopTabClass(TopTab.OngoingOrder)" @onclick="() => SetTopActiveTab(TopTab.OngoingOrder)">
+                            Ongoing Order
+                        </button>
+                        <button class="@GetTopTabClass(TopTab.TodayOrder)" @onclick="() => SetTopActiveTab(TopTab.TodayOrder)">
+                            Today Order
+                        </button>
+                        <button class="@GetTopTabClass(TopTab.CompletedOrder)" @onclick="() => SetTopActiveTab(TopTab.CompletedOrder)">
+                            Completed Order
+                        </button>
                     </div>
 
 
@@ -449,7 +474,24 @@ else
 
     private string GetTopTabClass(TopTab tab)
     {
-        return topActiveTab == tab ? "active" : string.Empty;
+        // Determine if the current tab is active
+        bool isActive = topActiveTab == tab;
+
+        // Define the base class for all buttons
+        string baseClass = "btn mr-2";
+
+        // Add the active-line class if the tab is active
+        string activeLineClass = isActive ? " active-line" : "";
+
+        // Return the appropriate class based on whether the tab is active
+        return tab switch
+        {
+            TopTab.NewOrder => isActive ? $"{baseClass} btn-outline-success{activeLineClass}" : $"{baseClass} btn-success",
+            TopTab.OngoingOrder => isActive ? $"{baseClass} btn-outline-warning{activeLineClass}" : $"{baseClass} btn-warning",
+            TopTab.TodayOrder => isActive ? $"{baseClass} btn-outline-info{activeLineClass}" : $"{baseClass} btn-info",
+            TopTab.CompletedOrder => isActive ? $"{baseClass} btn-outline-secondary{activeLineClass}" : $"{baseClass} btn-secondary",
+            _ => baseClass
+        };
     }
 
     private void AddToCart()
@@ -499,7 +541,7 @@ else
             if (response.IsSuccess)
             {
                 message = "Order Placed!";
-                MessageBody = response.Message;
+                //MessageBody = response.Message;
                 order = new();
                 customerId = null;
                 employeeId = null;

@@ -1,0 +1,165 @@
+﻿@using GridShared
+@using GridShared.Columns
+@using GridShared.Utility
+@using Microsoft.Extensions.Primitives
+@using RMS.Client.Pages.GridComponent
+@using RMS.Client.Shared.Popup
+@using RMS.Client.Client
+@using System.ComponentModel.DataAnnotations
+@inject AppClient client
+@implements ICustomGridComponent<PosDTO>
+@inject NavigationManager NavigationManager
+
+<button class='btn btn-sm txt-' style="border-radius:15px" @onclick="MyClickHandler" title="Edit"><i class="fa fa-print"></i></button>
+<PageDialog Title="@Title" Show="@show" ClosePageDialog="ResetForm">
+    @if (show)
+    {
+
+    }
+</PageDialog>
+@code {
+    [Parameter]
+    public PosDTO Item { get; set; }
+
+
+    private List<int> variantsid = new();
+
+    [Parameter]
+    public CGrid<PosDTO> Grid { get; set; }
+
+    [CascadingParameter]
+    protected AlertModel? alert { get; set; }
+
+    private Timer _timer;
+    private int _delay = 2500;
+    bool show = false;
+    bool process = false;
+    string Title = "Update Food Details";
+
+
+    [Required]
+    private List<int> selectedMenuTypeid { get; set; } = new();
+    private int? foodcategoryid;
+    private bool IsError = false;
+    private List<MenuType> menuTypes = new();
+    private List<FoodCategory> Category = new();
+    private List<AddVariants> Variants = new();
+    Dictionary<int, List<int>> FoodMenuTypeMap = new Dictionary<int, List<int>>();
+    Dictionary<int, List<int>> FoodVarientMap = new Dictionary<int, List<int>>();
+
+    private string imageDataUrl;
+
+    Food model = new();
+    private async Task HandleFileSelected(InputFileChangeEventArgs e)
+    {
+        var file = e.File;
+        if (file != null)
+        {
+            using (var memoryStream = new MemoryStream())
+            {
+                await file.OpenReadStream().CopyToAsync(memoryStream);
+                model.ImageFile = memoryStream.ToArray();
+                imageDataUrl = $"data:{file.ContentType};base64,{Convert.ToBase64String(model.ImageFile)}";
+            }
+        }
+    }
+
+    private async Task MyClickHandler(MouseEventArgs e)
+    {
+        show = true;
+        model = await client.GetFoodById(Item.Id);
+        alert?.Clear();
+
+        menuTypes = (await client.GetAllMenuType()).ToList();
+        Category = (await client.GetAllFoodCategory()).ToList();
+        Variants = (await client.GetAllAddVariants()).ToList();
+        // Convert existing image data to base64 string for preview
+        if (model.ImageFile != null && model.ImageFile.Length > 0)
+        {
+            imageDataUrl = $"data:image/png;base64,{Convert.ToBase64String(model.ImageFile)}";
+        }
+
+
+        foodcategoryid = model.FoodCategoryId > 0 ? model.FoodCategoryId : null;
+
+        var foodMenuTypeMap = await client.GetFoodMenuTypeByFoodId(model.Id);
+        selectedMenuTypeid.AddRange(foodMenuTypeMap.Select(o => o.MenuTypeId));
+
+        var foodVarientMap = await client.GetFoodVarientByFoodId(model.Id);
+        variantsid.AddRange(foodVarientMap.Select(o => o.FoodVarientId));
+    }
+
+    public async Task OnSave()
+    {
+        process = true;
+        alert?.Clear();
+
+        model.FoodCategoryId = foodcategoryid;
+        if (foodcategoryid != null)
+            model.FoodCategory = Category.Where(x => x.Id == foodcategoryid).Select(x => x.Name).First();
+
+        //model.VariantId = variantsid;
+        if (variantsid.Count > 0)
+            model.Variant = string.Join(", ", Variants.Where(x => variantsid.Contains(x.Id)).Select(x => x.Name));
+
+        if (selectedMenuTypeid.Count > 0)
+            model.MenuType = string.Join(", ", menuTypes.Where(menuType => selectedMenuTypeid.Contains(menuType.Id)).Select(menuType => menuType.Name));
+
+        var response = await client.UpsertFoodAsync(model);
+        if (response.IsSuccess)
+        {
+            if (response.Result.Id > 0)
+            {
+                if (FoodMenuTypeMap.ContainsKey(model.Id))
+                {
+                    FoodMenuTypeMap[model.Id] = selectedMenuTypeid.Select(id => id).ToList();
+                }
+                else
+                {
+                    FoodMenuTypeMap.Add(model.Id, selectedMenuTypeid.Select(id => id).ToList());
+                }
+
+                var result = await client.UpsertFoodMenuTypeMapping(FoodMenuTypeMap);
+            }
+
+            if (response.Result.Id > 0)
+            {
+                if (FoodVarientMap.ContainsKey(model.Id))
+                {
+                    FoodVarientMap[model.Id] = variantsid.Select(id => id).ToList();
+                }
+                else
+                {
+                    FoodVarientMap.Add(model.Id, variantsid.Select(id => id).ToList());
+                }
+
+                var result = await client.UpsertFoodVarientMapping(FoodVarientMap);
+            }
+            await FoodGrid.RefreshGridAsync();
+            alert?.SetSuccess(response.Message);
+
+        }
+        else
+        {
+            alert?.SetError(response.Message);
+        }
+
+        process = false;
+        StateHasChanged();
+        _timer = new Timer(TimerCallback, null, _delay, Timeout.Infinite);
+    }
+
+    private void TimerCallback(Object o)
+    {
+        alert?.Clear();
+        _timer.Dispose();
+        StateHasChanged();
+    }
+
+    private void ResetForm()
+    {
+        model = new();
+        show = false;
+        process = false;
+    }
+}

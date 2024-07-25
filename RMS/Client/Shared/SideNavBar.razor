@@ -1,5 +1,10 @@
 ﻿@inject Blazored.LocalStorage.ILocalStorageService oLocalStore
 @inject IJSRuntime JS
+@inject PermissionService PermissionService
+@using Microsoft.AspNetCore.Components.Authorization
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+
 
 <style>
     @@media screen and (max-width: 450px) {
@@ -20,319 +25,375 @@
         <div class="navbar-wrapper non-selectable">
             <div class="navbar-content scroll-div">
                 <ul class="nav pcoded-inner-navbar ">
-                    <li class="nav-item pcoded-menu-caption">
-                        <label>Home</label>
-                    </li>
-                    <li class="nav-item">
-                        <a href="/" class="nav-link" @onclick="ToggleDashboard" style="cursor:pointer">
-                            <span class="pcoded-micon">
-                                <i class="fa fa-bar-chart"></i>
-                            </span><span class="pcoded-mtext">Dashboard</span>
-                        </a>
-                    </li>
-                    <li class="nav-item pcoded-hasmenu @(IsRoomExpanded ? "pcoded-trigger" : "")">
-                        <a class="nav-link" @onclick="ToggleRoom" style="cursor:pointer">
-                            <span class="pcoded-micon">
-                                <i class="feather icon-layout"></i>
-                            </span>
-                            <span class="pcoded-mtext">Room</span>
-                        </a>
-                        <ul class="pcoded-submenu @(IsRoomExpanded ? "d-block" : "d-none")">
-                            <li><a href="room-categories">Categories</a></li>
-                            <li><a href="room-facilities">Facilities</a></li>
-                            <li><a href="rooms">Rooms</a></li>
-                        </ul>
-                    </li>
-                    <li class="nav-item pcoded-hasmenu @(IsHallExpanded ? "pcoded-trigger" : "")">
-                        <a class="nav-link" @onclick="ToggleHall" style="cursor:pointer">
-                            <span class="pcoded-micon">
-                                <i class="fa fa-building"></i>
-                            </span>
-                            <span class="pcoded-mtext">Hall</span>
-                        </a>
-                        <ul class="pcoded-submenu @(IsHallExpanded ? "d-block" : "d-none")">
-                            <li><a href="hall-categories">Categories</a></li>
-                            <li><a href="hall-facilities">Facilities</a></li>
-                            <li><a href="hall">Hall</a></li>
-                        </ul>
-                    </li>
-                    <li class="nav-item pcoded-menu-caption">
-                        <label>Human Resource</label>
-                    </li>
-                    <li class="nav-item pcoded-hasmenu @(IsEmployeeExpanded ? "pcoded-trigger" : "")">
-                        <a class="nav-link " @onclick="ToggleEmployee" style="cursor:pointer">
-                            <span class="pcoded-micon">
-                                <i class="fa fa-users"></i>
-                            </span><span class="pcoded-mtext">Employees</span>
-                        </a>
-                        <ul class="pcoded-submenu @(IsEmployeeExpanded ? "d-block" : "d-none")">
-                            <li><a href="emp-designations">Designations</a></li>
-                            <li><a href="emp-departments">Departments</a></li>
-                            <li><a href="employees">Employees</a></li>
+                    @if (canViewDashboard || canViewRooms || canViewHalls)
+                    {
+                        <li class="nav-item pcoded-menu-caption">
+                            <label>Home</label>
+                        </li>
+                    }
+                    @if (canViewDashboard)
+                    {
+                        <li class="nav-item">
+                            <a href="/" class="nav-link" @onclick="ToggleDashboard" style="cursor:pointer">
+                                <span class="pcoded-micon">
+                                    <i class="fa fa-bar-chart"></i>
+                                </span><span class="pcoded-mtext">Dashboard</span>
+                            </a>
+                        </li>
+                    }
+                    @if (canViewRooms)
+                    {
+                        <li class="nav-item pcoded-hasmenu @(IsRoomExpanded ? "pcoded-trigger" : "")">
+                            <a class="nav-link" @onclick="ToggleRoom" style="cursor:pointer">
+                                <span class="pcoded-micon">
+                                    <i class="feather icon-layout"></i>
+                                </span>
+                                <span class="pcoded-mtext">Room</span>
+                            </a>
+                            <ul class="pcoded-submenu @(IsRoomExpanded ? "d-block" : "d-none")">
+                                <li><a href="room-categories">Categories</a></li>
+                                <li><a href="room-facilities">Facilities</a></li>
+                                <li><a href="rooms">Rooms</a></li>
+                            </ul>
+                        </li>
+                    }
+                    @if (canViewHalls)
+                    {
+                        <li class="nav-item pcoded-hasmenu @(IsHallExpanded ? "pcoded-trigger" : "")">
+                            <a class="nav-link" @onclick="ToggleHall" style="cursor:pointer">
+                                <span class="pcoded-micon">
+                                    <i class="fa fa-building"></i>
+                                </span>
+                                <span class="pcoded-mtext">Hall</span>
+                            </a>
+                            <ul class="pcoded-submenu @(IsHallExpanded ? "d-block" : "d-none")">
+                                <li><a href="hall-categories">Categories</a></li>
+                                <li><a href="hall-facilities">Facilities</a></li>
+                                <li><a href="hall">Hall</a></li>
+                            </ul>
+                        </li>
+                    }
 
-                        </ul>
-                    </li>
-                    <li class="nav-item pcoded-hasmenu @(IsAttendanceExpanded ? "pcoded-trigger" : "")">
-                        <a class="nav-link " @onclick="ToggleAttendance" style="cursor:pointer">
-                            <span class="pcoded-micon">
-                                <i class="fa fa-address-card-o"></i>
-                            </span><span class="pcoded-mtext">Attendance</span>
-                        </a>
-                        <ul class="pcoded-submenu @(IsAttendanceExpanded ? "d-block" : "d-none")">
-                            <li><a href="attendance-list">Attendance List</a></li>
-                            <li><a href="attendance-report">Report </a></li>
-                            <li><a href="leave">Leave Types</a></li>
-                            <li><a href="leave-form">Leave</a></li>
+                    @if (canViewEmployees || canViewAttendance || canViewPayroll)
+                    {
+                        <li class="nav-item pcoded-menu-caption">
+                            <label>Human Resource</label>
+                        </li>
+                    }
+                    @if (canViewEmployees)
+                    {
+                        <li class="nav-item pcoded-hasmenu @(IsEmployeeExpanded ? "pcoded-trigger" : "")">
+                            <a class="nav-link " @onclick="ToggleEmployee" style="cursor:pointer">
+                                <span class="pcoded-micon">
+                                    <i class="fa fa-users"></i>
+                                </span><span class="pcoded-mtext">Employees</span>
+                            </a>
+                            <ul class="pcoded-submenu @(IsEmployeeExpanded ? "d-block" : "d-none")">
+                                <li><a href="emp-designations">Designations</a></li>
+                                <li><a href="emp-departments">Departments</a></li>
+                                <li><a href="employees">Employees</a></li>
 
-                        </ul>
-                    </li>
-                    <li class="nav-item pcoded-hasmenu @(IsPayrollExpanded ? "pcoded-trigger" : "")">
-                        <a class="nav-link " @onclick="TogglePayroll" style="cursor:pointer">
-                            <span class="pcoded-micon">
-                                <i class="fa fa-usd"></i>
-                            </span><span class="pcoded-mtext">Payroll</span>
-                        </a>
-                        <ul class="pcoded-submenu @(IsPayrollExpanded ? "d-block" : "d-none")">
-                            @* <li><a href="salary-type">Salary Type</a></li> *@
-                            <li><a href="salary-setup">Salary Setup </a></li>
-                            <li><a href="advance-salary">Advance Salary</a></li>
-                            <li><a href="salary-generate">Salary Generate</a></li>
-                        </ul>
-                    </li>
+                            </ul>
+                        </li>
+                    }
+                    @if (canViewAttendance)
+                    {
+                        <li class="nav-item pcoded-hasmenu @(IsAttendanceExpanded ? "pcoded-trigger" : "")">
+                            <a class="nav-link " @onclick="ToggleAttendance" style="cursor:pointer">
+                                <span class="pcoded-micon">
+                                    <i class="fa fa-address-card-o"></i>
+                                </span><span class="pcoded-mtext">Attendance</span>
+                            </a>
+                            <ul class="pcoded-submenu @(IsAttendanceExpanded ? "d-block" : "d-none")">
+                                <li><a href="attendance-list">Attendance List</a></li>
+                                <li><a href="attendance-report">Report </a></li>
+                                <li><a href="leave">Leave Types</a></li>
+                                <li><a href="leave-form">Leave</a></li>
 
-                    <li class="nav-item pcoded-menu-caption">
-                        <label>Store Management</label>
-                    </li>
-                    <li class="nav-item pcoded-hasmenu @(IsProductExpanded ? "pcoded-trigger" : "")">
-                        <a class="nav-link " @onclick="ToggleProduct" style="cursor:pointer">
-                            <span class="pcoded-micon">
-                                <i class="fa fa-cubes"></i>
-                            </span><span class="pcoded-mtext">Product</span>
-                        </a>
-                        <ul class="pcoded-submenu @(IsProductExpanded ? "d-block" : "d-none")">
-                            <li><a href="product-category">Product Category</a></li>
-                            <li><a href="Unit-Names">Unit Names</a></li>
-                            <li><a href="Products">Product List</a></li>
+                            </ul>
+                        </li>
+                    }
+                    @if (canViewPayroll)
+                    {
+                        <li class="nav-item pcoded-hasmenu @(IsPayrollExpanded ? "pcoded-trigger" : "")">
+                            <a class="nav-link " @onclick="TogglePayroll" style="cursor:pointer">
+                                <span class="pcoded-micon">
+                                    <i class="fa fa-usd"></i>
+                                </span><span class="pcoded-mtext">Payroll</span>
+                            </a>
+                            <ul class="pcoded-submenu @(IsPayrollExpanded ? "d-block" : "d-none")">
+                                @* <li><a href="salary-type">Salary Type</a></li> *@
+                                <li><a href="salary-setup">Salary Setup </a></li>
+                                <li><a href="advance-salary">Advance Salary</a></li>
+                                <li><a href="salary-generate">Salary Generate</a></li>
+                            </ul>
+                        </li>
+                    }
 
-                        </ul>
-                    </li>
+                    @if (canViewProducts || canViewSuppliers || canViewPurchases || canViewDestroyProducts || canViewSaleProducts)
+                    {
+                        <li class="nav-item pcoded-menu-caption">
+                            <label>Store Management</label>
+                        </li>
+                    }
+                    @if (canViewProducts)
+                    {
+                        <li class="nav-item pcoded-hasmenu @(IsProductExpanded ? "pcoded-trigger" : "")">
+                            <a class="nav-link " @onclick="ToggleProduct" style="cursor:pointer">
+                                <span class="pcoded-micon">
+                                    <i class="fa fa-cubes"></i>
+                                </span><span class="pcoded-mtext">Product</span>
+                            </a>
+                            <ul class="pcoded-submenu @(IsProductExpanded ? "d-block" : "d-none")">
+                                <li><a href="product-category">Product Category</a></li>
+                                <li><a href="Unit-Names">Unit Names</a></li>
+                                <li><a href="Products">Product List</a></li>
 
-                    <li class="nav-item">
-                        <a href="Suppliers" class="nav-link" @onclick="ToggleSupplier" style="cursor:pointer">
-                            <span class="pcoded-micon">
-                                <i class="fa fa-car"></i>
-                            </span><span class="pcoded-mtext">Supplier</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="Purchase" class="nav-link" @onclick="TogglePurchase" style="cursor:pointer">
-                            <span class="pcoded-micon">
-                                <i class="fa fa-shopping-cart"></i>
-                            </span><span class="pcoded-mtext">Purchase</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="Destroye-Products" class="nav-link" @onclick="ToggleDestroyed" style="cursor:pointer">
-                            <span class="pcoded-micon">
-                                <i class="fa fa-recycle"></i>
-                            </span><span class="pcoded-mtext">Destroy Products</span>
-                        </a>
-                    </li>
+                            </ul>
+                        </li>
+                    }
+                    @if (canViewSuppliers)
+                    {
+                        <li class="nav-item">
+                            <a href="Suppliers" class="nav-link" @onclick="ToggleSupplier" style="cursor:pointer">
+                                <span class="pcoded-micon">
+                                    <i class="fa fa-car"></i>
+                                </span><span class="pcoded-mtext">Supplier</span>
+                            </a>
+                        </li>
+                    }
+                    @if (canViewPurchases)
+                    {
+                        <li class="nav-item">
+                            <a href="Purchase" class="nav-link" @onclick="TogglePurchase" style="cursor:pointer">
+                                <span class="pcoded-micon">
+                                    <i class="fa fa-shopping-cart"></i>
+                                </span><span class="pcoded-mtext">Purchase</span>
+                            </a>
+                        </li>
+                    }
+                    @if (canViewDestroyProducts)
+                    {
+                        <li class="nav-item">
+                            <a href="Destroye-Products" class="nav-link" @onclick="ToggleDestroyed" style="cursor:pointer">
+                                <span class="pcoded-micon">
+                                    <i class="fa fa-recycle"></i>
+                                </span><span class="pcoded-mtext">Destroy Products</span>
+                            </a>
+                        </li>
+                    }
+                    @if (canViewSaleProducts)
+                    {
+                        <li class="nav-item">
+                            <a href="Sale-Products" class="nav-link" @onclick="ToggleSaleProducts" style="cursor:pointer">
+                                <span class="pcoded-micon">
+                                    <i class="fa fa-life-ring"></i>
+                                </span><span class="pcoded-mtext">Sale Products</span>
+                            </a>
+                        </li>
+                    }
 
-                    <li class="nav-item">
-                        <a href="Sale-Products" class="nav-link" @onclick="ToggleSaleProducts" style="cursor:pointer">
-                            <span class="pcoded-micon">
-                                <i class="fa fa-life-ring"></i>
-                            </span><span class="pcoded-mtext">Sale Products</span>
-                        </a>
-                    </li>
+                    @if (canViewRoomReservations)
+                    {
+                        <li class="nav-item pcoded-menu-caption">
+                            <label>Room Reservations</label>
+                        </li>
+                    }
+                    @if (canViewRoomReservations)
+                    {
+                        <li class="nav-item">
+                            <a href="room-status" class="nav-link" @onclick="ToggleDashboard" style="cursor:pointer">
+                                <span class="pcoded-micon">
+                                    <i class="fa fa-calendar-check-o"></i>
+                                </span><span class="pcoded-mtext">
+                                    Room Status
+                                </span>
 
-                    <li class="nav-item pcoded-menu-caption">
-                        <label>Room Reservations</label>
-                    </li>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="booking-list" class="nav-link" @onclick="ToggleDashboard" style="cursor:pointer">
+                                <span class="pcoded-micon">
+                                    <i class="fa fa-list-alt"></i>
+                                </span><span class="pcoded-mtext">Booking List</span>
 
-                    <li class="nav-item">
-                        <a href="room-status" class="nav-link" @onclick="ToggleDashboard" style="cursor:pointer">
-                            <span class="pcoded-micon">
-                                <i class="fa fa-calendar-check-o"></i>
-                            </span><span class="pcoded-mtext">
-                                Room Status
-                            </span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="new-booking" class="nav-link" @onclick="ToggleDashboard" style="cursor:pointer">
+                                <span class="pcoded-micon">
+                                    <i class="fa fa-external-link-square"></i>
+                                </span><span class="pcoded-mtext">New Booking</span>
 
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="booking-list" class="nav-link" @onclick="ToggleDashboard" style="cursor:pointer">
-                            <span class="pcoded-micon">
-                                <i class="fa fa-list-alt"></i>
-                            </span><span class="pcoded-mtext">Booking List</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="booking-type" class="nav-link" @onclick="ToggleDashboard" style="cursor:pointer">
+                                <span class="pcoded-micon">
+                                    <i class="fa fa-tags"></i>
+                                </span><span class="pcoded-mtext">
+                                    Booking Type
+                                </span>
 
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="new-booking" class="nav-link" @onclick="ToggleDashboard" style="cursor:pointer">
-                            <span class="pcoded-micon">
-                                <i class="fa fa-external-link-square"></i>
-                            </span><span class="pcoded-mtext">New Booking</span>
-
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="booking-type" class="nav-link" @onclick="ToggleDashboard" style="cursor:pointer">
-                            <span class="pcoded-micon">
-                                <i class="fa fa-tags"></i>
-                            </span><span class="pcoded-mtext">
-                                Booking Type
-                            </span>
-
-                        </a>
-                    </li>
-                   @*  <li class="nav-item">
-                        <a href="customers" class="nav-link" @onclick="ToggleDashboard" style="cursor:pointer">
-                            <span class="pcoded-micon">
-                                <i class="fa fa-users"></i>
-                            </span><span class="pcoded-mtext">
-                                Customers
-                            </span>
-                        </a>
+                            </a>
+                        </li>
+                        @*  <li class="nav-item">
+                    <a href="customers" class="nav-link" @onclick="ToggleDashboard" style="cursor:pointer">
+                    <span class="pcoded-micon">
+                    <i class="fa fa-users"></i>
+                    </span><span class="pcoded-mtext">
+                    Customers
+                    </span>
+                    </a>
                     </li> *@
+                    }
 
-                    <li class="nav-item pcoded-menu-caption">
-                        <label>Restaurant</label>
-                    </li>
+                    @if (canViewRestaurant)
+                    {
+                        <li class="nav-item pcoded-menu-caption">
+                            <label>Restaurant</label>
+                        </li>
+                    }
+                    @if (canViewRestaurant)
+                    {
+                        <li class="nav-item">
+                            <a href="menu-type" class="nav-link" @onclick="ToggleDashboard" style="cursor:pointer">
+                                <span class="pcoded-micon">
+                                    <i class="fa fa-cutlery"></i>
+                                </span><span class="pcoded-mtext">Menu Type</span>
+                            </a>
+                        </li>
 
-                    <li class="nav-item">
-                        <a href="menu-type" class="nav-link" @onclick="ToggleDashboard" style="cursor:pointer">
-                            <span class="pcoded-micon">
-                                <i class="fa fa-cutlery"></i>
-                            </span><span class="pcoded-mtext">Menu Type</span>
-                        </a>
-                    </li>
+                        <li class="nav-item">
+                            <a href="food-category" class="nav-link" @onclick="ToggleDashboard" style="cursor:pointer">
+                                <span class="pcoded-micon">
+                                    <i class="fa fa-lemon-o"></i>
+                                </span><span class="pcoded-mtext">Food Category</span>
+                            </a>
+                        </li>
 
-                    <li class="nav-item">
-                        <a href="food-category" class="nav-link" @onclick="ToggleDashboard" style="cursor:pointer">
-                            <span class="pcoded-micon">
-                                <i class="fa fa-lemon-o"></i>
-                            </span><span class="pcoded-mtext">Food Category</span>
-                        </a>
-                    </li>
+                        <li class="nav-item">
+                            <a href="add-variants" class="nav-link" @onclick="ToggleDashboard" style="cursor:pointer">
+                                <span class="pcoded-micon">
+                                    <i class="fa fa-microchip"></i>
+                                </span><span class="pcoded-mtext">Add Variants</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="add-food" class="nav-link" @onclick="ToggleDashboard" style="cursor:pointer">
+                                <span class="pcoded-micon">
+                                    <i class="fa fa-coffee"></i>
+                                </span><span class="pcoded-mtext">Add Food</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="table-config" class="nav-link" @onclick="ToggleDashboard" style="cursor:pointer">
+                                <span class="pcoded-micon">
+                                    @* <i class="fa fa-vault"></i> *@
+                                    <i class="fa fa-delicious"></i>
+                                </span><span class="pcoded-mtext">Table Config</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="pos" class="nav-link" @onclick="ToggleDashboard" style="cursor:pointer">
+                                <span class="pcoded-micon">
+                                    <i class="fa fa-file-text"></i>
+                                </span><span class="pcoded-mtext">POS Invoice</span>
+                            </a>
+                        </li>
 
-                    <li class="nav-item">
-                        <a href="add-variants" class="nav-link" @onclick="ToggleDashboard" style="cursor:pointer">
-                            <span class="pcoded-micon">
-                                <i class="fa fa-microchip"></i>
-                            </span><span class="pcoded-mtext">Add Variants</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="add-food" class="nav-link" @onclick="ToggleDashboard" style="cursor:pointer">
-                            <span class="pcoded-micon">
-                                <i class="fa fa-coffee"></i>
-                            </span><span class="pcoded-mtext">Add Food</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="table-config" class="nav-link" @onclick="ToggleDashboard" style="cursor:pointer">
-                            <span class="pcoded-micon">
-                                @* <i class="fa fa-vault"></i> *@
-                                <i class="fa fa-delicious"></i>
-                            </span><span class="pcoded-mtext">Table Config</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="pos" class="nav-link" @onclick="ToggleDashboard" style="cursor:pointer">
-                            <span class="pcoded-micon">
-                                <i class="fa fa-file-text"></i>
-                            </span><span class="pcoded-mtext">POS Invoice</span>
-                        </a>
-                    </li>
-
-                    @* <li class="nav-item">
-                        <a href="checklist-page" class="nav-link" @onclick="ToggleDashboard" style="cursor:pointer">
-                            <span class="pcoded-micon">
-                                <i class="fa fa-leaf"></i>
-                            </span><span class="pcoded-mtext">Food List</span>
-                        </a>
+                        @* <li class="nav-item">
+                    <a href="checklist-page" class="nav-link" @onclick="ToggleDashboard" style="cursor:pointer">
+                    <span class="pcoded-micon">
+                    <i class="fa fa-leaf"></i>
+                    </span><span class="pcoded-mtext">Food List</span>
+                    </a>
                     </li> *@
-
-                    <li class="nav-item pcoded-menu-caption">
-                        <label>House Keeping</label>
-                    </li>
-
-                    <li class="nav-item">
-                        <a href="checklist-page" class="nav-link" @onclick="ToggleDashboard" style="cursor:pointer">
-                            <span class="pcoded-micon">
-                                <i class="fa fa-list"></i>
-                            </span><span class="pcoded-mtext">Checklist</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="assign-room-cleaning" class="nav-link" @onclick="ToggleDashboard" style="cursor:pointer">
-                            <span class="pcoded-micon">
-                                <i class="fa fa-paint-brush"></i>
-                            </span><span class="pcoded-mtext">
-                                Assign Cleaning
-                            </span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="room-cleaning" class="nav-link" @onclick="ToggleDashboard" style="cursor:pointer">
-                            <span class="pcoded-micon">
-                                <i class="fa fa-joomla"></i>
-                            </span><span class="pcoded-mtext">
-                                Room Cleaning
-                            </span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="all-record" class="nav-link" @onclick="ToggleDashboard" style="cursor:pointer">
-                            <span class="pcoded-micon">
-                                <i class="fa fa-history"></i>
-                            </span><span class="pcoded-mtext">
-                                All Records
-                            </span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="cleaning-report" class="nav-link" @onclick="ToggleDashboard" style="cursor:pointer">
-                            <span class="pcoded-micon">
-                                <i class="fa fa-flag-checkered"></i>
-                            </span><span class="pcoded-mtext">
-                                Cleaning Report
-                            </span>
-                        </a>
-                    </li>
-
-                    <li class="nav-item pcoded-menu-caption">
-                        <label>Permissions</label>
-                    </li>
-                    <li class="nav-item">
-                        <a href="add-application-user" class="nav-link" @onclick="ToggleDashboard" style="cursor:pointer">
-                            <span class="pcoded-micon">
-                                <i class="fa fa-user-plus"></i>
-                            </span><span class="pcoded-mtext">
-                                Add User
-                            </span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="permision-controls" class="nav-link" @onclick="ToggleDashboard" style="cursor:pointer">
-                            <span class="pcoded-micon">
-                                <i class="fa fa-universal-access"></i>
-                            </span><span class="pcoded-mtext">
-                                Roles
-                            </span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="role-management" class="nav-link" @onclick="ToggleDashboard" style="cursor:pointer">
-                            <span class="pcoded-micon">
-                                <i class="fa fa-anchor" aria-hidden="true"></i>
-                            </span><span class="pcoded-mtext">
-                                Access Control
-                            </span>
-                        </a>
-                    </li>
+                    }
+                    @if (canViewHouseKeeping)
+                    {
+                        <li class="nav-item pcoded-menu-caption">
+                            <label>House Keeping</label>
+                        </li>
+                    }
+                    @if (canViewHouseKeeping)
+                    {
+                        <li class="nav-item">
+                            <a href="checklist-page" class="nav-link" @onclick="ToggleDashboard" style="cursor:pointer">
+                                <span class="pcoded-micon">
+                                    <i class="fa fa-list"></i>
+                                </span><span class="pcoded-mtext">Checklist</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="assign-room-cleaning" class="nav-link" @onclick="ToggleDashboard" style="cursor:pointer">
+                                <span class="pcoded-micon">
+                                    <i class="fa fa-paint-brush"></i>
+                                </span><span class="pcoded-mtext">
+                                    Assign Cleaning
+                                </span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="room-cleaning" class="nav-link" @onclick="ToggleDashboard" style="cursor:pointer">
+                                <span class="pcoded-micon">
+                                    <i class="fa fa-joomla"></i>
+                                </span><span class="pcoded-mtext">
+                                    Room Cleaning
+                                </span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="all-record" class="nav-link" @onclick="ToggleDashboard" style="cursor:pointer">
+                                <span class="pcoded-micon">
+                                    <i class="fa fa-history"></i>
+                                </span><span class="pcoded-mtext">
+                                    All Records
+                                </span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="cleaning-report" class="nav-link" @onclick="ToggleDashboard" style="cursor:pointer">
+                                <span class="pcoded-micon">
+                                    <i class="fa fa-flag-checkered"></i>
+                                </span><span class="pcoded-mtext">
+                                    Cleaning Report
+                                </span>
+                            </a>
+                        </li>
+                    }
+                    <AuthorizeView Roles="SuperAdmin,Admin">
+                        <li class="nav-item pcoded-menu-caption">
+                            <label>Permissions</label>
+                        </li>
+                        <li class="nav-item">
+                            <a href="add-application-user" class="nav-link" @onclick="ToggleDashboard" style="cursor:pointer">
+                                <span class="pcoded-micon">
+                                    <i class="fa fa-user-plus"></i>
+                                </span><span class="pcoded-mtext">
+                                    Add User
+                                </span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="permision-controls" class="nav-link" @onclick="ToggleDashboard" style="cursor:pointer">
+                                <span class="pcoded-micon">
+                                    <i class="fa fa-universal-access"></i>
+                                </span><span class="pcoded-mtext">
+                                    Roles
+                                </span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="role-management" class="nav-link" @onclick="ToggleDashboard" style="cursor:pointer">
+                                <span class="pcoded-micon">
+                                    <i class="fa fa-anchor" aria-hidden="true"></i>
+                                </span><span class="pcoded-mtext">
+                                    Access Control
+                                </span>
+                            </a>
+                        </li>
+                    </AuthorizeView>
                 </ul>
             </div>
         </div>
@@ -406,6 +467,24 @@
     public EventCallback<bool> IsCollapsedChanged { get; set; }
     string layout = "menu-light";
     string headerColor = "header-blue";
+
+    private bool isAdmin = false;
+
+    private bool canViewDashboard = false;
+    private bool canViewRooms = false;
+    private bool canViewHalls = false;
+    private bool canViewEmployees = false;
+    private bool canViewAttendance = false;
+    private bool canViewPayroll = false;
+    private bool canViewProducts = false;
+    private bool canViewSuppliers = false;
+    private bool canViewPurchases = false;
+    private bool canViewDestroyProducts = false;
+    private bool canViewSaleProducts = false;
+    private bool canViewRoomReservations = false;
+    private bool canViewRestaurant = false;
+    private bool canViewHouseKeeping = false;
+    //private bool canManagePermissions = false;
 
     private bool IsSidebarCollapsed = false;
     private async void ToggleSidebar()
@@ -594,7 +673,100 @@
         layout = await oLocalStore.GetItemAsync<string>("layout");
         headerColor = await oLocalStore.GetItemAsync<string>("headerColor");
         await JS.InvokeVoidAsync("setLayout", layout, headerColor);
+
+
+        // Check permissions for each section
+        var dashboardPermissions = await PermissionService.HasPermission("Dashboard");
+        if (dashboardPermissions != null)
+        {
+            canViewDashboard = dashboardPermissions.CanView;
+        }
+
+        var roomPermissions = await PermissionService.HasPermission("Rooms");
+        if (roomPermissions != null)
+        {
+            canViewRooms = roomPermissions.CanView;
+        }
+
+        var hallPermissions = await PermissionService.HasPermission("Hall");
+        if (hallPermissions != null)
+        {
+            canViewHalls = hallPermissions.CanView;
+        }
+
+        var employeePermissions = await PermissionService.HasPermission("Employees");
+        if (employeePermissions != null)
+        {
+            canViewEmployees = employeePermissions.CanView;
+        }
+
+        var attendancePermissions = await PermissionService.HasPermission("AttendanceList");
+        if (attendancePermissions != null)
+        {
+            canViewAttendance = attendancePermissions.CanView;
+        }
+
+        var payrollPermissions = await PermissionService.HasPermission("SalarySetup");
+        if (payrollPermissions != null)
+        {
+            canViewPayroll = payrollPermissions.CanView;
+        }
+
+        var productPermissions = await PermissionService.HasPermission("ProductList");
+        if (productPermissions != null)
+        {
+            canViewProducts = productPermissions.CanView;
+        }
+
+        var supplierPermissions = await PermissionService.HasPermission("Supplier");
+        if (supplierPermissions != null)
+        {
+            canViewSuppliers = supplierPermissions.CanView;
+        }
+
+        var purchasePermissions = await PermissionService.HasPermission("Purchase");
+        if (purchasePermissions != null)
+        {
+            canViewPurchases = purchasePermissions.CanView;
+        }
+
+        var destroyProductPermissions = await PermissionService.HasPermission("DestroyProducts");
+        if (destroyProductPermissions != null)
+        {
+            canViewDestroyProducts = destroyProductPermissions.CanView;
+        }
+
+        var saleProductPermissions = await PermissionService.HasPermission("SaleProducts");
+        if (saleProductPermissions != null)
+        {
+            canViewSaleProducts = saleProductPermissions.CanView;
+        }
+
+        var roomReservationPermissions = await PermissionService.HasPermission("RoomStatus");
+        if (roomReservationPermissions != null)
+        {
+            canViewRoomReservations = roomReservationPermissions.CanView;
+        }
+
+        var restaurantPermissions = await PermissionService.HasPermission("PosInvoice");
+        if (restaurantPermissions != null)
+        {
+            canViewRestaurant = restaurantPermissions.CanView;
+        }
+
+        var houseKeepingPermissions = await PermissionService.HasPermission("RoomCleaning");
+        if (houseKeepingPermissions != null)
+        {
+            canViewHouseKeeping = houseKeepingPermissions.CanView;
+        }
+
+        // var permissionManagementPermissions = await PermissionService.HasPermission("PermissionManagement");
+        // if (permissionManagementPermissions != null)
+        // {
+        //     canManagePermissions = permissionManagementPermissions.CanView;
+        // }
     }
+}
 
 
 }

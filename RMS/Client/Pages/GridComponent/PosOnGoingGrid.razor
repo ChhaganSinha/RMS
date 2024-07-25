@@ -91,6 +91,7 @@ else
                 {
                     c.Add().Encoded(false).Sanitized(false).RenderComponentAs<PosEditButton>().SetWidth("10px").Titled("Edit");
                     c.Add().Encoded(false).Sanitized(false).RenderComponentAs<PosCompleteButton>(new List<Action<object>> { (item) => RefreshGrid(item) }).SetWidth("10px").Titled("Complete");
+
                 }
 
                 if (hasFullAccess)

@@ -11,7 +11,7 @@
 @implements ICustomGridComponent<PosDTO>
 @inject NavigationManager NavigationManager
 
-<button class='btn btn-sm btn-warning' style="border-radius:15px" @onclick="MyClickHandler" title="Edit"><i class="fa fa-pencil-square-o"></i></button>
+<button class='btn btn-sm btn-primary' style="border-radius:15px" @onclick="MyClickHandler" title="Edit"><i class="fa fa-pencil-square-o"></i></button>
 <PageDialog Title="@Title" Show="@show" ClosePageDialog="ResetForm">
     @if (show)
     {
@@ -73,7 +73,7 @@
                         <div class="form-row">
                             <div class="form-group col-md-12">
                                 <label class="bold-font required-field" for="customerName">Customer Name</label>
-                                <a style="float: right;" href="javascript:void(0)" data-toggle="modal" data-target="#exampleModal">Add</a>
+                                @* <a style="float: right;" href="javascript:void(0)" data-toggle="modal" data-target="#exampleModal">Add</a> *@
                                 <HxSelect TItem="CustomerDetailsDTO"
                                           TValue="int?"
                                           Data="customerDetailsDTOs"
@@ -307,7 +307,7 @@
         foods = (await client.GetAllFood()).ToList();
         customerDetailsDTOs = (await client.GetAllCustomer()).ToList();
         employees = (await client.GetAllEmployee()).ToList();
-        tables = (await client.GetAllTableCon()).Where(x => x.Status == TableStatus.Available).ToList();
+        tables = (await client.GetAllTableCon()).ToList();
         Variants = (await client.GetAllAddVariants()).ToList();
         if (foodCategories.Count > 0)
         {
@@ -318,6 +318,7 @@
         customerId = order.CustomerId;
         employeeId = order.EmployeeId;
         tableId = order.TableId;
+        tables = tables.Where(x => x.Status == TableStatus.Available || x.Id == tableId).ToList();
     }
 
     private void AddToCart()

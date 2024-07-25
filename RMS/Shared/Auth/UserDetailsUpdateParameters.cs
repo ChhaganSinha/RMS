@@ -10,6 +10,7 @@ namespace RMS.Dto.Auth
 {
     public class UserDetailsUpdateParameters
     {
+        [Required]
         public string NewUserName { get; set; } = string.Empty;
 
         [EmailAddress(ErrorMessage = "Invalid email address")]

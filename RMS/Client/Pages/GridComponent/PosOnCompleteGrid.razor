@@ -4,6 +4,7 @@
 @using GridShared.Utility
 @using Microsoft.Extensions.Primitives
 @using RMS.Client.Pages.GridButton
+@using RMS.Client.Pages.GridButton.POS_Buttons
 @inject NavigationManager NavigationManager
 @inject HttpClient HttpClient
 @inject AuthenticationStateProvider AuthenticationStateProvider
@@ -47,8 +48,9 @@ else
             c.Add(o => o.GrandTotal).Css("table-bordered").Filterable(filter);
             if (canEdit || hasFullAccess)
             {
-                c.Add().Encoded(false).Sanitized(false).RenderComponentAs<PosEditButton>().SetWidth("10px").Titled("Edit");
-                // c.Add().Encoded(false).Sanitized(false).RenderComponentAs<PosCompleteButton>().SetWidth("10px").Titled("Complete");
+                c.Add().Encoded(false).Sanitized(false).RenderComponentAs<PosBillPrint>().SetWidth("10px").Titled("Biiling");
+                //c.Add().Encoded(false).Sanitized(false).RenderComponentAs<PosEditButton>().SetWidth("10px").Titled("Edit");
+                //c.Add().Encoded(false).Sanitized(false).RenderComponentAs<PosCompleteButton>().SetWidth("10px").Titled("Complete");
             }
 
             if (hasFullAccess)
