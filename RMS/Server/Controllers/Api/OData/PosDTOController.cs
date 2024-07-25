@@ -20,7 +20,7 @@ namespace RMS.Server.Controllers.Api.OData
         }
 
         [EnableQuery]
-       // [ODataAuthorize]
+        [ODataAuthorize]
         public IQueryable<PosDTO> Get()
         {
             var data = DbContext.PosDTO.Include(x=>x.OrderItems).AsQueryable();

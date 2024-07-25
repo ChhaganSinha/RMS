@@ -64,8 +64,8 @@ namespace RMS.Server.Intrastructure
             builder.EntitySet<CustomerDetailsDTO>("CustomerDetailsDTO");
             builder.EntitySet<ReservationDetailsDto>("ReservationDetailsDto");
             builder.EntitySet<TableCon>("TableCon");
-            builder.EntitySet<PosDTO>("PosDTO");
             builder.EntitySet<RoomCleaningAssignmentModel>("RoomCleaningAssignmentModel");
+            builder.EntitySet<PosDTO>("PosDTO");
 
             return builder.GetEdmModel();
         }
