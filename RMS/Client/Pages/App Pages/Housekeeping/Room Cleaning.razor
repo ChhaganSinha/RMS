@@ -49,7 +49,15 @@
             <div class="form-group row">
                 <div class="col-md-6">
                     <label class="col-form-label bold-font required-field">Room Number</label>
-                    <InputNumber @bind-Value="@model.RoomNo" id="roomNo" class="form-control"></InputNumber>
+                    <HxSelect TItem="Room"
+                              TValue="int?"
+                              Data="Rooms"
+                              @bind-Value="roomId"
+                              TextSelector="@(Rooms => Rooms.RoomNumber)"
+                              ValueSelector="@(Rooms => Rooms.Id)"
+                              Nullable="true"
+                              NullText="-select-"
+                              NullDataText="Loading Rooms..." />
                     <ValidationMessage For="() => model.RoomNo" />
                 </div>
                 <div class="col-md-6">
@@ -142,9 +150,9 @@
     [Parameter]
     public int Id { get; set; }
     private int? empid;
+    private int? roomId;
     [CascadingParameter]
     protected AlertModel? alert { get; set; }
-
     RoomCleaning model = new();
     public string Title = "Add RoomCleaning";
     bool show = false;
@@ -153,11 +161,13 @@
     private int _delay = 2500;
 
     private List<Employee> Employees = new();
+    private List<Room> Rooms = new();
 
     protected override async Task OnInitializedAsync()
     {
         alert?.Clear();
         Employees = (await client.GetAllEmployee()).ToList();
+        Rooms = (await client.GetAllRoom()).ToList();
     }
 
     public async Task OnSave()
@@ -192,6 +202,11 @@
     {
         return $"{employee.Name} ({employee.EmpId})";
     }
+
+    // private string FormatRoomText(Room room)
+    // {
+    //     return $"{room.RoomNumber} ({room.RoomId})";
+    // }
 
     private void TimerCallback(Object o)
     {

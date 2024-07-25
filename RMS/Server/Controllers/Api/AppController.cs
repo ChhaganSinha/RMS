@@ -181,6 +181,24 @@ namespace RMS.Server.Controllers.Api
         {
             return await _appRepository.DeleteRoom(id);
         }
+
+
+        [HttpPost]
+        [Route("UpsertRoomCleaningAssignment")]
+        public async Task<ApiResponse<RoomCleaningAssignmentModel>> UpsertRoomCleaningAssignment(RoomCleaningAssignmentModel data)
+        {
+            if (data.Id > 0)
+            {
+                data.ModifiedBy = User.Identity.Name;
+                data.ModifiedOn = DateTime.Now;
+            }
+            else
+            {
+                data.CreatedBy = User.Identity.Name;
+                data.CreatedOn = DateTime.Now;
+            }
+            return await _appRepository.UpsertRoomCleaningAssignment(data);
+        }
         #endregion
 
         #region Employee Setion

@@ -60,6 +60,7 @@ namespace RMS.DataContext
         public DbSet<PosDTO> PosDTO { get; set; }
         public DbSet<TableCon> TableCon { get; set; }
         public DbSet<UserProfilePicUpld> UserProfilePicUpld { get; set; }
+        public DbSet<RoomCleaningAssignmentModel> RoomCleaningAssignmentModel { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

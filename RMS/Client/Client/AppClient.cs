@@ -377,6 +377,29 @@ namespace RMS.Client.Client
                 return result;
             }
         }
+
+        public async Task<ApiResponse<RoomCleaningAssignmentModel>> UpsertRoomCleaningAssignment(RoomCleaningAssignmentModel data)
+        {
+            var result = new ApiResponse<RoomCleaningAssignmentModel>();
+
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/App/UpsertRoomCleaningAssignment", data);
+                res.EnsureSuccessStatusCode();
+                var json = await res.Content.ReadFromJsonAsync<ApiResponse<RoomCleaningAssignmentModel>>();
+                return json;
+
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+
+
+
+        }
         #endregion
 
         #region Hall Section

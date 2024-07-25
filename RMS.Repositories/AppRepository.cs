@@ -364,6 +364,66 @@ namespace RMS.Repositories
                 return result;
             }
         }
+
+        public async Task<ApiResponse<RoomCleaningAssignmentModel>> UpsertRoomCleaningAssignment(RoomCleaningAssignmentModel data)
+        {
+            var result = new ApiResponse<RoomCleaningAssignmentModel>();
+            try
+            {
+                if (data == null)
+                {
+                    result.IsSuccess = false;
+                    result.Message = "Invalid Room Cleaning Assignment data!";
+                    return result;
+                }
+
+                if (data.Id > 0)
+                {
+                    // Update logic
+                    var existingAssignment = await AppDbCxt.RoomCleaningAssignmentModel
+                        .Include(r => r.SelectedRooms)
+                        .FirstOrDefaultAsync(r => r.Id == data.Id);
+
+                    if (existingAssignment != null)
+                    {
+                        // Update existing properties
+                        existingAssignment.HouseKeeper = data.HouseKeeper;
+                        existingAssignment.RoomType = data.RoomType;
+                        existingAssignment.Status = data.Status;
+                        existingAssignment.ModifiedBy = data.ModifiedBy;
+                        existingAssignment.ModifiedOn = data.ModifiedOn;
+
+                        // Clear and update the selected rooms
+                        existingAssignment.SelectedRooms.Clear();
+                        existingAssignment.SelectedRooms.AddRange(data.SelectedRooms);
+
+                        AppDbCxt.RoomCleaningAssignmentModel.Update(existingAssignment);
+                    }
+                }
+                else
+                {
+                    // Insert logic
+                    data.CreatedBy = data.CreatedBy;
+                    data.CreatedOn = data.CreatedOn;
+
+                    AppDbCxt.RoomCleaningAssignmentModel.Add(data);
+                }
+
+                await AppDbCxt.SaveChangesAsync();
+
+                result.IsSuccess = true;
+                result.Result = data;
+                result.Message = data.Id > 0 ? "Data Successfully Updated." : "Data Successfully Inserted.";
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+
         #endregion
 
         #region Employee Section
