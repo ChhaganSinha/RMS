@@ -36,11 +36,15 @@ else
 
         c.Add(o => o.Id).SetWidth("10%").Css("table-bordered").Titled("SN.").Filterable(filter);
         c.Add(o => o.HouseKeeper).SetWidth("80%").Css("table-bordered").Titled("HouseKeeper Name").Filterable(filter);
+        c.Add(o => o.SelectedRooms).SetWidth("80%").Css("table-bordered").Titled("Room No.").Filterable(filter);
         c.Add(o => o.RoomType).SetWidth("80%").Css("table-bordered").Titled("RoomType").Filterable(filter);
         c.Add(o => o.Status).SetWidth("80%").Css("table-bordered").Titled("Room Status").Filterable(filter);
+        c.Add(o => o.CreatedOn).SetWidth("80%").Css("table-bordered").Titled("Date Start").Filterable(filter);
+        c.Add(o => o.ModifiedOn).SetWidth("80%").Css("table-bordered").Titled("Date End").Filterable(filter);
        
 
-        c.Add().Encoded(false).Sanitized(false).RenderComponentAs<RoomCleaningAssignmentEditButton>().SetWidth("10px").Titled("Edit");
+      //  c.Add().Encoded(false).Sanitized(false).RenderComponentAs<RoomCleaningAssignmentEditButton>().SetWidth("10px").Titled("Edit");
+        c.Add().Encoded(false).Sanitized(false).RenderComponentAs<RoomCleaningEditButton>().SetWidth("10px").Titled("Edit");
         c.Add().Encoded(false).Sanitized(false).RenderComponentAs<RoomCleaningAssignmentDeleteButton>(new List<Action<object>> { RefreshGrid }).SetWidth("10px").Titled("Delete");
     };
 

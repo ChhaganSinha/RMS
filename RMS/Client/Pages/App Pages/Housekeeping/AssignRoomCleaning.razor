@@ -18,7 +18,7 @@
                 <div class="page-header-title">
                     <h5 class="m-b-10">
                         Assign Room Cleaning
-                        <a @onclick="()=>show=true" style="cursor:pointer"><i class="fa fa-plus-circle fa-lg text-primary" aria-hidden="true" title="Assign Room Cleaning"></i></a>
+                        @* <a @onclick="()=>show=true" style="cursor:pointer"><i class="fa fa-plus-circle fa-lg text-primary" aria-hidden="true" title="Assign Room Cleaning"></i></a> *@
                     </h5>
                 </div>
                 <ul class="breadcrumb">
@@ -32,7 +32,7 @@
     </div>
 </div>
 
-<div class="row">
+@* <div class="row">
     <div class="col-sm-12 p-0">
         <div class="card-body p-2 mt-n3">
             <div class="card text">
@@ -43,12 +43,12 @@
         </div>
     </div>
 </div>
+ *@
 
-
-<PageDialog Title="@Title" Show="@show" ClosePageDialog="ResetForm">
+@* <PageDialog Title="@Title" Show="@show" ClosePageDialog="ResetForm">
 
     @if (show)
-    {
+    { *@
         <EditForm Model="@model" OnValidSubmit="OnValidSubmit">
             <DataAnnotationsValidator />
             <ValidationSummary />
@@ -114,9 +114,9 @@
 
             <button type="submit" class="btn btn-primary">Update</button>
         </EditForm>
-    }  <br />
+@*     }  <br />
 
-</PageDialog>
+</PageDialog> *@
 
 
 

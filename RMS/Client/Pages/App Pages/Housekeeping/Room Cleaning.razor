@@ -18,7 +18,7 @@
                 <div class="page-header-title">
                     <h5 class="m-b-10">
                         Room Cleaning List
-                        <a @onclick="()=>show=true" style="cursor:pointer"><i class="fa fa-plus-circle fa-lg text-primary" aria-hidden="true" title="Add RoomCleaning"></i></a>
+                        @* <a @onclick="()=>show=true" style="cursor:pointer"><i class="fa fa-plus-circle fa-lg text-primary" aria-hidden="true" title="Add RoomCleaning"></i></a> *@
                     </h5>
                 </div>
                 <ul class="breadcrumb">
@@ -34,7 +34,8 @@
 <div class="row">
     <div class="col-sm-12 p-0">
         <div class="card-body p-2 mt-n3">
-            <RoomCleaningGrid />
+            @* <RoomCleaningGrid /> *@
+            <AssignRoomCleaningGrid />
         </div>
     </div>
 </div>
@@ -184,7 +185,8 @@
         var response = await client.UpsertRoomCleaningAsync(model);
         if (response.IsSuccess)
         {
-            await RoomCleaningGrid.RefreshGridAsync();
+            //await RoomCleaningGrid.RefreshGridAsync();
+            await AssignRoomCleaningGrid.RefreshGridAsync();
             alert?.SetSuccess(response.Message);
             model = new();
         }

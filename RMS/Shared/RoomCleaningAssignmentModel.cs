@@ -8,7 +8,7 @@ namespace RMS.Dto
 {
     public class RoomCleaningAssignmentModel : Auditable
     {
-
+       
         public string HouseKeeper { get; set; } = string.Empty;
         public string RoomType { get; set; } = string.Empty;
         public string Status { get; set; } = string.Empty;
