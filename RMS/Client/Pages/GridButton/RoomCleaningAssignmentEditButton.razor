@@ -1,0 +1,157 @@
+﻿@using GridShared
+@using GridShared.Columns
+@using GridShared.Utility
+@using Microsoft.Extensions.Primitives
+@using RMS.Client.Pages.GridComponent
+@using RMS.Client.Shared.Popup
+@using RMS.Client.Client
+@using RMS.Dto.Enum
+@inject AppClient client
+@implements ICustomGridComponent<RoomCleaningAssignmentModel>
+@inject NavigationManager NavigationManager
+
+<button class='btn btn-sm btn-warning' style="border-radius:15px" @onclick="MyClickHandler" title="Edit"><i class="fa fa-pencil-square-o"></i></button>
+<PageDialog Title="@Title" Show="@show" ClosePageDialog="ResetForm">
+
+    @if (show)
+    {
+        <EditForm Model="@model" OnValidSubmit="OnSave">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+            <div class="row">
+                <div class="form-group col-md-4">
+                    <label for="houseKeeper">House Keeper</label>
+                    <HxSelect TItem="Employee"
+                              TValue="int?"
+                              Data="HouseKeepers"
+                              @bind-Value="empid"
+                              TextSelector="@(HouseKeepers => HouseKeepers.Name)"
+                              ValueSelector="@(HouseKeepers => HouseKeepers.Id)"
+                              Nullable="true"
+                              NullText="- Select -"
+                              NullDataText="Loading Employees..." />
+
+                    <ValidationMessage For="() => model.HouseKeeper" />
+                </div>
+
+                <div class="form-group col-md-4">
+                    <label for="roomType">Room Type</label>
+                    <select @bind="model.RoomType" class="form-control" id="roomType">
+                        <option value="">Select Room Type</option>
+                        @foreach (var type in RoomTypes)
+                        {
+                            <option value="@type.Name">@type.Name</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="form-group col-md-4">
+                    <label for="status">Status</label>
+                    <select @bind="model.Status" class="form-control" id="status">
+                        <option value="">Select Status</option>
+                        @foreach (var status in StatusList)
+                        {
+                            <option value="@status">@status</option>
+                        }
+                    </select>
+                </div>
+                <div class="form-group">
+                    @* <button type="button" class="btn btn-secondary" @onclick="FilterRooms">Search</button> *@
+                </div>
+            </div>
+
+            <div class="row">
+                @foreach (var room in roomModels)
+                {
+                    <div class="col-md-3 mb-2">
+                        <div class="card">
+                            <div class="card-body">
+                                <input type="checkbox" @bind="room.IsSelected" class="form-check-input" id="@room.RoomNo" />
+                                <label class="form-check-label" for="@room.RoomNo">@room.RoomNo</label>
+                                <div>@room.Status</div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <button type="submit" class="btn btn-primary">Update</button>
+        </EditForm>
+    }  <br />
+
+</PageDialog>
+@code {
+    [Parameter]
+    public RoomCleaningAssignmentModel Item { get; set; }
+
+    [Parameter]
+    public CGrid<RoomCleaningAssignmentModel> Grid { get; set; }
+
+    private IEnumerable<Employee> HouseKeepers = new List<Employee>();
+    private IEnumerable<RoomCategories> RoomTypes = new List<RoomCategories>();
+    private IEnumerable<Room> Rooms = new List<Room>();
+    private List<RoomModel> roomModels = new List<RoomModel>();
+
+    [CascadingParameter]
+    protected AlertModel? alert { get; set; }
+    public int? empid;
+    private static readonly List<string> StatusList = Enum.GetNames(typeof(RoomHallStatus)).ToList();
+    public string Title = "Add Assign Room Cleaning";
+    private Timer _timer;
+    private int _delay = 2500;
+    bool show = false;
+    bool process = false;
+
+
+    RoomCleaningAssignmentModel model = new();
+
+    private async Task MyClickHandler(MouseEventArgs e)
+    {
+        show = true;
+        model = await client.GetRoomCleaningAssignmentModelById(Item.Id);
+        HouseKeepers = await client.GetAllEmployee();
+        RoomTypes = await client.GetAllRoomCategory();
+        Rooms = await client.GetAllRoom();
+        roomModels = Rooms.Select(r => new RoomModel { RoomNo = r.RoomNumber, Status = r.Status.ToString(), IsSelected = false }).ToList();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        alert?.Clear();
+    }
+
+    public async Task OnSave()
+    {
+        process = true;
+        alert?.Clear();
+
+        var response = await client.UpsertRoomCleaningAssignment(model);
+        if (response.IsSuccess)
+        {
+            // model = response.Result;
+            alert?.SetSuccess(response.Message);
+            await AssignRoomCleaningGrid.RefreshGridAsync();
+        }
+        else
+            alert?.SetError(response.Message);
+
+        process = false;
+        StateHasChanged();
+        _timer = new Timer(TimerCallback, null, _delay, Timeout.Infinite);
+    }
+
+    private void TimerCallback(Object o)
+    {
+        alert?.Clear();
+        _timer.Dispose();
+        StateHasChanged();
+    }
+
+    private void ResetForm()
+    {
+        model = new();
+        show = false;
+        process = false;
+    }
+
+}

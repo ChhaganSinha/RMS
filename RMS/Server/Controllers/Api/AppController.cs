@@ -199,6 +199,20 @@ namespace RMS.Server.Controllers.Api
             }
             return await _appRepository.UpsertRoomCleaningAssignment(data);
         }
+
+        [HttpPost]
+        [Route("DeleteRoomCleaningAssignmentModel/{id}")]
+        public async Task<ApiResponse<RoomCleaningAssignmentModel>> DeleteRoomCleaningAssignmentModel(int id)
+        {
+            return await _appRepository.DeleteRoomCleaningAssignmentModel(id);
+        }
+
+        [HttpGet]
+        [Route("RoomCleaningAssignmentModel/{id}")]
+        public async Task<RoomCleaningAssignmentModel> GetRoomCleaningAssignmentModelById(int id)
+        {
+            return await _appRepository.GetRoomCleaningAssignmentModelById(id);
+        }
         #endregion
 
         #region Employee Setion

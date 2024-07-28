@@ -389,13 +389,17 @@ namespace RMS.Repositories
                         // Update existing properties
                         existingAssignment.HouseKeeper = data.HouseKeeper;
                         existingAssignment.RoomType = data.RoomType;
-                        existingAssignment.Status = data.Status;
+                        existingAssignment.Status = RoomHallStatus.AssignedToClean.ToString();
                         existingAssignment.ModifiedBy = data.ModifiedBy;
                         existingAssignment.ModifiedOn = data.ModifiedOn;
 
                         // Clear and update the selected rooms
                         existingAssignment.SelectedRooms.Clear();
-                        existingAssignment.SelectedRooms.AddRange(data.SelectedRooms);
+                        foreach (var roomModel in data.SelectedRooms)
+                        {
+                            roomModel.Status = RoomHallStatus.AssignedToClean.ToString();
+                            existingAssignment.SelectedRooms.Add(roomModel);
+                        }
 
                         AppDbCxt.RoomCleaningAssignmentModel.Update(existingAssignment);
                     }
@@ -405,9 +409,32 @@ namespace RMS.Repositories
                     // Insert logic
                     data.CreatedBy = data.CreatedBy;
                     data.CreatedOn = data.CreatedOn;
+                    data.Status = RoomHallStatus.AssignedToClean.ToString(); 
+
+                    foreach (var roomModel in data.SelectedRooms)
+                    {
+                        roomModel.Status = RoomHallStatus.AssignedToClean.ToString(); 
+                    }
 
                     AppDbCxt.RoomCleaningAssignmentModel.Add(data);
                 }
+
+                foreach (var roomBooking in data.SelectedRooms)
+                {
+                    var room = AppDbCxt.Room.FirstOrDefault(r => r.RoomNumber == roomBooking.RoomNo);
+                    if (room != null)
+                    {
+                        room.Status = RoomHallStatus.AssignedToClean;
+                        AppDbCxt.Room.Update(room);
+                    }
+                }
+
+                /* foreach (var roomBooking in data.RoomBookings)
+                 {
+                     var room = AppDbCxt.Room.FirstOrDefault(r => r.Id == roomBooking.RoomId);
+                     if (room != null) { room.Status = RoomHallStatus.Booked; AppDbCxt.Room.Update(room); }
+                 }*/
+
 
                 await AppDbCxt.SaveChangesAsync();
 
@@ -422,6 +449,45 @@ namespace RMS.Repositories
                 result.Message = ex.Message;
                 return result;
             }
+        }
+
+        public async Task<ApiResponse<RoomCleaningAssignmentModel>> DeleteRoomCleaningAssignmentModel(int id)
+        {
+            var result = new ApiResponse<RoomCleaningAssignmentModel>();
+            try
+            {
+                var existing = AppDbCxt.RoomCleaningAssignmentModel.First(x => x.Id == id);
+                result.Result = existing;
+                if (existing == null)
+                {
+                    result.IsSuccess = true;
+                    result.Message = "Room Category not found!";
+                    return result;
+                }
+
+                AppDbCxt.RoomCleaningAssignmentModel.Remove(existing);
+                await AppDbCxt.SaveChangesAsync();
+                result.IsSuccess = true;
+                result.Message = "Successfully Deleted!";
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+
+        public async Task<RoomCleaningAssignmentModel> GetRoomCleaningAssignmentModelById(int id)
+        {
+            RoomCleaningAssignmentModel result = null;
+
+#pragma warning disable CS8600
+            result = AppDbCxt.RoomCleaningAssignmentModel.FirstOrDefault(o => o.Id == id);
+#pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
+
+            return await Task.FromResult(result);
         }
 
         #endregion
@@ -3511,8 +3577,8 @@ namespace RMS.Repositories
                 {
                     Month = (Months)key,
                     Total = entries.Count(),
-                    Ready = entries.Count(i => i.Status == (RoomStatus.Ready)),
-                    Booked = entries.Count(i => i.Status == (RoomStatus.Booked)),
+                    Ready = entries.Count(i => i.Status == (RoomHallStatus.Ready)),
+                    Booked = entries.Count(i => i.Status == (RoomHallStatus.Booked)),
 
                 });
 

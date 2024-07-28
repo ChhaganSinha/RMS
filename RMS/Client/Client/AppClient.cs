@@ -400,6 +400,44 @@ namespace RMS.Client.Client
 
 
         }
+        public async Task<ApiResponse<RoomCleaningAssignmentModel>> DeleteRoomCleaningAssignmentModel(int id)
+        {
+            var result = new ApiResponse<RoomCleaningAssignmentModel>();
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/App/DeleteRoomCleaningAssignmentModel/{id}", new { });
+                res.EnsureSuccessStatusCode();
+                var json = await res.Content.ReadFromJsonAsync<ApiResponse<RoomCleaningAssignmentModel>>();
+                return json;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+
+        public async Task<RoomCleaningAssignmentModel> GetRoomCleaningAssignmentModelById(int id)
+        {
+            RoomCleaningAssignmentModel data = null;
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/App/RoomCleaningAssignmentModel/{id}");
+
+                res.EnsureSuccessStatusCode();
+
+                data = await res.Content.ReadFromJsonAsync<RoomCleaningAssignmentModel>();
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return data;
+        }
         #endregion
 
         #region Hall Section

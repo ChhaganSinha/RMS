@@ -13,7 +13,7 @@ namespace RMS.Dto
         public string BookingReferenceNo { get; set; } = string.Empty;
         public string PurposeOfVisit { get; set; } = string.Empty;
         public string Remarks { get; set; } = string.Empty;
-        public RoomStatus Status { get; set; }
+        public RoomHallStatus Status { get; set; }
         public List<RoomBookingDto> RoomBookings { get; set; } = new List<RoomBookingDto>();
         public List<CustomerInfoDto> CustomerInfo { get; set; } = new List<CustomerInfoDto>();
         public PaymentDetailsDto PaymentDetails { get; set; } = new PaymentDetailsDto();
