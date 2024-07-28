@@ -10,30 +10,144 @@
 @inject NavigationManager NavigationManager
 
 <button class='btn btn-sm btn-secondary' style="border-radius:15px" @onclick="MyClickHandler" title="View"><i class="fa fa-eye"></i></button>
-<SimpleDailog Title="@Title" Show="@show" OnCloseDialog="ResetForm">
+<PageDialog Title="@Title" Show="@show" ClosePageDialog="ResetForm">
     @if (show)
     {
+        <div class="container">
+            <h4>Reservation Details</h4>
+            <table class="table table-bordered">
+                <tbody>
+                    <tr>
+                        <th>Check-In</th>
+                        <td>@model.CheckIn.ToString("dd MMM yyyy")</td>
+                    </tr>
+                    <tr>
+                        <th>Check-Out</th>
+                        <td>@model.CheckOut.ToString("dd MMM yyyy")</td>
+                    </tr>
+                    <tr>
+                        <th>Arrival From</th>
+                        <td>@model.ArrivalFrom</td>
+                    </tr>
+                    <tr>
+                        <th>Booking Type</th>
+                        <td>@model.BookingType</td>
+                    </tr>
+                    <tr>
+                        <th>Booking Reference No</th>
+                        <td>@model.BookingReferenceNo</td>
+                    </tr>
+                    <tr>
+                        <th>Purpose Of Visit</th>
+                        <td>@model.PurposeOfVisit</td>
+                    </tr>
+                    <tr>
+                        <th>Remarks</th>
+                        <td>@model.Remarks</td>
+                    </tr>
+                    <tr>
+                        <th>Status</th>
+                        <td>@model.Status</td>
+                    </tr>
+                </tbody>
+            </table>
 
+            <h4>Room Bookings</h4>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Room Type</th>
+                        <th>Room No</th>
+                        <th>Adults</th>
+                        <th>Children</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var room in model.RoomBookings)
+                    {
+                        <tr>
+                            <td>@room.RoomType</td>
+                            <td>@room.RoomNo</td>
+                            <td>@room.Adults</td>
+                            <td>@room.Children</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
 
-        <EditForm Model="model" OnValidSubmit="OnSave">
-            <DataAnnotationsValidator />
-            <div>
-              
-            </div>
+            <h4>Customer Information</h4>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Mobile No</th>
+                        <th>Email</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var customer in model.CustomerInfo)
+                    {
+                        <tr>
+                            <td>@customer.Name</td>
+                            <td>@customer.MobileNo</td>
+                            <td>@customer.Email</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
 
-            @if (process || model == null)
-            {
-                <div style="text-align:center">
-                    <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
-                </div>
-            }
-            <UiAlert Model="alert"></UiAlert>
-            <hr />
-            <button type="submit" class="btn btn-primary float-right col-md-4">Add</button>
-        </EditForm>
-        <br />
+            <h4>Payment Details</h4>
+            <table class="table table-bordered">
+                <tbody>
+                    <tr>
+                        <th>Discount Reason</th>
+                        <td>@model.PaymentDetails.DiscountReason</td>
+                    </tr>
+                    <tr>
+                        <th>Discount Rate</th>
+                        <td>@model.PaymentDetails.DiscountRate</td>
+                    </tr>
+                    <tr>
+                        <th>Discount Amount</th>
+                        <td>@model.PaymentDetails.DiscountAmount</td>
+                    </tr>
+                    <tr>
+                        <th>Commission Rate</th>
+                        <td>@model.PaymentDetails.CommissionRate</td>
+                    </tr>
+                    <tr>
+                        <th>Commission Amount</th>
+                        <td>@model.PaymentDetails.CommissionAmount</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h4>Billing Details</h4>
+            <table class="table table-bordered">
+                <tbody>
+                    <tr>
+                        <th>Booking Charge</th>
+                        <td>@model.BillingDetails.BookingCharge</td>
+                    </tr>
+                    <tr>
+                        <th>Tax</th>
+                        <td>@model.BillingDetails.Tax</td>
+                    </tr>
+                    <tr>
+                        <th>Service Charge</th>
+                        <td>@model.BillingDetails.ServiceCharge</td>
+                    </tr>
+                    <tr>
+                        <th>Total Charge</th>
+                        <td>@model.BillingDetails.TotalCharge</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     }
-</SimpleDailog>
+</PageDialog>
+
+
 @code {
     [Parameter]
     public ReservationDetailsDto Item { get; set; }
@@ -48,39 +162,15 @@
     private int _delay = 2500;
     bool show = false;
     bool process = false;
-    string Title = "Update Category";
+    string Title = "View Booking Deatils";
 
     ReservationDetailsDto model = new();
 
     private async Task MyClickHandler(MouseEventArgs e)
     {
+        alert?.Clear();
         show = true;
-       // model = await client.GetBookingListById(Item.Id);
-    }
-
-    protected override async Task OnInitializedAsync()
-    {
-        alert?.Clear();
-    }
-
-    public async Task OnSave()
-    {
-        process = true;
-        alert?.Clear();
-
-        // var response = await client.UpsertBookingListAsync(model);
-        // if (response.IsSuccess)
-        // {
-        //     // model = response.Result;
-        //     alert?.SetSuccess(response.Message);
-        //     await BookingListGrid.RefreshGridAsync();
-        // }
-        // else
-        //     alert?.SetError(response.Message);
-
-        process = false;
-        StateHasChanged();
-        _timer = new Timer(TimerCallback, null, _delay, Timeout.Infinite);
+       model = await client.GetReservationDetailsDtoById(Item.Id);
     }
 
     private void TimerCallback(Object o)

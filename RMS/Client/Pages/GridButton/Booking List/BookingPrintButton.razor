@@ -8,32 +8,119 @@
 @inject AppClient client
 @implements ICustomGridComponent<ReservationDetailsDto>
 @inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
 
 <button class='btn btn-sm btn-success' style="border-radius:15px" @onclick="MyClickHandler" title="Print"><i class="fa fa-print"></i></button>
-<SimpleDailog Title="@Title" Show="@show" OnCloseDialog="ResetForm">
+
+<PageDialog Title="@Title" Show="@show" ClosePageDialog="ResetForm">
     @if (show)
     {
-
-
-        <EditForm Model="model" OnValidSubmit="OnSave">
-            <DataAnnotationsValidator />
-            <div>
-              
-            </div>
-
-            @if (process || model == null)
-            {
-                <div style="text-align:center">
-                    <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
+        <section class="py-3 py-md-5" id="billSection">
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-12 col-lg-9 col-xl-8 col-xxl-7">
+                        <div class="row gy-3 mb-3">
+                            <div class="col-6">
+                                <h2 class="text-uppercase text-endx m-0">Reservation Invoice</h2>
+                            </div>
+                            @* Uncomment and replace the source with your logo image URL *@
+                            <!-- <div class="col-6">
+                                <a class="d-block text-end" href="#!">
+                                    <img src="/assets/images/logo.png" class="img-fluid" alt="Logo" width="100" height="44">
+                                </a>
+                            </div> -->
+                            <div class="col-12">
+                                <h4>From</h4>
+                                <address>
+                                    <strong>Royal Heritage</strong><br>
+                                    Hotel Street<br>
+                                    Pilibhit City, UP, 262001<br>
+                                    Phone: xxxxxxxxx<br>
+                                    Email: info@royalheritagepilibhit.in
+                                </address>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-12 col-sm-6 col-md-8">
+                                <h4>Bill To</h4>
+                                <address>
+                                    <strong>@model.CustomerInfo.FirstOrDefault()?.Name</strong><br>
+                                    <!-- Assuming customer's address -->
+                                    @* 456 Oak Avenue<br> *@
+                                    City, State, Zip Code<br>
+                                    Phone: @model.CustomerInfo.FirstOrDefault()?.MobileNo<br>
+                                    Email: @model.CustomerInfo.FirstOrDefault()?.Email
+                                </address>
+                            </div>
+                            <div class="col-12 col-sm-6 col-md-4">
+                                <h4 class="row">
+                                    <span class="col-6">Invoice #</span>
+                                    <br />
+                                    <span class="col-6 text-sm-end">@model.BookingReferenceNo</span>
+                                </h4>
+                                <div class="row">
+                                    <span class="col-6">Date</span>
+                                    <span class="col-6 text-sm-end">@DateTime.Now.ToString("MM/dd/yyyy")</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-12">
+                                <div class="table-responsive">
+                                    <table class="table table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col" class="text-uppercase">Qty</th>
+                                                <th scope="col" class="text-uppercase">Description</th>
+                                                <th scope="col" class="text-uppercase text-end">Unit Price</th>
+                                                <th scope="col" class="text-uppercase text-end">Amount</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="table-group-divider">
+                                            @foreach (var room in model.RoomBookings)
+                                            {
+                                                <tr>
+                                                    <th scope="row">1</th>
+                                                    <td>@room.RoomType</td>
+                                                    <td class="text-end">@room.RoomNo</td>
+                                                    <td class="text-end">@room.RoomNo</td>
+                                                </tr>
+                                            }
+                                            <tr>
+                                                <th scope="row" colspan="3" class="text-end">Subtotal</th>
+                                                <td class="text-end">@model.BillingDetails.BookingCharge.ToString("C", new System.Globalization.CultureInfo("en-IN"))</td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="3" class="text-end">Tax</td>
+                                                <td class="text-end">@model.BillingDetails.Tax.ToString("C", new System.Globalization.CultureInfo("en-IN"))</td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="3" class="text-end">Service Charge</td>
+                                                <td class="text-end">@model.BillingDetails.ServiceCharge.ToString("C", new System.Globalization.CultureInfo("en-IN"))</td>
+                                            </tr>
+                                            <tr>
+                                                <th scope="row" colspan="3" class="text-uppercase text-end">Total</th>
+                                                <td class="text-end">@model.BillingDetails.TotalCharge.ToString("C", new System.Globalization.CultureInfo("en-IN"))</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12 text-end">
+                                <button type="button" class="btn btn-primary mb-3" @onclick="PrintInvoice">Print Invoice</button>
+                                <button type="button" class="btn btn-success mb-3" @onclick="DownloadPDF">Download as PDF</button>
+                                @* <button type="submit" class="btn btn-danger mb-3">Pay Now</button> *@
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            }
-            <UiAlert Model="alert"></UiAlert>
-            <hr />
-            <button type="submit" class="btn btn-primary float-right col-md-4">Add</button>
-        </EditForm>
-        <br />
+            </div>
+        </section>
     }
-</SimpleDailog>
+</PageDialog>
+
 @code {
     [Parameter]
     public ReservationDetailsDto Item { get; set; }
@@ -44,57 +131,31 @@
     [CascadingParameter]
     protected AlertModel? alert { get; set; }
 
-    private Timer _timer;
-    private int _delay = 2500;
     bool show = false;
-    bool process = false;
-    string Title = "Update Category";
+    string Title = "Invoice";
 
     ReservationDetailsDto model = new();
 
     private async Task MyClickHandler(MouseEventArgs e)
     {
+        alert?.Clear();
         show = true;
-       // model = await client.GetBookingListById(Item.Id);
+        model = await client.GetReservationDetailsDtoById(Item.Id);
     }
 
-    protected override async Task OnInitializedAsync()
+    private async Task PrintInvoice()
     {
-        alert?.Clear();
+        await JSRuntime.InvokeVoidAsync("window.print");
     }
 
-    public async Task OnSave()
+    private async Task DownloadPDF()
     {
-        process = true;
-        alert?.Clear();
-
-        // var response = await client.UpsertBookingListAsync(model);
-        // if (response.IsSuccess)
-        // {
-        //     // model = response.Result;
-        //     alert?.SetSuccess(response.Message);
-        //     await BookingListGrid.RefreshGridAsync();
-        // }
-        // else
-        //     alert?.SetError(response.Message);
-
-        process = false;
-        StateHasChanged();
-        _timer = new Timer(TimerCallback, null, _delay, Timeout.Infinite);
-    }
-
-    private void TimerCallback(Object o)
-    {
-        alert?.Clear();
-        _timer.Dispose();
-        StateHasChanged();
+        await JSRuntime.InvokeVoidAsync("downloadPDF");
     }
 
     private void ResetForm()
     {
         model = new();
         show = false;
-        process = false;
     }
-
 }

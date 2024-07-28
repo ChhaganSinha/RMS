@@ -2676,6 +2676,52 @@ namespace RMS.Repositories
                 return result;
             }
         }
+
+        public async Task<ApiResponse<ReservationDetailsDto>> CheckOutReservations(ReservationDetailsDto reservationDetailsDto)
+        {
+            var result = new ApiResponse<ReservationDetailsDto>();
+            try
+            {
+                var existing = AppDbCxt.ReservationDetails.FirstOrDefault(x => x.Id == reservationDetailsDto.Id);
+
+                if (existing == null)
+                {
+                    result.IsSuccess = false;
+                    result.Message = "Booking not found!";
+                    return result;
+                }
+
+                // Update reservation status
+                existing.Status = RoomHallStatus.Dirty;
+                existing.CheckOut = DateTime.Now;
+                AppDbCxt.ReservationDetails.Update(existing);
+
+                // Get all room numbers involved in the booking
+                var roomNumbers = reservationDetailsDto.RoomBookings.Select(rb => rb.RoomNo).ToList();
+
+                // Update the status of each room to Dirty
+                var roomsToUpdate = AppDbCxt.Room.Where(r => roomNumbers.Contains(r.RoomNumber)).ToList();
+                foreach (var room in roomsToUpdate)
+                {
+                    room.Status = RoomHallStatus.Dirty;
+                    AppDbCxt.Room.Update(room);
+                }
+
+                await AppDbCxt.SaveChangesAsync();
+
+                result.Result = existing;
+                result.IsSuccess = true;
+                result.Message = "Successfully Checked Out!";
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+
         #endregion
 
         #region Restaurant

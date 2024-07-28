@@ -38,13 +38,14 @@ else
         c.Add(o => o.Id).SetWidth("10%").Css("table-bordered").Titled("SN.").Filterable(filter);
         c.Add(o => o.BookingReferenceNo).Css("table-bordered").Titled("booking No.").Filterable(filter);
         c.Add(o => o.BookingType).Css("table-bordered").Titled("Room No.").Filterable(filter);
+        c.Add(o => o.Status).Css("table-bordered").Filterable(filter);
         c.Add(o => o.CheckOut).Css("table-bordered").Filterable(filter);
         c.Add(o => o.CheckIn).Css("table-bordered").Filterable(filter);
     
     
 
         c.Add().Encoded(false).Sanitized(false).RenderComponentAs<BookingEditButton>().SetWidth("1px");
-        c.Add().Encoded(false).Sanitized(false).RenderComponentAs<BookingCheckInButton>().SetWidth("1px");
+        c.Add().Encoded(false).Sanitized(false).RenderComponentAs<BookingCheckOutButton>(new List<Action<object>> { RefreshGrid }).SetWidth("10px");
         c.Add().Encoded(false).Sanitized(false).RenderComponentAs<BookingViewButton>().SetWidth("1px");
         c.Add().Encoded(false).Sanitized(false).RenderComponentAs<BookingPrintButton>().SetWidth("1px");
         c.Add().Encoded(false).Sanitized(false).RenderComponentAs<BookingCancelButton>(new List<Action<object>> { RefreshGrid }).SetWidth("10px");

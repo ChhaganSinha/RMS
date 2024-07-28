@@ -1,0 +1,113 @@
+﻿@using GridShared
+@using GridShared.Columns
+@using GridShared.Utility
+@using Microsoft.Extensions.Primitives
+@using RMS.Client.Pages.GridComponent
+@using RMS.Client.Shared.Popup
+@using RMS.Client.Client
+@inject AppClient client
+@implements ICustomGridComponent<ReservationDetailsDto>
+@inject NavigationManager NavigationManager
+
+@if(Item.Status == Dto.Enum.RoomHallStatus.Booked)
+{
+    <button class='btn btn-sm btn-primary' style="border-radius:15px" @onclick="MyClickHandler" title="Check Out"><i class="fa fa-check-square-o"></i></button>
+}
+else
+{
+    <p style="font-size: 8px; font-weight: 600; margin: 0;" class="text-c-red">Checked Out</p>
+}
+<SimpleDailog Title="@Title" Show="@show" OnCloseDialog="ResetForm">
+    @if (show)
+    {
+        @if (!TaskCompleted && !process)
+        {
+            <div style="text-align:center;">
+                <h6 class="pb-2">Are you sure want to Check Out?</h6>
+
+                <button class="btn btn-danger" @onclick="ProcesCheckOut">Yes</button>
+                <button class="btn btn-primary" @onclick="ResetForm">No</button>
+            </div>
+        }
+        else if (TaskCompleted && process)
+        {
+            <div style="text-align:center;">
+                @MessageBody
+            </div>
+            <br />
+        }
+        else
+        {
+            <div style="text-align:center">
+                <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
+            </div>
+        }
+    }
+</SimpleDailog>
+@code {
+    [Parameter]
+    public ReservationDetailsDto Item { get; set; }
+
+    [Parameter]
+    public CGrid<ReservationDetailsDto> Grid { get; set; }
+
+    [CascadingParameter]
+    protected AlertModel? alert { get; set; }
+
+    [Parameter]
+    public IList<Action<object>> Actions { get; set; }
+
+    private Timer _timer;
+    private int _delay = 2500;
+    bool show = false;
+    bool process = false;
+    bool TaskCompleted = false;
+    string Title = "Checking Out";
+    string MessageBody = string.Empty;
+
+    ReservationDetailsDto model = new();
+
+    private async Task ProcesCheckOut()
+    {
+
+        process = true;
+        var responce = await client.ChekOutReservation(Item);
+        if (responce.IsSuccess == true)
+        {
+            MessageBody = responce.Message;
+        }
+        else
+        {
+            MessageBody = responce.Message;
+        }
+
+        TaskCompleted = true;
+        Title = "Process Completed!";
+        Actions[0]?.Invoke(Item);
+        
+    }
+
+    private async Task MyClickHandler(MouseEventArgs e)
+    {
+        show = true;
+        MessageBody = string.Empty;
+        TaskCompleted = false;
+
+    }
+
+
+    private void TimerCallback(Object o)
+    {
+        alert?.Clear();
+        _timer.Dispose();
+        StateHasChanged();
+    }
+
+    private void ResetForm()
+    {
+        model = new();
+        show = false;
+        process = false;
+    }
+
+}

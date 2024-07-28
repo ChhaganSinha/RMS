@@ -8,67 +8,66 @@
 @inject NavigationManager NavigationManager
 @attribute [Authorize]
 
-
 <div class="row">
-    
-        <div class="col-md-6 col-xl-3">
-            <div class="card bg-c-blue order-card">
-                <div class="card-body" style="padding: 4px 25px;">
-                    <h6 class="text-white">Total Bookings</h6>
-                    <h2 class="text-right text-white"><i class="feather icon-shopping-cart float-left"></i><span>@bookingStats?.TotalBookings</span></h2>
-                    <p class="m-b-0">Today<span class="float-right">@bookingStats?.TodaysBookings</span></p>
-                    <p class="m-b-0">This month<span class="float-right">@bookingStats?.ThisMonthBookings</span></p>
-                </div>
+    <div class="col-md-6 col-xl-3">
+        <div class="card bg-c-blue order-card">
+            <div class="card-body" style="padding: 4px 25px;">
+                <h6 class="text-white">Total Bookings</h6>
+                <h2 class="text-right text-white">
+                    <i class="feather icon-shopping-cart float-left"></i>
+                    <span>@bookingStats?.TotalBookings</span>
+                </h2>
+                <p class="m-b-0">Today<span class="float-right">@bookingStats?.TodaysBookings</span></p>
+                <p class="m-b-0">This month<span class="float-right">@bookingStats?.ThisMonthBookings</span></p>
             </div>
         </div>
-    
+    </div>
+
     <div class="col-md-6 col-xl-3">
         <div class="card bg-c-green order-card">
             <div class="card-body" style="padding: 4px 25px;">
                 <h6 class="text-white">Hotel's Total Amount</h6>
-                <h2 class="text-right text-white"><i class="feather icon-tag float-left"></i><span>&#8377;@bookingStats?.TotalAmount.ToString("F2")</span></h2>
-                <p class="m-b-0">Today<span class="float-right">&#8377;@bookingStats?.TodaysAmount.ToString("F2")</span></p>
-                <p class="m-b-0">This Month<span class="float-right">&#8377;@bookingStats?.ThisMonthAmount.ToString("F2")</span></p>
+                <h2 class="text-right text-white">
+                    <i class="feather icon-tag float-left"></i>
+                    <span>&#8377;@FormatAmount(bookingStats?.TotalAmount)</span>
+                </h2>
+                <p class="m-b-0">Today<span class="float-right">&#8377;@FormatAmount(bookingStats?.TodaysAmount)</span></p>
+                <p class="m-b-0">This Month<span class="float-right">&#8377;@FormatAmount(bookingStats?.ThisMonthAmount)</span></p>
             </div>
         </div>
     </div>
+
     <div class="col-md-6 col-xl-3">
         <div class="card bg-c-red order-card">
             <div class="card-body" style="padding: 4px 25px;">
                 <h6 class="text-white" style="font-size: 12px">Restaurant's Total Amount</h6>
-                <h2 class="text-right text-white"><i class="feather icon-award float-left"></i> <span>&#8377;@bookingStats?.ResTotalAmount.ToString("F2")</span></h2>
-                <p class="m-b-0">Today<span class="float-right">&#8377,@bookingStats?.ResTodaysAmount.ToString("F2")</span></p>
-                <p class="m-b-0">This Month<span class="float-right">&#8377;@bookingStats?.ResThisMonthAmount.ToString("F2")</span></p>
+                <h2 class="text-right text-white">
+                    <i class="feather icon-award float-left"></i>
+                    <span>&#8377;@FormatAmount(bookingStats?.ResTotalAmount)</span>
+                </h2>
+                <p class="m-b-0">Today<span class="float-right">&#8377;@FormatAmount(bookingStats?.ResTodaysAmount)</span></p>
+                <p class="m-b-0">This Month<span class="float-right">&#8377;@FormatAmount(bookingStats?.ResThisMonthAmount)</span></p>
             </div>
         </div>
     </div>
+
     <div class="col-md-6 col-xl-3">
         <div class="card bg-c-yellow order-card">
             <div class="card-body" style="padding: 4px 25px;">
                 <h6 class="text-white">Total Customer</h6>
-                <h2 class="text-right text-white"><i class="feather icon-repeat float-left"></i><span>@customerStats?.Total</span></h2>
+                <h2 class="text-right text-white">
+                    <i class="feather icon-repeat float-left"></i>
+                    <span>@customerStats?.Total</span>
+                </h2>
                 <p class="m-b-0">Today<span class="float-right">@customerStats?.Today</span></p>
                 <p class="m-b-0">This Month<span class="float-right">@customerStats?.ThisMonth</span></p>
             </div>
         </div>
     </div>
 
-    
-    @* dummy chart *@
-   
+    @* Dummy chart *@
+
     <div class="row">
-        @* <div class="col-xl-6 col-md-6">
-            <div class="card" style="height: 500px;">
-                <div class="card-header" style="text-align:center">
-                    <h5>Clicks % by Department </h5>
-                </div>
-                <div class="card-body" style="height: calc(100% - 56px);">
-                    <Chart Id="TrainingPie" Type="@ChartType.pie" Datasets="@TrainingPieChartData" AspectRatio="false"
-                           Labels="@TrainingPieChartLabels" Ids="@TrainingPieChartIds" IsStacked="false">
-                    </Chart>
-                </div>
-            </div>
-        </div> *@
         <div class="col-xl-6 col-md-6">
             <div class="card">
                 <div class="card-header text-center">
@@ -83,22 +82,23 @@
                 </div>
             </div>
         </div>
+
         <div class="col-xl-6 col-md-6">
-            @* <div class="card" style="height: 500px;"> *@
             <div class="card">
                 <div class="card-header text-center">
                     <h5>Trend of Customer Reservation</h5>
                 </div>
                 <div class="card-body" style="height: calc(100% - 56px);">
                     <div style="width: 100%;">
-                         <Chart Id="TrainingLine" Type="@ChartType.line" Datasets="@TrainingLineChartData" AspectRatio="false"
+                        <Chart Id="TrainingLine" Type="@ChartType.line" Datasets="@TrainingLineChartData" AspectRatio="false"
                                Labels="@TrainingBarChartLabels" Ids="@TrainingBarChartIds" IsStacked="false">
-                        </Chart> 
+                        </Chart>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
     <div class="row">
         <div class="col-xl-6 col-md-6">
             <div class="card">
@@ -120,6 +120,7 @@
                 </div>
             </div>
         </div>
+
         <div class="col-xl-6 col-md-6">
             <div class="card">
                 <div class="card-header" style="text-align:center">
@@ -141,8 +142,6 @@
             </div>
         </div>
     </div>
-
-
 </div>
 
 @code {
@@ -156,7 +155,6 @@
     public List<ChartJsDataset> TrainingLineChartData { get; set; } = new List<ChartJsDataset>();
     public string[] TrainingLineChartLabels { get; set; }
 
-
     private List<ChartJsDataset> TrainingPieChartData = new List<ChartJsDataset>
     {
         new ChartJsDataset
@@ -167,26 +165,18 @@
         }
     };
 
-
-
     private string[] TrainingPieChartLabels = { "Booking Amount", "Total Booking" };
     private int[] TrainingPieChartIds = { 1, 2 };
-
-
 
     private List<ReservationDetailsDto> TodaysBookings = new List<ReservationDetailsDto>();
     private List<ReservationDetailsDto> NextDaysBookings = new List<ReservationDetailsDto>();
     private Statistic bookingStats;
     private CustomersEntry customerStats;
 
-
     protected override async Task OnInitializedAsync()
     {
         StartDate = new DateTime(DateTime.Now.Year, 1, 1);
         EndDate = new DateTime(DateTime.Now.Year, 12, 31).AddHours(24).AddSeconds(-1);
-
-
-
 
         TodaysBookings = await client.GetTodaysBookingsAsync();
         NextDaysBookings = await client.GetNextDaysBookingsAsync();
@@ -195,7 +185,7 @@
         var BarchartData = await client.GetMonthwiseData(DateTime.Now.Year);
 
         TrainingBarChartIds = BarchartData.MonthwiseEntry.Select(o => (int)o.Month).ToArray();
-        TrainingBarChartLabels = BarchartData.MonthwiseEntry.Select(o => o.Month.ToString()).ToArray(); //Recent Training Report
+        TrainingBarChartLabels = BarchartData.MonthwiseEntry.Select(o => o.Month.ToString()).ToArray(); // Recent Training Report
         TrainingBarChartData.Add(new ChartJsDataset
             {
                 Label = "Total Room Booked",
@@ -208,37 +198,28 @@
             {
                 Label = "Total Customer Reservations",
                 Data = BarchartData.MonthwiseEntry.Select(o => o.Total.ToString()).ToArray(),
-                BackgroundColor = ColorHelper.GetBackgroundColors(Color.Chocolate, BarchartData.MonthwiseEntry.Count()), //Trend of Training Completion Percentege
+                BackgroundColor = ColorHelper.GetBackgroundColors(Color.Chocolate, BarchartData.MonthwiseEntry.Count()), // Trend of Training Completion Percentage
             });
+    }
 
-        //var monthlyBookings = await client.GetMonthlyBookingsAsync();
+    private string FormatAmount(decimal? amount)
+    {
+        if (amount == null)
+        {
+            return "0";
+        }
 
-        // Initialize all months with 0 bookings
-       //  var allMonths = new Dictionary<string, int>();
-       //  foreach (var month in Enum.GetNames(typeof(Months)))
-       //  {
-       //      allMonths[month] = 0;
-       //  }
-
-       //  // Update the months with actual booking data
-       //  foreach (var booking in monthlyBookings)
-       //  {
-       //      allMonths[booking.Key] = booking.Value;
-       //  }
-
-
-       //  var bookingCounts = monthlyBookings.Values.Select(v => v.ToString()).ToArray();
-
-       // // TrainingBarChartLabels = monthlyBookings.Keys.ToArray();
-
-       //  TrainingBarChartData = new List<ChartJsDataset>
-       //  {
-       //      new ChartJsDataset
-       //      {
-       //          Label = "Bookings",
-       //          Data = bookingCounts,
-       //          BackgroundColor = new string[] { "rgba(75, 192, 192, 0.2)" }
-       //      }
-       //  };
+        if (amount >= 10000000)
+        {
+            return $"{amount / 10000000:F2}M"; // Convert to millions
+        }
+        else if (amount >= 1000)
+        {
+            return $"{amount / 1000:F2}K"; // Convert to thousands
+        }
+        else
+        {
+            return amount.Value.ToString("F2"); // Default formatting
+        }
     }
 }

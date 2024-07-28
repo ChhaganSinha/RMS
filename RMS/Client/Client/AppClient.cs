@@ -2293,7 +2293,7 @@ namespace RMS.Client.Client
 
             return details;
         }
-
+       
         public async Task<ApiResponse<BookingType>> UpsertBookingTypeAsync(BookingType data)
         {
             var result = new ApiResponse<BookingType>();
@@ -2452,6 +2452,29 @@ namespace RMS.Client.Client
                 return result;
             }
         }
+
+        
+        public async Task<ApiResponse<ReservationDetailsDto>> ChekOutReservation(ReservationDetailsDto data)
+        {
+            var result = new ApiResponse<ReservationDetailsDto>();
+
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/App/ChekOutReservation", data);
+                res.EnsureSuccessStatusCode();
+                var json = await res.Content.ReadFromJsonAsync<ApiResponse<ReservationDetailsDto>>();
+                return json;
+
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+
+
         #endregion
 
         #region Restaurant

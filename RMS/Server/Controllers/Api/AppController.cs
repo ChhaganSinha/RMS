@@ -916,6 +916,13 @@ namespace RMS.Server.Controllers.Api
         {
             return await _appRepository.DeleteReservationDetails(id);
         }
+
+        [HttpPost]
+        [Route("ChekOutReservation")]
+        public async Task<ApiResponse<ReservationDetailsDto>> CheckOutReservations(ReservationDetailsDto data)
+        {
+            return await _appRepository.CheckOutReservations(data);
+        }
         #endregion
 
         #region Resturant
