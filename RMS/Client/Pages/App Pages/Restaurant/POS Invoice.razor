@@ -103,7 +103,7 @@
                                                             <div class="card mb-2" @onclick="() => ShowFoodDetailsModal(food)" style="cursor:pointer;">
                                                                 <img src="@GetImageSrc(food)" class="card-img-top" alt="@food.FoodName" width="100">
                                                                 <div class="card-body p-2">
-                                                                    <h6 class="card-title m-0">@food.FoodName</h6>
+                                                                    <h6 style="height:33px" class="card-title m-0">@food.FoodName</h6>
                                                                     <p class="card-text m-0" style="font-size:8px">Price: @food.Price.ToString("0.00")</p>
                                                                     <!-- Hidden Inputs -->
                                                                     <input type="hidden" name="select_product_id" class="select_product_id" value="@food.Id">
@@ -181,7 +181,7 @@
                                         <div class="form-row">
                                             <div class="form-group col-md-12">
                                                 <label class="bold-font" for="cookingTime">Cooking Time</label>
-                                                <input name="cookedtime" type="text" class="form-control timepicker3 hasDatepicker" id="cookedtime" placeholder="00:00:00" autocomplete="off">
+                                                <input name="cookedtime" @bind="order.CookingTime" type="text" class="form-control timepicker3 hasDatepicker" id="cookedtime" placeholder="00:00:00" autocomplete="off">
                                             </div>
                                         </div>
                                     </div>
@@ -589,12 +589,14 @@ else
         employees = (await client.GetAllEmployee()).ToList();
         tables = (await client.GetAllTableCon()).Where(x => x.Status == TableStatus.Available).ToList();
         Variants = (await client.GetAllAddVariants()).ToList();
-        if (foodCategories.Count > 0)
-        {
-            verticalActiveTab = (VerticalTab)foodCategories[0].Id;
-        }
+
+        // Set default vertical tab to show all foods
+        verticalActiveTab = VerticalTab.AllFood;
+
+        // Load foods according to the default tab
         FilterFoods();
     }
+
 
     private void SetVerticalActiveTab(VerticalTab categoryId)
     {
@@ -634,6 +636,8 @@ else
         StateHasChanged();
     }
 
+
+
     private void ApplyCategoryFilter(VerticalTab categoryId)
     {
         if (categoryId == VerticalTab.AllFood)
@@ -647,6 +651,8 @@ else
                 .ToList();
         }
     }
+
+
 
     private void ShowFoodDetailsModal(Food food)
     {

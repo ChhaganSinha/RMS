@@ -122,7 +122,7 @@
                         <div class="form-row">
                             <div class="form-group col-md-12">
                                 <label class="bold-font" for="cookingTime">Cooking Time</label>
-                                <input name="cookedtime" type="text" class="form-control timepicker3 hasDatepicker" id="cookedtime" placeholder="00:00:00" autocomplete="off">
+                                <input name="cookedtime" @bind="order.CookingTime" type="text" class="form-control timepicker3 hasDatepicker" id="cookedtime" placeholder="00:00:00" autocomplete="off">
                             </div>
                         </div>
                     </div>
@@ -241,6 +241,34 @@
     }
 </PageDialog>
 
+<!-- Add to cart Modal -->
+<PageDialog2 Show="@showcart" ClosePageDialog="CloseCart">
+    @if (showcart)
+    {
+        <table class="table table-bordered table-hover bg-white" id="purchaseTable">
+            <thead>
+                <tr>
+                    <th class="text-center">Item Information</th>
+                    <th class="text-center">Size</th>
+                    <th class="text-center wp_100">TaxPercentage</th>
+                    <th class="text-center wp_120">Price</th>
+                </tr>
+            </thead>
+            <tbody id="addItem">
+            <td class="text-center">@selectedFood.FoodName</td>
+            <td class="text-center">@selectedFood.Variant</td>
+            <td class="text-center">@selectedFood.TaxPercentage.ToString("F2")</td>
+            <td class="text-center">@selectedFood.Price.ToString("F2")</td>
+            </tbody>
+            <footer class="mt-1">
+                <button class="btn btn-primary btn-sm" @onclick="AddToCart">
+                    <i class="fa fa-shopping-cart"></i> Add to Cart
+                </button>
+            </footer>
+        </table>
+    }
+</PageDialog2>
+
 @code {
     [Parameter]
     public PosDTO Item { get; set; }
@@ -313,12 +341,14 @@
         {
             verticalActiveTab = (VerticalTab)foodCategories[0].Id;
         }
-        FilterFoods();
         order = await client.GetPosById(Item.Id);
         customerId = order.CustomerId;
         employeeId = order.EmployeeId;
         tableId = order.TableId;
         tables = tables.Where(x => x.Status == TableStatus.Available || x.Id == tableId).ToList();
+        // Set default vertical tab to show all foods
+        verticalActiveTab = VerticalTab.AllFood;
+        FilterFoods();
     }
 
     private void AddToCart()
@@ -343,7 +373,10 @@
         _timer.Dispose();
         StateHasChanged();
     }
-
+    private void CloseCart()
+    {
+        showcart = false;
+    }
     private void ResetForm()
     {
         order = new();
@@ -380,6 +413,7 @@
                 customerId = null;
                 employeeId = null;
                 tableId = null;
+                show = false;
             }
             else
             {
@@ -438,6 +472,7 @@
         StateHasChanged();
     }
 
+
     private void ApplyCategoryFilter(VerticalTab categoryId)
     {
         if (categoryId == VerticalTab.AllFood)
@@ -451,6 +486,7 @@
                 .ToList();
         }
     }
+
 
     private void ShowFoodDetailsModal(Food food)
     {

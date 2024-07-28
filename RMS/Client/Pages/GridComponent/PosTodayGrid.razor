@@ -45,6 +45,7 @@ else
             c.Add(o => o.Table).Css("table-bordered").Filterable(filter);
             c.Add(o => o.Status).Css("table-bordered").Filterable(filter);
             c.Add(o => o.GrandTotal).Css("table-bordered").Filterable(filter);
+            c.Add(o => o.CreatedOn).Css("table-bordered").Filterable(filter);
 
             if (canEdit || hasFullAccess)
             {
@@ -80,6 +81,16 @@ else
         var values = new string[] { $"CreatedOn__1__{start}" };
         // query.Add("grid-sorting", "Id__1__1");
         query.Add("grid-filter", new StringValues(values));
+        // filterType: string for the selected filter type. It can be one of these characters:
+        // 1: Equals
+        // 2: Contains
+        // 3: StartsWith
+        // 4: EndsWidth
+        // 5: GreaterThan
+        // 6: LessThan
+        // 7: GreaterThanOrEquals
+        // 8: LessThanOrEquals
+
 
         var client = new GridODataClient<PosDTO>(HttpClient, url, query, false, "ordersGrid", columns, 5)
             //.Sortable(true)

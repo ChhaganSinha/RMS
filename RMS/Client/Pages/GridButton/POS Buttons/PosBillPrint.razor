@@ -7,20 +7,257 @@
 @using RMS.Client.Client
 @using System.ComponentModel.DataAnnotations
 @inject AppClient client
+@inject IJSRuntime JS
 @implements ICustomGridComponent<PosDTO>
 @inject NavigationManager NavigationManager
 
-<button class='btn btn-sm txt-' style="border-radius:15px" @onclick="MyClickHandler" title="Edit"><i class="fa fa-print"></i></button>
+<style>
+    @@media print {
+        /* Hide everything by default */
+        body * {
+            display: none !important;
+        }
+        /* Show only the invoice card */
+        .invoice-card,
+        .invoice-card * {
+            display: block !important;
+        }
+        /* Set a white background for the printed page */
+        body {
+            background: #fff !important;
+        }
+        /* Set default font size for better readability */
+        .invoice-card {
+            width: 100%; /* Use full width for print */
+            padding: 0;
+            margin: 0;
+            border: none;
+            box-shadow: none;
+        }
+        /* Margin and padding adjustments */
+        .page-wrapper {
+            padding: 0;
+            margin: 0;
+        }
+        /* Style adjustments for text */
+        .invoice-title,
+        .invoice-footer {
+            font-size: 14px;
+            margin: 0;
+        }
+        /* Ensure headings are visible */
+        .heading {
+            font-size: 16px;
+            font-weight: bold;
+        }
+        /* Ensure strong elements are bold */
+        strong {
+            font-weight: bold;
+        }
+    }
+
+    /* General Styles */
+    .invoice-card {
+        display: flex;
+        flex-direction: column;
+        padding: 25px;
+        width: 300px;
+        background-color: #fff;
+        border-radius: 5px;
+        margin: 35px auto;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .invoice-head {
+        flex-direction: column;
+        margin-bottom: 25px;
+        text-align: center;
+    }
+
+        .invoice-head img {
+            max-width: 150px;
+        }
+
+    .invoice-title {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin: 15px 0;
+    }
+
+        .invoice-title h4 {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+    .invoice-details {
+        border-top: 0.5px dashed #747272;
+        border-bottom: 0.5px dashed #747272;
+        margin: 15px 0;
+    }
+
+    .invoice-list {
+        width: 100%;
+        border-collapse: collapse;
+        table-layout: fixed; /* Prevent table from expanding */
+    }
+
+        .invoice-list th,
+        .invoice-list td {
+            text-align: left;
+            padding: 8px;
+            word-wrap: break-word; /* Enable word wrapping */
+        }
+
+        .invoice-list th {
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        .invoice-list tbody tr {
+            border-bottom: 1px dashed #858080;
+        }
+
+    .invoice-footer {
+        margin-top: 20px;
+        border-top: 1px dotted #858080;
+        border-bottom: 1px dotted #858080;
+        padding-top: 10px;
+        padding-bottom: 10px;
+    }
+
+    .row-data {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+
+    .text-center {
+        text-align: center;
+    }
+
+    .text-bold {
+        font-weight: bold;
+    }
+
+    .invoice_address {
+        border-top: 1px dotted #858080;
+        margin-top: 20px;
+    }
+
+    .right-align {
+        text-align: right;
+    }
+</style>
+
+<button class="btn btn-sm txt-" style="border-radius:15px" @onclick="MyClickHandler" title="Bill Print">
+    <i class="fa fa-print"></i>
+</button>
+
 <PageDialog Title="@Title" Show="@show" ClosePageDialog="ResetForm">
     @if (show)
     {
+        <div class="page-wrapper">
+            <div class="invoice-card">
+                <div class="invoice-head">
+                    <img src="/assets/images/logo.png" style="width: 100px;" alt="">
+                    <h6>Royal Heritage Pilibhit</h6>
+                    <p class="my-0">@model.CustomerType</p>
+                    <p style="font-size: 10px;" class="item-title">Date: @DateTime.Now.ToString("MMM dd, yyyy")</p>
+                </div>
 
+                <div class="invoice-details">
+                    <table class="invoice-list">
+                        <thead>
+                            <tr>
+                                <th style="font-size: 8px !important;">Item</th>
+                                <th style="font-size: 8px !important;">Quantity</th>
+                                <th style="font-size: 8px !important;">Price</th>
+                                <th style="font-size: 8px !important;">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody style="font-size: 9px;">
+                            @foreach (var orderItem in model.OrderItems)
+                            {
+                                <tr>
+                                    <td>
+                                        <div class="item-info">
+                                            @orderItem.ProductName
+                                            <span>@orderItem.VariantName</span>
+                                        </div>
+                                    </td>
+                                    <td>@orderItem.Quantity</td>
+                                    <td>₹@orderItem.Price.ToString("N2")</td> <!-- Rupee symbol with two decimal places -->
+                                    <td>₹@orderItem.Total.ToString("N2")</td> <!-- Rupee symbol with two decimal places -->
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="invoice-footer">
+                    <div class="row-data">
+                        <span>Sub - Total Amount</span>
+                        <strong>₹@model.OriginalTotal.ToString("N2")</strong>
+                    </div>
+                    <div class="row-data">
+                        <span>Vat(@model.VatPercentage%)</span>
+                        <strong>₹@model.VatTax.ToString("N2")</strong>
+                    </div>
+                    <div class="row-data">
+                        <span>Service Charge</span>
+                        <strong>₹@model.ServiceCharge.ToString("N2")</strong>
+                    </div>
+                    <div class="row-data">
+                        <span>Discount</span>
+                        <strong>₹@model.InvoiceDiscount.ToString("N2")</strong>
+                    </div>
+                    <div class="row-data border-top">
+                        <span class="text-bold">Grand Total</span>
+                        <strong class="text-bold">₹@model.GrandTotal.ToString("N2")</strong>
+                    </div>
+                    <div class="row-data">
+                        <span>Customer Paid Amount</span>
+                        <strong>₹@model.GrandTotal.ToString("N2")</strong>
+                    </div>
+                    <div class="row-data">
+                        <span>Change Due</span>
+                        <strong>0</strong>
+                    </div>
+                    <div class="row-data">
+                        <span>Total payment</span>
+                        <strong>₹@model.GrandTotal.ToString("N2")</strong>
+                    </div>
+                </div>
+
+                <div class="invoice_address">
+                    <div class="row-data right-align">
+                        <div class="item-info">
+                            <p class="item-title">Billing To: @model.CustomerName</p>
+                        </div>
+                        @* <strong>Bill By: @model.Employee</strong> *@
+                    </div>
+     
+                    <div class="text-center">
+                        <h6 class="mt-10 text-c-red">Thank you very much</h6>
+                        <span><span>Powered By: </span> <span class="text-info">Royal Heritage</span></span>
+                        <br />
+                        <span style="font-size: 9px; font-weight: 600;">www.royalheritagepilibhit.in</span>
+                    </div>
+                </div>
+            </div>
+            <button class="btn btn-primary mt-4" @onclick="PrintInvoice">Print</button>
+        </div>
     }
 </PageDialog>
+
+
+
+
 @code {
     [Parameter]
     public PosDTO Item { get; set; }
-
 
     private List<int> variantsid = new();
 
@@ -34,7 +271,7 @@
     private int _delay = 2500;
     bool show = false;
     bool process = false;
-    string Title = "Update Food Details";
+    string Title = "Billing Details";
 
 
     [Required]
@@ -49,100 +286,20 @@
 
     private string imageDataUrl;
 
-    Food model = new();
-    private async Task HandleFileSelected(InputFileChangeEventArgs e)
-    {
-        var file = e.File;
-        if (file != null)
-        {
-            using (var memoryStream = new MemoryStream())
-            {
-                await file.OpenReadStream().CopyToAsync(memoryStream);
-                model.ImageFile = memoryStream.ToArray();
-                imageDataUrl = $"data:{file.ContentType};base64,{Convert.ToBase64String(model.ImageFile)}";
-            }
-        }
-    }
+    PosDTO model = new();
+
 
     private async Task MyClickHandler(MouseEventArgs e)
     {
         show = true;
-        model = await client.GetFoodById(Item.Id);
+        model = await client.GetPosById(Item.Id);
         alert?.Clear();
-
-        menuTypes = (await client.GetAllMenuType()).ToList();
-        Category = (await client.GetAllFoodCategory()).ToList();
-        Variants = (await client.GetAllAddVariants()).ToList();
-        // Convert existing image data to base64 string for preview
-        if (model.ImageFile != null && model.ImageFile.Length > 0)
-        {
-            imageDataUrl = $"data:image/png;base64,{Convert.ToBase64String(model.ImageFile)}";
-        }
-
-
-        foodcategoryid = model.FoodCategoryId > 0 ? model.FoodCategoryId : null;
-
-        var foodMenuTypeMap = await client.GetFoodMenuTypeByFoodId(model.Id);
-        selectedMenuTypeid.AddRange(foodMenuTypeMap.Select(o => o.MenuTypeId));
-
-        var foodVarientMap = await client.GetFoodVarientByFoodId(model.Id);
-        variantsid.AddRange(foodVarientMap.Select(o => o.FoodVarientId));
     }
 
-    public async Task OnSave()
+    private async Task OnSave()
     {
         process = true;
         alert?.Clear();
-
-        model.FoodCategoryId = foodcategoryid;
-        if (foodcategoryid != null)
-            model.FoodCategory = Category.Where(x => x.Id == foodcategoryid).Select(x => x.Name).First();
-
-        //model.VariantId = variantsid;
-        if (variantsid.Count > 0)
-            model.Variant = string.Join(", ", Variants.Where(x => variantsid.Contains(x.Id)).Select(x => x.Name));
-
-        if (selectedMenuTypeid.Count > 0)
-            model.MenuType = string.Join(", ", menuTypes.Where(menuType => selectedMenuTypeid.Contains(menuType.Id)).Select(menuType => menuType.Name));
-
-        var response = await client.UpsertFoodAsync(model);
-        if (response.IsSuccess)
-        {
-            if (response.Result.Id > 0)
-            {
-                if (FoodMenuTypeMap.ContainsKey(model.Id))
-                {
-                    FoodMenuTypeMap[model.Id] = selectedMenuTypeid.Select(id => id).ToList();
-                }
-                else
-                {
-                    FoodMenuTypeMap.Add(model.Id, selectedMenuTypeid.Select(id => id).ToList());
-                }
-
-                var result = await client.UpsertFoodMenuTypeMapping(FoodMenuTypeMap);
-            }
-
-            if (response.Result.Id > 0)
-            {
-                if (FoodVarientMap.ContainsKey(model.Id))
-                {
-                    FoodVarientMap[model.Id] = variantsid.Select(id => id).ToList();
-                }
-                else
-                {
-                    FoodVarientMap.Add(model.Id, variantsid.Select(id => id).ToList());
-                }
-
-                var result = await client.UpsertFoodVarientMapping(FoodVarientMap);
-            }
-            await FoodGrid.RefreshGridAsync();
-            alert?.SetSuccess(response.Message);
-
-        }
-        else
-        {
-            alert?.SetError(response.Message);
-        }
 
         process = false;
         StateHasChanged();
@@ -161,5 +318,10 @@
         model = new();
         show = false;
         process = false;
+    }
+
+    private void PrintInvoice()
+    {
+        JS.InvokeVoidAsync("window.print");
     }
 }
