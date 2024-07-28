@@ -2961,6 +2961,23 @@ namespace RMS.Client.Client
             }
         }
 
+        public async Task<ApiResponse<ReservationDetailsDto>> DeleteBookingList(int id)
+        {
+            var result = new ApiResponse<ReservationDetailsDto>();
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/App/DeleteBookingList/{id}", new { });
+                res.EnsureSuccessStatusCode();
+                var json = await res.Content.ReadFromJsonAsync<ApiResponse<ReservationDetailsDto>>();
+                return json;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
 
         #endregion
 

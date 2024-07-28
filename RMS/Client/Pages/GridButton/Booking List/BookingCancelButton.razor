@@ -52,20 +52,20 @@
     bool process = false;
     bool TaskCompleted = false;
     string MessageBody = string.Empty;
-    string Title = "Delete Booking Type";
-
+    string Title = "Cancle Booking";
+  
     private async void Delete()
     {
         process = true;
-        // var responce = await client.DeleteBookingList(Item.Id);
-        // if (responce.IsSuccess == true)
-        // {
-        //     MessageBody = responce.Message;
-        // }
-        // else
-        // {
-        //     MessageBody = responce.Message;
-        // }
+         var responce = await client.DeleteBookingList(Item.Id);
+         if (responce.IsSuccess == true)
+        {
+            MessageBody = responce.Message;
+        }
+        else
+        {
+            MessageBody = responce.Message;
+        }
 
         TaskCompleted = true;
         Actions[0]?.Invoke(Item);

@@ -1247,6 +1247,14 @@ namespace RMS.Server.Controllers.Api
 
             return result;
         }
+
+
+        [HttpPost]
+        [Route("DeleteBookingList/{id}")]
+        public async Task<ApiResponse<ReservationDetailsDto>> DeleteBookingList(int id)
+        {
+            return await _appRepository.DeleteBookingList(id);
+        }
         #endregion
 
         #region Update Profilr images

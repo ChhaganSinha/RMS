@@ -2613,11 +2613,13 @@ namespace RMS.Repositories
 
                 if (data.Id > 0)
                 {
+                    data.Status = RoomHallStatus.Booked;
                     AppDbCxt.ReservationDetails.Update(data);
                     result.Message = "Data Successfully Updated.";
                 }
                 else
                 {
+                    data.Status = RoomHallStatus.Booked;
                     AppDbCxt.ReservationDetails.Add(data);
                     result.Message = "Data Successfully Inserted.";
                 }
@@ -2712,6 +2714,46 @@ namespace RMS.Repositories
                 result.Result = existing;
                 result.IsSuccess = true;
                 result.Message = "Successfully Checked Out!";
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+
+
+        public async Task<ApiResponse<ReservationDetailsDto>> DeleteBookingList(int id)
+        {
+            var result = new ApiResponse<ReservationDetailsDto>();
+            try
+            {
+                var existing = AppDbCxt.ReservationDetails
+                    .Include(rd => rd.CustomerInfo)
+                    .Include(rd => rd.RoomBookings)
+                    .Include(rd => rd.PaymentDetails)
+                    .Include(rd => rd.BillingDetails)
+                    .FirstOrDefault(x => x.Id == id);
+
+                if (existing == null)
+                {
+                    result.IsSuccess = true;
+                    result.Message = "Reservation not found!";
+                    return result;
+                }
+
+                
+
+                // Remove the reservation
+                AppDbCxt.ReservationDetails.Remove(existing);
+                
+                await AppDbCxt.SaveChangesAsync();
+
+                result.Result = existing;
+                result.IsSuccess = true;
+                result.Message = "Successfully Deleted!";
                 return result;
             }
             catch (Exception ex)
