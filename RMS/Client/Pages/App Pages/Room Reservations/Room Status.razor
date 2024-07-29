@@ -38,7 +38,8 @@
 
                     <div class="row mb-3">
                         <div class="col-md-3">
-                            <select class="form-control" @bind="selectedRoomStatus">
+                            <label for="statusDropdown" style="font-weight: bold;">Status:</label>
+                            <select id="statusDropdown" class="form-control" @bind="selectedRoomStatus">
                                 <option value="">All Statuses</option>
                                 @foreach (var status in roomStatuses)
                                 {
@@ -47,7 +48,8 @@
                             </select>
                         </div>
                         <div class="col-md-3">
-                            <select class="form-control" @bind="selectedRoomType">
+                            <label for="typeDropdown" style="font-weight: bold;">Room Type:</label>
+                            <select id="typeDropdown" class="form-control" @bind="selectedRoomType">
                                 <option value="">All Types</option>
                                 @foreach (var type in roomTypes)
                                 {
@@ -55,16 +57,17 @@
                                 }
                             </select>
                         </div>
-                        <div class="col-md-3">
-                            <select class="form-control" @bind="selectedFloor">
-                                <option value="">All Floors</option>
-                                @foreach (var floor in floors)
-                                {
-                                    <option value="@floor">@floor</option>
-                                }
-                            </select>
-                        </div>
-                        <div class="col-md-3">
+                        @* <div class="col-md-3">
+                        <label for="floorDropdown">Floor:</label>
+                        <select id="floorDropdown" class="form-control" @bind="selectedFloor">
+                        <option value="">All Floors</option>
+                        @foreach (var floor in floors)
+                        {
+                        <option value="@floor">@floor</option>
+                        }
+                        </select>
+                        </div> *@
+                        <div class="col-md-3 d-flex align-items-end" style="margin-to">
                             <button class="btn btn-primary" @onclick="ApplyFilters">Search</button>
                         </div>
                     </div>
@@ -94,22 +97,33 @@
                                                     <p class="m-0">Room Type: @room.Category</p>
                                                     <p class="m-0">Check Out: None</p>
                                                     <p class="m-0 text-c-green">Charge: @room.Price</p>
-                                                    @if(room.Status == RoomHallStatus.Booked){
+                                                    @if (room.Status == RoomHallStatus.Booked)
+                                                    {
                                                         <button type="button" style="width: 60%;align-self: center;" class="btn btn-danger btn-sm mt-5 font-weight-bold" disabled>
-                                                        Booked
+                                                            Booked
                                                         </button>
 
-                                                    }else{
-                                                            <button type="button" style="width: 60%;align-self: center;" class="btn btn-success btn-sm mt-5 font-weight-bold" @onclick="() => BookRoom(room)">
-                                                                Available
-                                                            </button>
                                                     }
-                                                    
+                                                    else if (room.Status == RoomHallStatus.Available)
+                                                    {
+
+                                                        <button type="button" style="width: 60%;align-self: center;" class="btn btn-success btn-sm mt-5 font-weight-bold" @onclick="() => BookRoom(room)">
+                                                            Available
+                                                        </button>
+                                                    }
+                                                    else if (room.Status == RoomHallStatus.Dirty || room.Status == RoomHallStatus.UnderProcess || room.Status == RoomHallStatus.AssignedToClean || room.Status == RoomHallStatus.UnderMaintenance || room.Status == RoomHallStatus.Blocked || room.Status == RoomHallStatus.BookedAndAssignedToClean)
+                                                    {
+                                                        <button type="button" style="width: 100%;align-self: center;" class="btn btn-warning btn-sm mt-5 font-weight-bold" disabled>
+                                                            Under Maintenance
+                                                        </button>
+                                                    }
+
+
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                 }
+                                }
                             }
                             else
                             {
@@ -125,6 +139,7 @@
         </div>
     </div>
 </div>
+
 
 <SimpleDailog Title="@Title" Show="@show" OnCloseDialog="ResetForm">
     @if (show)
@@ -215,8 +230,8 @@
     {
         filteredRooms = Rooms
             .Where(r => (!selectedRoomStatus.HasValue || r.Status == selectedRoomStatus.Value) &&
-                        (string.IsNullOrEmpty(selectedRoomType) || r.Category == selectedRoomType) &&
-                        (!selectedFloor.HasValue || r.floor == selectedFloor.Value))
+                        (string.IsNullOrEmpty(selectedRoomType) || r.Category == selectedRoomType))
+                       // (!selectedFloor.HasValue || r.floor == selectedFloor.Value))
             .ToList();
     }
 

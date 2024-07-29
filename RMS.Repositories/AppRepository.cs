@@ -2684,7 +2684,7 @@ namespace RMS.Repositories
             var result = new ApiResponse<ReservationDetailsDto>();
             try
             {
-                var existing = AppDbCxt.ReservationDetails.FirstOrDefault(x => x.Id == reservationDetailsDto.Id);
+                var existing = AppDbCxt.ReservationDetails.Include(rd => rd.RoomBookings).FirstOrDefault(x => x.Id == reservationDetailsDto.Id);
 
                 if (existing == null)
                 {
@@ -2698,16 +2698,23 @@ namespace RMS.Repositories
                 existing.CheckOut = DateTime.Now;
                 AppDbCxt.ReservationDetails.Update(existing);
 
-                // Get all room numbers involved in the booking
-                var roomNumbers = reservationDetailsDto.RoomBookings.Select(rb => rb.RoomNo).ToList();
+                /* // Get all room numbers involved in the booking
+                 var roomNumbers = reservationDetailsDto.RoomBookings.Select(rb => rb.RoomNo).ToList();
 
-                // Update the status of each room to Dirty
-                var roomsToUpdate = AppDbCxt.Room.Where(r => roomNumbers.Contains(r.RoomNumber)).ToList();
-                foreach (var room in roomsToUpdate)
+                 // Update the status of each room to Dirty
+                 var roomsToUpdate = AppDbCxt.Room.Where(r => roomNumbers.Contains(r.RoomNumber)).ToList();
+                 foreach (var room in roomsToUpdate)
+                 {
+                     room.Status = RoomHallStatus.Dirty;
+                     AppDbCxt.Room.Update(room);
+                 }*/
+
+                foreach (var roomBooking in existing.RoomBookings)
                 {
-                    room.Status = RoomHallStatus.Dirty;
-                    AppDbCxt.Room.Update(room);
+                    var room = AppDbCxt.Room.FirstOrDefault(r => r.RoomNumber == roomBooking.RoomNo);
+                    if (room != null) { room.Status = RoomHallStatus.Dirty; AppDbCxt.Room.Update(room); }
                 }
+
 
                 await AppDbCxt.SaveChangesAsync();
 
