@@ -2751,6 +2751,12 @@ namespace RMS.Repositories
                 
                 await AppDbCxt.SaveChangesAsync();
 
+                foreach (var roomBooking in existing.RoomBookings)
+                {
+                    var room = AppDbCxt.Room.FirstOrDefault(r => r.Id == roomBooking.RoomId);
+                    if (room != null) { room.Status = RoomHallStatus.Available; AppDbCxt.Room.Update(room); }
+                }
+                await AppDbCxt.SaveChangesAsync();
                 result.Result = existing;
                 result.IsSuccess = true;
                 result.Message = "Successfully Deleted!";
