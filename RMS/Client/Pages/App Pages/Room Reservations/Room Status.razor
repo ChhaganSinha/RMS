@@ -242,19 +242,7 @@
     public async Task OnSave()
     {
         alert?.Clear();
-        process = true;
-        // var result = await client.BookRoom(roomModel);
-        // if (result.Success)
-        // {
-        //     alert?.SetSuccess("Room booked successfully.");
-        //     show = false;
-        // }
-        // else
-        // {
-        //     alert?.SetError("Failed to book the room.");
-        // }
-        // process = false;
-        // StateHasChanged();
+        NavigationManager.NavigateTo($"/new-booking/r/{roomModel.RoomNumber}");
     }
 
     public void ResetForm()

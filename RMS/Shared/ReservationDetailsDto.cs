@@ -22,7 +22,7 @@ namespace RMS.Dto
 
     public class RoomBookingDto : BaseEntity
     {
-        public RoomType RoomType { get; set; }
+        public string RoomType { get; set; } = string.Empty;
 
         public int? RoomId { get; set; }
         public string RoomNo { get; set; } = string.Empty;

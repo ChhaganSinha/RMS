@@ -1,4 +1,5 @@
 ﻿@page "/new-booking"
+@page "/new-booking/r/{roomNumber}"
 @page "/new-booking/{Id:int}"
 @using RMS.Client.Client
 @using RMS.Client.Pages.GridComponent
@@ -436,6 +437,8 @@ else
 @code {
     [Parameter]
     public int Id { get; set; }
+    [Parameter]
+    public string roomNumber { get; set; } = string.Empty;
     public int CustomerCount = 0;
 
     [CascadingParameter]
@@ -491,7 +494,9 @@ else
             NavigationManager.NavigateTo("/unauthorized");
             return;
         }
-        AddRoom();
+        if(Id == 0 && string.IsNullOrEmpty(roomNumber))
+            AddRoom();
+
         rooms = await client.GetAllRoom();
         roomCategories = await client.GetAllRoomCategory();
         customers = (await client.GetAllCustomer()).ToList();
@@ -516,6 +521,22 @@ else
                     Adults = rb.Adults,
                     Children = rb.Children
                 }).ToList();
+        }
+        if (!string.IsNullOrEmpty(roomNumber))
+        {
+            var selectedRoom = rooms.Where(x => x.RoomNumber == roomNumber).FirstOrDefault();
+            if(selectedRoom != null)
+            {
+                roomBookings.Add(new RoomBooking
+                {
+                        RoomType = selectedRoom.Category,
+                        RoomNo = selectedRoom.RoomNumber,
+                        Adults = 0,
+                        Children = 0
+                });
+
+               
+            }
         }
     }
 
@@ -551,7 +572,7 @@ else
             // Update room details in model
             model.RoomBookings = roomBookings.Select(rb => new RoomBookingDto
                 {
-                    RoomType = Enum.TryParse<RoomType>(rb.RoomType, out var roomTypeEnum) ? roomTypeEnum : RoomType.SingleRoom,
+                    RoomType = rb.RoomType,
                     RoomNo = rb.RoomNo,
                     RoomId = rooms.Where(x => x.RoomNumber == rb.RoomNo).Select(x => x.Id).First(),
                     Adults = rb.Adults,
