@@ -2,22 +2,34 @@
 @using GridShared.Columns
 @using GridShared.Utility
 @using Microsoft.Extensions.Primitives
-@using RMS.Client.Client
+@using RMS.Client.Pages.GridComponent
 @using RMS.Client.Shared.Popup
+@using RMS.Client.Client
 @inject AppClient client
 @implements ICustomGridComponent<ReservationDetailsDto>
 @inject NavigationManager NavigationManager
 
-<button class='btn btn-sm btn-danger' style="border-radius:15px" @onclick="MyClickHandler" title="Delete"><i class="fa fa-trash"></i></button>
+@if(Item.Status == Dto.Enum.RoomHallStatus.Booked)
+{
+    <button class='btn btn-sm btn-primary' style="border-radius:15px" @onclick="MyClickHandler" title="Check Out"><i class="fa fa-check-square-o"></i></button>
+}
+@if(Item.Status == Dto.Enum.RoomHallStatus.Dirty)
+{
+    <p style="font-size: 8px; font-weight: 600; margin: 0;" class="text-c-red">Checked Out</p>
+}
+else
+{
+    
+}
 <SimpleDailog Title="@Title" Show="@show" OnCloseDialog="ResetForm">
     @if (show)
     {
         @if (!TaskCompleted && !process)
         {
             <div style="text-align:center;">
-                <h6 class="pb-2">Are you sure want to Cancel Reservation?</h6>
+                <h6 class="pb-2">Are you sure want to Check Out?</h6>
 
-                <button class="btn btn-danger" @onclick="Delete">Yes</button>
+                <button class="btn btn-danger" @onclick="ProcesCheckOut">Yes</button>
                 <button class="btn btn-primary" @onclick="ResetForm">No</button>
             </div>
         }
@@ -28,16 +40,15 @@
             </div>
             <br />
         }
+       
         else
         {
             <div style="text-align:center">
                 <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
             </div>
         }
-        <br />
     }
 </SimpleDailog>
-
 @code {
     [Parameter]
     public ReservationDetailsDto Item { get; set; }
@@ -45,20 +56,28 @@
     [Parameter]
     public CGrid<ReservationDetailsDto> Grid { get; set; }
 
+    [CascadingParameter]
+    protected AlertModel? alert { get; set; }
+
     [Parameter]
     public IList<Action<object>> Actions { get; set; }
 
+    private Timer _timer;
+    private int _delay = 2500;
     bool show = false;
     bool process = false;
     bool TaskCompleted = false;
+    string Title = "Checking Out";
     string MessageBody = string.Empty;
-    string Title = "Cancle Booking";
-  
-    private async void Delete()
+
+    ReservationDetailsDto model = new();
+
+    private async Task ProcesCheckOut()
     {
+
         process = true;
-         var responce = await client.DeleteBookingList(Item.Id);
-         if (responce.IsSuccess == true)
+        var responce = await client.ChekOutReservation(Item);
+        if (responce.IsSuccess == true)
         {
             MessageBody = responce.Message;
         }
@@ -68,24 +87,32 @@
         }
 
         TaskCompleted = true;
+        Title = "Process Completed!";
         Actions[0]?.Invoke(Item);
+        
     }
 
-    private void MyClickHandler(MouseEventArgs e)
+    private async Task MyClickHandler(MouseEventArgs e)
     {
         show = true;
         MessageBody = string.Empty;
         TaskCompleted = false;
+
     }
 
-    public void ResetForm()
-    {
 
-        show = false;
-        TaskCompleted = false;
-        process = false;
-        MessageBody = string.Empty;
+    private void TimerCallback(Object o)
+    {
+        alert?.Clear();
+        _timer.Dispose();
         StateHasChanged();
+    }
+
+    private void ResetForm()
+    {
+        model = new();
+        show = false;
+        process = false;
     }
 
 }

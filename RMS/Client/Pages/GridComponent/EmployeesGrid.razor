@@ -11,7 +11,7 @@
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject PermissionService PermissionService
 
-@if (_task.IsCompleted)
+@if (_task?.IsCompleted ?? false)
 {
     <div class="row">
         <div class="col-sm-12">

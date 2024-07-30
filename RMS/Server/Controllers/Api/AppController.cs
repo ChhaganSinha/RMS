@@ -181,6 +181,38 @@ namespace RMS.Server.Controllers.Api
         {
             return await _appRepository.DeleteRoom(id);
         }
+
+
+        [HttpPost]
+        [Route("UpsertRoomCleaningAssignment")]
+        public async Task<ApiResponse<RoomCleaningAssignmentModel>> UpsertRoomCleaningAssignment(RoomCleaningAssignmentModel data)
+        {
+            if (data.Id > 0)
+            {
+                data.ModifiedBy = User.Identity.Name;
+                data.ModifiedOn = DateTime.Now;
+            }
+            else
+            {
+                data.CreatedBy = User.Identity.Name;
+                data.CreatedOn = DateTime.Now;
+            }
+            return await _appRepository.UpsertRoomCleaningAssignment(data);
+        }
+
+        [HttpPost]
+        [Route("DeleteRoomCleaningAssignmentModel/{id}")]
+        public async Task<ApiResponse<RoomCleaningAssignmentModel>> DeleteRoomCleaningAssignmentModel(int id)
+        {
+            return await _appRepository.DeleteRoomCleaningAssignmentModel(id);
+        }
+
+        [HttpGet]
+        [Route("RoomCleaningAssignmentModel/{id}")]
+        public async Task<RoomCleaningAssignmentModel> GetRoomCleaningAssignmentModelById(int id)
+        {
+            return await _appRepository.GetRoomCleaningAssignmentModelById(id);
+        }
         #endregion
 
         #region Employee Setion
@@ -884,6 +916,13 @@ namespace RMS.Server.Controllers.Api
         {
             return await _appRepository.DeleteReservationDetails(id);
         }
+
+        [HttpPost]
+        [Route("ChekOutReservation")]
+        public async Task<ApiResponse<ReservationDetailsDto>> CheckOutReservations(ReservationDetailsDto data)
+        {
+            return await _appRepository.CheckOutReservations(data);
+        }
         #endregion
 
         #region Resturant
@@ -1207,6 +1246,14 @@ namespace RMS.Server.Controllers.Api
             }
 
             return result;
+        }
+
+
+        [HttpPost]
+        [Route("DeleteBookingList/{id}")]
+        public async Task<ApiResponse<ReservationDetailsDto>> DeleteBookingList(int id)
+        {
+            return await _appRepository.DeleteBookingList(id);
         }
         #endregion
 

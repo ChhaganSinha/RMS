@@ -75,7 +75,7 @@ else
         authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
 
         // Fetch permissions
-        var permissions = await PermissionService.HasPermission("EmployeeAttendance");
+        var permissions = await PermissionService.HasPermission("AttendanceList");
         if (permissions != null)
         {
             canView = permissions.CanView;

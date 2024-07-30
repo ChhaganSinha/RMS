@@ -6,20 +6,22 @@ using System.ComponentModel.DataAnnotations;
 
 namespace RMS.Dto
 {
-    public class RoomCleaningAssignmentModel
+    public class RoomCleaningAssignmentModel : Auditable
     {
-        [Required]
+       
         public string HouseKeeper { get; set; } = string.Empty;
         public string RoomType { get; set; } = string.Empty;
         public string Status { get; set; } = string.Empty;
         public List<RoomModel> SelectedRooms { get; set; } = new List<RoomModel>();
     }
 
-    public class RoomModel
+    public class RoomModel : BaseEntity
     {
         public string RoomNo { get; set; } = string.Empty;
         public string Status { get; set; } = string.Empty;
-        public bool IsSelected { get; set; }
+
+        public DateTime DateTime { get; set; }
+        public bool IsSelected { get; set; } = false;
     }
 }
 

@@ -377,6 +377,67 @@ namespace RMS.Client.Client
                 return result;
             }
         }
+
+        public async Task<ApiResponse<RoomCleaningAssignmentModel>> UpsertRoomCleaningAssignment(RoomCleaningAssignmentModel data)
+        {
+            var result = new ApiResponse<RoomCleaningAssignmentModel>();
+
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/App/UpsertRoomCleaningAssignment", data);
+                res.EnsureSuccessStatusCode();
+                var json = await res.Content.ReadFromJsonAsync<ApiResponse<RoomCleaningAssignmentModel>>();
+                return json;
+
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+
+
+
+        }
+        public async Task<ApiResponse<RoomCleaningAssignmentModel>> DeleteRoomCleaningAssignmentModel(int id)
+        {
+            var result = new ApiResponse<RoomCleaningAssignmentModel>();
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/App/DeleteRoomCleaningAssignmentModel/{id}", new { });
+                res.EnsureSuccessStatusCode();
+                var json = await res.Content.ReadFromJsonAsync<ApiResponse<RoomCleaningAssignmentModel>>();
+                return json;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+
+        public async Task<RoomCleaningAssignmentModel> GetRoomCleaningAssignmentModelById(int id)
+        {
+            RoomCleaningAssignmentModel data = null;
+            try
+            {
+                var res = await HttpClient.GetAsync($"api/App/RoomCleaningAssignmentModel/{id}");
+
+                res.EnsureSuccessStatusCode();
+
+                data = await res.Content.ReadFromJsonAsync<RoomCleaningAssignmentModel>();
+
+            }
+            catch (Exception ex)
+            {
+                Logger.LogCritical(ex, ex.Message);
+                throw;
+            }
+
+            return data;
+        }
         #endregion
 
         #region Hall Section
@@ -2232,7 +2293,7 @@ namespace RMS.Client.Client
 
             return details;
         }
-
+       
         public async Task<ApiResponse<BookingType>> UpsertBookingTypeAsync(BookingType data)
         {
             var result = new ApiResponse<BookingType>();
@@ -2391,6 +2452,29 @@ namespace RMS.Client.Client
                 return result;
             }
         }
+
+        
+        public async Task<ApiResponse<ReservationDetailsDto>> ChekOutReservation(ReservationDetailsDto data)
+        {
+            var result = new ApiResponse<ReservationDetailsDto>();
+
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/App/ChekOutReservation", data);
+                res.EnsureSuccessStatusCode();
+                var json = await res.Content.ReadFromJsonAsync<ApiResponse<ReservationDetailsDto>>();
+                return json;
+
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+
+
         #endregion
 
         #region Restaurant
@@ -2877,6 +2961,23 @@ namespace RMS.Client.Client
             }
         }
 
+        public async Task<ApiResponse<ReservationDetailsDto>> DeleteBookingList(int id)
+        {
+            var result = new ApiResponse<ReservationDetailsDto>();
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/App/DeleteBookingList/{id}", new { });
+                res.EnsureSuccessStatusCode();
+                var json = await res.Content.ReadFromJsonAsync<ApiResponse<ReservationDetailsDto>>();
+                return json;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
 
         #endregion
 

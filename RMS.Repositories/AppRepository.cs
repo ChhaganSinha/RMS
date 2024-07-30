@@ -364,6 +364,132 @@ namespace RMS.Repositories
                 return result;
             }
         }
+
+        public async Task<ApiResponse<RoomCleaningAssignmentModel>> UpsertRoomCleaningAssignment(RoomCleaningAssignmentModel data)
+        {
+            var result = new ApiResponse<RoomCleaningAssignmentModel>();
+            try
+            {
+                if (data == null)
+                {
+                    result.IsSuccess = false;
+                    result.Message = "Invalid Room Cleaning Assignment data!";
+                    return result;
+                }
+
+                if (data.Id > 0)
+                {
+                    // Update logic
+                    var existingAssignment = await AppDbCxt.RoomCleaningAssignmentModel
+                        .Include(r => r.SelectedRooms)
+                        .FirstOrDefaultAsync(r => r.Id == data.Id);
+
+                    if (existingAssignment != null)
+                    {
+                        // Update existing properties
+                        existingAssignment.HouseKeeper = data.HouseKeeper;
+                        existingAssignment.RoomType = data.RoomType;
+                        existingAssignment.Status = RoomHallStatus.AssignedToClean.ToString();
+                        existingAssignment.ModifiedBy = data.ModifiedBy;
+                        existingAssignment.ModifiedOn = data.ModifiedOn;
+
+                        // Clear and update the selected rooms
+                        existingAssignment.SelectedRooms.Clear();
+                        foreach (var roomModel in data.SelectedRooms)
+                        {
+                            roomModel.Status = RoomHallStatus.AssignedToClean.ToString();
+                            existingAssignment.SelectedRooms.Add(roomModel);
+                        }
+
+                        AppDbCxt.RoomCleaningAssignmentModel.Update(existingAssignment);
+                    }
+                }
+                else
+                {
+                    // Insert logic
+                    data.CreatedBy = data.CreatedBy;
+                    data.CreatedOn = data.CreatedOn;
+                    data.Status = RoomHallStatus.AssignedToClean.ToString(); 
+
+                    foreach (var roomModel in data.SelectedRooms)
+                    {
+                        roomModel.Status = RoomHallStatus.AssignedToClean.ToString(); 
+                    }
+
+                    AppDbCxt.RoomCleaningAssignmentModel.Add(data);
+                }
+
+                foreach (var roomBooking in data.SelectedRooms)
+                {
+                    var room = AppDbCxt.Room.FirstOrDefault(r => r.RoomNumber == roomBooking.RoomNo);
+                    if (room != null)
+                    {
+                        room.Status = RoomHallStatus.AssignedToClean;
+                        AppDbCxt.Room.Update(room);
+                    }
+                }
+
+                /* foreach (var roomBooking in data.RoomBookings)
+                 {
+                     var room = AppDbCxt.Room.FirstOrDefault(r => r.Id == roomBooking.RoomId);
+                     if (room != null) { room.Status = RoomHallStatus.Booked; AppDbCxt.Room.Update(room); }
+                 }*/
+
+
+                await AppDbCxt.SaveChangesAsync();
+
+                result.IsSuccess = true;
+                result.Result = data;
+                result.Message = data.Id > 0 ? "Data Successfully Updated." : "Data Successfully Inserted.";
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+
+        public async Task<ApiResponse<RoomCleaningAssignmentModel>> DeleteRoomCleaningAssignmentModel(int id)
+        {
+            var result = new ApiResponse<RoomCleaningAssignmentModel>();
+            try
+            {
+                var existing = AppDbCxt.RoomCleaningAssignmentModel.First(x => x.Id == id);
+                result.Result = existing;
+                if (existing == null)
+                {
+                    result.IsSuccess = true;
+                    result.Message = "Room Category not found!";
+                    return result;
+                }
+
+                AppDbCxt.RoomCleaningAssignmentModel.Remove(existing);
+                await AppDbCxt.SaveChangesAsync();
+                result.IsSuccess = true;
+                result.Message = "Successfully Deleted!";
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+
+        public async Task<RoomCleaningAssignmentModel> GetRoomCleaningAssignmentModelById(int id)
+        {
+            RoomCleaningAssignmentModel result = null;
+
+#pragma warning disable CS8600
+            result = AppDbCxt.RoomCleaningAssignmentModel.FirstOrDefault(o => o.Id == id);
+#pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
+
+            return await Task.FromResult(result);
+        }
+
         #endregion
 
         #region Employee Section
@@ -2487,11 +2613,13 @@ namespace RMS.Repositories
 
                 if (data.Id > 0)
                 {
+                    data.Status = RoomHallStatus.Booked;
                     AppDbCxt.ReservationDetails.Update(data);
                     result.Message = "Data Successfully Updated.";
                 }
                 else
                 {
+                    data.Status = RoomHallStatus.Booked;
                     AppDbCxt.ReservationDetails.Add(data);
                     result.Message = "Data Successfully Inserted.";
                 }
@@ -2550,6 +2678,105 @@ namespace RMS.Repositories
                 return result;
             }
         }
+
+        public async Task<ApiResponse<ReservationDetailsDto>> CheckOutReservations(ReservationDetailsDto reservationDetailsDto)
+        {
+            var result = new ApiResponse<ReservationDetailsDto>();
+            try
+            {
+                var existing = AppDbCxt.ReservationDetails.Include(rd => rd.RoomBookings).FirstOrDefault(x => x.Id == reservationDetailsDto.Id);
+
+                if (existing == null)
+                {
+                    result.IsSuccess = false;
+                    result.Message = "Booking not found!";
+                    return result;
+                }
+
+                // Update reservation status
+                existing.Status = RoomHallStatus.Dirty;
+                existing.CheckOut = DateTime.Now;
+                AppDbCxt.ReservationDetails.Update(existing);
+
+                /* // Get all room numbers involved in the booking
+                 var roomNumbers = reservationDetailsDto.RoomBookings.Select(rb => rb.RoomNo).ToList();
+
+                 // Update the status of each room to Dirty
+                 var roomsToUpdate = AppDbCxt.Room.Where(r => roomNumbers.Contains(r.RoomNumber)).ToList();
+                 foreach (var room in roomsToUpdate)
+                 {
+                     room.Status = RoomHallStatus.Dirty;
+                     AppDbCxt.Room.Update(room);
+                 }*/
+
+                foreach (var roomBooking in existing.RoomBookings)
+                {
+                    var room = AppDbCxt.Room.FirstOrDefault(r => r.RoomNumber == roomBooking.RoomNo);
+                    if (room != null) { room.Status = RoomHallStatus.Dirty; AppDbCxt.Room.Update(room); }
+                }
+
+
+                await AppDbCxt.SaveChangesAsync();
+
+                result.Result = existing;
+                result.IsSuccess = true;
+                result.Message = "Successfully Checked Out!";
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+
+
+        public async Task<ApiResponse<ReservationDetailsDto>> DeleteBookingList(int id)
+        {
+            var result = new ApiResponse<ReservationDetailsDto>();
+            try
+            {
+                var existing = AppDbCxt.ReservationDetails
+                    .Include(rd => rd.CustomerInfo)
+                    .Include(rd => rd.RoomBookings)
+                    .Include(rd => rd.PaymentDetails)
+                    .Include(rd => rd.BillingDetails)
+                    .FirstOrDefault(x => x.Id == id);
+
+                if (existing == null)
+                {
+                    result.IsSuccess = true;
+                    result.Message = "Reservation not found!";
+                    return result;
+                }
+
+                
+
+                // Remove the reservation
+                AppDbCxt.ReservationDetails.Remove(existing);
+                
+                await AppDbCxt.SaveChangesAsync();
+
+                foreach (var roomBooking in existing.RoomBookings)
+                {
+                    var room = AppDbCxt.Room.FirstOrDefault(r => r.Id == roomBooking.RoomId);
+                    if (room != null) { room.Status = RoomHallStatus.Available; AppDbCxt.Room.Update(room); }
+                }
+                await AppDbCxt.SaveChangesAsync();
+                result.Result = existing;
+                result.IsSuccess = true;
+                result.Message = "Successfully Deleted!";
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+
         #endregion
 
         #region Restaurant
@@ -3451,8 +3678,8 @@ namespace RMS.Repositories
                 {
                     Month = (Months)key,
                     Total = entries.Count(),
-                    Ready = entries.Count(i => i.Status == (RoomStatus.Ready)),
-                    Booked = entries.Count(i => i.Status == (RoomStatus.Booked)),
+                    Ready = entries.Count(i => i.Status == (RoomHallStatus.Ready)),
+                    Booked = entries.Count(i => i.Status == (RoomHallStatus.Booked)),
 
                 });
 

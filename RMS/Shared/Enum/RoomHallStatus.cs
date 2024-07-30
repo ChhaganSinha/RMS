@@ -9,7 +9,14 @@ namespace RMS.Dto.Enum
     public enum RoomHallStatus
     {
         Available,
+        Ready,
         Booked,
-        Maintenance
+        AssignedToClean,
+        BookedAndAssignedToClean,
+        UnderMaintenance,
+        Dirty,
+        Blocked,
+        DoNotReserve,
+        UnderProcess
     }
 }

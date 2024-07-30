@@ -9,22 +9,22 @@ using RMS.Server.Intrastructure.ActionFilters;
 
 namespace RMS.Server.Controllers.Api.OData
 {
-    [Authorize]
-    public class RoomCategoriesController : ODataController
+
+    public class RoomCleaningAssignmentModelController : ODataController
     {
-        public ILogger<RoomCategoriesController> Logger { get; }
+        public ILogger<RoomCleaningAssignmentModelController> Logger { get; }
         public AppDbContext DbContext { get; }
-        public RoomCategoriesController(ILogger<RoomCategoriesController> logger, AppDbContext dbContext)
+        public RoomCleaningAssignmentModelController(ILogger<RoomCleaningAssignmentModelController> logger, AppDbContext dbContext)
         {
-            Logger = logger;  
+            Logger = logger;
             DbContext = dbContext;
         }
 
         [EnableQuery]
         [ODataAuthorize]
-        public IQueryable<RoomCategories> Get()
+        public IQueryable<RoomCleaningAssignmentModel> Get()
         {
-            var data = DbContext.RoomCategories.AsQueryable();
+            var data = DbContext.RoomCleaningAssignmentModel.AsQueryable();
             return data;
         }
     }

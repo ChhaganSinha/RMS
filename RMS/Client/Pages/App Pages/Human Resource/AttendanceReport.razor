@@ -28,60 +28,55 @@
     </div>
 </div>
 
-<div class="row">
-    <div class="col-sm-12 p-0">
-        <div class="card-body p-2 mt-n3">
-            <div class="card text">
-                <div class="card-body">
-                    @if (canView)
-                    {
+@if (canView)
+{
+    <div class="row">
+        <div class="col-sm-12 p-0">
+            <div class="card-body p-2 mt-n3">
+                <div class="card text">
+                    <div class="card-body">
                         <AttendanceReportGrid />
-                    }
-                    else
-                    {
-                        <p>You do not have permission to view this data.</p>
-                    }
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
-<SimpleDailog Title="@Title" Show="@show" OnCloseDialog="ResetForm">
-    @if (show)
-    {
-        <EditForm Model="model" OnValidSubmit="OnSave">
-            <DataAnnotationsValidator />
-            <div>
-                <HxSelect TItem="Employee"
-                          TValue="int?"
-                          Data="employees"
-                          @bind-Value="employeeId"
-                          TextSelector="@(employee => employee.Name)"
-                          ValueSelector="@(employee => employee.Id)"
-                          Nullable="true"
-                          NullText="-select employee-"
-                          NullDataText="Loading employees..." />
-                @if (employeeId == null && submit)
-                {
-                    <p class="text-danger">Please select employee</p>
-                }
-            </div>
-            @if (process)
-            {
-                <div style="text-align:center">
-                    <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
+    <SimpleDailog Title="@Title" Show="@show" OnCloseDialog="ResetForm">
+        @if (show)
+        {
+            <EditForm Model="model" OnValidSubmit="OnSave">
+                <DataAnnotationsValidator />
+                <div>
+                    <HxSelect TItem="Employee"
+                              TValue="int?"
+                              Data="employees"
+                              @bind-Value="employeeId"
+                              TextSelector="@(employee => employee.Name)"
+                              ValueSelector="@(employee => employee.Id)"
+                              Nullable="true"
+                              NullText="-select employee-"
+                              NullDataText="Loading employees..." />
+                    @if (employeeId == null && submit)
+                    {
+                        <p class="text-danger">Please select employee</p>
+                    }
                 </div>
-            }
+                @if (process)
+                {
+                    <div style="text-align:center">
+                        <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
+                    </div>
+                }
 
-            <UiAlert Model="alert"></UiAlert>
-            <hr />
-            <button type="submit" class="btn btn-primary float-right col-md-4">CheckIn</button>
-        </EditForm>
-        <br />
-    }
-</SimpleDailog>
-
+                <UiAlert Model="alert"></UiAlert>
+                <hr />
+                <button type="submit" class="btn btn-primary float-right col-md-4">CheckIn</button>
+            </EditForm>
+            <br />
+        }
+    </SimpleDailog>
+}
 @code {
     [Parameter]
     public int Id { get; set; }

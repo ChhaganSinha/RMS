@@ -7,7 +7,7 @@
 @inject NavigationManager NavigationManager
 @using Havit.Blazor.Components.Web
 @using Havit.Blazor.Components.Web.Bootstrap
-@using System.ComponentModel.DataAnnotations;
+@using System.ComponentModel.DataAnnotations
 @using RMS.Dto.Enum
 @inject PermissionService PermissionService
 @attribute [Authorize]
@@ -19,6 +19,7 @@
                 <div class="page-header-title">
                     <h5 class="m-b-10">
                         Assign Room Cleaning
+                        @* <a @onclick="()=>show=true" style="cursor:pointer"><i class="fa fa-plus-circle fa-lg text-primary" aria-hidden="true" title="Assign Room Cleaning"></i></a> *@
                     </h5>
                 </div>
                 <ul class="breadcrumb">
@@ -31,49 +32,70 @@
         </div>
     </div>
 </div>
+
 @if (canView || canEdit || hasFullAccess)
 {
-<div class="row">
-    <div class="col-sm-12 p-0">
-        <div class="card-body p-2 mt-n3">
-        @*     <EditForm Model="@model" OnValidSubmit="OnValidSubmit">
+    <div class="row">
+        <div class="col-sm-12 p-0">
+            <div class="card-body p-2 mt-n3">
+                <div class="card text">
+                    <div class="card-body">
+                        <AssignRoomCleaningGrid />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <PageDialog Title="@Title" Show="@show" ClosePageDialog="ResetForm">
+
+        @if (show)
+        {
+            <EditForm Model="@model" OnValidSubmit="OnValidSubmit">
                 <DataAnnotationsValidator />
-                <div class="form-group">
-                    <label for="houseKeeper">House Keeper</label>
-                    <select @bind="model.HouseKeeper" class="form-control" id="houseKeeper">
-                        <option value="">Nothing selected</option>
-                        @foreach (var keeper in HouseKeepers)
-                        {
-                            <option value="@keeper">@keeper.Name</option>
-                        }
-                    </select>
-                    <ValidationMessage For="() => model.HouseKeeper" />
-                </div>
+                <ValidationSummary />
+                <div class="row">
+                    <div class="form-group col-md-4">
+                        <label for="houseKeeper">House Keeper</label>
+                        <HxSelect TItem="Employee"
+                                  TValue="int?"
+                                  Data="HouseKeepers"
+                                  @bind-Value="empid"
+                                  TextSelector="@(HouseKeepers => HouseKeepers.Name)"
+                                  ValueSelector="@(HouseKeepers => HouseKeepers.Id)"
+                                  Nullable="true"
+                                  NullText="- Select -"
+                                  NullDataText="Loading Employees..." />
 
-                <div class="form-group">
-                    <label for="roomType">Room Type</label>
-                    <select @bind="model.RoomType" class="form-control" id="roomType">
-                        <option value="">Select Room Type</option>
-                        @foreach (var type in RoomTypes)
-                        {
-                            <option value="@type">@type.Name</option>
-                        }
-                    </select>
-                </div>
+                        <ValidationMessage For="() => model.HouseKeeper" />
+                    </div>
 
-                <div class="form-group">
-                    <label for="status">Status</label>
-                    <select @bind="model.Status" class="form-control" id="status">
-                        <option value="">Select Status</option>
-                        @foreach (var status in StatusList)
-                        {
-                            <option value="@status">@status</option>
-                        }
-                    </select>
-                </div>
 
-                <div class="form-group">
-                    <button type="button" class="btn btn-secondary" @onclick="FilterRooms">Search</button>
+
+                    <div class="form-group col-md-4">
+                        <label for="roomType">Room Type</label>
+                        <select @bind="model.RoomType" class="form-control" id="roomType">
+                            <option value="">Select Room Type</option>
+                            @foreach (var type in RoomTypes)
+                            {
+                                <option value="@type.Name">@type.Name</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="form-group col-md-4">
+                        <label for="status">Status</label>
+                        <select @bind="model.Status" class="form-control" id="status">
+                            <option value="">Select Status</option>
+                            @foreach (var status in StatusList)
+                            {
+                                <option value="@status">@status</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <button type="button" class="btn btn-secondary" @onclick="FilterRooms">Search</button>
+                    </div>
                 </div>
 
                 <div class="row">
@@ -82,8 +104,8 @@
                         <div class="col-md-3 mb-2">
                             <div class="card">
                                 <div class="card-body">
-                                    <input type="checkbox" @bind="room.IsSelected" class="form-check-input" id="room@room.RoomNumber" />
-                                    <label class="form-check-label" for="room@room.RoomNumber">@room.RoomNumber</label>
+                                    <input type="checkbox" @bind="room.IsSelected" class="form-check-input" id="@room.RoomNo" />
+                                    <label class="form-check-label" for="@room.RoomNo">@room.RoomNo</label>
                                     <div>@room.Status</div>
                                 </div>
                             </div>
@@ -91,12 +113,11 @@
                     }
                 </div>
 
-                <button type="submit" class="btn btn-primary">Update</button>
-            </EditForm> *@
-        </div>
-    </div>
-</div>
 
+                <button type="submit" class="btn btn-primary">Update</button>
+            </EditForm>
+        }  <br />
+    </PageDialog>
 }
 else
 {
@@ -113,10 +134,18 @@ else
     private IEnumerable<Employee> HouseKeepers = new List<Employee>();
     private IEnumerable<RoomCategories> RoomTypes = new List<RoomCategories>();
     private IEnumerable<Room> Rooms = new List<Room>();
-    private IEnumerable<Room> FilteredRooms = new List<Room>();
+    private List<RoomModel> roomModels = new List<RoomModel>();
+    private IEnumerable<RoomModel> FilteredRooms = new List<RoomModel>();
 
-    private static readonly List<string> StatusList = Enum.GetNames(typeof(RoomStatus)).ToList();
-
+    [CascadingParameter]
+    protected AlertModel? alert { get; set; }
+    public int? empid;
+    private static readonly List<string> StatusList = Enum.GetNames(typeof(RoomHallStatus)).ToList();
+    public string Title = "Add Assign Room Cleaning";
+    bool show = false;
+    bool process = false;
+    private Timer _timer;
+    private int _delay = 2500;
     protected override async Task OnInitializedAsync()
     {
         // Check permissions
@@ -137,20 +166,103 @@ else
         HouseKeepers = await client.GetAllEmployee();
         RoomTypes = await client.GetAllRoomCategory();
         Rooms = await client.GetAllRoom();
-        FilteredRooms = Rooms;
+        // roomModels = Rooms.Select(r => new RoomModel { RoomNo = r.RoomNumber, Status = r.Status.ToString(), IsSelected = false }).ToList();
+        //FilteredRooms = roomModels;
+
+
+        // roomModels = Rooms
+        //     .Select(r => new RoomModel
+        //         {
+        //             RoomNo = r.RoomNumber,
+        //             Status = r.Status.ToString(),
+        //             IsSelected = false,
+        //             DateTime = r.CreatedOn
+        //         })
+        //     .OrderByDescending(r => r.DateTime) // Order by the latest status change
+        //     .ToList();
+
+        // StateHasChanged();
     }
 
     private void FilterRooms()
     {
-        // FilteredRooms = Rooms.Where(room =>
-        //     (string.IsNullOrEmpty(model.HouseKeeper) || room.AssignedHouseKeeper == model.HouseKeeper) &&
-        //     (string.IsNullOrEmpty(model.RoomType) || room.Category.CategoryName == model.RoomType) &&
-        //     (string.IsNullOrEmpty(model.Status) || room.Status.ToString() == model.Status)
-        // ).ToList();
+        FilteredRooms = Rooms
+            .Where(room =>
+                (string.IsNullOrEmpty(model.RoomType) || room.Category == model.RoomType) &&
+                (string.IsNullOrEmpty(model.Status) || room.Status.ToString() == model.Status)
+            )
+            .Select(room => new RoomModel
+                {
+                    RoomNo = room.RoomNumber,
+                    Status = room.Status.ToString(),
+                    IsSelected = false
+                })
+            .ToList();
     }
 
-    private void OnValidSubmit()
+
+    private async void OnValidSubmit()
     {
-        
+
+        try
+        {
+            process = true;
+            alert?.Clear();
+
+
+            var emp = HouseKeepers.FirstOrDefault(o => o.Id == empid);
+            if (emp != null)
+            {
+                model.HouseKeeper = emp.Name;
+            }
+            model.SelectedRooms = FilteredRooms.Where(room => room.IsSelected).ToList();
+
+
+            // var selectedStatus = model.Status;
+            // model.SelectedRooms = roomModels
+            //     .Where(room => room.IsSelected)
+            //     .Select(room =>
+            //     {
+            //         room.Status = selectedStatus;
+            //         return room;
+            //     })
+            //     .ToList();
+
+            var result = await client.UpsertRoomCleaningAssignment(model);
+
+            if (result.IsSuccess)
+            {
+                // model = response.Result;
+                await AssignRoomCleaningGrid.RefreshGridAsync();
+                alert?.SetSuccess(result.Message);
+                model = new();
+            }
+            else
+                alert?.SetError(result.Message);
+
+            process = false;
+            StateHasChanged();
+            _timer = new Timer(TimerCallback, null, _delay, Timeout.Infinite);
+
+            await JSRuntime.InvokeVoidAsync("alert", "Room cleaning assignment updated successfully.");
+        }
+        catch (Exception ex)
+        {
+            // Handle exceptions
+            await JSRuntime.InvokeVoidAsync("alert", $"Error updating room cleaning assignment: {ex.Message}");
+        }
+
+    }
+    private void TimerCallback(Object o)
+    {
+        alert?.Clear();
+        _timer.Dispose();
+        StateHasChanged();
+    }
+    private void ResetForm()
+    {
+        model = new();
+        show = false;
+        process = false;
     }
 }

@@ -156,11 +156,11 @@
                                                                             <td class="border-0" style="width:35%">
                                                                                 <div class="form-group mb-0">
                                                                                     <label class="font-weight-600 mb-1">Room Type<span class="text-danger">*</span></label>
-                                                                                    <select class="form-select" @bind="roombook.RoomType">
+                                                                                     <select class="form-select" @bind-value="roombook.RoomType" @onchange="RoomTypeOnChange" @bind-value:event="oninput">
                                                                                         <option selected>Choose Room Type</option>
-                                                                                        @foreach (var val in Enum.GetValues(typeof(RoomType)))
+                                                                                        @foreach (var val in roomCategories)
                                                                                         {
-                                                                                            <option value="@val">@val</option>
+                                                                                            <option value="@val.Name">@val.Name</option>
                                                                                         }
                                                                                     </select>
                                                                                 </div>
@@ -454,6 +454,7 @@ else
         };
 
     IEnumerable<Room> rooms = new List<Room>();
+    IEnumerable<RoomCategories> roomCategories = new List<RoomCategories>();
     List<CustomerDetailsDTO> customers = new List<CustomerDetailsDTO>();
     private List<CustomerDetailsDTO> existingCustomers = new List<CustomerDetailsDTO>();
     public string Title = "Please wait..";
@@ -492,6 +493,7 @@ else
         }
         AddRoom();
         rooms = await client.GetAllRoom();
+        roomCategories = await client.GetAllRoomCategory();
         customers = (await client.GetAllCustomer()).ToList();
         if (Id > 0)
         {
@@ -718,5 +720,12 @@ else
     {
         model.BillingDetails.ServiceCharge = Convert.ToDecimal(e.Value);
         CalculateTotalCharge();
+    }
+
+    private void RoomTypeOnChange(ChangeEventArgs e)
+    {
+        string selectedValue = e.Value?.ToString();
+        rooms = rooms.Where(o => o.Category == selectedValue);
+        StateHasChanged();
     }
 }

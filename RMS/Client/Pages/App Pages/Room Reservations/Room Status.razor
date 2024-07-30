@@ -30,6 +30,7 @@
         </div>
     </div>
 </div>
+
 @if (canView || canEdit || hasFullAccess)
 {
     <div class="row">
@@ -37,10 +38,10 @@
             <div class="card-body p-2 mt-n3">
                 <div class="card text">
                     <div class="card-body">
-
                         <div class="row mb-3">
                             <div class="col-md-3">
-                                <select class="form-control" @bind="selectedRoomStatus">
+                                <label for="statusDropdown" class="font-weight-bold">Status:</label>
+                                <select id="statusDropdown" class="form-control" @bind="selectedRoomStatus">
                                     <option value="">All Statuses</option>
                                     @foreach (var status in roomStatuses)
                                     {
@@ -49,7 +50,8 @@
                                 </select>
                             </div>
                             <div class="col-md-3">
-                                <select class="form-control" @bind="selectedRoomType">
+                                <label for="typeDropdown" class="font-weight-bold">Room Type:</label>
+                                <select id="typeDropdown" class="form-control" @bind="selectedRoomType">
                                     <option value="">All Types</option>
                                     @foreach (var type in roomTypes)
                                     {
@@ -57,16 +59,7 @@
                                     }
                                 </select>
                             </div>
-                            <div class="col-md-3">
-                                <select class="form-control" @bind="selectedFloor">
-                                    <option value="">All Floors</option>
-                                    @foreach (var floor in floors)
-                                    {
-                                        <option value="@floor">@floor</option>
-                                    }
-                                </select>
-                            </div>
-                            <div class="col-md-3">
+                            <div class="col-md-3 d-flex align-items-end">
                                 <button class="btn btn-primary" @onclick="ApplyFilters">Search</button>
                             </div>
                         </div>
@@ -74,8 +67,10 @@
                         <div class="row">
                             @if (loading)
                             {
-                                <div class="col-sm-12" style="margin-top:40vh">
-                                    <div class="loader-progress"></div>
+                                <div class="col-sm-12 text-center" style="margin-top:40vh">
+                                    <div class="spinner-border" role="status">
+                                        <span class="visually-hidden">Loading...</span>
+                                    </div>
                                 </div>
                             }
                             else
@@ -84,41 +79,29 @@
                                 {
                                     @foreach (var room in filteredRooms)
                                     {
-                                        <div class="col-sm-6 col-lg-4 col-xl-3 col-xxl-2">
-                                            <div class="position-relative d-flex justify-content-center">
-                                                <div class="card shadow" style="width: 100%; border: 1px solid silver;">
-                                                    <div class="hotel-image">
-                                                        <img src="data:image;base64,@Convert.ToBase64String(room.ImageFile)" class="image-inner card-img-top" alt="Room Image">
-                                                    </div>
-                                                    <div class="card-img-overlay d-flex flex-column justify-content-center text-center text-white" style="background-color: rgba(0, 0, 0, 0.5); margin: 2px; border: 1px solid firebrick;">
-                                                        @* <h4 class="fs-21 mt-2 font-weight-bold">Floor: @room.floor</h4> *@
-                                                        <h5 class="mt-2 font-weight-bold">Room No: @room.RoomNumber</h5>
-                                                        <p class="m-0">Room Type: @room.Category</p>
-                                                        <p class="m-0">Check Out: None</p>
-                                                        <p class="m-0 text-c-green">Charge: @room.Price</p>
+                                        <div class="col-sm-6 col-md-3 mb-3">
+                                            <div class="card shadow" style="max-width: 12rem; font-size: 0.875rem; font-family: monospace;">
+                                                <div class="card-header p-0">
+                                                    <img src="data:image;base64,@Convert.ToBase64String(room.ImageFile)" class="img-fluid" style="height: 100px; object-fit: cover;" alt="Room Image">
+                                                </div>
+                                                <div class="card-body bg-light" style="padding: 0.5rem; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);">
+                                                    <h5 class="card-title font-weight-bold mb-2 text-center">Room No: @room.RoomNumber</h5>
+                                                    <p style="font-size: 12px;" class="card-text mb-0 text-center">Room Type: @room.Category</p>
+                                                    <p style="font-size: 12px;" class="card-text mb-0 text-center">Check Out: None</p>
+                                                    <p style="font-size: 12px;" class="card-text text-success mb-0 text-center">Charge: @room.Price</p>
+                                                    <div class="text-center mt-2">
                                                         @if (room.Status == RoomHallStatus.Booked)
                                                         {
-                                                            <button type="button" style="width: 60%;align-self: center;" class="btn btn-danger btn-sm mt-5 font-weight-bold" disabled>
-                                                                Booked
-                                                            </button>
-
+                                                            <button type="button" class="btn btn-danger btn-sm" disabled>Booked</button>
+                                                        }
+                                                        else if (room.Status == RoomHallStatus.Available)
+                                                        {
+                                                            <button type="button" class="btn btn-success btn-sm" @onclick="() => BookRoom(room)">Available</button>
                                                         }
                                                         else
                                                         {
-                                                            @if (canEdit || hasFullAccess)
-                                                            {
-                                                                <button type="button" style="width: 60%;align-self: center;" class="btn btn-success btn-sm mt-5 font-weight-bold" @onclick="() => BookRoom(room)">
-                                                                    Available
-                                                                </button>
-                                                            }
-                                                            else
-                                                            {
-                                                                <button type="button" style="width: 60%;align-self: center;" class="btn btn-success btn-sm mt-5 font-weight-bold" disabled>
-                                                                    Available
-                                                                </button>
-                                                            }
+                                                            <button type="button" class="btn btn-warning btn-sm" disabled>Under Maintenance</button>
                                                         }
-
                                                     </div>
                                                 </div>
                                             </div>
@@ -127,13 +110,10 @@
                                 }
                                 else
                                 {
-                                    <p class="text-primary"> No Room Data Available!</p>
+                                    <p class="text-primary">No Room Data Available!</p>
                                 }
                             }
                         </div>
-
-
-
                     </div>
                 </div>
             </div>
@@ -147,31 +127,31 @@
                 <DataAnnotationsValidator />
                 <div>
                     <div class="form-group row mb-2">
-                        <label class="col-form-label col-md-6 bold-font" style="padding-right: 0;"><i class="fa fa-check-square"></i> Booking Status</label>
+                        <label class="col-form-label col-md-6 bold-font"><i class="fa fa-check-square"></i> Booking Status</label>
                         <div class="col-md-6">
                             <div class="form-control">@roomModel.Status.ToString()</div>
                         </div>
                     </div>
                     <div class="form-group row mb-2">
-                        <label class="col-form-label col-md-6 bold-font" style="padding-right: 0;"><i class="fa fa-sort-numeric-asc"></i> Room Number</label>
+                        <label class="col-form-label col-md-6 bold-font"><i class="fa fa-sort-numeric-asc"></i> Room Number</label>
                         <div class="col-md-6">
                             <div class="form-control">@roomModel.RoomNumber.ToString()</div>
                         </div>
                     </div>
                     <div class="form-group row mb-2">
-                        <label class="col-form-label col-md-6 bold-font" style="padding-right: 0;"><i class="fa fa-th-list"></i> Room Type</label>
+                        <label class="col-form-label col-md-6 bold-font"><i class="fa fa-th-list"></i> Room Type</label>
                         <div class="col-md-6">
                             <div class="form-control">@roomModel.Category.ToString()</div>
                         </div>
                     </div>
                     <div class="form-group row mb-2">
-                        <label class="col-form-label col-md-6 bold-font" style="padding-right: 0;"><i class="fa fa-usd"></i> Rent/Day</label>
+                        <label class="col-form-label col-md-6 bold-font"><i class="fa fa-usd"></i> Rent/Day</label>
                         <div class="col-md-6">
                             <div class="form-control">@roomModel.Price.ToString()</div>
                         </div>
                     </div>
                     <div class="form-group row mb-2">
-                        <label class="col-form-label col-md-6 bold-font" style="padding-right: 0;"><i class="fa fa-user"></i> Extra Capacity</label>
+                        <label class="col-form-label col-md-6 bold-font"><i class="fa fa-user"></i> Extra Capacity</label>
                         <div class="col-md-6">
                             <div class="form-control">@(roomModel.ExtraCapacity ? "Yes" : "No")</div>
                         </div>
@@ -179,8 +159,10 @@
                 </div>
                 @if (process)
                 {
-                    <div style="text-align:center">
-                        <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
+                    <div class="text-center">
+                        <div class="spinner-border" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
                     </div>
                 }
                 <UiAlert Model="alert"></UiAlert>
@@ -190,10 +172,6 @@
             <br />
         }
     </SimpleDailog>
-}
-else
-{
-    <div class="alert alert-danger">You do not have permission to view this page.</div>
 }
 
 @code {
@@ -207,7 +185,7 @@ else
     public string Title = "Room Booking";
     bool show = false;
     bool process = false;
-    bool loading = true; // Add loading flag
+    bool loading = true;
     private Timer _timer;
     private int _delay = 2500;
 
@@ -227,7 +205,6 @@ else
     protected override async Task OnInitializedAsync()
     {
         alert?.Clear();
-        // Check permissions
         var permissions = await PermissionService.HasPermission("RoomStatus");
         if (permissions != null)
         {
@@ -237,22 +214,21 @@ else
         }
         if (!canView)
         {
-            // Redirect or handle unauthorized access
             NavigationManager.NavigateTo("/unauthorized");
             return;
         }
         Rooms = (await client.GetAllRoom()).ToList();
         roomTypes = (await client.GetAllRoomCategory()).ToList();
         filteredRooms = Rooms;
-        loading = false; // Set loading to false once data is loaded
+        loading = false;
     }
 
     private void ApplyFilters()
     {
         filteredRooms = Rooms
             .Where(r => (!selectedRoomStatus.HasValue || r.Status == selectedRoomStatus.Value) &&
-                        (string.IsNullOrEmpty(selectedRoomType) || r.Category == selectedRoomType) &&
-                        (!selectedFloor.HasValue || r.floor == selectedFloor.Value))
+                        (string.IsNullOrEmpty(selectedRoomType) || r.Category == selectedRoomType))
+            // (!selectedFloor.HasValue || r.floor == selectedFloor.Value))
             .ToList();
     }
 
@@ -265,30 +241,26 @@ else
 
     public async Task OnSave()
     {
-        NavigationManager.NavigateTo($"new-booking/{roomModel.Id}");
-    }
-
-    private void TimerCallback(Object o)
-    {
         alert?.Clear();
-        _timer.Dispose();
-        StateHasChanged();
+        process = true;
+        // var result = await client.BookRoom(roomModel);
+        // if (result.Success)
+        // {
+        //     alert?.SetSuccess("Room booked successfully.");
+        //     show = false;
+        // }
+        // else
+        // {
+        //     alert?.SetError("Failed to book the room.");
+        // }
+        // process = false;
+        // StateHasChanged();
     }
 
-    private void ResetForm()
+    public void ResetForm()
     {
-        model = new();
         show = false;
-        process = false;
-    }
-
-    public void OnClose()
-    {
-        model = new();
-    }
-
-    public void Show()
-    {
-        show = true;
+        roomModel = new Room();
+        alert?.Clear();
     }
 }

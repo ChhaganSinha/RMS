@@ -39,6 +39,7 @@ else
     {
         c.Add(o => o.Id).SetWidth("10%").Css("table-bordered").Titled("SN.").Filterable(filter);
         c.Add(o => o.RoomNumber).Css("table-bordered").Filterable(filter);
+        c.Add(o => o.Status).Css("table-bordered").Filterable(filter);
         c.Add(o => o.Price).Css("table-bordered").Filterable(filter);
         c.Add(o => o.Category).Css("table-bordered").Filterable(filter);
         c.Add(o => o.NumberOfBed).Css("table-bordered").Filterable(filter);
