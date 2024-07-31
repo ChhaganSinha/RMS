@@ -8,6 +8,7 @@ namespace RMS.Dto
     {
         public DateTime CheckIn { get; set; } = DateTime.Now;
         public DateTime CheckOut { get; set; }
+        public string RoomNos { get; set; } = string.Empty;
         public string ArrivalFrom { get; set; } = string.Empty;
         public BookingReferenceType BookingType { get; set; }
         public string BookingReferenceNo { get; set; } = string.Empty;

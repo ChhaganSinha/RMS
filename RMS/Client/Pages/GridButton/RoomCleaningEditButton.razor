@@ -5,6 +5,7 @@
 @using RMS.Client.Pages.GridComponent
 @using RMS.Client.Shared.Popup
 @using RMS.Client.Client
+@using RMS.Dto.Enum
 @inject AppClient client
 @implements ICustomGridComponent<RoomCleaning>
 @inject NavigationManager NavigationManager
@@ -55,15 +56,10 @@
                 <div class="col-md-12">
                     <label class="col-form-label bold-font required-field">Status</label>
                     <select @bind="model.Status" class="form-control">
-                        <option>Ready</option>
-                        <option>Booked</option>
-                        <option>Assigned to Clean</option>
-                        <option>Booked and Assigned to Clean</option>
-                        <option>Under Maintenance</option>
-                        <option>Dirty</option>
-                        <option>Blocked</option>
-                        <option>Do not Reserve</option>
-                        <option>Under Process</option>
+                        @foreach (var status in Enum.GetValues(typeof(RoomHallStatus)).Cast<RoomHallStatus>())
+                        {
+                            <option value="@status">@status</option>
+                        }
                     </select>
                     <ValidationMessage For="() => model.Status" />
                 </div>
@@ -100,6 +96,7 @@
 @code {
     [Parameter]
     public RoomCleaning Item { get; set; }
+    public RoomHallStatus Status { get; set; }
     private int? empid;
     [Parameter]
     public CGrid<RoomCleaning> Grid { get; set; }

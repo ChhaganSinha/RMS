@@ -1,0 +1,118 @@
+﻿@using GridShared
+@using GridShared.Columns
+@using GridShared.Utility
+@using Microsoft.Extensions.Primitives
+@using RMS.Client.Pages.GridComponent
+@using RMS.Client.Shared.Popup
+@using RMS.Client.Client
+@inject AppClient client
+@implements ICustomGridComponent<RoomCleaningAssignmentModel>
+@inject NavigationManager NavigationManager
+
+@if(Item.Status == Dto.Enum.RoomHallStatus.AssignedToClean.ToString())
+{
+    <button class='btn btn-sm btn-primary' style="border-radius:15px" @onclick="MyClickHandler" title="Assigned to Clean"><i class="fa fa-check-square-o"></i></button>
+}
+@if(Item.Status == Dto.Enum.RoomHallStatus.Available.ToString())
+{
+    <p style="font-size: 8px; font-weight: 600; margin: 0;" class="text-c-green">Task Completed</p>
+}
+else
+{
+    
+}
+<SimpleDailog Title="@Title" Show="@show" OnCloseDialog="ResetForm">
+    @if (show)
+    {
+        @if (!TaskCompleted && !process)
+        {
+            <div style="text-align:center;">
+                <h6 class="pb-2">Are you sure want to <br /> Mark Task as Complete?</h6>
+
+                <button class="btn btn-danger" @onclick="ProcesCheckOut">Yes</button>
+                <button class="btn btn-primary" @onclick="ResetForm">No</button>
+            </div>
+        }
+        else if (TaskCompleted && process)
+        {
+            <div style="text-align:center;">
+                @MessageBody
+            </div>
+            <br />
+        }
+
+        else
+        {
+            <div style="text-align:center">
+                <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
+            </div>
+        }
+    }
+</SimpleDailog>
+@code {
+    [Parameter]
+    public RoomCleaningAssignmentModel Item { get; set; }
+
+    [Parameter]
+    public CGrid<RoomCleaningAssignmentModel> Grid { get; set; }
+
+    [CascadingParameter]
+    protected AlertModel? alert { get; set; }
+
+    [Parameter]
+    public IList<Action<object>> Actions { get; set; }
+
+    private Timer _timer;
+    private int _delay = 2500;
+    bool show = false;
+    bool process = false;
+    bool TaskCompleted = false;
+    string Title = "Task Completed";
+    string MessageBody = string.Empty;
+
+    RoomCleaningAssignmentModel model = new();
+
+    private async Task ProcesCheckOut()
+    {
+
+        process = true;
+        var responce = await client.EmpTaskUpdate(Item);
+        if (responce.IsSuccess == true)
+        {
+            MessageBody = responce.Message;
+        }
+        else
+        {
+            MessageBody = responce.Message;
+        }
+
+        TaskCompleted = true;
+        Title = "Task Completed!";
+        Actions[0]?.Invoke(Item);
+        
+    }
+
+    private async Task MyClickHandler(MouseEventArgs e)
+    {
+        show = true;
+        MessageBody = string.Empty;
+        TaskCompleted = false;
+
+    }
+
+
+    private void TimerCallback(Object o)
+    {
+        alert?.Clear();
+        _timer.Dispose();
+        StateHasChanged();
+    }
+
+    private void ResetForm()
+    {
+        model = new();
+        show = false;
+        process = false;
+    }
+
+}

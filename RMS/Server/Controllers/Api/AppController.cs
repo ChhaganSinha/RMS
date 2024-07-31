@@ -923,6 +923,13 @@ namespace RMS.Server.Controllers.Api
         {
             return await _appRepository.CheckOutReservations(data);
         }
+
+        [HttpPost]
+        [Route("EmpTaskUpdate")]
+        public async Task<ApiResponse<RoomCleaningAssignmentModel>> EmpTaskUpdate(RoomCleaningAssignmentModel data)
+        {
+            return await _appRepository.EmpTaskUpdate(data);
+        }
         #endregion
 
         #region Resturant

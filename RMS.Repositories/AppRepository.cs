@@ -409,10 +409,12 @@ namespace RMS.Repositories
                     // Insert logic
                     data.CreatedBy = data.CreatedBy;
                     data.CreatedOn = data.CreatedOn;
+                    
                     data.Status = RoomHallStatus.AssignedToClean.ToString(); 
 
                     foreach (var roomModel in data.SelectedRooms)
                     {
+                        roomModel.StartDate = DateTime.Now;
                         roomModel.Status = RoomHallStatus.AssignedToClean.ToString(); 
                     }
 
@@ -2626,6 +2628,7 @@ namespace RMS.Repositories
                 // Save changes to ReservationDetails first
                 await AppDbCxt.SaveChangesAsync();
                 // Update room status to Booked for each room in RoomBookings
+
                 foreach(var roomBooking in data.RoomBookings)
                 {
                     var room = AppDbCxt.Room.FirstOrDefault(r => r.Id == roomBooking.RoomId);
@@ -2731,6 +2734,61 @@ namespace RMS.Repositories
             }
         }
 
+        public async Task<ApiResponse<RoomCleaningAssignmentModel>> EmpTaskUpdate(RoomCleaningAssignmentModel data)
+        {
+            var result = new ApiResponse<RoomCleaningAssignmentModel>();
+            try
+            {
+                if (data == null)
+                {
+                    result.IsSuccess = false;
+                    result.Message = "Invalid Room Cleaning Assignment data!";
+                    return result;
+                }
+
+                // Retrieve the existing assignment
+                var existingAssignment = await AppDbCxt.RoomCleaningAssignmentModel
+                    .Include(r => r.SelectedRooms)
+                    .FirstOrDefaultAsync(r => r.Id == data.Id);
+
+                if (existingAssignment != null)
+                {
+                    // Update the selected rooms by matching RoomNo
+                    foreach (var roomModel in existingAssignment.SelectedRooms)
+                    {
+                       // var matchingRoom = data.SelectedRooms.FirstOrDefault(x => x.RoomNo == roomModel.RoomNo);
+                        if (data.RoomNo == roomModel.RoomNo)
+                        {
+                            roomModel.EndDate = DateTime.Now;
+                            roomModel.Status = RoomHallStatus.Available.ToString();
+                        }
+                    }
+
+                    AppDbCxt.RoomCleaningAssignmentModel.Update(existingAssignment);
+                }
+
+                // Update the status of the room based on RoomNo in the Room model
+                var room = await AppDbCxt.Room.FirstOrDefaultAsync(r => r.RoomNumber == data.RoomNo);
+                if (room != null)
+                {
+                    room.Status = RoomHallStatus.Available;
+                    AppDbCxt.Room.Update(room);
+                }
+
+                await AppDbCxt.SaveChangesAsync();
+
+                result.IsSuccess = true;
+                result.Result = data;
+                result.Message = data.Id > 0 ? "Data Successfully Updated." : "Data Successfully Inserted.";
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
 
         public async Task<ApiResponse<ReservationDetailsDto>> DeleteBookingList(int id)
         {
