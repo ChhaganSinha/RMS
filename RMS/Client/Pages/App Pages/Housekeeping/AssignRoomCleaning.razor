@@ -50,7 +50,7 @@
     <PageDialog Title="@Title" Show="@show" ClosePageDialog="ResetForm">
 
     @if (show)
-    { *@
+    { 
 <EditForm Model="@model" OnValidSubmit="OnValidSubmit">
     <DataAnnotationsValidator />
     <ValidationSummary />
