@@ -305,11 +305,22 @@ namespace RMS.Repositories
             var result = new ApiResponse<Room>();
             try
             {
-
                 if (data == null)
                 {
-                    result.IsSuccess = true;
+                    result.IsSuccess = false;
                     result.Message = "Invalid Room data!";
+                    return result;
+                }
+
+                // Check if the room number already exists
+                var existingRoom = await AppDbCxt.Room
+                    .Where(r => r.RoomNumber == data.RoomNumber && r.Id != data.Id)
+                    .FirstOrDefaultAsync();
+
+                if (existingRoom != null)
+                {
+                    result.IsSuccess = false;
+                    result.Message = "Room number already exists!";
                     return result;
                 }
 
@@ -324,7 +335,7 @@ namespace RMS.Repositories
                     result.Message = "Data Successfully Inserted.";
                 }
 
-                AppDbCxt.SaveChanges();
+                await AppDbCxt.SaveChangesAsync();
                 result.IsSuccess = true;
                 result.Result = data;
                 return result;
@@ -336,6 +347,7 @@ namespace RMS.Repositories
                 return result;
             }
         }
+
 
         public async Task<ApiResponse<Room>> DeleteRoom(int id)
         {

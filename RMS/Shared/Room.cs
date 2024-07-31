@@ -43,6 +43,6 @@ namespace RMS.Dto
         public string RoomNo { get; set; }
         public int Adults { get; set; }
         public int Children { get; set; }
-        public List<Room> FilteredRooms { get; set; } = new List<Room>();
+        public IEnumerable<Room> FilteredRooms { get; set; }
     }
 }
