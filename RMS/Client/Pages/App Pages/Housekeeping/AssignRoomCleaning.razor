@@ -12,128 +12,128 @@
 @inject PermissionService PermissionService
 @attribute [Authorize]
 
-<div class="page-header breadcumb-sticky">
-    <div class="page-block">
-        <div class="row align-items-center">
-            <div class="col-md-12">
-                <div class="page-header-title">
-                    <h5 class="m-b-10">
-                        Assign Room Cleaning
-                        @* <a @onclick="()=>show=true" style="cursor:pointer"><i class="fa fa-plus-circle fa-lg text-primary" aria-hidden="true" title="Assign Room Cleaning"></i></a> *@
-                    </h5>
+@if (canView || canEdit || hasFullAccess)
+{
+    <div class="page-header breadcumb-sticky">
+        <div class="page-block">
+            <div class="row align-items-center">
+                <div class="col-md-12">
+                    <div class="page-header-title">
+                        <h5 class="m-b-10">
+                            Assign Room Cleaning
+                            @* <a @onclick="()=>show=true" style="cursor:pointer"><i class="fa fa-plus-circle fa-lg text-primary" aria-hidden="true" title="Assign Room Cleaning"></i></a> *@
+                        </h5>
+                    </div>
+                    <ul class="breadcrumb">
+                        <li class="breadcrumb-item">
+                            <a href="/"><i class="feather icon-home"></i></a>
+                        </li>
+                        <li class="breadcrumb-item"><a>Assign Cleaning</a></li>
+                    </ul>
                 </div>
-                <ul class="breadcrumb">
-                    <li class="breadcrumb-item">
-                        <a href="/"><i class="feather icon-home"></i></a>
-                    </li>
-                    <li class="breadcrumb-item"><a>Assign Cleaning</a></li>
-                </ul>
+            </div>
+        </div>
+    </div>
+
+    @* <div class="row">
+    <div class="col-sm-12 p-0">
+        <div class="card-body p-2 mt-n3">
+            <div class="card text">
+                <div class="card-body">
+                    <AssignRoomCleaningGrid />
+                </div>
             </div>
         </div>
     </div>
 </div>
+ *@
 
-@if (canView || canEdit || hasFullAccess)
-{
-    <div class="row">
-        <div class="col-sm-12 p-0">
-            <div class="card-body p-2 mt-n3">
-                <div class="card text">
-                    <div class="card-body">
-                        <AssignRoomCleaningGrid />
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <PageDialog Title="@Title" Show="@show" ClosePageDialog="ResetForm">
+    @* <PageDialog Title="@Title" Show="@show" ClosePageDialog="ResetForm">
 
     @if (show)
-    { 
-<EditForm Model="@model" OnValidSubmit="OnValidSubmit">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
-    <div class="row">
-        <div class="form-group col-md-4">
-            <label for="houseKeeper">House Keeper</label>
-            <HxSelect TItem="Employee"
-                      TValue="int?"
-                      Data="HouseKeepers"
-                      @bind-Value="empid"
-                      TextSelector="@(HouseKeepers => HouseKeepers.Name)"
-                      ValueSelector="@(HouseKeepers => HouseKeepers.Id)"
-                      Nullable="true"
-                      NullText="- Select -"
-                      NullDataText="Loading Employees..." />
+    { *@
+    <EditForm Model="@model" OnValidSubmit="OnValidSubmit">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+        <div class="row">
+            <div class="form-group col-md-4">
+                <label for="houseKeeper">House Keeper</label>
+                <HxSelect TItem="Employee"
+                          TValue="int?"
+                          Data="HouseKeepers"
+                          @bind-Value="empid"
+                          TextSelector="@(HouseKeepers => HouseKeepers.Name)"
+                          ValueSelector="@(HouseKeepers => HouseKeepers.Id)"
+                          Nullable="true"
+                          NullText="- Select -"
+                          NullDataText="Loading Employees..." />
 
-            <ValidationMessage For="() => model.HouseKeeper" />
-        </div>
+                <ValidationMessage For="() => model.HouseKeeper" />
+            </div>
 
 
 
-        <div class="form-group col-md-4">
-            <label for="roomType">Room Type</label>
-            <select @bind="model.RoomType" class="form-control" id="roomType">
-                <option value="">Select Room Type</option>
-                @foreach (var type in RoomTypes)
+            <div class="form-group col-md-4">
+                <label for="roomType">Room Type</label>
+                <select @bind="model.RoomType" class="form-control" id="roomType">
+                    <option value="">Select Room Type</option>
+                    @foreach (var type in RoomTypes)
+                    {
+                        <option value="@type.Name">@type.Name</option>
+                    }
+                </select>
+            </div>
+
+            <div class="form-group col-md-4">
+                <label for="status">Status</label>
+                <select @bind="model.Status" class="form-control" id="status">
+                    <option value="">Select Status</option>
+                    @foreach (var status in StatusList)
+                    {
+                        <option value="@status">@status</option>
+                    }
+                </select>
+            </div>
+            <div class="form-group col-md-4">
+                <button type="button" class="btn btn-secondary" @onclick="FilterRooms">Search</button>
+                @if (!string.IsNullOrEmpty(ErrorMessage))
                 {
-                    <option value="@type.Name">@type.Name</option>
+                    <div class="text-danger">@ErrorMessage</div>
                 }
-            </select>
+            </div>
+
+
         </div>
 
-        <div class="form-group col-md-4">
-            <label for="status">Status</label>
-            <select @bind="model.Status" class="form-control" id="status">
-                <option value="">Select Status</option>
-                @foreach (var status in StatusList)
-                {
-                    <option value="@status">@status</option>
-                }
-            </select>
-        </div>
-        <div class="form-group col-md-4">
-            <button type="button" class="btn btn-secondary" @onclick="FilterRooms">Search</button>
-            @if (!string.IsNullOrEmpty(ErrorMessage))
+        <div class="row">
+            @foreach (var room in FilteredRooms)
             {
-                <div class="text-danger">@ErrorMessage</div>
+                <div class="col-md-3 mb-2">
+                    <div class="card">
+                        <div class="card-body">
+                            <input type="checkbox" @bind="room.IsSelected" class="form-check-input" id="@room.RoomNo" />
+                            <label class="form-check-label" for="@room.RoomNo">@room.RoomNo</label>
+                            <div>@room.Status</div>
+                        </div>
+                    </div>
+                </div>
             }
         </div>
 
-        
-    </div>
-
-    <div class="row">
-        @foreach (var room in FilteredRooms)
+        @if (FilteredRooms.Any())
         {
-            <div class="col-md-3 mb-2">
-                <div class="card">
-                    <div class="card-body">
-                        <input type="checkbox" @bind="room.IsSelected" class="form-check-input" id="@room.RoomNo" />
-                        <label class="form-check-label" for="@room.RoomNo">@room.RoomNo</label>
-                        <div>@room.Status</div>
-                    </div>
-                </div>
-            </div>
+            <button type="submit" class="btn btn-primary">Update</button>
         }
-    </div>
+    </EditForm>
+}
 
 
-                <button type="submit" class="btn btn-primary">Update</button>
-            </EditForm>
-        }  <br />
-    </PageDialog>
-}
-else
-{
-    <div class="alert alert-danger">You do not have permission to view this page.</div>
-}
 
 @code {
     private bool canView = false;
     private bool canEdit = false;
     private bool hasFullAccess = false;
+
 
     private RoomCleaningAssignmentModel model = new RoomCleaningAssignmentModel();
 
@@ -172,7 +172,8 @@ else
             NavigationManager.NavigateTo("/unauthorized");
             return;
         }
-        HouseKeepers = await client.GetAllEmployee();
+
+        HouseKeepers = (await client.GetAllEmployee()).Where(x => x.EmployeeDesignation == "Housekeeping Staff");
         RoomTypes = await client.GetAllRoomCategory();
         Rooms = await client.GetAllRoom();
         // roomModels = Rooms.Select(r => new RoomModel { RoomNo = r.RoomNumber, Status = r.Status.ToString(), IsSelected = false }).ToList();

@@ -586,7 +586,7 @@ else
         foodCategories = (await client.GetAllFoodCategory()).ToList();
         foods = (await client.GetAllFood()).ToList();
         customerDetailsDTOs = (await client.GetAllCustomer()).ToList();
-        employees = (await client.GetAllEmployee()).ToList();
+        employees = (await client.GetAllEmployee()).Where(x => x.EmployeeDesignation == "Waitstaff").ToList();
         tables = (await client.GetAllTableCon()).Where(x => x.Status == TableStatus.Available).ToList();
         Variants = (await client.GetAllAddVariants()).ToList();
 

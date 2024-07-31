@@ -771,7 +771,7 @@ else
     {
         return string.IsNullOrEmpty(roomType)
             ? Enumerable.Empty<Room>()
-            : rooms.Where(r => r.Category == roomType);
+            : rooms.Where(r => r.Category == roomType && r.Status == RoomHallStatus.Available);
     }
     private void AddRoom()
     {

@@ -74,13 +74,38 @@ namespace RMS.DataContext
                 .Ignore(e => e.RoomNo)
                 .Ignore(e => e.Status);
 
-
             modelBuilder.Entity<ReservationDetailsDto>()
                .Ignore(e => e.RoomNos);
-            //modelBuilder.Entity<EmployeeAttendance>()
-            //    .HasOne(ea => ea.Employee)
-            //    .WithMany()
-            //    .HasForeignKey(ea => ea.EmployeeId);
+
+            SeedEmployeeDesignations(modelBuilder);
+            SeedEmployeeDepartments(modelBuilder);
+        }
+
+        private void SeedEmployeeDesignations(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<EmployeeDesignation>().HasData(
+                new EmployeeDesignation { Id = 1, Name = "Hotel Manager" },
+                new EmployeeDesignation { Id = 2, Name = "Restaurant Manager" },
+                new EmployeeDesignation { Id = 3, Name = "Chef" },
+                new EmployeeDesignation { Id = 4, Name = "Sous Chef" },
+                new EmployeeDesignation { Id = 5, Name = "Housekeeping Staff" },
+                new EmployeeDesignation { Id = 6, Name = "Bartender" },
+                new EmployeeDesignation { Id = 7, Name = "Waitstaff" },
+                new EmployeeDesignation { Id = 8, Name = "Event Coordinator" },
+                new EmployeeDesignation { Id = 9, Name = "Maintenance Worker" }
+            );
+        }
+
+        private void SeedEmployeeDepartments(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<EmployeeDepartment>().HasData(
+                new EmployeeDepartment { Id = 1, Name = "Management" },
+                new EmployeeDepartment { Id = 2, Name = "Reception" },
+                new EmployeeDepartment { Id = 3, Name = "Restaurant" },
+                new EmployeeDepartment { Id = 4, Name = "Housekeeping" },
+                new EmployeeDepartment { Id = 5, Name = "Cleaning" },
+                new EmployeeDepartment { Id = 6, Name = "Maintenance" }
+            );
         }
     }
 }
