@@ -86,17 +86,17 @@ else
             query.Add("grid-sorting", "Id__1__1");
 
             var client = new GridODataClient<RoomCategories>(HttpClient, url, query, false, "ordersGrid", columns, 5)
-                .Sortable(true)
-                // .Filterable(true)
-                // .ClearFiltersButton(true)
-                .SetStriped(true)
-                .WithMultipleFilters()
-                .WithGridItemsCount()
-                // .SetExcelExport(true, true, "RoomCategories.xlsx")
-                .ChangePageSize(true)
-                .EmptyText("No data available")
-                .SetKeyboard(true)
-                .Searchable(true, false, false);
+             .Sortable(true)
+             // .Filterable(true)
+             // .ClearFiltersButton(true)
+             .SetStriped(true)
+             .WithMultipleFilters()
+             .WithGridItemsCount()
+             // .SetExcelExport(true, true, "RoomCategories.xlsx")
+             .ChangePageSize(true)
+             .EmptyText("No data available")
+             .SetKeyboard(true)
+             .Searchable(true, false, false);
 
             _grid = client.Grid;
             _task = client.UpdateGrid();

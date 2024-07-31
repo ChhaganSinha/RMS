@@ -146,6 +146,7 @@
                                                         <th>Action</th>
                                                     </tr>
                                                 </thead>
+
                                                 <tbody>
                                                     @foreach (var roombook in roomBookings)
                                                     {
@@ -157,7 +158,7 @@
                                                                             <td class="border-0" style="width:35%">
                                                                                 <div class="form-group mb-0">
                                                                                     <label class="font-weight-600 mb-1">Room Type<span class="text-danger">*</span></label>
-                                                                                     <select class="form-select" @bind-value="roombook.RoomType" @onchange="RoomTypeOnChange" @bind-value:event="oninput">
+                                                                                    <select class="form-select" value="@roombook.RoomType" @onchange="(e) => RoomTypeOnChange(e, roombook)">
                                                                                         <option selected>Choose Room Type</option>
                                                                                         @foreach (var val in roomCategories)
                                                                                         {
@@ -169,17 +170,13 @@
                                                                             <td class="border-0" style="width:25%">
                                                                                 <div class="form-group mb-0">
                                                                                     <label class="font-weight-600 mb-1">Room No.<span class="text-danger">*</span></label>
-                                                                                    <InputSelect class="form-select" @bind-Value="roombook.RoomNo">
-                                                                                        <option selected>Choose Room </option>
-                                                                                        @foreach (var room in rooms.Where(x => x.Status == RoomHallStatus.Available || x.RoomNumber == roombook.RoomNo))
+                                                                                    <select class="form-select" value="@roombook.RoomNo" @onchange="(e) => roombook.RoomNo = e.Value.ToString()">
+                                                                                        <option selected>Choose Room</option>
+                                                                                        @foreach (var room in GetFilteredRooms(roombook.RoomType))
                                                                                         {
-                                                                                            //@if (room.RoomNumber != roombook.RoomNo)
-                                                                                            {
-                                                                                                <option value="@room.RoomNumber">@room.RoomNumber</option>
-
-                                                                                            }
+                                                                                            <option value="@room.RoomNumber">@room.RoomNumber</option>
                                                                                         }
-                                                                                    </InputSelect>
+                                                                                    </select>
                                                                                 </div>
                                                                             </td>
                                                                             <td class="border-0" style="width:20%">
@@ -204,6 +201,9 @@
                                                         </tr>
                                                     }
                                                 </tbody>
+
+
+
                                             </table>
                                             <button type="button" @onclick="AddRoom" class="btn btn-primary mt-2">Add Room</button>
                                         </div>
@@ -457,6 +457,7 @@ else
         };
 
     IEnumerable<Room> rooms = new List<Room>();
+    IEnumerable<Room> filteredRooms = new List<Room>();
     IEnumerable<RoomCategories> roomCategories = new List<RoomCategories>();
     List<CustomerDetailsDTO> customers = new List<CustomerDetailsDTO>();
     private List<CustomerDetailsDTO> existingCustomers = new List<CustomerDetailsDTO>();
@@ -494,12 +495,14 @@ else
             NavigationManager.NavigateTo("/unauthorized");
             return;
         }
-        if(Id == 0 && string.IsNullOrEmpty(roomNumber))
+        if (Id == 0 && string.IsNullOrEmpty(roomNumber))
             AddRoom();
 
         rooms = await client.GetAllRoom();
+        filteredRooms = rooms.ToList();
         roomCategories = await client.GetAllRoomCategory();
         customers = (await client.GetAllCustomer()).ToList();
+
         if (Id > 0)
         {
             model = await client.GetReservationDetailsDtoById(Id);
@@ -519,26 +522,34 @@ else
                     RoomType = rb.RoomType.ToString(),
                     RoomNo = rb.RoomNo,
                     Adults = rb.Adults,
-                    Children = rb.Children
+                    Children = rb.Children,
+                    FilteredRooms = rooms.Where(x => x.Category == rb.RoomType && !roomBookings.Select(rb => rb.RoomNo).Contains(x.RoomNumber)).ToList()
                 }).ToList();
         }
         if (!string.IsNullOrEmpty(roomNumber))
         {
             var selectedRoom = rooms.Where(x => x.RoomNumber == roomNumber).FirstOrDefault();
-            if(selectedRoom != null)
+            if (selectedRoom != null)
             {
                 roomBookings.Add(new RoomBooking
-                {
+                    {
                         RoomType = selectedRoom.Category,
                         RoomNo = selectedRoom.RoomNumber,
                         Adults = 0,
-                        Children = 0
-                });
-
-               
+                        Children = 0,
+                        FilteredRooms = rooms.Where(x => x.Category == selectedRoom.Category && x.RoomNumber != roomNumber).ToList()
+                    });
+            }
+        }
+        else
+        {
+            foreach (var roomBooking in roomBookings)
+            {
+                roomBooking.FilteredRooms = rooms.Where(x => x.Category == roomBooking.RoomType && !roomBookings.Select(rb => rb.RoomNo).Contains(x.RoomNumber)).ToList();
             }
         }
     }
+
 
     private async Task SyncCustoomerDertails(CustomerDetailsDTO customerDetailsDTO)
     {
@@ -567,14 +578,28 @@ else
         show = true;
         TaskCompleted = false;
         message = "Please wait";
+
         try
         {
+            // Check for duplicate room numbers
+            var duplicateRooms = roomBookings
+                .GroupBy(rb => rb.RoomNo)
+                .Where(g => g.Count() > 1)
+                .Select(g => g.Key)
+                .ToList();
+
+            if (duplicateRooms.Any())
+            {
+                alert?.SetError($"Duplicate room numbers found: {string.Join(", ", duplicateRooms)}");
+                return;
+            }
+
             // Update room details in model
             model.RoomBookings = roomBookings.Select(rb => new RoomBookingDto
                 {
                     RoomType = rb.RoomType,
                     RoomNo = rb.RoomNo,
-                    RoomId = rooms.Where(x => x.RoomNumber == rb.RoomNo).Select(x => x.Id).First(),
+                    RoomId = rooms.FirstOrDefault(x => x.RoomNumber == rb.RoomNo)?.Id ?? 0,
                     Adults = rb.Adults,
                     Children = rb.Children
                 }).ToList();
@@ -582,25 +607,27 @@ else
             // Update customer information in model
             model.CustomerInfo = existingCustomers.Select(ec => new CustomerInfoDto
                 {
-                    // SL = ec.Id,
                     Name = ec.FirstName,
                     MobileNo = ec.MobileNo,
                     Email = ec.Email
                 }).ToList();
 
-
             var response = await client.UpsertReservationDetails(model);
             if (response.IsSuccess)
             {
-                // model = response.Result;
-                //await HallCategoryGrid.RefreshGridAsync();
                 alert?.SetSuccess(response.Message);
+                message = "Success";
+                MessageBody = response.Message;
                 model = new();
             }
             else
+            {
                 alert?.SetError(response.Message);
+                MessageBody = response.Message;
+                message = "Error!";
+            }
 
-            message = response.Message;
+            
             model = new ReservationDetailsDto
                 {
                     PaymentDetails = new PaymentDetailsDto(),
@@ -621,8 +648,8 @@ else
         process = false;
         rooms = await client.GetAllRoom();
         StateHasChanged();
-        //_timer = new Timer(TimerCallback, null, _delay, Timeout.Infinite);
     }
+
 
     private void TimerCallback(Object o)
     {
@@ -650,16 +677,6 @@ else
     }
 
     private List<RoomBooking> roomBookings = new List<RoomBooking>();
-
-    private void AddRoom()
-    {
-        roomBookings.Add(new RoomBooking());
-    }
-
-    private void DeleteRoom(RoomBooking roomBooking)
-    {
-        roomBookings.Remove(roomBooking);
-    }
 
     private void OnCustomerChanged(int? newCustomerId)
     {
@@ -743,10 +760,41 @@ else
         CalculateTotalCharge();
     }
 
-    private void RoomTypeOnChange(ChangeEventArgs e)
+    private void RoomTypeOnChange(ChangeEventArgs e, RoomBooking roombook)
     {
         string selectedValue = e.Value?.ToString();
-        rooms = rooms.Where(o => o.Category == selectedValue);
+        roombook.RoomType = selectedValue;
+        roombook.FilteredRooms = rooms.Where(o => o.Category == selectedValue && !roomBookings.Select(rb => rb.RoomNo).Contains(o.RoomNumber)).ToList();
         StateHasChanged();
     }
+    private IEnumerable<Room> GetFilteredRooms(string roomType)
+    {
+        return string.IsNullOrEmpty(roomType)
+            ? Enumerable.Empty<Room>()
+            : rooms.Where(r => r.Category == roomType);
+    }
+    private void AddRoom()
+    {
+        if (roomBookings.Any(rb => rb.RoomNo == string.Empty))
+        {
+            // Prevent adding a new room if there's already an empty entry
+            return;
+        }
+
+        roomBookings.Add(new RoomBooking
+            {
+                RoomType = string.Empty,
+                RoomNo = string.Empty,
+                Adults = 0,
+                Children = 0
+            });
+        StateHasChanged(); // Trigger UI update
+    }
+
+    private void DeleteRoom(RoomBooking roombook)
+    {
+        roomBookings.Remove(roombook);
+        StateHasChanged(); // Trigger UI update
+    }
+
 }
