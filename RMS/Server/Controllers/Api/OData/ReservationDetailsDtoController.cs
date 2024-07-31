@@ -24,8 +24,27 @@ namespace RMS.Server.Controllers.Api.OData
         [ODataAuthorize]
         public IQueryable<ReservationDetailsDto> Get()
         {
-            var data = DbContext.ReservationDetails.AsQueryable();
-            return data;
+            //return DbContext.ReservationDetails.AsQueryable();
+            var data = from assignment in DbContext.ReservationDetails
+                       from room in assignment.RoomBookings
+                       select new ReservationDetailsDto
+                       {
+                           Id = assignment.Id,
+                           BookingReferenceNo = assignment.BookingReferenceNo,
+                           RoomNos = string.Join(", ", assignment.RoomBookings.Select(rb => rb.RoomNo)),
+                           CheckIn = assignment.CheckIn,
+                           CheckOut = assignment.CheckOut,
+                           ArrivalFrom = assignment.ArrivalFrom,
+                           BookingType = assignment.BookingType,
+                           PurposeOfVisit = assignment.PurposeOfVisit,
+                           Remarks = assignment.Remarks,
+                           Status = assignment.Status,
+                           RoomBookings = assignment.RoomBookings,
+                           CustomerInfo = assignment.CustomerInfo,
+                           PaymentDetails = assignment.PaymentDetails,
+                           BillingDetails = assignment.BillingDetails
+                       };
+            return data.AsQueryable();
         }
     }
 }

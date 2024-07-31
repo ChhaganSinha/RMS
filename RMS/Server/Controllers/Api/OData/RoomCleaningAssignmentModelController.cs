@@ -21,11 +21,28 @@ namespace RMS.Server.Controllers.Api.OData
         }
 
         [EnableQuery]
-        //[ODataAuthorize]
+        [ODataAuthorize]
         public IQueryable<RoomCleaningAssignmentModel> Get()
         {
-            var data = DbContext.RoomCleaningAssignmentModel.AsQueryable();
-            return data;
+            //  var data = DbContext.RoomCleaningAssignmentModel.AsQueryable();
+
+            var data = from assignment in DbContext.RoomCleaningAssignmentModel
+                       from room in assignment.SelectedRooms
+                       select new RoomCleaningAssignmentModel
+                       {
+                           Id = assignment.Id,
+                          // HouseKeeperId = assignment.HouseKeeperId,
+                           HouseKeeper = assignment.HouseKeeper,
+                           RoomNo = room.RoomNo,
+                           RoomType = assignment.RoomType,
+                           Status = room.Status,
+                           IsSelected = room.IsSelected,
+                           StartDate = room.StartDate,
+                           EndDate = room.EndDate
+                       };
+
+
+            return data.AsQueryable();
         }
     }
 }

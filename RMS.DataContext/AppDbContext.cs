@@ -67,6 +67,16 @@ namespace RMS.DataContext
             modelBuilder.Ignore<CleaningReport>();
             base.OnModelCreating(modelBuilder);
 
+            modelBuilder.Entity<RoomCleaningAssignmentModel>()
+                .Ignore(e => e.StartDate)
+                .Ignore(e => e.EndDate)
+                .Ignore(e => e.IsSelected)
+                .Ignore(e => e.RoomNo)
+                .Ignore(e => e.Status);
+
+
+            modelBuilder.Entity<ReservationDetailsDto>()
+               .Ignore(e => e.RoomNos);
             //modelBuilder.Entity<EmployeeAttendance>()
             //    .HasOne(ea => ea.Employee)
             //    .WithMany()

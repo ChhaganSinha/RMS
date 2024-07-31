@@ -2474,7 +2474,25 @@ namespace RMS.Client.Client
             }
         }
 
+        public async Task<ApiResponse<RoomCleaningAssignmentModel>> EmpTaskUpdate(RoomCleaningAssignmentModel data)
+        {
+            var result = new ApiResponse<RoomCleaningAssignmentModel>();
 
+            try
+            {
+                var res = await HttpClient.PostAsJsonAsync($"api/App/EmpTaskUpdate", data);
+                res.EnsureSuccessStatusCode();
+                var json = await res.Content.ReadFromJsonAsync<ApiResponse<RoomCleaningAssignmentModel>>();
+                return json;
+
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
         #endregion
 
         #region Restaurant

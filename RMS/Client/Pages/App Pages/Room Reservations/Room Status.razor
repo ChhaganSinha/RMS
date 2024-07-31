@@ -223,7 +223,7 @@
         Rooms = (await client.GetAllRoom()).ToList();
         roomTypes = (await client.GetAllRoomCategory()).ToList();
         filteredRooms = Rooms;
-        loading = false; // Set loading to false once data is loaded
+        loading = false;
     }
 
     private void ApplyFilters()
