@@ -925,6 +925,13 @@ namespace RMS.Server.Controllers.Api
         }
 
         [HttpPost]
+        [Route("ChekInReservation")]
+        public async Task<ApiResponse<ReservationDetailsDto>> CheckInReservations(ReservationDetailsDto data)
+        {
+            return await _appRepository.CheckInReservations(data);
+        }
+
+        [HttpPost]
         [Route("EmpTaskUpdate")]
         public async Task<ApiResponse<RoomCleaningAssignmentModel>> EmpTaskUpdate(RoomCleaningAssignmentModel data)
         {

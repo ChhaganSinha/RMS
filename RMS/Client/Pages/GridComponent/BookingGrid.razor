@@ -32,34 +32,37 @@ else
     private static GridComponent<ReservationDetailsDto> Component;
     static bool filter = true;
     static AuthenticationState authState;
-    // Permission flags
     private static bool canView = false;
     private static bool canEdit = false;
     private static bool hasFullAccess = false;
+    private static bool isCheckedIn = false;
 
     Action<IGridColumnCollection<ReservationDetailsDto>> columns = c =>
     {
         if (canView)
         {
-              c.Add(o => o.Id).SetWidth("10%").Css("table-bordered").Titled("SN.").Filterable(filter);
-   c.Add(o => o.BookingReferenceNo).Css("table-bordered").Titled("booking No.").Filterable(filter);
-   c.Add(o => o.RoomNos).Css("table-bordered").Titled("Room No.").Filterable(filter);
-   c.Add(o => o.CheckIn).Css("table-bordered").Titled("Check In").Filterable(filter);
-   c.Add(o => o.CheckOut).Css("table-bordered").Titled("Check Out").Filterable(filter);
-   c.Add(o => o.Status).Css("table-bordered").Titled("Status").Filterable(filter);
+            c.Add(o => o.Id).SetWidth("10%").Css("table-bordered").Titled("SN.").Filterable(filter);
+            c.Add(o => o.BookingReferenceNo).Css("table-bordered").Titled("booking No.").Filterable(filter);
+            c.Add(o => o.RoomNos).Css("table-bordered").Titled("Room No.").Filterable(filter);
+            c.Add(o => o.AcceptedCheckIn).Css("table-bordered").Titled("Expected CheckIn").Filterable(filter);
+            c.Add(o => o.AcceptedCheckOut).Css("table-bordered").Titled("Expected CheckOut").Filterable(filter);
+            c.Add(o => o.CheckIn).Css("table-bordered").Titled("Check In").Filterable(filter);
+            c.Add(o => o.CheckOut).Css("table-bordered").Titled("Check Out").Filterable(filter);
+            c.Add(o => o.Status).Css("table-bordered").Titled("Status").Filterable(filter);
 
 
 
-            c.Add().Encoded(false).Sanitized(false).RenderComponentAs<BookingEditButton>().SetWidth("1px");
+            c.Add().Encoded(false).Sanitized(false).Titled("Edit").RenderComponentAs<BookingEditButton>().SetWidth("1px");
             if (canEdit || hasFullAccess)
             {
-                c.Add().Encoded(false).Sanitized(false).RenderComponentAs<BookingCheckOutButton>(new List<Action<object>> { RefreshGrid }).SetWidth("10px");
-                c.Add().Encoded(false).Sanitized(false).RenderComponentAs<BookingViewButton>().SetWidth("1px");
-                c.Add().Encoded(false).Sanitized(false).RenderComponentAs<BookingPrintButton>().SetWidth("1px");
+                c.Add().Encoded(false).Sanitized(false).Titled("Check In").RenderComponentAs<BookingCheckInButton>(new List<Action<object>> { RefreshGrid }).SetWidth("10px");
+                c.Add().Encoded(false).Sanitized(false).Titled("Check Out").RenderComponentAs<BookingCheckOutButton>(new List<Action<object>> { RefreshGrid }).SetWidth("10px");
+                c.Add().Encoded(false).Sanitized(false).Titled("View").RenderComponentAs<BookingViewButton>().SetWidth("1px");
+                c.Add().Encoded(false).Sanitized(false).Titled("Print").RenderComponentAs<BookingPrintButton>().SetWidth("1px");
             }
-            if (hasFullAccess)
+            if (hasFullAccess && !isCheckedIn)
             {
-                c.Add().Encoded(false).Sanitized(false).RenderComponentAs<BookingCancelButton>(new List<Action<object>> { RefreshGrid }).SetWidth("10px");
+                c.Add().Encoded(false).Sanitized(false).Titled("Delete").RenderComponentAs<BookingCancelButton>(new List<Action<object>> { RefreshGrid }).SetWidth("10px");
             }
         }
     };
@@ -67,7 +70,7 @@ else
     protected override async Task OnParametersSetAsync()
     {
         authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        // Check permissions
+   
         var permissions = await PermissionService.HasPermission("BookingList");
         if (permissions != null)
         {

@@ -2613,14 +2613,19 @@ namespace RMS.Repositories
                     return result;
                 }
 
+                DateTime acceptedCheckIn = data.AcceptedCheckIn;
+                DateTime acceptedCheckOut = data.AcceptedCheckOut;
+
                 if (data.Id > 0)
                 {
+                    
                     data.Status = RoomHallStatus.Booked;
                     AppDbCxt.ReservationDetails.Update(data);
                     result.Message = "Data Successfully Updated.";
                 }
                 else
                 {
+                    
                     data.Status = RoomHallStatus.Booked;
                     AppDbCxt.ReservationDetails.Add(data);
                     result.Message = "Data Successfully Inserted.";
@@ -2717,6 +2722,41 @@ namespace RMS.Repositories
                     var room = AppDbCxt.Room.FirstOrDefault(r => r.RoomNumber == roomBooking.RoomNo);
                     if (room != null) { room.Status = RoomHallStatus.Dirty; AppDbCxt.Room.Update(room); }
                 }
+
+
+                await AppDbCxt.SaveChangesAsync();
+
+                result.Result = existing;
+                result.IsSuccess = true;
+                result.Message = "Successfully Checked Out!";
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.IsSuccess = false;
+                result.Message = ex.Message;
+                return result;
+            }
+        }
+
+
+        public async Task<ApiResponse<ReservationDetailsDto>> CheckInReservations(ReservationDetailsDto reservationDetailsDto)
+        {
+            var result = new ApiResponse<ReservationDetailsDto>();
+            try
+            {
+                var existing = AppDbCxt.ReservationDetails.FirstOrDefault(x => x.Id == reservationDetailsDto.Id);
+
+                if (existing == null)
+                {
+                    result.IsSuccess = false;
+                    result.Message = "Booking not found!";
+                    return result;
+                }
+
+                
+                existing.CheckIn = DateTime.Now;
+                AppDbCxt.ReservationDetails.Update(existing);
 
 
                 await AppDbCxt.SaveChangesAsync();

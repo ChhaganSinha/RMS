@@ -9,31 +9,45 @@
 @implements ICustomGridComponent<ReservationDetailsDto>
 @inject NavigationManager NavigationManager
 
-<button class='btn btn-sm btn-primary' style="border-radius:15px" @onclick="MyClickHandler" title="Check In"><i class="fa fa-check-square-o"></i></button>
+@if (Item.CheckIn.ToShortDateString() == DateTime.MinValue.ToShortDateString())
+{
+    <button class='btn btn-sm btn-primary' style="border-radius:15px" @onclick="MyClickHandler" title="Check In">
+        <i class="fa fa-check-circle-o"></i>
+    </button>
+}
+else
+{
+    <span>Checked In</span>
+}
+
 <SimpleDailog Title="@Title" Show="@show" OnCloseDialog="ResetForm">
     @if (show)
     {
+        @if (!TaskCompleted && !process)
+        {
+            <div style="text-align:center;">
+                <h6 class="pb-2">Are you sure want to Check In?</h6>
 
-
-        <EditForm Model="model" OnValidSubmit="OnSave">
-            <DataAnnotationsValidator />
-            <div>
-              
+                <button class="btn btn-danger" @onclick="ProcesCheckIn">Yes</button>
+                <button class="btn btn-primary" @onclick="ResetForm">No</button>
             </div>
-
-            @if (process || model == null)
-            {
-                <div style="text-align:center">
-                    <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
-                </div>
-            }
-            <UiAlert Model="alert"></UiAlert>
-            <hr />
-            <button type="submit" class="btn btn-primary float-right col-md-4">Add</button>
-        </EditForm>
-        <br />
+        }
+        else if (TaskCompleted && process)
+        {
+            <div style="text-align:center;">
+                @MessageBody
+            </div>
+            <br />
+        }
+        else
+        {
+            <div style="text-align:center">
+                <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
+            </div>
+        }
     }
 </SimpleDailog>
+
 @code {
     [Parameter]
     public ReservationDetailsDto Item { get; set; }
@@ -44,43 +58,44 @@
     [CascadingParameter]
     protected AlertModel? alert { get; set; }
 
+    [Parameter]
+    public IList<Action<object>> Actions { get; set; }
+
     private Timer _timer;
     private int _delay = 2500;
     bool show = false;
     bool process = false;
-    string Title = "Update Category";
+    bool TaskCompleted = false;
+    string Title = "Checking In";
+    string MessageBody = string.Empty;
+   // bool isCheckedIn = false; 
 
     ReservationDetailsDto model = new();
+
+    private async Task ProcesCheckIn()
+    {
+        process = true;
+        var response = await client.ChekInReservation(Item);
+        if (response.IsSuccess)
+        {
+            MessageBody = response.Message;
+           // isCheckedIn = true;
+        }
+        else
+        {
+            MessageBody = response.Message;
+        }
+
+        TaskCompleted = true;
+        Title = "Process Completed!";
+        Actions[0]?.Invoke(response.Result);
+    }
 
     private async Task MyClickHandler(MouseEventArgs e)
     {
         show = true;
-       // model = await client.GetBookingListById(Item.Id);
-    }
-
-    protected override async Task OnInitializedAsync()
-    {
-        alert?.Clear();
-    }
-
-    public async Task OnSave()
-    {
-        process = true;
-        alert?.Clear();
-
-        // var response = await client.UpsertBookingListAsync(model);
-        // if (response.IsSuccess)
-        // {
-        //     // model = response.Result;
-        //     alert?.SetSuccess(response.Message);
-        //     await BookingListGrid.RefreshGridAsync();
-        // }
-        // else
-        //     alert?.SetError(response.Message);
-
-        process = false;
-        StateHasChanged();
-        _timer = new Timer(TimerCallback, null, _delay, Timeout.Infinite);
+        MessageBody = string.Empty;
+        TaskCompleted = false;
     }
 
     private void TimerCallback(Object o)
@@ -96,5 +111,4 @@
         show = false;
         process = false;
     }
-
 }
