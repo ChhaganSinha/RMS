@@ -24,27 +24,53 @@ namespace RMS.Server.Controllers.Api.OData
         [ODataAuthorize]
         public IQueryable<ReservationDetailsDto> Get()
         {
-            //return DbContext.ReservationDetails.AsQueryable();
-            var data = from assignment in DbContext.ReservationDetails
-                       from room in assignment.RoomBookings
-                       select new ReservationDetailsDto
-                       {
-                           Id = assignment.Id,
-                           BookingReferenceNo = assignment.BookingReferenceNo,
-                           RoomNos = string.Join(", ", assignment.RoomBookings.Select(rb => rb.RoomNo)),
-                           CheckIn = assignment.CheckIn,
-                           CheckOut = assignment.CheckOut,
-                           ArrivalFrom = assignment.ArrivalFrom,
-                           BookingType = assignment.BookingType,
-                           PurposeOfVisit = assignment.PurposeOfVisit,
-                           Remarks = assignment.Remarks,
-                           Status = assignment.Status,
-                           RoomBookings = assignment.RoomBookings,
-                           CustomerInfo = assignment.CustomerInfo,
-                           PaymentDetails = assignment.PaymentDetails,
-                           BillingDetails = assignment.BillingDetails
-                       };
+            var data = DbContext.ReservationDetails
+                .Select(assignment => new ReservationDetailsDto
+                {
+                    Id = assignment.Id,
+                    BookingReferenceNo = assignment.BookingReferenceNo,
+                    RoomNos = string.Join(", ", assignment.RoomBookings.Select(rb => rb.RoomNo)),
+                    CheckIn = assignment.CheckIn,
+                    CheckOut = assignment.CheckOut,
+                    ArrivalFrom = assignment.ArrivalFrom,
+                    BookingType = assignment.BookingType,
+                    PurposeOfVisit = assignment.PurposeOfVisit,
+                    Remarks = assignment.Remarks,
+                    Status = assignment.Status,
+                    RoomBookings = assignment.RoomBookings.Select(rb => new RoomBookingDto
+                    {
+                        RoomType = rb.RoomType,
+                        RoomId = rb.RoomId,
+                        RoomNo = rb.RoomNo,
+                        Adults = rb.Adults,
+                        Children = rb.Children
+                    }).ToList(),
+                    CustomerInfo = assignment.CustomerInfo.Select(ci => new CustomerInfoDto
+                    {
+                        SL = ci.SL,
+                        Name = ci.Name,
+                        MobileNo = ci.MobileNo,
+                        Email = ci.Email
+                    }).ToList(),
+                    PaymentDetails = new PaymentDetailsDto
+                    {
+                        DiscountReason = assignment.PaymentDetails.DiscountReason,
+                        DiscountRate = assignment.PaymentDetails.DiscountRate,
+                        DiscountAmount = assignment.PaymentDetails.DiscountAmount,
+                        CommissionRate = assignment.PaymentDetails.CommissionRate,
+                        CommissionAmount = assignment.PaymentDetails.CommissionAmount
+                    },
+                    BillingDetails = new BillingDetailsDto
+                    {
+                        BookingCharge = assignment.BillingDetails.BookingCharge,
+                        Tax = assignment.BillingDetails.Tax,
+                        ServiceCharge = assignment.BillingDetails.ServiceCharge,
+                        TotalCharge = assignment.BillingDetails.TotalCharge
+                    }
+                });
+
             return data.AsQueryable();
         }
+
     }
 }

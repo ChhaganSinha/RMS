@@ -170,9 +170,9 @@
                                                                             <td class="border-0" style="width:25%">
                                                                                 <div class="form-group mb-0">
                                                                                     <label class="font-weight-600 mb-1">Room No.<span class="text-danger">*</span></label>
-                                                                                    <select class="form-select" @bind-value="@roombook.RoomNo" @onchange="(e) => OnRoomNoChange(e,roombook)" @bind-value:event="oninput">
+                                                                                    <select class="form-select" @bind-value="@roombook.RoomNo" @onchange="(e) => OnRoomNoChange(e, roombook)" @bind-value:event="oninput">
                                                                                         <option selected>Choose Room</option>
-                                                                                        @foreach (var room in GetFilteredRooms(roombook.RoomType))
+                                                                                        @foreach (var room in GetFilteredRooms(roombook))
                                                                                         {
                                                                                             <option value="@room.RoomNumber">@room.RoomNumber</option>
                                                                                         }
@@ -349,6 +349,7 @@
                                 </div>
 
                                 <div class="text-right mt-3">
+                                    <a href="booking-list" class="btn btn-secondary w-100p">Close</a>
                                     <button type="submit" class="btn btn-primary w-100p" id="bookingsave">Save</button>
                                 </div>
 
@@ -481,7 +482,6 @@ else
     protected override async Task OnInitializedAsync()
     {
         alert?.Clear();
-        // Check permissions
         var permissions = await PermissionService.HasPermission("NewBooking");
         if (permissions != null)
         {
@@ -491,7 +491,6 @@ else
         }
         if (!canView)
         {
-            // Redirect or handle unauthorized access
             NavigationManager.NavigateTo("/unauthorized");
             return;
         }
@@ -499,7 +498,6 @@ else
             AddRoom();
 
         rooms = await client.GetAllRoom();
-        filteredRooms = rooms.ToList();
         roomCategories = await client.GetAllRoomCategory();
         customers = (await client.GetAllCustomer()).ToList();
 
@@ -522,13 +520,12 @@ else
                     RoomType = rb.RoomType.ToString(),
                     RoomNo = rb.RoomNo,
                     Adults = rb.Adults,
-                    Children = rb.Children,
-                    FilteredRooms = rooms.Where(x => x.Category == rb.RoomType && !roomBookings.Select(rb => rb.RoomNo).Contains(x.RoomNumber)).ToList()
+                    Children = rb.Children
                 }).ToList();
         }
         if (!string.IsNullOrEmpty(roomNumber))
         {
-            var selectedRoom = rooms.Where(x => x.RoomNumber == roomNumber).FirstOrDefault();
+            var selectedRoom = rooms.FirstOrDefault(x => x.RoomNumber == roomNumber);
             if (selectedRoom != null)
             {
                 roomBookings.Add(new RoomBooking
@@ -536,18 +533,11 @@ else
                         RoomType = selectedRoom.Category,
                         RoomNo = selectedRoom.RoomNumber,
                         Adults = 0,
-                        Children = 0,
-                        FilteredRooms = rooms.Where(x => x.Category == selectedRoom.Category && x.RoomNumber != roomNumber).ToList()
+                        Children = 0
                     });
             }
         }
-        else
-        {
-            foreach (var roomBooking in roomBookings)
-            {
-                roomBooking.FilteredRooms = rooms.Where(x => x.Category == roomBooking.RoomType && !roomBookings.Select(rb => rb.RoomNo).Contains(x.RoomNumber)).ToList();
-            }
-        }
+        UpdateFilteredRooms();
     }
 
 
@@ -677,6 +667,7 @@ else
     }
 
     private List<RoomBooking> roomBookings = new List<RoomBooking>();
+    private List<RoomBooking> roomBookingFilter = new List<RoomBooking>();
 
     private void OnCustomerChanged(int? newCustomerId)
     {
@@ -762,29 +753,43 @@ else
 
     private void OnRoomNoChange(ChangeEventArgs e, RoomBooking roombook)
     {
-        string selectedValue = e.Value?.ToString();
-        roombook.FilteredRooms = rooms.Where(o => !roomBookings.Select(rb => rb.RoomNo).Contains(o.RoomNumber)).ToList();
-        StateHasChanged();
+        roombook.RoomNo = e.Value?.ToString();
+        UpdateFilteredRooms();
     }
 
     private void RoomTypeOnChange(ChangeEventArgs e, RoomBooking roombook)
     {
-        string selectedValue = e.Value?.ToString();
-        roombook.RoomType = selectedValue;
-        roombook.FilteredRooms = rooms.Where(o => o.Category == selectedValue && !roomBookings.Select(rb => rb.RoomNo).Contains(o.RoomNumber)).ToList();
+        roombook.RoomType = e.Value?.ToString();
+        UpdateFilteredRooms();
+    }
+
+    private IEnumerable<Room> GetFilteredRooms(RoomBooking roombook)
+    {
+        var selectedRoomNumbers = roomBookingFilter.Select(rb => rb.RoomNo).ToHashSet();
+
+        return string.IsNullOrEmpty(roombook.RoomType)
+            ? Enumerable.Empty<Room>()
+            : rooms.Where(r => r.Category == roombook.RoomType && r.Status == RoomHallStatus.Available && (roombook.RoomNo == r.RoomNumber || !selectedRoomNumbers.Contains(r.RoomNumber)));
+    }
+
+    private void UpdateFilteredRooms()
+    {
+        roomBookingFilter = roomBookings.Where(rb => !string.IsNullOrEmpty(rb.RoomNo)).ToList();
+
+        foreach (var roomBooking in roomBookings)
+        {
+            roomBooking.FilteredRooms = GetFilteredRooms(roomBooking).ToList();
+        }
         StateHasChanged();
     }
-    private IEnumerable<Room> GetFilteredRooms(string roomType)
-    {
-        return string.IsNullOrEmpty(roomType)
-            ? Enumerable.Empty<Room>()
-            : rooms.Where(r => r.Category == roomType && r.Status == RoomHallStatus.Available);
-    }
+
+
+
+
     private void AddRoom()
     {
-        if (roomBookings.Any(rb => rb.RoomNo == string.Empty))
+        if (roomBookings.Any(rb => string.IsNullOrEmpty(rb.RoomNo)))
         {
-            // Prevent adding a new room if there's already an empty entry
             return;
         }
 
@@ -795,13 +800,12 @@ else
                 Adults = 0,
                 Children = 0
             });
-        StateHasChanged(); // Trigger UI update
+        UpdateFilteredRooms();
     }
 
     private void DeleteRoom(RoomBooking roombook)
     {
         roomBookings.Remove(roombook);
-        StateHasChanged(); // Trigger UI update
+        UpdateFilteredRooms();
     }
-
 }
