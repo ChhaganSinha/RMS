@@ -27,20 +27,24 @@
     </div>
 </div>
 
-<div class="row">
-    <div class="col-sm-12 p-0">
-        <div class="card-body p-2 mt-n3">
-            @if (canView)
-            {
+@if (canView || canEdit || hasFullAccess)
+{
+    <div class="row">
+        <div class="col-sm-12 p-0">
+            <div class="card-body p-2 mt-n3">
+
                 <CleaningReportGrid />
-            }
-            else
-            {
-                <p>You do not have permission to view this report.</p>
-            }
+
+            </div>
         </div>
     </div>
-</div>
+}
+else
+{
+    <div class="col-sm-12" style="margin-top:40vh">
+        <div class="loader-progress"></div>
+    </div>
+}
 
 @code {
     private bool canView = false;

@@ -35,65 +35,71 @@
     </div>
 </div>
 
-<div class="row">
-    <div class="col-sm-12 p-0">
-        <div class="card-body p-2 mt-n3">
-            <div class="card text">
-                <div class="card-body">
-                    <AdvanceSalaryGrid />
-                </div>
+@if (canView || canEdit || hasFullAccess)
+{
+    <div class="row">
+        <div class="col-sm-12 p-0">
+            <div class="card-body p-2 mt-n3">
+                <AdvanceSalaryGrid />
+
             </div>
         </div>
     </div>
-</div>
 
-<SimpleDailog Title="@Title" Show="@show" OnCloseDialog="ResetForm">
-    @if (show && canEdit)
-    {
-        <EditForm Model="model" OnValidSubmit="OnSave">
-            <DataAnnotationsValidator />
-            <div>
-                <div class="form-group row">
-                    <label class="col-form-label bold-font">Select Employee</label>
-                    <HxSelect TItem="Employee"
-                              TValue="int?"
-                              Data="Employees"
-                              @bind-Value="employeeId"
-                              TextSelector="@(e => e.Name)"
-                              ValueSelector="@(e => e.Id)"
-                              Nullable="true"
-                              NullText="-select-"
-                              NullDataText="Loading..." />
+    <SimpleDailog Title="@Title" Show="@show" OnCloseDialog="ResetForm">
+        @if (show && canEdit)
+        {
+            <EditForm Model="model" OnValidSubmit="OnSave">
+                <DataAnnotationsValidator />
+                <div>
+                    <div class="form-group row">
+                        <label class="col-form-label bold-font">Select Employee</label>
+                        <HxSelect TItem="Employee"
+                                  TValue="int?"
+                                  Data="Employees"
+                                  @bind-Value="employeeId"
+                                  TextSelector="@(e => e.Name)"
+                                  ValueSelector="@(e => e.Id)"
+                                  Nullable="true"
+                                  NullText="-select-"
+                                  NullDataText="Loading..." />
 
-                    @if (employeeId == null && submit)
-                    {
-                        <p class="text-danger">Please select one</p>
-                    }
-                </div>
-                <div class="form-group row">
-                    <div class="">
-                        <label class="col-form-label bold-font">Advance Amount</label>
-                        <InputNumber @bind-Value="model.AdvanceAmount" id="AdvanceAmount" class="form-control"></InputNumber>
-                        <ValidationMessage For="() => model.AdvanceAmount" />
+                        @if (employeeId == null && submit)
+                        {
+                            <p class="text-danger">Please select one</p>
+                        }
+                    </div>
+                    <div class="form-group row">
+                        <div class="">
+                            <label class="col-form-label bold-font">Advance Amount</label>
+                            <InputNumber @bind-Value="model.AdvanceAmount" id="AdvanceAmount" class="form-control"></InputNumber>
+                            <ValidationMessage For="() => model.AdvanceAmount" />
+                        </div>
                     </div>
                 </div>
-            </div>
-            @if (process)
-            {
-                <div style="text-align:center">
-                    <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
-                </div>
-            }
-            <UiAlert Model="alert"></UiAlert>
-            <hr />
-            @if (canEdit)
-            {
-                <button type="submit" class="btn btn-primary float-right col-md-4">Add</button>
-            }
-        </EditForm>
-        <br />
-    }
-</SimpleDailog>
+                @if (process)
+                {
+                    <div style="text-align:center">
+                        <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
+                    </div>
+                }
+                <UiAlert Model="alert"></UiAlert>
+                <hr />
+                @if (canEdit)
+                {
+                    <button type="submit" class="btn btn-primary float-right col-md-4">Add</button>
+                }
+            </EditForm>
+            <br />
+        }
+    </SimpleDailog>
+}
+else
+{
+    <div class="col-sm-12" style="margin-top:40vh">
+        <div class="loader-progress"></div>
+    </div>
+}
 
 @code {
     [Parameter]

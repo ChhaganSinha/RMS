@@ -109,34 +109,18 @@
                     </div>
                 </div>
                 <div class="form-group row">
-                    <div class="col-md-4">
-                        <label class="col-form-label bold-font" style="padding-right: 0;">No. of Beds</label>
-                        <InputNumber @bind-Value="@model.NumberOfBed" id="NumberOfBed" class="form-control"></InputNumber>
-                        <ValidationMessage For="() => model.NumberOfBed" />
-                    </div>
-                    <div class="col-md-4">
+                    <div class="col-md-6">
                         <label class="col-form-label bold-font" style="padding-right: 0;">Capacity</label>
                         <InputText @bind-Value="@model.Capacity" id="Capacity" class="form-control"></InputText>
                         <ValidationMessage For="() => model.Capacity" />
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-6">
                         <label class="col-form-label bold-font" style="padding-right: 0;">Extra Capacity</label>
                         <InputCheckbox @bind-Value="model.ExtraCapacity" id="ExtraCapacity" class="form-check-input" style="margin-left: -100px;margin-top: 45px; font-size: x-large;margin-top: 42px;" />
                         <ValidationMessage For="() => model.ExtraCapacity" />
                     </div>
                 </div>
-                <div class="form-group row">
-                    <div class="col-md-6">
-                        <label class="col-form-label bold-font" style="padding-right: 0;">Bed Charge</label>
-                        <InputText @bind-Value="@model.BedCharge" id="BedCharge" class="form-control"></InputText>
-                        <ValidationMessage For="() => model.BedCharge" />
-                    </div>
-                    <div class="col-md-6">
-                        <label class="col-form-label bold-font" style="padding-right: 0;">Person Charge</label>
-                        <InputText @bind-Value="@model.PersonCharge" id="PersonCharge" class="form-control"></InputText>
-                        <ValidationMessage For="() => model.PersonCharge" />
-                    </div>
-                </div>
+          
                 <div class="form-group row">
                     <div class="col-md-3">
                         <label class="col-form-label bold-font" style="padding-right: 0;">IsActive</label>
@@ -174,7 +158,9 @@
 }
 else
 {
-    <div class="alert alert-danger">You do not have permission to view this page.</div>
+    <div class="col-sm-12" style="margin-top:40vh">
+        <div class="loader-progress"></div>
+    </div>
 }
 
 @code {

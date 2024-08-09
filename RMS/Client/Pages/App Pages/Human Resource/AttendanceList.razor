@@ -36,11 +36,9 @@
     <div class="row">
         <div class="col-sm-12 p-0">
             <div class="card-body p-2 mt-n3">
-                <div class="card text">
-                    <div class="card-body">
-                        <AttendanceGrid />
-                    </div>
-                </div>
+
+                <AttendanceGrid />
+
             </div>
         </div>
     </div>
@@ -79,6 +77,12 @@
             <br />
         }
     </SimpleDailog>
+}
+else
+{
+    <div class="col-sm-12" style="margin-top:40vh">
+        <div class="loader-progress"></div>
+    </div>
 }
 
 @code {

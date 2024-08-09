@@ -8,6 +8,7 @@
 @inject PermissionService PermissionService
 @attribute [Authorize]
 
+
 <div class="page-header breadcumb-sticky">
     <div class="page-block">
         <div class="row align-items-center">
@@ -32,43 +33,42 @@
         </div>
     </div>
 </div>
-<div class="row">
-    <div class="col-sm-12 p-0">
-        <div class="card-body p-2 mt-n3">
-            <div class="card text">
-                <div class="card-body">
-                    <RoomFacilitiesGrid />
-                </div>
+
+@if (canView)
+{
+    <div class="row">
+        <div class="col-sm-12 p-0">
+            <div class="card-body p-2 mt-n3">
+
+                <RoomFacilitiesGrid />
             </div>
         </div>
     </div>
-</div>
 
 
-<SimpleDailog Title="@Title" Show="@show" OnCloseDialog="ResetForm">
-    @if (show)
-    {
-
-
-        <EditForm Model="model" OnValidSubmit="OnSave">
-            <DataAnnotationsValidator />
-            <div>
-                <input type="text" placeholder="Enter Category" @bind-value="model.Name" class="form-control mb-2" />
-                <ValidationMessage For="() => model.Name" />
-            </div>
-            @if (process)
-            {
-                <div style="text-align:center">
-                    <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
+    <SimpleDailog Title="@Title" Show="@show" OnCloseDialog="ResetForm">
+        @if (show)
+        {
+            <EditForm Model="model" OnValidSubmit="OnSave">
+                <DataAnnotationsValidator />
+                <div>
+                    <input type="text" placeholder="Enter Category" @bind-value="model.Name" class="form-control mb-2" />
+                    <ValidationMessage For="() => model.Name" />
                 </div>
-            }
-            <UiAlert Model="alert"></UiAlert>
-            <hr />
-            <button type="submit" class="btn btn-primary float-right col-md-4">Add</button>
-        </EditForm>
-        <br />
-    }
-</SimpleDailog>
+                @if (process)
+                {
+                    <div style="text-align:center">
+                        <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
+                    </div>
+                }
+                <UiAlert Model="alert"></UiAlert>
+                <hr />
+                <button type="submit" class="btn btn-primary float-right col-md-4">Add</button>
+            </EditForm>
+            <br />
+        }
+    </SimpleDailog>
+}
 
 @code {
     [Parameter]

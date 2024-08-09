@@ -11,7 +11,7 @@
 @inject PermissionService PermissionService
 @attribute [Authorize]
 
-     @if (canEdit || hasFullAccess)
+@if (canEdit || hasFullAccess)
 {
     <div class="modal-content border-0">
         <div class="modal-header">
@@ -371,6 +371,13 @@
 
     </div>
 }
+else
+{
+    <div class="col-sm-12" style="margin-top:40vh">
+        <div class="loader-progress"></div>
+    </div>
+}
+
 @code {
     [Parameter]
     public int Id { get; set; }

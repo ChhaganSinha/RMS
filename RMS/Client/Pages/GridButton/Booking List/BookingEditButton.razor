@@ -34,30 +34,7 @@
         NavigationManager.NavigateTo($"new-booking/{Item.Id}");
     }
 
-    protected override async Task OnInitializedAsync()
-    {
-        alert?.Clear();
-    }
-
-    public async Task OnSave()
-    {
-        process = true;
-        alert?.Clear();
-
-        // var response = await client.UpsertBookingListAsync(model);
-        // if (response.IsSuccess)
-        // {
-        //     // model = response.Result;
-        //     alert?.SetSuccess(response.Message);
-        //     await BookingListGrid.RefreshGridAsync();
-        // }
-        // else
-        //     alert?.SetError(response.Message);
-
-        process = false;
-        StateHasChanged();
-        _timer = new Timer(TimerCallback, null, _delay, Timeout.Infinite);
-    }
+    
 
     private void TimerCallback(Object o)
     {

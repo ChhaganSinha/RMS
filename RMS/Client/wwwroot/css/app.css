@@ -118,13 +118,13 @@ a, .btn-link {
 
 /* HTML: <div class="loader-progress"></div> */
 .loader-progress {
-    width: 120px;
-    height: 20px;
+    width: 180px;
+    height: 12px;
     background: linear-gradient(90deg, #0000, orange) left -50px top 0/50px 20px no-repeat lightblue;
     animation: l2 1s infinite linear;
     position: fixed;
     top: 50%;
-    left: 60%;
+    left: 56%;
     transform: translate(-50%, -50%);
 }
 

@@ -38,18 +38,9 @@
     <div class="row">
         <div class="col-sm-12 p-0">
             <div class="card-body p-2 mt-n3">
-                <div class="card text">
-                    <div class="card-body">
-                        @if (canView)
-                        {
-                            <HallFacilitiesGrid />
-                        }
-                        else
-                        {
-                            <div>You do not have permission to view this content.</div>
-                        }
-                    </div>
-                </div>
+
+                <HallFacilitiesGrid />
+
             </div>
         </div>
     </div>
@@ -80,7 +71,9 @@
 }
 else
 {
-    <div class="alert alert-danger">You do not have permission to view this page.</div>
+    <div class="col-sm-12" style="margin-top:40vh">
+        <div class="loader-progress"></div>
+    </div>
 }
 
 

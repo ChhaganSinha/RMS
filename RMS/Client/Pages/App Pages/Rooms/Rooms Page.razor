@@ -13,6 +13,7 @@
 @inject PermissionService PermissionService
 @attribute [Authorize]
 
+
 <div class="page-header breadcumb-sticky">
     <div class="page-block">
         <div class="row align-items-center">
@@ -48,41 +49,34 @@
             </div>
         </div>
     </div>
-}
-else
-{
-    <div class="col-sm-12">
-        <p>You do not have permission to view this page.</p>
-    </div>
-}
 
-<PageDialog Title="@Title" Show="@show" ClosePageDialog="ResetForm">
-    @if (show)
-    {
-        <EditForm Model="model" OnValidSubmit="OnSave">
-            <DataAnnotationsValidator />
-            <div class="form-group row">
-                <div class="col-md-4">
-                    <label class="col-form-label bold-font required-field">Room Number</label>
-                    <InputText @bind-Value="@model.RoomNumber" id="RoomNumber" class="form-control"></InputText>
-                    <ValidationMessage For="() => model.RoomNumber" />
-                </div>
-                <div class="col-md-4">
-                    <label class="col-form-label bold-font">Price</label>
-                    <InputNumber @bind-Value="@model.Price" id="Price" class="form-control"></InputNumber>
-                    <ValidationMessage For="() => model.Price" />
-                </div>
-                <div class="col-md-4">
-                    <label class="col-form-label bold-font">Floor</label>
-                    <select class="form-control" @bind="model.floor">
-                        @foreach (var floor in Enum.GetValues(typeof(Floor)).Cast<Floor>())
-                        {
-                            <option value="@floor">@floor</option>
-                        }
-                    </select>
-                    <ValidationMessage For="() => model.floor" />
-                </div>
-                @*  <div class="col-md-3">
+    <PageDialog Title="@Title" Show="@show" ClosePageDialog="ResetForm">
+        @if (show)
+        {
+            <EditForm Model="model" OnValidSubmit="OnSave">
+                <DataAnnotationsValidator />
+                <div class="form-group row">
+                    <div class="col-md-4">
+                        <label class="col-form-label bold-font required-field">Room Number</label>
+                        <InputText @bind-Value="@model.RoomNumber" id="RoomNumber" class="form-control"></InputText>
+                        <ValidationMessage For="() => model.RoomNumber" />
+                    </div>
+                    <div class="col-md-4">
+                        <label class="col-form-label bold-font">Price</label>
+                        <InputNumber @bind-Value="@model.Price" id="Price" class="form-control"></InputNumber>
+                        <ValidationMessage For="() => model.Price" />
+                    </div>
+                    <div class="col-md-4">
+                        <label class="col-form-label bold-font">Floor</label>
+                        <select class="form-control" @bind="model.floor">
+                            @foreach (var floor in Enum.GetValues(typeof(Floor)).Cast<Floor>())
+                            {
+                                <option value="@floor">@floor</option>
+                            }
+                        </select>
+                        <ValidationMessage For="() => model.floor" />
+                    </div>
+                    @*  <div class="col-md-3">
             <label class="col-form-label bold-font">Room Status</label>
             <select class="form-control" @bind="model.Status">
             @foreach (var status in Enum.GetValues(typeof(RoomHallStatus)).Cast<RoomHallStatus>())
@@ -92,101 +86,109 @@ else
             </select>
             <ValidationMessage For="() => model.Status" />
             </div> *@
-            </div>
-            <div class="form-group row">
-                <div class="col-md-6">
-                    <label class="col-form-label bold-font">Select Category</label>
-                    <HxSelect TItem="RoomCategories"
-                              TValue="int?"
-                              Data="Categories"
-                              @bind-Value="categoriesId"
-                              TextSelector="@(Categories => Categories.Name)"
-                              ValueSelector="@(Categories => Categories.Id)"
-                              Nullable="true"
-                              NullText="-select-"
-                              NullDataText="Loading categories..." />
-                    <ValidationMessage For="() => model.Category" />
                 </div>
-                <div class="col-md-6">
-                    <label class="col-form-label bold-font">Select Facilities</label>
-                    <HxMultiSelect TItem="RoomFacilities"
-                                   AutoSort="false"
-                                   TValue="int"
-                                   Data="@Facilities"
-                                   @bind-Value="@SelectedFacilities"
-                                   TextSelector="@(p => p.Name)"
-                                   ValueSelector="@(p => p.Id)"
-                                   EmptyText="- Select -"
-                                   NullDataText="Loading..." />
-                    @if (SelectedFacilities.Count() == 0 && IsError)
-                    {
-                        <span style="color:red">Please select at least one Facility</span>
-                    }
+                <div class="form-group row">
+                    <div class="col-md-6">
+                        <label class="col-form-label bold-font">Select Category</label>
+                        <HxSelect TItem="RoomCategories"
+                                  TValue="int?"
+                                  Data="Categories"
+                                  @bind-Value="categoriesId"
+                                  TextSelector="@(Categories => Categories.Name)"
+                                  ValueSelector="@(Categories => Categories.Id)"
+                                  Nullable="true"
+                                  NullText="-select-"
+                                  NullDataText="Loading categories..." />
+                        <ValidationMessage For="() => model.Category" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="col-form-label bold-font">Select Facilities</label>
+                        <HxMultiSelect TItem="RoomFacilities"
+                                       AutoSort="false"
+                                       TValue="int"
+                                       Data="@Facilities"
+                                       @bind-Value="@SelectedFacilities"
+                                       TextSelector="@(p => p.Name)"
+                                       ValueSelector="@(p => p.Id)"
+                                       EmptyText="- Select -"
+                                       NullDataText="Loading..." />
+                        @if (SelectedFacilities.Count() == 0 && IsError)
+                        {
+                            <span style="color:red">Please select at least one Facility</span>
+                        }
+                    </div>
                 </div>
-            </div>
-            <div class="form-group row">
-                <div class="col-md-4">
-                    <label class="col-form-label bold-font" style="padding-right: 0;">No. of Beds</label>
-                    <InputNumber @bind-Value="@model.NumberOfBed" id="NumberOfBed" class="form-control"></InputNumber>
-                    <ValidationMessage For="() => model.NumberOfBed" />
+                <div class="form-group row">
+                    <div class="col-md-4">
+                        <label class="col-form-label bold-font" style="padding-right: 0;">No. of Beds</label>
+                        <InputNumber @bind-Value="@model.NumberOfBed" id="NumberOfBed" class="form-control"></InputNumber>
+                        <ValidationMessage For="() => model.NumberOfBed" />
+                    </div>
+                    <div class="col-md-4">
+                        <label class="col-form-label bold-font" style="padding-right: 0;">Capacity</label>
+                        <InputText @bind-Value="@model.Capacity" id="Capacity" class="form-control"></InputText>
+                        <ValidationMessage For="() => model.Capacity" />
+                    </div>
+                    <div class="col-md-4">
+                        <label class="col-form-label bold-font" style="padding-right: 0;">Extra Capacity</label>
+                        <InputCheckbox @bind-Value="model.ExtraCapacity" id="ExtraCapacity" class="form-check-input" style="margin-left: -100px;margin-top: 45px; font-size: x-large;margin-top: 42px;" />
+                        <ValidationMessage For="() => model.ExtraCapacity" />
+                    </div>
                 </div>
-                <div class="col-md-4">
-                    <label class="col-form-label bold-font" style="padding-right: 0;">Capacity</label>
-                    <InputText @bind-Value="@model.Capacity" id="Capacity" class="form-control"></InputText>
-                    <ValidationMessage For="() => model.Capacity" />
+                <div class="form-group row">
+                    <div class="col-md-6">
+                        <label class="col-form-label bold-font" style="padding-right: 0;">Bed Charge</label>
+                        <InputText @bind-Value="@model.BedCharge" id="BedCharge" class="form-control"></InputText>
+                        <ValidationMessage For="() => model.BedCharge" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="col-form-label bold-font" style="padding-right: 0;">Person Charge</label>
+                        <InputText @bind-Value="@model.PersonCharge" id="PersonCharge" class="form-control"></InputText>
+                        <ValidationMessage For="() => model.PersonCharge" />
+                    </div>
                 </div>
-                <div class="col-md-4">
-                    <label class="col-form-label bold-font" style="padding-right: 0;">Extra Capacity</label>
-                    <InputCheckbox @bind-Value="model.ExtraCapacity" id="ExtraCapacity" class="form-check-input" style="margin-left: -100px;margin-top: 45px; font-size: x-large;margin-top: 42px;" />
-                    <ValidationMessage For="() => model.ExtraCapacity" />
+                <div class="form-group row">
+                    <div class="col-md-3">
+                        <label class="col-form-label bold-font" style="padding-right: 0;">IsActive</label>
+                        <InputCheckbox @bind-Value="model.IsActive" class="form-check-input" style="font-size: x-large;margin-top: 42px; margin-left: -56px;" />
+                        <ValidationMessage For="() => model.IsActive" />
+                    </div>
+                    <div class="col-md-9">
+                        <label class="col-form-label bold-font">Upload Image</label>
+                        <InputFile OnChange="HandleFileSelected" class="form-control" />
+                        <br />
+                        <img id="imgPreview" src="@imageDataUrl" style="max-width: 200px; max-height: 200px; display: @(imageDataUrl == null ? "none" : "block");" />
+                        <ValidationMessage For="() => model.ImageFile" />
+                    </div>
                 </div>
-            </div>
-            <div class="form-group row">
-                <div class="col-md-6">
-                    <label class="col-form-label bold-font" style="padding-right: 0;">Bed Charge</label>
-                    <InputText @bind-Value="@model.BedCharge" id="BedCharge" class="form-control"></InputText>
-                    <ValidationMessage For="() => model.BedCharge" />
+                <div class="form-group row">
+                    <div class="col-md-12">
+                        <label class="col-form-label bold-font" style="padding-right: 0;">Descriptions</label>
+                        <InputTextArea @bind-Value="@model.Descriptions" id="Descriptions" class="form-control"></InputTextArea>
+                        <ValidationMessage For="() => model.Descriptions" />
+                    </div>
                 </div>
-                <div class="col-md-6">
-                    <label class="col-form-label bold-font" style="padding-right: 0;">Person Charge</label>
-                    <InputText @bind-Value="@model.PersonCharge" id="PersonCharge" class="form-control"></InputText>
-                    <ValidationMessage For="() => model.PersonCharge" />
-                </div>
-            </div>
-            <div class="form-group row">
-                <div class="col-md-3">
-                    <label class="col-form-label bold-font" style="padding-right: 0;">IsActive</label>
-                    <InputCheckbox @bind-Value="model.IsActive" class="form-check-input" style="font-size: x-large;margin-top: 42px; margin-left: -56px;" />
-                    <ValidationMessage For="() => model.IsActive" />
-                </div>
-                <div class="col-md-9">
-                    <label class="col-form-label bold-font">Upload Image</label>
-                    <InputFile OnChange="HandleFileSelected" class="form-control" />
-                    <br />
-                    <img id="imgPreview" src="@imageDataUrl" style="max-width: 200px; max-height: 200px; display: @(imageDataUrl == null ? "none" : "block");" />
-                    <ValidationMessage For="() => model.ImageFile" />
-                </div>
-            </div>
-            <div class="form-group row">
-                <div class="col-md-12">
-                    <label class="col-form-label bold-font" style="padding-right: 0;">Descriptions</label>
-                    <InputTextArea @bind-Value="@model.Descriptions" id="Descriptions" class="form-control"></InputTextArea>
-                    <ValidationMessage For="() => model.Descriptions" />
-                </div>
-            </div>
-            @if (process)
-            {
-                <div style="text-align:center">
-                    <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
-                </div>
-            }
-            <UiAlert Model="alert"></UiAlert>
-            <hr style="margin-bottom: 2px;" />
-            <button type="submit" class="btn btn-primary float-right col-md-4">Add</button>
-        </EditForm>
-        <br />
-    }
-</PageDialog>
+                @if (process)
+                {
+                    <div style="text-align:center">
+                        <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
+                    </div>
+                }
+                <UiAlert Model="alert"></UiAlert>
+                <hr style="margin-bottom: 2px;" />
+                <button type="submit" class="btn btn-primary float-right col-md-4">Add</button>
+            </EditForm>
+            <br />
+        }
+    </PageDialog>
+}
+else
+{
+    <div class="col-sm-12" style="margin-top:40vh">
+        <div class="loader-progress"></div>
+    </div>
+}
+
 
 @code {
     [Parameter]

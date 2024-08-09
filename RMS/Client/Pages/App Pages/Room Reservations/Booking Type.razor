@@ -39,11 +39,9 @@
     <div class="row">
         <div class="col-sm-12 p-0">
             <div class="card-body p-2 mt-n3">
-                <div class="card text">
-                    <div class="card-body">
+  
                         <BookingTypeGrid />
-                    </div>
-                </div>
+              
             </div>
         </div>
     </div>
@@ -52,8 +50,6 @@
     <SimpleDailog Title="@Title" Show="@show" OnCloseDialog="ResetForm">
         @if (show)
         {
-
-
             <EditForm Model="model" OnValidSubmit="OnSave">
                 <DataAnnotationsValidator />
                 <div>
@@ -76,7 +72,9 @@
 }
 else
 {
-    <div class="alert alert-danger">You do not have permission to view this page.</div>
+    <div class="col-sm-12" style="margin-top:40vh">
+        <div class="loader-progress"></div>
+    </div>
 }
 
 @code {

@@ -22,8 +22,8 @@
     }
     else
     {
-        <div class="col-sm-12">
-            <p>You do not have permission to view this data.</p>
+        <div class="col-sm-12" style="margin-top:40vh">
+            <div class="loader-progress"></div>
         </div>
     }
 }
@@ -93,6 +93,12 @@ else
             _grid = client.Grid;
             _task = client.UpdateGrid();
             await _task;
+        }
+        if (!canView)
+        {
+            // Redirect or handle unauthorized access
+            NavigationManager.NavigateTo("/unauthorized");
+            return;
         }
     }
 
