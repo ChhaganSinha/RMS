@@ -378,11 +378,14 @@
             </div>
 
         </div> <!-- Occupant Details Modal -->
-        <div class="modal custom-modal" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-xl">
-                <NewCustomerPage OnCloseCustomer="SyncCustoomerDertails" />
+        <div class="modal custom-modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-xl modal-dialog-centered" style="width:500px;">
+                <div class="modal-content">
+                    <NewCustomerResto OnCloseCustomer="SyncCustoomerDertails" />
+                </div>
             </div>
         </div>
+
         <!-- Add to cart Modal -->
         <PageDialog Show="@showcart" ClosePageDialog="ResetForm">
             @if (showcart)

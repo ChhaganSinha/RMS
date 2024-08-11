@@ -7,15 +7,11 @@
     <base href="/" />
     <meta name="theme-color" content="#ffffff">
 
-    <!-- If you add any scoped CSS files, uncomment the following to load them
-    <link href="RMS.Client.styles.css" rel="stylesheet" /> -->
     <link href="css/bootstrap/bootstrap.min.css" rel="stylesheet" />
     <link href="css/app.css" rel="stylesheet" />
     <link rel="stylesheet" href="assets/css/style.css">
     <link rel="stylesheet" href="assets/font-awesome/css/font-awesome.min.css">
-    <!-- Summernote Editor -->
     <link href="./_content/BlazingComponents.Summernote/summernote/summernote-lite.min.css" rel="stylesheet" />
-
     <link href="_content/GridBlazor/css/gridblazor.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="css/Custom.css">
 
@@ -36,7 +32,6 @@
     <div id="app">
         <div class="loader-clone"></div>
         <div class="loading-message">Please wait...</div>
-        <!-- <div class="loader-progress"></div> -->
     </div>
 
     <div id="blazor-error-ui" style="z-index:9999">
@@ -44,6 +39,7 @@
         <a href="" class="reload">Reload</a>
         <a class="dismiss">🗙</a>
     </div>
+
     <script src="_framework/blazor.webassembly.js"></script>
     <!--UI Template-->
     <script src="assets/js/vendor-all.min.js"></script>
@@ -53,56 +49,20 @@
     <script src="assets/js/theme.js"></script>
 
     <script src="js/bootstrap.bundle.min.js"></script>
-    <!-- Chart JS -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script type="text/javascript" src="js/my-chart-js.js"></script>
     <script src="_content/GridBlazor/js/gridblazor.js"></script>
-
-
-
 
     <!-- Summernote Editor -->
     <script src="./_content/BlazingComponents.Summernote/summernote/jquery-3.4.1.slim.min.js"></script>
     <script src="./_content/BlazingComponents.Summernote/summernote/summernote-lite.min.js"></script>
     <script src="js/SummerEditorHack.js"></script>
-
     <script src="https://code.jquery.com/ui/1.11.3/jquery-ui.min.js"></script>
-    <script type="text/javascript">
-        function setModalDraggableAndResizable() {
-            $('.modal-content').resizable({
-                //alsoResize: ".modal-dialog",
-                minHeight: 300,
-                minWidth: 300
-            });
-            $('.modal-dialog').draggable();
-        }
 
-        function printInvoice() {
-            window.print();
-        }
-    </script>
+    <!-- Print and Download PDF Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/printThis/1.15.0/printThis.min.js"></script>
+    <script src="js/Print.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
-    <script>
-        function printInvoice() {
-            const printContents = document.getElementById('billSection').innerHTML;
-            const originalContents = document.body.innerHTML;
-            document.body.innerHTML = printContents;
-            window.print();
-            document.body.innerHTML = originalContents;
-        }
-
-        function downloadPDF() {
-            const element = document.getElementById('billSection');
-            html2pdf().from(element).set({
-                margin: 1,
-                filename: 'reservation_invoice.pdf',
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2 },
-                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
-            }).save();
-        }
-    </script>
-
 </body>
 
 </html>

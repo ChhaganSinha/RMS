@@ -40,7 +40,7 @@ namespace RMS.Dto
         public string ContactType { get; set; } = string.Empty;
 
         [EmailAddress]
-        public string Email { get; set; } = string.Empty;
+        public string Email { get; set; } = "user@email.com";
 
         public string Country { get; set; } = string.Empty;
 
@@ -55,7 +55,7 @@ namespace RMS.Dto
         // Identity Details
         public string IdentityType { get; set; } = string.Empty;
 
-        [Required]
+        //[Required]
         public string IDNumber { get; set; } = string.Empty;
 
         public byte[] FrontIdentityImage { get; set; } = new byte[0];

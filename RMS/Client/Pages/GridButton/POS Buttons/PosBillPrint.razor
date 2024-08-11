@@ -8,18 +8,13 @@
 @using System.ComponentModel.DataAnnotations
 @inject AppClient client
 @inject IJSRuntime JS
-@implements ICustomGridComponent<PosDTO>
 @inject NavigationManager NavigationManager
+@implements ICustomGridComponent<PosDTO>
 
 <style>
     @@media print {
-        /* Hide everything by default */
-        body * {
-            display: none !important;
-        }
         /* Show only the invoice card */
-        .invoice-card,
-        .invoice-card * {
+        .invoice-card, .invoice-card * {
             display: block !important;
         }
         /* Set a white background for the printed page */
@@ -40,8 +35,7 @@
             margin: 0;
         }
         /* Style adjustments for text */
-        .invoice-title,
-        .invoice-footer {
+        .invoice-title, .invoice-footer {
             font-size: 14px;
             margin: 0;
         }
@@ -64,7 +58,6 @@
         width: 300px;
         background-color: #fff;
         border-radius: 5px;
-        margin: 35px auto;
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     }
 
@@ -107,16 +100,9 @@
             text-align: left;
             padding: 8px;
             word-wrap: break-word; /* Enable word wrapping */
+            white-space: normal; /* Ensure text wraps */
         }
 
-        .invoice-list th {
-            font-size: 15px;
-            font-weight: 600;
-        }
-
-        .invoice-list tbody tr {
-            border-bottom: 1px dashed #858080;
-        }
 
     .invoice-footer {
         margin-top: 20px;
@@ -151,14 +137,14 @@
     }
 </style>
 
-<button class="btn btn-sm txt-" style="border-radius:15px" @onclick="MyClickHandler" title="Bill Print">
+<button class="btn btn-sm" style="border-radius:15px" @onclick="MyClickHandler" title="Bill Print">
     <i class="fa fa-print"></i>
 </button>
 
 <PageDialog Title="@Title" Show="@show" ClosePageDialog="ResetForm">
     @if (show)
     {
-        <div class="page-wrapper">
+        <div class="page-wrapper" style="font-family:monospace;">
             <div class="invoice-card">
                 <div class="invoice-head">
                     <img src="/assets/images/logo.png" style="width: 100px;" alt="">
@@ -188,8 +174,8 @@
                                         </div>
                                     </td>
                                     <td>@orderItem.Quantity</td>
-                                    <td>₹@orderItem.Price.ToString("N2")</td> <!-- Rupee symbol with two decimal places -->
-                                    <td>₹@orderItem.Total.ToString("N2")</td> <!-- Rupee symbol with two decimal places -->
+                                    <td>₹@orderItem.Price.ToString("N2")</td>
+                                    <td>₹@orderItem.Total.ToString("N2")</td>
                                 </tr>
                             }
                         </tbody>
@@ -236,9 +222,7 @@
                         <div class="item-info">
                             <p class="item-title">Billing To: @model.CustomerName</p>
                         </div>
-                        @* <strong>Bill By: @model.Employee</strong> *@
                     </div>
-     
                     <div class="text-center">
                         <h6 class="mt-10 text-c-red">Thank you very much</h6>
                         <span><span>Powered By: </span> <span class="text-info">Royal Heritage</span></span>
@@ -252,14 +236,9 @@
     }
 </PageDialog>
 
-
-
-
 @code {
     [Parameter]
     public PosDTO Item { get; set; }
-
-    private List<int> variantsid = new();
 
     [Parameter]
     public CGrid<PosDTO> Grid { get; set; }
@@ -267,27 +246,12 @@
     [CascadingParameter]
     protected AlertModel? alert { get; set; }
 
+    private bool show = false;
+    private bool process = false;
+    private string Title = "Billing Details";
+    private PosDTO model = new();
     private Timer _timer;
     private int _delay = 2500;
-    bool show = false;
-    bool process = false;
-    string Title = "Billing Details";
-
-
-    [Required]
-    private List<int> selectedMenuTypeid { get; set; } = new();
-    private int? foodcategoryid;
-    private bool IsError = false;
-    private List<MenuType> menuTypes = new();
-    private List<FoodCategory> Category = new();
-    private List<AddVariants> Variants = new();
-    Dictionary<int, List<int>> FoodMenuTypeMap = new Dictionary<int, List<int>>();
-    Dictionary<int, List<int>> FoodVarientMap = new Dictionary<int, List<int>>();
-
-    private string imageDataUrl;
-
-    PosDTO model = new();
-
 
     private async Task MyClickHandler(MouseEventArgs e)
     {
@@ -320,8 +284,9 @@
         process = false;
     }
 
-    private void PrintInvoice()
+    private async Task PrintInvoice()
     {
-        JS.InvokeVoidAsync("window.print");
+        await JS.InvokeVoidAsync("printArea", ".invoice-card");
     }
+
 }

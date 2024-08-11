@@ -1,13 +1,13 @@
 ﻿
 @if (Model.IsSuccess && !string.IsNullOrEmpty(Model.Message))
 {
-    <div class="alert alert-primary p-1" role="alert">
+    <div class="alert alert-primary p-1 text-center pb-0" role="alert">
         @((MarkupString)Model.Message)
     </div>
 }
 else if (Model.IsError && !string.IsNullOrEmpty(Model.Message))
 {
-    <div class="alert alert-warning" role="alert">
+    <div class="alert alert-warning text-center pb-0" role="alert">
         @Model.Message
     </div>
 }
