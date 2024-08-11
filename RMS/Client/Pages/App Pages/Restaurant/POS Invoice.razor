@@ -27,8 +27,12 @@
             left: 0;
         }
 
+    .custom-hover:hover {
+        background-color: #afb4ef !important; /* This adds the bg-light effect */
+    }
+
 </style>
-<div class="page-header breadcumb-sticky">
+<div class="page-header breadcumb-sticky" style="margin-bottom: 10px;">
     <div class="page-block">
         <div class="row align-items-center">
             <div class="col-md-12">
@@ -80,31 +84,67 @@
                                 <!-- Left Column: Search and Food Categories -->
                                 <div class="col-md-8 p-0" style="margin-top: -20px;">
                                     <div class="card p-2" style="margin: 16px;">
-                                        <input type="text" placeholder="Search for food..." class="form-control mb-3" @bind="searchQuery" @oninput="FilterFoods" />
+                                        <div class="d-flex justify-content-center mb-3">
+                                            <div class="position-relative">
+                                                <input type="text"
+                                                       placeholder="Search for food..."
+                                                       class="form-control"
+                                                       style="width: 250px; height: 35px; text-align: center; border-radius: 20px;"
+                                                       @bind="@searchQuery"
+                                                       @bind:event="oninput" />
+
+
+                                                @if (!string.IsNullOrEmpty(searchQuery))
+                                                {
+                                                    <span class="position-absolute"
+                                                          style="right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer;"
+                                                          @onclick="ClearSearchQuery">
+                                                        <i class="fa fa-times"></i>
+                                                    </span>
+                                                }
+                                            </div>
+                                        </div>
+
+                                        <!-- Main Row -->
                                         <div class="row">
+                                            <!-- Category Column -->
                                             <div class="col-md-4">
-                                                <div class="nav flex-column nav-pills overflow-auto" style="height: 390px; border:1px dashed; padding:10px; overflow:auto">
-                                                    <a style="font-size:16px; cursor:pointer;"
-                                                       class="nav-link mb-2 btn-success @GetVerticalTabClass(VerticalTab.AllFood)"
-                                                       @onclick="() => SetVerticalActiveTab(VerticalTab.AllFood)">
-                                                        All Food
-                                                    </a>
-                                                    @foreach (var category in foodCategories)
-                                                    {
-                                                        <a style="font-size:16px; cursor:pointer;" class="nav-link mb-2 @GetVerticalTabClass((VerticalTab)category.Id) btn-success" @onclick="() => SetVerticalActiveTab((VerticalTab)category.Id)">@category.Name</a>
-                                                    }
+                                                <div class="overflow-auto" style="height: 390px; border:1px dashed; overflow-y:auto; overflow-x:hidden; width: 100%; scrollbar-width: thin;">
+                                                    <ul class="nav flex-column nav-pills">
+                                                        <li class="nav-item">
+                                                            <a style="font-size:15px; cursor:pointer; text-align:center; padding: 4px; border-radius: 0; font-weight: 500;"
+                                                               class="nav-link mb-0 @GetVerticalTabClass(VerticalTab.AllFood) custom-hover"
+                                                               @onclick="() => SetVerticalActiveTab(VerticalTab.AllFood)">
+                                                                All Food
+                                                            </a>
+                                                        </li>
+                                                        <hr class="m-0 p-0" style="height:0px" />
+                                                        @foreach (var category in foodCategories)
+                                                        {
+                                                            <li class="nav-item">
+                                                                <a style="font-size:15px; cursor:pointer; text-align:center; padding: 4px; border-radius: 0; font-weight: 500;"
+                                                                   class="nav-link mb-0 @GetVerticalTabClass((VerticalTab)category.Id) custom-hover"
+                                                                   @onclick="() => SetVerticalActiveTab((VerticalTab)category.Id)">
+                                                                    @category.Name
+                                                                </a>
+                                                            </li>
+                                                            <hr class="m-0 p-0" style="height:0px" />
+                                                        }
+                                                    </ul>
                                                 </div>
                                             </div>
+
+                                            <!-- Food Column -->
                                             <div class="col-md-8">
                                                 <div class="row">
                                                     @foreach (var food in filteredFoods)
                                                     {
-                                                        <div class="col-md-3">
-                                                            <div class="card mb-2" @onclick="() => ShowFoodDetailsModal(food)" style="cursor:pointer;">
-                                                                <img src="@GetImageSrc(food)" class="card-img-top" alt="@food.FoodName" width="100">
-                                                                <div class="card-body p-2">
+                                                        <div class="col-md-4 d-flex align-items-stretch">
+                                                            <div class="card mb-2" @onclick="() => ShowFoodDetailsModal(food)" style="cursor:pointer; width: 100%; height: 100%;">
+                                                                <img src="@GetImageSrc(food)" class="card-img-top" alt="@food.FoodName" style="height: 80px; object-fit: cover;">
+                                                                <div class="card-body p-2 d-flex flex-column">
                                                                     <h6 style="height:33px" class="card-title m-0">@food.FoodName</h6>
-                                                                    <p class="card-text m-0" style="font-size:8px">Price: @food.Price.ToString("0.00")</p>
+                                                                    <p class="card-text m-0 mt-auto" style="font-size:8px">Price: @food.Price.ToString("0.00")</p>
                                                                     <!-- Hidden Inputs -->
                                                                     <input type="hidden" name="select_product_id" class="select_product_id" value="@food.Id">
                                                                     <input type="hidden" name="select_totalvarient" class="select_totalvarient" value="@food.VariantId.HasValue ? 1 : 0">
@@ -126,23 +166,11 @@
                                     </div>
                                 </div>
 
+
                                 <!-- Right Column: Customer and Order Details -->
                                 <div class="col-md-4 p-0" style="margin-top: -20px;">
                                     <div class="card p-4" style="margin: 16px;">
                                         <div class="form-row">
-                                            <div class="form-group col-md-12">
-                                                <label class="bold-font required-field" for="customerName">Customer Name</label>
-                                                <a style="float: right;" href="javascript:void(0)" data-toggle="modal" data-target="#exampleModal">Add</a>
-                                                <HxSelect TItem="CustomerDetailsDTO"
-                                                          TValue="int?"
-                                                          Data="customerDetailsDTOs"
-                                                          @bind-Value="customerId"
-                                                          TextSelector="@(o => o.FirstName)"
-                                                          ValueSelector="@(o => o.Id)"
-                                                          Nullable="true"
-                                                          NullText="-select-"
-                                                          NullDataText="Loading..." />
-                                            </div>
                                             <div class="form-group col-md-12">
                                                 <label class="bold-font" for="customerType">Customer Type</label>
                                                 <select class="form-control" id="CustomerType">
@@ -152,6 +180,21 @@
                                                     }
                                                 </select>
                                             </div>
+
+                                            <div class="form-group col-md-12">
+                                                <label class="bold-font required-field" for="customerName">Customer Name</label>
+                                                <a class="btn btn-primary btn-small" style="float: right; padding: 0 10px; href="javascript:void(0)" data-toggle="modal" data-target="#exampleModal">Add</a>
+                                                <HxSelect TItem="CustomerDetailsDTO"
+                                                          TValue="int?"
+                                                          Data="customerDetailsDTOs"
+                                                          @bind-Value="customerId"
+                                                          TextSelector="@(o => o.FirstName)"
+                                                          ValueSelector="@(o => o.Id)"
+                                                          Nullable="true"
+                                                          NullText="-- select --"
+                                                          NullDataText="Loading..." />
+                                            </div>
+
                                             <div class="form-group col-md-12">
                                                 <label class="bold-font" for="waiter">Waiter</label>
                                                 <HxSelect TItem="Employee"
@@ -161,7 +204,7 @@
                                                           TextSelector="@(o => o.Name)"
                                                           ValueSelector="@(o => o.Id)"
                                                           Nullable="true"
-                                                          NullText="-select-"
+                                                          NullText="-- select --"
                                                           NullDataText="Loading..." />
                                             </div>
                                             <div class="form-group col-md-12">
@@ -173,7 +216,7 @@
                                                           TextSelector="@(tables => tables.TableNumber)"
                                                           ValueSelector="@(tables => tables.Id)"
                                                           Nullable="true"
-                                                          NullText="-select-"
+                                                          NullText="-- select --"
                                                           NullDataText="Loading..." />
 
                                             </div>
@@ -428,6 +471,11 @@ else
     private bool canEdit = false;
     private bool hasFullAccess = false;
 
+    private void ClearSearchQuery()
+    {
+        searchQuery = string.Empty;
+        FilterFoods();
+    }
     private void ResetForm()
     {
         showcart = false;
@@ -457,7 +505,20 @@ else
 
     private TopTab topActiveTab = TopTab.NewOrder;
     private VerticalTab verticalActiveTab = VerticalTab.Category1;
-    private string searchQuery = string.Empty;
+    private string _searchQuery;
+
+    public string searchQuery
+    {
+        get => _searchQuery;
+        set
+        {
+            if (_searchQuery != value)
+            {
+                _searchQuery = value;
+                FilterFoods();
+            }
+        }
+    }
     private List<Food> filteredFoods = new();
     public List<FoodCategory> foodCategories = new();
     public List<Food> foods = new();
@@ -634,9 +695,8 @@ else
                 .Where(f => f.FoodName.Contains(searchQuery, StringComparison.OrdinalIgnoreCase))
                 .ToList();
             verticalActiveTab = VerticalTab.AllFood;
+            //ApplyCategoryFilter((VerticalTab)filteredFoods[0].FoodCategoryId);
         }
-
-        StateHasChanged();
     }
 
 
