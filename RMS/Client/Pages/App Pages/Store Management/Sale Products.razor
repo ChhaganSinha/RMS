@@ -70,12 +70,13 @@
                                   NullDataText="Loading ProductCategories..." />
                         <ValidationMessage For="() => model.ProductCategory" />
                     </div>
-
                     <div class="col-md-6">
-                        <label class="col-form-label bold-font required-field">Price</label>
-                        <InputNumber @bind-Value="@model.Price" id="available" class="form-control"></InputNumber>
-                        <ValidationMessage For="() => model.Price" />
+                        <label class="col-form-label bold-font required-field">Quantity</label>
+                        <InputNumber @bind-Value="@model.Quantity" id="available" class="form-control"></InputNumber>
+                        <ValidationMessage For="() => model.Quantity" />
                     </div>
+
+                    
                 </div>
                 <div class="form-group row">
                     <div class="col-md-6">
@@ -93,17 +94,12 @@
                                   NullDataText="Loading ProductList..." />
                         <ValidationMessage For="() => model.ProductName" />
                     </div>
+                   
                     <div class="col-md-6">
-                        <label class="col-form-label bold-font required-field">Quantity</label>
-                        <InputNumber @bind-Value="@model.Quantity" id="available" class="form-control"></InputNumber>
-                        <ValidationMessage For="() => model.Quantity" />
+                        <label class="col-form-label bold-font required-field">Price</label>
+                        <InputNumber @bind-Value="@model.Price" id="available" class="form-control"></InputNumber>
+                        <ValidationMessage For="() => model.Price" />
                     </div>
-
-
-
-
-
-
 
 
                 </div>

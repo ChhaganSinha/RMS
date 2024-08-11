@@ -8,7 +8,8 @@ namespace RMS.Dto.Enum
 {
     public enum CustomerType
     {
+        CheckedIn,
         Regular,
-        VIP
+        WalkIn
     }
 }

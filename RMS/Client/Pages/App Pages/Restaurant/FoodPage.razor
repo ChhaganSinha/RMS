@@ -50,28 +50,6 @@
         {
             <EditForm Model="model" OnValidSubmit="OnSave">
                 <DataAnnotationsValidator />
-                <div class="form-group row">
-                    <!-- Food Name -->
-                    <div class="col-md-4">
-                        <label class="col-form-label bold-font required-field">Food Name</label>
-                        <InputText @bind-Value="@model.FoodName" id="FoodName" class="form-control"></InputText>
-                        <ValidationMessage For="() => model.FoodName" />
-                    </div>
-
-                    <!-- Price -->
-                    <div class="col-md-4">
-                        <label class="col-form-label bold-font">Price</label>
-                        <InputNumber @bind-Value="@model.Price" id="Price" class="form-control"></InputNumber>
-                        <ValidationMessage For="() => model.Price" />
-                    </div>
-
-                    <!-- Tax Percentage -->
-                    <div class="col-md-4">
-                        <label class="col-form-label bold-font">Tax %</label>
-                        <InputNumber @bind-Value="@model.TaxPercentage" id="TaxPercentage" class="form-control"></InputNumber>
-                        <ValidationMessage For="() => model.TaxPercentage" />
-                    </div>
-                </div>
 
                 <div class="form-group row">
                     <!-- Select Menu Type -->
@@ -116,6 +94,29 @@
                                        ValueSelector="@(p => p.Id)"
                                        EmptyText="- Select -"
                                        NullDataText="Loading..." />
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <!-- Food Name -->
+                    <div class="col-md-4">
+                        <label class="col-form-label bold-font required-field">Food Name</label>
+                        <InputText @bind-Value="@model.FoodName" id="FoodName" class="form-control"></InputText>
+                        <ValidationMessage For="() => model.FoodName" />
+                    </div>
+
+                    <!-- Price -->
+                    <div class="col-md-4">
+                        <label class="col-form-label bold-font">Price</label>
+                        <InputNumber @bind-Value="@model.Price" id="Price" class="form-control"></InputNumber>
+                        <ValidationMessage For="() => model.Price" />
+                    </div>
+
+                    <!-- Tax Percentage -->
+                    <div class="col-md-4">
+                        <label class="col-form-label bold-font">Tax %</label>
+                        <InputNumber @bind-Value="@model.TaxPercentage" id="TaxPercentage" class="form-control"></InputNumber>
+                        <ValidationMessage For="() => model.TaxPercentage" />
                     </div>
                 </div>
 
