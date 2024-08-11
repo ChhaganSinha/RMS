@@ -102,21 +102,21 @@
                                     </div>
                                     <div class="col-md-6 align-self-center mb-3">
 
-                                        <div class="custom-control custom-radio custom-control-inline">
+                                        <div class="custom-control custom-radio" style="padding-left: 0;">
                                             <input type="radio" checked="@(model.Gender == GenderEnum.Male.ToString())"
                                                    name="Gender" @onchange="@(() => model.Gender = GenderEnum.Male.ToString())" />
-                                            <label class="custom-control-label" for="male">Male</label>
+                                            <label class="" for="male">Male</label>
                                         </div>
-                                        <div class="custom-control custom-radio custom-control-inline">
+                                        <div class="custom-control custom-radio" style="padding-left: 0;">
                                             <input type="radio" checked="@(model.Gender == GenderEnum.Female.ToString())"
                                                    name="Gender" @onchange="@(() => model.Gender = GenderEnum.Female.ToString())" />
-                                            <label class="custom-control-label" for="female">Female</label>
+                                            <label class="" for="female">Female</label>
                                         </div>
 
-                                        <div class="custom-control custom-radio custom-control-inline">
+                                        <div class="custom-control custom-radio" style="padding-left: 0;">
                                             <input type="radio" checked="@(model.Gender == GenderEnum.Other.ToString())"
                                                    name="Gender" @onchange="@(() => model.Gender = GenderEnum.Other.ToString())" />
-                                            <label class="custom-control-label" for="female">Other</label>
+                                            <label class="" for="female">Other</label>
                                         </div>
                                     </div>
 

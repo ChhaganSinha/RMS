@@ -137,30 +137,43 @@
                                             <!-- Food Column -->
                                             <div class="col-md-8">
                                                 <div class="row">
-                                                    @foreach (var food in filteredFoods)
-                                                    {
-                                                        <div class="col-md-4 d-flex align-items-stretch">
-                                                            <div class="card mb-2" @onclick="() => ShowFoodDetailsModal(food)" style="cursor:pointer; width: 100%; height: 100%;">
-                                                                <img src="@GetImageSrc(food)" class="card-img-top" alt="@food.FoodName" style="height: 80px; object-fit: cover;">
-                                                                <div class="card-body p-2 d-flex flex-column">
-                                                                    <h6 style="height:33px" class="card-title m-0">@food.FoodName</h6>
-                                                                    <p class="card-text m-0 mt-auto" style="font-size:8px">Price: @food.Price.ToString("0.00")</p>
-                                                                    <!-- Hidden Inputs -->
-                                                                    <input type="hidden" name="select_product_id" class="select_product_id" value="@food.Id">
-                                                                    <input type="hidden" name="select_totalvarient" class="select_totalvarient" value="@food.VariantId.HasValue ? 1 : 0">
-                                                                    <input type="hidden" name="select_iscustomeqty" class="select_iscustomeqty" value="">
-                                                                    <input type="hidden" name="select_product_size" class="select_product_size" value="">
-                                                                    <input type="hidden" name="select_product_isgroup" class="select_product_isgroup" value="">
-                                                                    <input type="hidden" name="select_product_cat" class="select_product_cat" value="@food.FoodCategoryId">
-                                                                    <input type="hidden" name="select_varient_name" class="select_varient_name" value="@food.Variant">
-                                                                    <input type="hidden" name="select_product_name" class="select_product_name" value="@food.FoodName">
-                                                                    <input type="hidden" name="select_product_price" class="select_product_price" value="@food.Price">
-                                                                    <input type="hidden" name="select_addons" class="select_addons" value="">
+                                                    <div class="col-12 overflow-auto" style="height: 390px; overflow-y:auto; overflow-x:hidden; scrollbar-width: thin;">
+                                                        <div class="row" style="row-gap: 10px;">
+                                                            <!-- Added row-gap for spacing between rows -->
+                                                            @foreach (var food in filteredFoods)
+                                                            {
+                                                                <div class="col-md-4 d-flex align-items-stretch">
+                                                                    <div class="card mb-2" @onclick="() => ShowFoodDetailsModal(food)" style="cursor:pointer; width: 100%; height: 100%;">
+                                                                        <img src="@GetImageSrc(food)" class="card-img-top" alt="@food.FoodName" style="height: 80px; object-fit: cover;">
+                                                                        <div class="card-body p-2 d-flex flex-column">
+                                                                            <h6 style="height:33px" class="card-title m-0">@food.FoodName</h6>
+                                                                            <p class="card-text m-0 mt-auto" style="font-size:8px">Price: @food.Price.ToString("0.00")</p>
+                                                                            <!-- Hidden Inputs -->
+                                                                            <input type="hidden" name="select_product_id" class="select_product_id" value="@food.Id">
+                                                                            <input type="hidden" name="select_totalvarient" class="select_totalvarient" value="@food.VariantId.HasValue ? 1 : 0">
+                                                                            <input type="hidden" name="select_iscustomeqty" class="select_iscustomeqty" value="">
+                                                                            <input type="hidden" name="select_product_size" class="select_product_size" value="">
+                                                                            <input type="hidden" name="select_product_isgroup" class="select_product_isgroup" value="">
+                                                                            <input type="hidden" name="select_product_cat" class="select_product_cat" value="@food.FoodCategoryId">
+                                                                            <input type="hidden" name="select_varient_name" class="select_varient_name" value="@food.Variant">
+                                                                            <input type="hidden" name="select_product_name" class="select_product_name" value="@food.FoodName">
+                                                                            <input type="hidden" name="select_product_price" class="select_product_price" value="@food.Price">
+                                                                            <input type="hidden" name="select_addons" class="select_addons" value="">
+                                                                        </div>
+                                                                    </div>
                                                                 </div>
-                                                            </div>
+                                                            }
+                                                            @if (filteredFoods.Count == 0)
+                                                            {
+                                                                <div class="col-12">
+                                                                    <p>No food found!</p>
+                                                                </div>
+                                                            }
                                                         </div>
-                                                    }
+                                                    </div>
                                                 </div>
+
+
                                             </div>
                                         </div>
                                     </div>
