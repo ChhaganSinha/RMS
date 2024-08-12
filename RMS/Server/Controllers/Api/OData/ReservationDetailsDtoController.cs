@@ -32,6 +32,8 @@ namespace RMS.Server.Controllers.Api.OData
                     RoomNos = string.Join(", ", assignment.RoomBookings.Select(rb => rb.RoomNo)),
                     CheckIn = assignment.CheckIn,
                     CheckOut = assignment.CheckOut,
+                    AcceptedCheckIn = assignment.AcceptedCheckIn,
+                    AcceptedCheckOut = assignment.AcceptedCheckOut,
                     ArrivalFrom = assignment.ArrivalFrom,
                     BookingType = assignment.BookingType,
                     PurposeOfVisit = assignment.PurposeOfVisit,

@@ -78,7 +78,7 @@
                                 <option value="@leaveType.Id">@leaveType.TypeName</option>
                             }
                         </select>
-                        <ValidationMessage For="() => model.LeaveType" />
+                        <ValidationMessage For="() => model.LeaveTypeId" />
                     </div>
                 </div>
 
@@ -89,7 +89,7 @@
                         <ValidationMessage For="() => model.ApplicationStartDate" />
                     </div>
                     <div class="col-md-6">
-                        <label class="col-form-label bold-font">Application End Date</label>
+                        <label class="col-form-label bold-font required-field">Application End Date</label>
                         <input type="date" @bind-Value="@model.ApplicationEndDate" id="ApplicationEndDate" class="form-control" @bind-Value:event="oninput" @onchange="CalculateApplyDays"></input>
                         <ValidationMessage For="() => model.ApplicationEndDate" />
                     </div>
@@ -119,7 +119,7 @@
                         <ValidationMessage For="() => model.ApproveStartDate" />
                     </div>
                     <div class="col-md-6">
-                        <label class="col-form-label bold-font">Approve End Date</label>
+                        <label class="col-form-label bold-font required-field">Approve End Date</label>
                         <input type="date" @bind-Value="@model.ApproveEndDate" id="ApproveEndDate" class="form-control" @bind-Value:event="oninput" @onchange="CalculateApproveDays"></input>
                         <ValidationMessage For="() => model.ApproveEndDate" />
                     </div>
