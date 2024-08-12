@@ -69,6 +69,10 @@
                           NullDataText="Loading Employees..." />
 
                 <ValidationMessage For="() => model.HouseKeeper" />
+                @if (submit == true && empid == null)
+                {
+                    <p class="text-danger">This field is Required</p>
+                }
             </div>
 
 
@@ -82,6 +86,10 @@
                         <option value="@type.Name">@type.Name</option>
                     }
                 </select>
+                @if (submit == true && string.IsNullOrEmpty(model.RoomType))
+                {
+                    <p class="text-danger">This field is Required</p>
+                }
             </div>
 
             <div class="form-group col-md-4">
@@ -93,6 +101,10 @@
                         <option value="@status">@status</option>
                     }
                 </select>
+                @if (submit == true && string.IsNullOrEmpty(model.Status))
+                {
+                    <p class="text-danger">This field is Required</p>
+                }
             </div>
             <div class="form-group col-md-4">
                 <button type="button" class="btn btn-secondary" @onclick="FilterRooms">Search</button>
@@ -104,26 +116,41 @@
 
 
         </div>
+        <div class="card p-1" style="max-height: 500px; overflow-y: auto; scrollbar-width:none">
+            <div class="row">
+                @foreach (var room in FilteredRooms)
+                {
+                    var cardColor = room.Status switch
+                    {
+                        "Available" => "bg-primary text-white",    // Blue for Available
+                        "AssignedToClean" => "bg-warning",         // Yellow for Assigned to Clean
+                        _ => "bg-light"                            // Light gray for other statuses
+                    };
 
-        <div class="row">
-            @foreach (var room in FilteredRooms)
-            {
-                <div class="col-md-3 mb-2">
-                    <div class="card">
-                        <div class="card-body">
-                            <input type="checkbox" @bind="room.IsSelected" class="form-check-input" id="@room.RoomNo" />
-                            <label class="form-check-label" for="@room.RoomNo">@room.RoomNo</label>
-                            <div>@room.Status</div>
+                    <div class="col-md-3 mb-2">
+                        <div class="card @cardColor" style="padding: 0.5rem; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);">
+                            <div class="card-body" style="font-family: cursive;">
+                                @if (room.Status != RoomHallStatus.AssignedToClean.ToString())
+                                {
+                                    <input type="checkbox" @bind="room.IsSelected" class="form-check-input" id="@room.RoomNo" />
+                                }
+                                <label class="form-check-label" for="@room.RoomNo"><i class="text-dark">Room Number : </i>@room.RoomNo</label>
+                                <div class="text-light">@room.Status</div>
+                            </div>
                         </div>
                     </div>
-                </div>
-            }
+                }
+            </div>
+            <UiAlert Model="alert"></UiAlert>
+            <hr class="m-1"/>
+            <div class="col-md-3 p-0">
+                @if (FilteredRooms.Any())
+                {
+                    <button type="submit" class="btn btn-primary">Update</button>
+                }
+            </div>
         </div>
 
-        @if (FilteredRooms.Any())
-        {
-            <button type="submit" class="btn btn-primary">Update</button>
-        }
     </EditForm>
 }
 else
@@ -227,12 +254,16 @@ else
         }
     }
 
-
+    bool submit = false;
     private async void OnValidSubmit()
     {
-
+        submit = false;
+        alert?.Clear();
         try
         {
+            submit = true;
+            if (empid == null || string.IsNullOrEmpty(model.RoomType) || string.IsNullOrEmpty(model.Status))
+                return;
             process = true;
             alert?.Clear();
 
@@ -272,14 +303,13 @@ else
             StateHasChanged();
             _timer = new Timer(TimerCallback, null, _delay, Timeout.Infinite);
 
-            await JSRuntime.InvokeVoidAsync("alert", "Room cleaning assignment updated successfully.");
+            //await JSRuntime.InvokeVoidAsync("alert", "Room cleaning assignment updated successfully.");
         }
         catch (Exception ex)
         {
-            // Handle exceptions
-            await JSRuntime.InvokeVoidAsync("alert", $"Error updating room cleaning assignment: {ex.Message}");
+            // await JSRuntime.InvokeVoidAsync("alert", $"Error updating room cleaning assignment: {ex.Message}");
         }
-
+        submit = false;
     }
     private void TimerCallback(Object o)
     {

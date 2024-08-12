@@ -44,55 +44,55 @@
                             <EditForm Model="model" OnValidSubmit="OnSave">
                                 <DataAnnotationsValidator />
                             @* <ValidationSummary/> *@
-                                <div id="reservation">
-                                    <div class="card mb-4">
-                                        <div class="card-header py-2 ">
-                                            <h6 class="fs-17 font-weight-600 mb-0">
-                                                Reservation Details <span id="msg" class="red-message"></span>
-                                                <small class="float-end">
-                                                    <a href="booking-list" id="view_checin" class="btn btn-primary btn-sm">
-                                                        Booking List
-                                                    </a>
-                                                </small>
-                                            </h6>
-                                        </div>
-                                        <hr class="m-0" />
-                                        <div class="card-body">
-                                            <div class="row">
-                                                <div class="col-md-4 mb-3">
-                                                    <div class="form-group mb-0">
-                                                        <label class="form-label font-weight-600 mb-1">Check In <span class="text-danger">*</span></label>
-                                                        <div class="input-group">
-                                                            <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
-                                                            <input type="date" @bind="model.CheckIn" name="datefilter" class="form-control datefilter" id="datefilter1" placeholder="mm/dd/yyyy --:-- --">
-                                                        </div>
+                            <div id="reservation">
+                                <div class="card mb-4">
+                                    <div class="card-header py-2 ">
+                                        <h6 class="fs-17 font-weight-600 mb-0">
+                                            Reservation Details <span id="msg" class="red-message"></span>
+                                            <small class="float-end">
+                                                <a href="booking-list" id="view_checin" class="btn btn-primary btn-sm">
+                                                    Booking List
+                                                </a>
+                                            </small>
+                                        </h6>
+                                    </div>
+                                    <hr class="m-0" />
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-4 mb-3">
+                                                <div class="form-group mb-0">
+                                                    <label class="form-label font-weight-600 mb-1">Check In <span class="text-danger">*</span></label>
+                                                    <div class="input-group">
+                                                        <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
+                                                        <input type="date" @bind="model.AcceptedCheckIn" name="datefilter" class="form-control datefilter" id="datefilter1" placeholder="mm/dd/yyyy --:-- --">
                                                     </div>
                                                 </div>
-                                                <div class="col-md-4 mb-3">
-                                                    <div class="form-group mb-0">
-                                                        <label class="form-label font-weight-600 mb-1">Check Out <span class="text-danger">*</span></label>
-                                                        <div class="input-group">
-                                                            <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
-                                                            <input type="date" @bind="model.CheckOut" name="datefilter" class="form-control datefilter" id="datefilter2" placeholder="mm/dd/yyyy --:-- --">
-                                                        </div>
+                                            </div>
+                                            <div class="col-md-4 mb-3">
+                                                <div class="form-group mb-0">
+                                                    <label class="form-label font-weight-600 mb-1">Check Out <span class="text-danger">*</span></label>
+                                                    <div class="input-group">
+                                                        <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
+                                                        <input type="date" @bind="model.AcceptedCheckOut" name="datefilter" class="form-control datefilter" id="datefilter2" placeholder="mm/dd/yyyy --:-- --">
                                                     </div>
                                                 </div>
-                                                <div class="col-md-4 mb-3">
-                                                    <div class="form-group mb-0">
-                                                        <label class="form-label font-weight-600 mb-1">Arrival From</label>
-                                                        <div class="input-group">
-                                                            <span class="input-group-text"><i class="fas fa-plane-arrival"></i></span>
-                                                            <input type="text" @bind="model.ArrivalFrom" class="form-control" id="arrival_from" placeholder="Arrival From">
-                                                        </div>
+                                            </div>
+                                            <div class="col-md-4 mb-3">
+                                                <div class="form-group mb-0">
+                                                    <label class="form-label font-weight-600 mb-1">Arrival From</label>
+                                                    <div class="input-group">
+                                                        <span class="input-group-text"><i class="fas fa-plane-arrival"></i></span>
+                                                        <input type="text" @bind="model.ArrivalFrom" class="form-control" id="arrival_from" placeholder="Arrival From">
                                                     </div>
                                                 </div>
-                                                <div class="col-md-4 mb-3">
-                                                    <div class="form-group mb-0">
-                                                        <label class="form-label font-weight-600 mb-1">Booking Type</label>
-                                                        <div class="input-group">
-                                                            <span class="input-group-text"><i class="fas fa-hotel"></i></span>
-                                                            <select class="form-select" @bind="model.BookingType" data-live-search="true" data-width="100%" id="booking_type">
-                                                                <option selected>Choose Reference Type</option>
+                                            </div>
+                                            <div class="col-md-4 mb-3">
+                                                <div class="form-group mb-0">
+                                                    <label class="form-label font-weight-600 mb-1">Booking Type</label>
+                                                    <div class="input-group">
+                                                        <span class="input-group-text"><i class="fas fa-hotel"></i></span>
+                                                        <select class="form-select" @bind="model.BookingType" data-live-search="true" data-width="100%" id="booking_type">
+                                                            <option selected>Choose Reference Type</option>
                                                             @foreach (var val in Enum.GetValues(typeof(BookingReferenceType)))
                                                             {
                                                                         <option value="@val">@val</option>

@@ -6,8 +6,10 @@ namespace RMS.Dto
 {
     public class ReservationDetailsDto : Auditable
     {
-        public DateTime CheckIn { get; set; } = DateTime.Now;
+        public DateTime CheckIn { get; set; }
+        public DateTime AcceptedCheckIn { get; set; }
         public DateTime CheckOut { get; set; }
+        public DateTime AcceptedCheckOut { get; set; }
         public string RoomNos { get; set; } = string.Empty;
         public string ArrivalFrom { get; set; } = string.Empty;
         public BookingReferenceType BookingType { get; set; }

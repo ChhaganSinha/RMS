@@ -30,8 +30,9 @@ namespace RMS.Dto
         public int? EmployeeId { get; set; }
         public string EmployeeName { get; set; } = string.Empty;
 
-       // [Required(ErrorMessage = "Leave Type is required")]
+        [Required(ErrorMessage = "Leave Type is required")]
         public int? LeaveTypeId { get; set; }
+      
         public string LeaveType { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Application Start Date is required")]
@@ -40,7 +41,7 @@ namespace RMS.Dto
         [Required(ErrorMessage = "Application End Date is required")]
         public DateTime ApplicationEndDate { get; set; } = DateTime.Now.AddDays(2);
 
-        public int ApplyDaysCount { get; set; }
+        public int ApplyDaysCount { get; set; } = 3;
         public string ApplicationHardCopy { get; set; } = string.Empty;
         public byte[]? ApplicationHardCopyByteData { get; set; }
 
@@ -50,7 +51,7 @@ namespace RMS.Dto
         [Required(ErrorMessage = "Approve End Date is required")]
         public DateTime ApproveEndDate { get; set; } = DateTime.Now.AddDays(2);
 
-        public int ApproveDaysCount { get; set; }
+        public int ApproveDaysCount { get; set; } = 3;
 
         public string ApprovedBy { get; set; } = string.Empty;
         public string Reason { get; set; } = string.Empty;

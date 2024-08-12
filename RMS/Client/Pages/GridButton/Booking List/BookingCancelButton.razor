@@ -8,7 +8,10 @@
 @implements ICustomGridComponent<ReservationDetailsDto>
 @inject NavigationManager NavigationManager
 
-<button class='btn btn-sm btn-danger' style="border-radius:15px" @onclick="MyClickHandler" title="Delete"><i class="fa fa-trash"></i></button>
+@if (Item.CheckIn.ToShortDateString() == DateTime.MinValue.ToShortDateString())
+{
+<button class='btn btn-sm btn-danger' style="border-radius:15px" @onclick="MyClickHandler" title="Delete"><i class="fa fa-trash"></i></button>    
+}
 <SimpleDailog Title="@Title" Show="@show" OnCloseDialog="ResetForm">
     @if (show)
     {
