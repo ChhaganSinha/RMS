@@ -11,7 +11,7 @@
 
 @if(Item.Status == Dto.Enum.RoomHallStatus.Booked)
 {
-    <button class='btn btn-sm btn-primary' style="border-radius:15px" @onclick="MyClickHandler" title="Check Out"><i class="fa fa-check-square-o"></i></button>
+    <button class='btn btn-sm btn-info' style="border-radius:15px" @onclick="MyClickHandler" title="Check Out"><i class="fa fa-sign-out"></i></button>
 }
 @if(Item.Status == Dto.Enum.RoomHallStatus.Dirty)
 {

@@ -145,7 +145,7 @@
     @if (show)
     {
         <div class="page-wrapper" style="font-family:monospace;">
-            <div class="invoice-card">
+            <div id="invoice-card" style="width: 400px;">
                 <div class="invoice-head">
                     <img src="/assets/images/logo.png" style="width: 100px;" alt="">
                     <h6>Royal Heritage Pilibhit</h6>
@@ -232,6 +232,7 @@
                 </div>
             </div>
             <button class="btn btn-primary mt-4" @onclick="PrintInvoice">Print</button>
+            <button class="btn btn-warning mt-4" @onclick="DownloadPdf"> Download Pdf</button>
         </div>
     }
 </PageDialog>
@@ -286,7 +287,14 @@
 
     private async Task PrintInvoice()
     {
-        await JS.InvokeVoidAsync("printArea", ".invoice-card");
+        await JS.InvokeVoidAsync("printPDF", "invoice-card");
     }
+
+    private async Task DownloadPdf()
+    {
+        var filename = $"{Item.CustomerName}_invoice_{DateTime.Now.ToString()}.pdf"; // Define your filename
+        await JS.InvokeVoidAsync("downloadPDF", "invoice-card", filename);
+    }
+
 
 }

@@ -10,6 +10,12 @@
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject PermissionService PermissionService
 
+<style>
+    table.grid-table .grid-header > .grid-header-group > .grid-header-title {
+        margin-right: 0px;
+        font-size: 10px;
+    }
+</style>
 @if (_task?.IsCompleted ?? false)
 {
     <div class="row">
@@ -55,8 +61,8 @@ else
             c.Add().Encoded(false).Sanitized(false).Titled("Edit").RenderComponentAs<BookingEditButton>().SetWidth("1px");
             if (canEdit || hasFullAccess)
             {
-                c.Add().Encoded(false).Sanitized(false).Titled("Check In").RenderComponentAs<BookingCheckInButton>(new List<Action<object>> { RefreshGrid }).SetWidth("10px");
-                c.Add().Encoded(false).Sanitized(false).Titled("Check Out").RenderComponentAs<BookingCheckOutButton>(new List<Action<object>> { RefreshGrid }).SetWidth("10px");
+                c.Add().Encoded(false).Sanitized(false).Titled("CheckIn").RenderComponentAs<BookingCheckInButton>(new List<Action<object>> { RefreshGrid }).SetWidth("1px");
+                c.Add().Encoded(false).Sanitized(false).Titled("CheckOut").RenderComponentAs<BookingCheckOutButton>(new List<Action<object>> { RefreshGrid }).SetWidth("1px");
                 c.Add().Encoded(false).Sanitized(false).Titled("View").RenderComponentAs<BookingViewButton>().SetWidth("1px");
                 c.Add().Encoded(false).Sanitized(false).Titled("Print").RenderComponentAs<BookingPrintButton>().SetWidth("1px");
             }
