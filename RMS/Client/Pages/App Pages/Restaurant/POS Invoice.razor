@@ -2,6 +2,7 @@
 @using RMS.Client.Client
 @using RMS.Client.Pages.App_Pages.Room_Reservations
 @using RMS.Client.Pages.GridComponent
+@using RMS.Client.Shared.Component
 @using RMS.Client.Shared.Popup
 @inject AppClient client
 @inject IJSRuntime JSRuntime
@@ -109,7 +110,7 @@
                                         <div class="row">
                                             <!-- Category Column -->
                                             <div class="col-md-4">
-                                                <div class="overflow-auto" style="height: 390px; border:1px dashed; overflow-y:auto; overflow-x:hidden; width: 100%; scrollbar-width: thin;">
+                                                <div class="overflow-auto" style="height: 370px; border:1px dashed; overflow-y:auto; overflow-x:hidden; width: 100%; scrollbar-width: thin;">
                                                     <ul class="nav flex-column nav-pills">
                                                         <li class="nav-item">
                                                             <a style="font-size:15px; cursor:pointer; text-align:center; padding: 4px; border-radius: 0; font-weight: 500;"
@@ -137,7 +138,7 @@
                                             <!-- Food Column -->
                                             <div class="col-md-8">
                                                 <div class="row">
-                                                    <div class="col-12 overflow-auto" style="height: 390px; overflow-y:auto; overflow-x:hidden; scrollbar-width: none;">
+                                                    <div class="col-12 overflow-auto" style="height: 370px; overflow-y:auto; overflow-x:hidden; scrollbar-width: none;">
                                                         <div class="row" style="row-gap: 10px;">
                                                             <!-- Added row-gap for spacing between rows -->
                                                             @foreach (var food in filteredFoods)
@@ -197,15 +198,11 @@
                                             <div class="form-group col-md-12">
                                                 <label class="bold-font required-field" for="customerName">Customer Name</label>
                                                 <a class="btn btn-primary btn-small" style="float: right; padding: 0 10px; href="javascript:void(0)" data-toggle="modal" data-target="#exampleModal">Add</a>
-                                                <HxSelect TItem="CustomerDetailsDTO"
-                                                          TValue="int?"
-                                                          Data="customerDetailsDTOs"
-                                                          @bind-Value="customerId"
-                                                          TextSelector="@(o => o.FirstName)"
-                                                          ValueSelector="@(o => o.Id)"
-                                                          Nullable="true"
-                                                          NullText="-- select --"
-                                                          NullDataText="Loading..." />
+                                                <DropdownSelect @bind-Value="customerId"
+                                                                EventDropdown="OnCustomerChanged"
+                                                                DataSource="DropdownCustomer"
+                                                                EmptyText="-- Select --"
+                                                                Css="form-select form-select-sm" />
                                                 @if (customerId == null && submit == true)
                                                 {
                                                     <p class="text-danger m-0">This field is required.</p>
@@ -214,27 +211,19 @@
 
                                             <div class="form-group col-md-12">
                                                 <label class="bold-font" for="waiter">Waiter</label>
-                                                <HxSelect TItem="Employee"
-                                                          TValue="int?"
-                                                          Data="employees"
-                                                          @bind-Value="employeeId"
-                                                          TextSelector="@(o => o.Name)"
-                                                          ValueSelector="@(o => o.Id)"
-                                                          Nullable="true"
-                                                          NullText="-- select --"
-                                                          NullDataText="Loading..." />
+                                                <DropdownSelect @bind-Value="employeeId"
+                                                                EventDropdown="OnWaiterChanged"
+                                                                DataSource="DropdownWaiters"
+                                                                EmptyText="-- Select --"
+                                                                Css="form-select form-select-sm" />
                                             </div>
                                             <div class="form-group col-md-12">
                                                 <label class="bold-font" for="table">TableNumber</label>
-                                                <HxSelect TItem="TableCon"
-                                                          TValue="int?"
-                                                          Data="tables"
-                                                          @bind-Value="tableId"
-                                                          TextSelector="@(tables => tables.TableNumber)"
-                                                          ValueSelector="@(tables => tables.Id)"
-                                                          Nullable="true"
-                                                          NullText="-- select --"
-                                                          NullDataText="Loading..." />
+                                                <DropdownSelect @bind-Value="tableId"
+                                                                EventDropdown="OnTableChanged"
+                                                                DataSource="DropdownTable"
+                                                                EmptyText="-- Select --"
+                                                                Css="form-select form-select-sm" />
 
                                             </div>
                                         </div>
@@ -413,7 +402,7 @@
                 </table>
             }
         </PageDialog>
-        <div class="modal" id="calculatorModal" tabindex="-1" role="dialog" aria-labelledby="calculatorModalLabel" aria-hidden="true">
+        <div class="modal" id="calculatorModal" tabindex="-1" role="dialog" aria-labelledby="calculatorModalLabel" aria-hidden="true" style="z-index:99999">
             <div class="modal-dialog modal-dialog-centered" role="document">
                 <div class="modal-content border-0" style="width: 340px;">
                     <div class="modal-header bg-dark text-white p-1">
@@ -548,10 +537,6 @@ else
     public List<CustomerDetailsDTO> customerDetailsDTOs = new();
     public List<Employee> employees = new();
     public List<TableCon> tables = new();
-    private int? customerId;
-    private int? employeeId;
-    private int? tableId;
-
 
     private void SetTopActiveTab(TopTab tab)
     {
@@ -606,7 +591,7 @@ else
     {
         submit = false;
         submit = true;
-        if(customerId == null)
+        if (customerId == null)
         {
             return;
         }
@@ -689,6 +674,10 @@ else
 
         // Load foods according to the default tab
         FilterFoods();
+        // Convert to dropdown format
+        DropdownWaiters = employees.Select(a => new KeyValuePair<string, string>(a.Id.ToString(), $"{a.Name}")).ToList();
+        DropdownCustomer = customerDetailsDTOs.Select(a => new KeyValuePair<string, string>(a.Id.ToString(), $"{a.FirstName}({a.MobileNo})")).ToList();
+        DropdownTable = tables.Select(a => new KeyValuePair<string, string>(a.Id.ToString(), $"{a.TableNumber} (cap. : {a.TableCapacity})")).ToList();
     }
 
 
@@ -794,5 +783,32 @@ else
     public async Task ApiRefresh()
     {
         tables = (await client.GetAllTableCon()).Where(x => x.Status == TableStatus.Available).ToList();
+    }
+
+    private List<KeyValuePair<string, string>> DropdownWaiters;
+    private int? employeeId;
+    private Task OnWaiterChanged(string value)
+    {
+        employeeId = int.Parse(value);
+        // Handle asset selection change
+        return Task.CompletedTask;
+    }
+
+    private List<KeyValuePair<string, string>> DropdownCustomer;
+    private int? customerId;
+    private Task OnCustomerChanged(string value)
+    {
+        customerId = int.Parse(value);
+        // Handle asset selection change
+        return Task.CompletedTask;
+    }
+
+    private List<KeyValuePair<string, string>> DropdownTable;
+    private int? tableId;
+    private Task OnTableChanged(string value)
+    {
+        tableId = int.Parse(value);
+        // Handle asset selection change
+        return Task.CompletedTask;
     }
 }

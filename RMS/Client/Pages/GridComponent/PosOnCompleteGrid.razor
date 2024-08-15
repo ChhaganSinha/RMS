@@ -48,7 +48,7 @@ else
             c.Add(o => o.GrandTotal).Css("table-bordered").Filterable(filter);
             if (canEdit || hasFullAccess)
             {
-                c.Add().Encoded(false).Sanitized(false).RenderComponentAs<PosBillPrint>().SetWidth("10px").Titled("Biiling");
+                c.Add().Encoded(false).Sanitized(false).RenderComponentAs<PosBillPrint>().SetWidth("10px").Titled("Billing");
                 //c.Add().Encoded(false).Sanitized(false).RenderComponentAs<PosEditButton>().SetWidth("10px").Titled("Edit");
                 //c.Add().Encoded(false).Sanitized(false).RenderComponentAs<PosCompleteButton>().SetWidth("10px").Titled("Complete");
             }

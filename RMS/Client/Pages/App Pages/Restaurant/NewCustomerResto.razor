@@ -32,24 +32,24 @@
                             <div class="">
                                 <div class="row">
                                     <div class="col-md-12">
-                                        <div class="">
 
-                                            <label class="form-label font-weight-600 mb-1" for="name">Name</label>
-                                            <div class="input-group">
-                                                <span class="input-group-text"><i class="fas fa-user-circle"></i></span>
-                                                <input type="name" @bind="model.FirstName" class="form-control" id="name">
-                                            </div>
-                                            <ValidationMessage For="() => model.FirstName" />
-                                            <br/>
-                                            <label class="form-label font-weight-600 mb-1" for="mobileNo">Mobile No.</label>
-                                            <div class="input-group">
-                                                <span class="input-group-text"><i class="fas fa-mobile"></i></span>
-                                                <input type="number" @bind="model.MobileNo" class="form-control" id="mobileNo" placeholder="Mobile No.">
-                                            </div>
-                                            <ValidationMessage For="() => model.MobileNo" />
-
+                                        <label class="form-label font-weight-600 mb-1" for="name">Name</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fas fa-user-circle"></i></span>
+                                            <input type="name" @bind="model.FirstName" class="form-control" id="name">
                                         </div>
-                                        <UiAlert Model="alert"></UiAlert>
+                                        <ValidationMessage For="() => model.FirstName" />
+                                        <br />
+                                        <label class="form-label font-weight-600 mb-1" for="mobileNo">Mobile No.</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fas fa-mobile"></i></span>
+                                            <input type="number" @bind="model.MobileNo" class="form-control" id="mobileNo" placeholder="Mobile No.">
+                                        </div>
+                                        <ValidationMessage For="() => model.MobileNo" />
+
+                                        <div class="mt-1">
+                                            <UiAlert Model="alert"></UiAlert>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -58,7 +58,7 @@
                 </div>
             </div>
 
-           
+
             <div class="modal-footer" style="padding: 5px 25px;">
                 <button type="button" class="btn btn-danger" @onclick="OnClose" data-dismiss="modal">Close</button>
                 <button type="submit" class="btn btn-primary">Add</button>
