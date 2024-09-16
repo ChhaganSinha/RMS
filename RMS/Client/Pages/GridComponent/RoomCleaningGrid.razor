@@ -75,12 +75,13 @@ else
 
         var client = new GridODataClient<RoomCleaning>(HttpClient, url, query, false, "ordersGrid", columns, 5)
             .Sortable(true)
-            // .Filterable(true)
-            // .ClearFiltersButton(true)
+            .Filterable(true)
+            .ClearFiltersButton(true)
             .SetStriped(true)
             .WithMultipleFilters()
             .WithGridItemsCount()
             .ChangePageSize(true)
+            .SetExcelExport(true, true, "RoomCleaning.xlsx")
             .EmptyText("No data available")
             .SetKeyboard(true)
             .Searchable(true, false, false);

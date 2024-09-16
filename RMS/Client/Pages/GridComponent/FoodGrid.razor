@@ -97,6 +97,8 @@ else
             .WithMultipleFilters()
             .WithGridItemsCount()
             .ChangePageSize(true)
+            .ClearFiltersButton(true)
+            .SetExcelExport(true, true, "Foods.xlsx")
             .EmptyText("No data available")
             .SetKeyboard(true)
             .Searchable(true, false, false);

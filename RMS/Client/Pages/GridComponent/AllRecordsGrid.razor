@@ -82,9 +82,12 @@ else
             var client = new GridODataClient<AllRecord>(HttpClient, url, query, false, "ordersGrid", columns, 5)
                 .Sortable(true)
                 .SetStriped(true)
+                .Filterable(true)
+                .ClearFiltersButton(true)
                 .WithMultipleFilters()
                 .WithGridItemsCount()
                 .ChangePageSize(true)
+                .SetExcelExport(true, true, "AllRecord.xlsx")
                 .EmptyText("No data available")
                 .SetKeyboard(true)
                 .Searchable(true, false, false);
