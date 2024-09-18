@@ -332,12 +332,12 @@
                                                         <input type="number" class="form-control" value="@model.BillingDetails.BookingCharge" @onchange="OnBookingChargeChanged" placeholder="Booking Charge">
                                                     </div>
                                                     <div class="col-6 mb-3">
-                                                        <label class="font-weight-600 mb-0">Tax</label>
-                                                        <input type="number" class="form-control" value="@model.BillingDetails.Tax" @onchange="OnTaxChanged" placeholder="Tax">
+                                                        <label class="font-weight-600 mb-0">Tax%</label>
+                                                        <input type="number" class="form-control" @bind="model.BillingDetails.Tax" @oninput="OnTaxChanged" placeholder="Tax" />
                                                     </div>
                                                     <div class="col-6 mb-3">
                                                         <label class="font-weight-600 mb-0">Service Charge</label>
-                                                        <input type="number" class="form-control" value="@model.BillingDetails.ServiceCharge" @onchange="OnServiceChargeChanged" placeholder="Service Charge">
+                                                        <input type="number" class="form-control" @bind="model.BillingDetails.ServiceCharge" @oninput="OnServiceChargeChanged" placeholder="Service Charge" />
                                                     </div>
                                                     <div class="col-6 mb-3">
                                                         <label class="font-weight-600 mb-0"><b>Total</b></label>
@@ -708,12 +708,7 @@ else
         model.CustomerInfo.Remove(customer);
     }
 
-    private void CalculateTotalCharge()
-    {
-        model.BillingDetails.TotalCharge = model.BillingDetails.BookingCharge +
-                                           model.BillingDetails.Tax +
-                                           model.BillingDetails.ServiceCharge;
-    }
+
 
     private void OnBookingChargeChanged(ChangeEventArgs e)
     {
@@ -721,23 +716,10 @@ else
         CalculateTotalCharge();
     }
 
-    private void OnTaxChanged(ChangeEventArgs e)
-    {
-        model.BillingDetails.Tax = Convert.ToDecimal(e.Value);
-        CalculateTotalCharge();
-    }
 
-    private void OnServiceChargeChanged(ChangeEventArgs e)
-    {
-        model.BillingDetails.ServiceCharge = Convert.ToDecimal(e.Value);
-        CalculateTotalCharge();
-    }
 
-    private void OnRoomNoChange(ChangeEventArgs e, RoomBooking roombook)
-    {
-        roombook.RoomNo = e.Value?.ToString();
-        UpdateFilteredRooms();
-    }
+
+
 
     private void RoomTypeOnChange(ChangeEventArgs e, RoomBooking roombook)
     {
@@ -802,11 +784,6 @@ else
         UpdateFilteredRooms();
     }
 
-    private void DeleteRoom(RoomBooking roombook)
-    {
-        roomBookings.Remove(roombook);
-        UpdateFilteredRooms();
-    }
 
     private List<KeyValuePair<string, string>> DropdownCustomer;
     private int? selectedCustomerId;
@@ -834,4 +811,78 @@ else
         selectedCustomerId = null;
         selectedCustomerName = string.Empty;
     }
+
+
+    private void CalculateTotalCharge()
+    {
+        decimal totalBookingCharge = roomBookings.Sum(rb =>
+        {
+            var room = rooms.FirstOrDefault(r => r.RoomNumber == rb.RoomNo);
+            return room?.Price ?? 0;
+        });
+
+        model.BillingDetails.BookingCharge = totalBookingCharge;
+
+        // Recalculate the total charge including tax and service charge
+        model.BillingDetails.TotalCharge = totalBookingCharge +
+                                           (totalBookingCharge * model.BillingDetails.Tax / 100) +
+                                           model.BillingDetails.ServiceCharge;
+    }
+
+    private void OnRoomNoChange(ChangeEventArgs e, RoomBooking roombook)
+    {
+        roombook.RoomNo = e.Value?.ToString();
+        var room = rooms.FirstOrDefault(r => r.RoomNumber == roombook.RoomNo);
+        if (room != null)
+        {
+            // Update the booking charge for this room
+            CalculateTotalCharge();
+        }
+        UpdateFilteredRooms();
+    }
+
+    private void DeleteRoom(RoomBooking roombook)
+    {
+        roomBookings.Remove(roombook);
+        // Recalculate the total charge after room removal
+        CalculateTotalCharge();
+        UpdateFilteredRooms();
+    }
+
+    private void OnTaxChanged(ChangeEventArgs e)
+    {
+        if (!string.IsNullOrEmpty(e.Value?.ToString()))
+        {
+            // Update the tax value
+            model.BillingDetails.Tax = Convert.ToDecimal(e.Value);
+        }
+        else
+        {
+            // If tax is cleared (empty string), set tax to 0
+            model.BillingDetails.Tax = 0;
+        }
+
+        // Recalculate the total charge with the updated (or removed) tax
+        CalculateTotalCharge();
+    }
+
+
+    private void OnServiceChargeChanged(ChangeEventArgs e)
+    {
+        if (!string.IsNullOrEmpty(e.Value?.ToString()))
+        {
+            // Update the service charge value
+            model.BillingDetails.ServiceCharge = Convert.ToDecimal(e.Value);
+        }
+        else
+        {
+            // If service charge is cleared (empty string), set service charge to 0
+            model.BillingDetails.ServiceCharge = 0;
+        }
+
+        // Recalculate the total charge with the updated (or removed) service charge
+        CalculateTotalCharge();
+    }
+
+
 }
