@@ -65,7 +65,7 @@
                                                     <label class="form-label font-weight-600 mb-1">Check In <span class="text-danger">*</span></label>
                                                     <div class="input-group">
                                                         <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
-                                                        <input type="date" @bind="model.AcceptedCheckIn" name="datefilter" class="form-control datefilter" id="datefilter1" placeholder="mm/dd/yyyy --:-- --">
+                                                        <input type="datetime-local" @bind="model.ExpectedCheckIn" name="datefilter" class="form-control datefilter" id="datefilter1" placeholder="mm/dd/yyyy --:-- --">
                                                     </div>
                                                 </div>
                                             </div>
@@ -74,7 +74,7 @@
                                                     <label class="form-label font-weight-600 mb-1">Check Out <span class="text-danger">*</span></label>
                                                     <div class="input-group">
                                                         <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
-                                                        <input type="date" @bind="model.AcceptedCheckOut" name="datefilter" class="form-control datefilter" id="datefilter2" placeholder="mm/dd/yyyy --:-- --">
+                                                        <input type="datetime-local" @bind="model.ExpectedCheckOut" name="datefilter" class="form-control datefilter" id="datefilter2" placeholder="mm/dd/yyyy --:-- --">
                                                     </div>
                                                 </div>
                                             </div>
@@ -105,22 +105,34 @@
 
                                             <div class="col-md-4 mb-3">
                                                 <div class="form-group mb-0">
-                                                    <label class="form-label font-weight-600 mb-1">Booking Reference No</label>
+                                                    <label class="form-label font-weight-600 mb-1">
+                                                    </label>
                                                     <div class="input-group">
-                                                        <span class="input-group-text"><i class="fas fa-sort-numeric-up-alt"></i></span>
+                                                        <span class="input-group-text">
+                                                            <i class="fas fa-id-card"></i>
+                                                        </span>
                                                         <input type="text" @bind="model.BookingReferenceNo" class="form-control" id="bsorurce_no" placeholder="Booking Reference No.">
                                                     </div>
                                                 </div>
                                             </div>
+
                                             <div class="col-md-4 mb-3">
                                                 <div class="form-group mb-0">
                                                     <label class="form-label font-weight-600 mb-1">Purpose of Visit</label>
                                                     <div class="input-group">
                                                         <span class="input-group-text"><i class="fas fa-eye"></i></span>
-                                                        <input type="text" @bind="model.PurposeOfVisit" class="form-control" id="pof_visit" placeholder="Purpose of Visit">
+                                                        <select @bind="model.PurposeOfVisit" class="form-select" id="pof_visit">
+                                                            <option value="">Select Purpose of Visit</option>
+                                                            <option value="Business">Business</option>
+                                                            <option value="Leisure">Leisure</option>
+                                                            <option value="Conference">Conference</option>
+                                                            <option value="Vacation">Vacation</option>
+                                                            <option value="Other">Other</option>
+                                                        </select>
                                                     </div>
                                                 </div>
                                             </div>
+
                                             <div class="col-md-4 mb-3">
                                                 <div class="form-group mb-0">
                                                     <label class="form-label font-weight-600 mb-1">Remarks</label>
@@ -156,7 +168,7 @@
                                                                 <table class="table table-borderless mb-0">
                                                                     <tbody>
                                                                         <tr>
-                                                                            <td class="border-0" style="width:35%">
+                                                                            <td class="border-0" style="width:30%">
                                                                                 <div class="form-group mb-0">
                                                                                     <label class="font-weight-600 mb-1">Room Type<span class="text-danger">*</span></label>
                                                                                     <select class="form-select" @bind-value="@roombook.RoomType" @onchange="(e) => RoomTypeOnChange(e, roombook)" @bind-value:event="oninput">
@@ -168,7 +180,7 @@
                                                                                     </select>
                                                                                 </div>
                                                                             </td>
-                                                                            <td class="border-0" style="width:25%">
+                                                                            <td class="border-0" style="width:20%">
                                                                                 <div class="form-group mb-0">
                                                                                     <label class="font-weight-600 mb-1">Room No.<span class="text-danger">*</span></label>
                                                                                     <select class="form-select" @bind-value="@roombook.RoomNo" @onchange="(e) => OnRoomNoChange(e, roombook)" @bind-value:event="oninput">
@@ -180,16 +192,22 @@
                                                                                     </select>
                                                                                 </div>
                                                                             </td>
-                                                                            <td class="border-0" style="width:20%">
+                                                                            <td class="border-0" style="width:15%">
                                                                                 <div class="form-group mb-0">
                                                                                     <label class="font-weight-600 mb-1">#Adults</label>
                                                                                     <input type="number" min="1" class="form-control" @bind="roombook.Adults" placeholder="Adults" />
                                                                                 </div>
                                                                             </td>
-                                                                            <td class="border-0" style="width:20%">
+                                                                            <td class="border-0" style="width:15%">
                                                                                 <div class="form-group mb-0">
                                                                                     <label class="font-weight-600 mb-1">#Children</label>
                                                                                     <input type="number" min="0" class="form-control" @bind="roombook.Children" placeholder="Children" />
+                                                                                </div>
+                                                                            </td>
+                                                                            <td class="border-0" style="width:20%">
+                                                                                <div class="form-group mb-0">
+                                                                                    <label class="font-weight-600 mb-1">Price</label>
+                                                                                    <input type="number" min="0" class="form-control" @bind="roombook.RoomPrice" placeholder="Children" />
                                                                                 </div>
                                                                             </td>
                                                                         </tr>
@@ -268,52 +286,105 @@
                                             <hr class="m-0" />
                                             <div class="card-body">
                                                 <div class="row">
-                                                    <div class="col-6 mb-3">
+                                                    <div class="col-12 mb-3">
                                                         <div class="form-group mb-0">
                                                             <label class="font-weight-600 mb-1">Discount Reason</label>
                                                             <div class="input-group">
                                                                 <span class="input-group-text"><i class="fas fa-tags"></i></span>
-                                                                <input type="text" class="form-control" @bind="model.PaymentDetails.DiscountReason" placeholder="Discount Reason">
+                                                                <select @bind="model.PaymentDetails.DiscountReason" class="form-select">
+                                                                    <option value="">Select Discount Reason</option>
+                                                                    @foreach (DiscountReason reason in Enum.GetValues(typeof(DiscountReason)))
+                                                                    {
+                                                                        <option value="@reason">@reason</option>
+                                                                    }
+                                                                </select>
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <div class="col-6 mb-3">
+                                              
+                                                <!-- Switch between Rupee and Percentage -->
+                                                <div class="col-4 mb-3">
+                                                    <div class="form-check form-switch" style="margin-top: 30px; margin-left: 20px;">
+                                                        <input class="form-check-input" type="checkbox" id="discountSwitch" @bind="model.PaymentDetails.isDiscountInPercentage"
+                                                               @bind:event="oninput" @onchange="OnDiscountToggleChanged" disabled="@(!model.PaymentDetails.DiscountReason.HasValue)">
+                                                        <label class="form-check-label" for="discountSwitch">
+                                                            @(model.PaymentDetails.isDiscountInPercentage ? "in %" : "in Rupee")
+                                                        </label>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Discount Input Field -->
+                                                @if (model.PaymentDetails.isDiscountInPercentage)
+                                                {
+                                                    <div class="col-8 mb-3">
                                                         <div class="form-group mb-0">
                                                             <label class="font-weight-600 mb-1">Discount (Max-100%)</label>
-                                                            <div class="input-group">
-                                                                <span class="input-group-text"><i class="fas fa-tags"></i></span>
-                                                                <input type="number" class="form-control" @bind="model.PaymentDetails.DiscountRate" placeholder="Discount (Max-100%)">
-                                                            </div>
+                                                                <div class="input-group">
+                                                                    <span class="input-group-text"><i class="fas fa-percent"></i></span>
+                                                                    <input type="number" class="form-control"
+                                                                           @bind="model.PaymentDetails.DiscountRate"
+                                                                           placeholder="Discount (Max-100%)"
+                                                                           min="0" max="100"
+                                                                           disabled="@(!model.PaymentDetails.DiscountReason.HasValue)"
+                                                                           @oninput="OnDiscountRateChange">
+                                                                </div>
+
                                                         </div>
                                                     </div>
-                                                    <div class="col-6 mb-3">
+                                                }
+                                                else
+                                                {
+                                                    <div class="col-8 mb-3">
                                                         <div class="form-group mb-0">
                                                             <label class="font-weight-600 mb-1">Discount Amount</label>
                                                             <div class="input-group">
-                                                                <span class="input-group-text">$</span>
-                                                                <input type="number" class="form-control" @bind="model.PaymentDetails.DiscountAmount">
+                                                                <span class="input-group-text">₹</span>
+                                                                <input type="number" class="form-control" @bind="model.PaymentDetails.DiscountAmount" placeholder="Discount Amount"
+                                                                       disabled="@(!model.PaymentDetails.DiscountReason.HasValue)" @oninput="OnDiscountAmountChange">
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <div class="col-6 mb-3">
-                                                        <div class="form-group mb-0">
-                                                            <label class="font-weight-600 mb-1">Commission (%)</label>
-                                                            <div class="input-group">
-                                                                <span class="input-group-text"><i class="fas fa-percent"></i></span>
-                                                                <input type="number" class="form-control" @bind="model.PaymentDetails.CommissionRate" placeholder="Commission rate">
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-6 mb-3">
-                                                        <div class="form-group mb-0">
-                                                            <label class="font-weight-600 mb-1">Commission Amount</label>
-                                                            <div class="input-group">
-                                                                <span class="input-group-text">$</span>
-                                                                <input type="number" class="form-control" @bind="model.PaymentDetails.CommissionAmount" placeholder="Commission amount">
-                                                            </div>
-                                                        </div>
-                                                    </div>
+                                                }
                                                 </div>
+
+                                                <div class="row">
+                                                    <!-- Switch between Commission in Rupee or Percentage -->
+                                                    <div class="col-4 mb-3">
+                                                        <div class="form-check form-switch" style="margin-top: 30px; margin-left: 20px;">
+                                                            <input class="form-check-input" type="checkbox" id="commissionSwitch" @bind="model.PaymentDetails.isCommissionInPercentage">
+                                                            <label class="form-check-label" for="commissionSwitch">
+                                                                @(model.PaymentDetails.isCommissionInPercentage ? "in %" : "in Rupee")
+                                                            </label>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Conditional rendering based on the switch state -->
+                                                    @if (model.PaymentDetails.isCommissionInPercentage)
+                                                    {
+                                                        <div class="col-8 mb-3">
+                                                            <div class="form-group mb-0">
+                                                                <label class="font-weight-600 mb-1">Commission (%)</label>
+                                                                <div class="input-group">
+                                                                    <span class="input-group-text"><i class="fas fa-percent"></i></span>
+                                                                    <input type="number" class="form-control" @bind="model.PaymentDetails.CommissionRate" placeholder="Commission rate">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    }
+                                                    else
+                                                    {
+                                                        <div class="col-8 mb-3">
+                                                            <div class="form-group mb-0">
+                                                                <label class="font-weight-600 mb-1">Commission Amount</label>
+                                                                <div class="input-group">
+                                                                    <span class="input-group-text">₹</span>
+                                                                    <input type="number" class="form-control" @bind="model.PaymentDetails.CommissionAmount" placeholder="Commission amount">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    }
+                                                </div>
+
                                             </div>
                                         </div>
                                     </div>
@@ -333,7 +404,7 @@
                                                     </div>
                                                     <div class="col-6 mb-3">
                                                         <label class="font-weight-600 mb-0">Tax%</label>
-                                                        <input type="number" class="form-control" @bind="model.BillingDetails.Tax" @oninput="OnTaxChanged" placeholder="Tax" />
+                                                        <input type="number" class="form-control" @bind="model.BillingDetails.Tax" @oninput="OnTaxChanged" placeholder="Tax" min="0"/>
                                                     </div>
                                                     <div class="col-6 mb-3">
                                                         <label class="font-weight-600 mb-0">Service Charge</label>
@@ -516,8 +587,11 @@ else
                     RoomType = rb.RoomType.ToString(),
                     RoomNo = rb.RoomNo,
                     Adults = rb.Adults,
-                    Children = rb.Children
+                    Children = rb.Children,
+                    RoomPrice = rb.RoomPrice
                 }).ToList();
+
+            UpdateFilteredRooms();
         }
         if (!string.IsNullOrEmpty(roomNumber))
         {
@@ -529,9 +603,11 @@ else
                         RoomType = selectedRoom.Category,
                         RoomNo = selectedRoom.RoomNumber,
                         Adults = 0,
-                        Children = 0
+                        Children = 0,
+                        RoomPrice = selectedRoom.Price
                     });
             }
+            CalculateTotalCharges();
         }
 
         // UpdateFilteredRooms();
@@ -588,7 +664,9 @@ else
                     RoomNo = rb.RoomNo,
                     RoomId = rooms.FirstOrDefault(x => x.RoomNumber == rb.RoomNo)?.Id ?? 0,
                     Adults = rb.Adults,
-                    Children = rb.Children
+                    Children = rb.Children,
+                    RoomPrice = rb.RoomPrice
+
                 }).ToList();
 
             // Update customer information in model
@@ -622,6 +700,8 @@ else
                     CustomerInfo = new List<CustomerInfoDto>(),
                     RoomBookings = new List<RoomBookingDto>()
                 };
+
+            roomBookings = new List<RoomBooking>(); //reset room bboking table
             TaskCompleted = true;
         }
         catch (Exception ex)
@@ -724,24 +804,8 @@ else
     private void RoomTypeOnChange(ChangeEventArgs e, RoomBooking roombook)
     {
         roombook.RoomType = e.Value?.ToString();
+        roombook.RoomPrice = 0;
         UpdateFilteredRooms();
-    }
-
-    private IEnumerable<Room> GetFilteredRooms(RoomBooking roombook)
-    {
-        if (Id > 0)
-        {
-            return rooms;
-        }
-        else
-        {
-
-            var selectedRoomNumbers = roomBookingFilter.Select(rb => rb.RoomNo).ToHashSet();
-
-            return string.IsNullOrEmpty(roombook.RoomType)
-                ? Enumerable.Empty<Room>()
-                : rooms.Where(r => r.Category == roombook.RoomType && r.Status == RoomHallStatus.Available && (roombook.RoomNo == r.RoomNumber || !selectedRoomNumbers.Contains(r.RoomNumber)));
-        }
     }
 
     private void UpdateFilteredRooms()
@@ -754,6 +818,36 @@ else
         }
         StateHasChanged();
     }
+
+    private IEnumerable<Room> GetFilteredRooms(RoomBooking roombook)
+    {
+        var selectedRoomNumbers = roomBookingFilter.Select(rb => rb.RoomNo).ToHashSet();
+
+        if (Id > 0)
+        {
+            // For the case when Id > 0, include the current room and other available rooms
+            return string.IsNullOrEmpty(roombook.RoomType)
+                ? Enumerable.Empty<Room>()
+                : rooms.Where(r =>
+                    r.Category == roombook.RoomType &&
+                    (r.RoomNumber == roombook.RoomNo || r.Status == RoomHallStatus.Available)
+                );
+        }
+        else
+        {
+            // For the case when Id is 0, apply the filter on available rooms only
+            return string.IsNullOrEmpty(roombook.RoomType)
+                ? Enumerable.Empty<Room>()
+                : rooms.Where(r =>
+                    r.Category == roombook.RoomType &&
+                    r.Status == RoomHallStatus.Available &&
+                    (r.RoomNumber == roombook.RoomNo || !selectedRoomNumbers.Contains(r.RoomNumber))
+                );
+        }
+    }
+
+
+   
 
     // private void UpdateFilteredRooms()
     // {
@@ -829,14 +923,49 @@ else
                                            model.BillingDetails.ServiceCharge;
     }
 
+    private void CalculateTotalCharges()
+    {
+        // Calculate the total booking charge from room bookings
+        decimal totalBookingCharge = roomBookings.Sum(rb =>
+        {
+            var room = rooms.FirstOrDefault(r => r.RoomNumber == rb.RoomNo);
+            return room?.Price ?? 0;
+        });
+
+        // Update the booking charge in billing details
+        model.BillingDetails.BookingCharge = totalBookingCharge;
+
+        // Calculate discount
+        decimal discount = model.PaymentDetails.isDiscountInPercentage
+            ? totalBookingCharge * model.PaymentDetails.DiscountRate / 100
+            : model.PaymentDetails.DiscountAmount;
+
+        // Calculate commission
+        decimal commission = model.PaymentDetails.isCommissionInPercentage
+            ? totalBookingCharge * model.PaymentDetails.CommissionRate / 100
+            : model.PaymentDetails.CommissionAmount;
+
+        // Calculate the total charge including tax, service charge, discount, and commission
+        model.BillingDetails.TotalCharge = totalBookingCharge +
+                                           (totalBookingCharge * model.BillingDetails.Tax / 100) +
+                                           model.BillingDetails.ServiceCharge -
+                                           discount -
+                                           commission;
+    }
+
+
+
+
     private void OnRoomNoChange(ChangeEventArgs e, RoomBooking roombook)
     {
         roombook.RoomNo = e.Value?.ToString();
+        roombook.RoomPrice = 0;
         var room = rooms.FirstOrDefault(r => r.RoomNumber == roombook.RoomNo);
         if (room != null)
         {
             // Update the booking charge for this room
-            CalculateTotalCharge();
+            roombook.RoomPrice = room.Price;
+            CalculateTotalCharges();
         }
         UpdateFilteredRooms();
     }
@@ -845,7 +974,7 @@ else
     {
         roomBookings.Remove(roombook);
         // Recalculate the total charge after room removal
-        CalculateTotalCharge();
+        CalculateTotalCharges();
         UpdateFilteredRooms();
     }
 
@@ -853,7 +982,6 @@ else
     {
         if (!string.IsNullOrEmpty(e.Value?.ToString()))
         {
-            // Update the tax value
             model.BillingDetails.Tax = Convert.ToDecimal(e.Value);
         }
         else
@@ -863,7 +991,7 @@ else
         }
 
         // Recalculate the total charge with the updated (or removed) tax
-        CalculateTotalCharge();
+        CalculateTotalCharges();
     }
 
 
@@ -881,8 +1009,80 @@ else
         }
 
         // Recalculate the total charge with the updated (or removed) service charge
-        CalculateTotalCharge();
+        CalculateTotalCharges();
     }
 
+    private void OnDiscountChanged(ChangeEventArgs e)
+    {
+        if (model.PaymentDetails.isDiscountInPercentage)
+        {
+            model.PaymentDetails.DiscountRate = Convert.ToDecimal(e.Value);
+        }
+        else
+        {
+            model.PaymentDetails.DiscountAmount = Convert.ToDecimal(e.Value);
+        }
+        CalculateTotalCharges();
+    }
+
+    private void OnCommissionChanged(ChangeEventArgs e)
+    {
+        if (model.PaymentDetails.isCommissionInPercentage)
+        {
+            model.PaymentDetails.CommissionRate = Convert.ToDecimal(e.Value);
+        }
+        else
+        {
+            model.PaymentDetails.CommissionAmount = Convert.ToDecimal(e.Value);
+        }
+        CalculateTotalCharges();
+    }
+
+    
+
+    public void OnDiscountRateChange(ChangeEventArgs e)
+    {
+        if (!string.IsNullOrEmpty(e.Value?.ToString()))
+        {
+            // Update the discount rate when it's in percentage
+            model.PaymentDetails.DiscountRate = Convert.ToDecimal(e.Value);
+        }
+        else
+        {
+            model.PaymentDetails.DiscountRate = 0;
+        }
+
+        // Recalculate the total charges
+        CalculateTotalCharges();
+    }
+
+    public void OnDiscountAmountChange(ChangeEventArgs e)
+    {
+        if (!string.IsNullOrEmpty(e.Value?.ToString()))
+        {
+            // Update the discount amount when it's in Rupees
+            model.PaymentDetails.DiscountAmount = Convert.ToDecimal(e.Value);
+        }
+        else
+        {
+            model.PaymentDetails.DiscountAmount = 0;
+        }
+
+        // Recalculate the total charges
+        CalculateTotalCharges();
+    }
+
+    private void OnDiscountToggleChanged(ChangeEventArgs e)
+    {
+        if (model.PaymentDetails.isDiscountInPercentage)
+        {
+            model.PaymentDetails.DiscountAmount = 0;
+        }
+        else
+        {
+            model.PaymentDetails.DiscountRate = 0;
+        }
+        CalculateTotalCharges();
+    }
 
 }

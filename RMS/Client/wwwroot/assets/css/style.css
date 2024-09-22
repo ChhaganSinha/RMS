@@ -20601,7 +20601,7 @@ pre[class*=language-]:after, pre[class*=language-]:before {
 
             .pcoded-navbar .pcoded-inner-navbar li > a {
                 text-align: left;
-                padding: 7px 20px;
+                padding: 2px 20px;
                 margin: 5px 0 0;
                 border-radius: 2px;
                 display: block;

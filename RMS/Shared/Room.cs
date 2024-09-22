@@ -43,6 +43,8 @@ namespace RMS.Dto
         public string RoomNo { get; set; }
         public int Adults { get; set; }
         public int Children { get; set; }
+ 
+        public Decimal RoomPrice { get; set; }
         public IEnumerable<Room> FilteredRooms { get; set; }
     }
 }

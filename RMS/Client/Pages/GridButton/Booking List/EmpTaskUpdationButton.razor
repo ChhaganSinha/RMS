@@ -11,7 +11,7 @@
 
 @if(Item.Status == Dto.Enum.RoomHallStatus.AssignedToClean.ToString())
 {
-    <button class='btn btn-sm btn-primary' style="border-radius:15px" @onclick="MyClickHandler" title="Assigned to Clean"><i class="fa fa-check-square-o"></i></button>
+    <button class='btn btn-sm btn-primary' style="border-radius:15px" @onclick="MyClickHandler" title="Mark Task as Complete"><i class="fa fa-check-square-o"></i></button>
 }
 @if(Item.Status == Dto.Enum.RoomHallStatus.Available.ToString())
 {

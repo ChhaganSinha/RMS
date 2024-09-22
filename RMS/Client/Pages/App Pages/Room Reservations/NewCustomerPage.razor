@@ -274,12 +274,9 @@
                                                 <span class="input-group-text"><i class="fas fa-images"></i></span>
                                                 <select class="form-select" id="contacttype" @bind="model.IdentityType">
                                                     <option value="0">Identity Type</option> <!-- Optional: Add a default option -->
-                                                    @foreach (ContactTypeEnum type in Enum.GetValues(typeof(IdentityType)))
+                                                    @foreach (var type in Enum.GetValues(typeof(IdentityType)))
                                                     {
-                                                        if (type != ContactTypeEnum.None)
-                                                        {
-                                                            <option value="@type">@type</option>
-                                                        }
+                                                        <option value="@type">@type</option>
                                                     }
                                                 </select>
                                                 <ValidationMessage For="() => model.IdentityType" />

@@ -105,9 +105,13 @@
                                                         {
                                                             <button type="button" class="btn btn-success btn-sm" @onclick="() => BookRoom(room)">Available</button>
                                                         }
-                                                        else
+                                                        else if (room.Status == RoomHallStatus.AssignedToClean)
                                                         {
                                                             <button type="button" class="btn btn-warning btn-sm" disabled>Under Maintenance</button>
+                                                        }
+                                                        else
+                                                        {
+                                                            <button type="button" class="btn btn-secondary btn-sm" disabled>Dirty</button>
                                                         }
                                                     </div>
                                                 </div>

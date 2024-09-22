@@ -19,7 +19,7 @@
         <section>
             <div class="container" style="font-family:monospace;">
                 <div class="row justify-content-center m-0">
-                    <div class="col-12 col-lg-9 col-xl-8 col-xxl-7">
+                    <div class="col-12 col-lg-12 col-xl-12 col-xxl-12">
                         <div id="billSection">
                             <div class="row gy-3 mb-3">
                                 <div class="col-6">
@@ -73,19 +73,19 @@
                                             <thead>
                                                 <tr>
                                                     <th scope="col" class="text-uppercase">Qty</th>
-                                                    <th scope="col" class="text-uppercase">Description</th>
+                                                    <th scope="col" class="text-uppercase">Type</th>
+                                                    <th scope="col" class="text-uppercase text-end">Room Number</th>
                                                     <th scope="col" class="text-uppercase text-end">Unit Price</th>
-                                                    <th scope="col" class="text-uppercase text-end">Amount</th>
                                                 </tr>
                                             </thead>
                                             <tbody class="table-group-divider">
                                                 @foreach (var room in model.RoomBookings)
                                                 {
                                                     <tr>
-                                                        <th scope="row">1</th>
+                                                        <th scope="row">@(++count)</th>
                                                         <td>@room.RoomType</td>
                                                         <td class="text-end">@room.RoomNo</td>
-                                                        <td class="text-end">@room.RoomNo</td>
+                                                        <td class="text-end">@room.RoomPrice</td>
                                                     </tr>
                                                 }
                                                 <tr>
@@ -94,12 +94,27 @@
                                                 </tr>
                                                 <tr>
                                                     <td colspan="3" class="text-end">Tax</td>
-                                                    <td class="text-end">@model.BillingDetails.Tax.ToString("C", new System.Globalization.CultureInfo("en-IN"))</td>
+                                                    <td class="text-end">
+                                                        @((model.BillingDetails.Tax / 100).ToString("P2")) 
+                                                    </td>
                                                 </tr>
                                                 <tr>
                                                     <td colspan="3" class="text-end">Service Charge</td>
                                                     <td class="text-end">@model.BillingDetails.ServiceCharge.ToString("C", new System.Globalization.CultureInfo("en-IN"))</td>
                                                 </tr>
+
+                                                <!-- Discount details section -->
+                                                <tr>
+                                                    <td colspan="3" class="text-end">
+                                                        Discount (@(model.PaymentDetails.isDiscountInPercentage ? $"{model.PaymentDetails.DiscountRate}% in Percentage" : $"₹{model.PaymentDetails.DiscountAmount} in Rupee"))
+                                                    </td>
+                                                    <td class="text-end">
+                                                        -@((model.PaymentDetails.isDiscountInPercentage
+                                                           ? model.BillingDetails.BookingCharge * model.PaymentDetails.DiscountRate / 100
+                                                           : model.PaymentDetails.DiscountAmount).ToString("C", new System.Globalization.CultureInfo("en-IN")))
+                                                    </td>
+                                                </tr>
+
                                                 <tr>
                                                     <th scope="row" colspan="3" class="text-uppercase text-end">Total</th>
                                                     <td class="text-end">@model.BillingDetails.TotalCharge.ToString("C", new System.Globalization.CultureInfo("en-IN"))</td>
@@ -107,11 +122,13 @@
                                             </tbody>
                                         </table>
                                     </div>
+
                                 </div>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-12 text-end">
+                                <button type="button" class="btn btn-secondary mb-3" @onclick="ResetForm">Close</button>
                                 <button type="button" class="btn btn-primary mb-3" @onclick="PrintInvoice">Print Invoice</button>
                                 <button type="button" class="btn btn-warning mb-3" @onclick="DownloadPdf">Download PDF</button>
                                 @* <button type="submit" class="btn btn-danger mb-3">Pay Now</button> *@
@@ -137,6 +154,7 @@
 
     bool show = false;
     string Title = "Invoice";
+    int count = 0;
 
     ReservationDetailsDto model = new();
 

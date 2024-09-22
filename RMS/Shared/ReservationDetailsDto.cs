@@ -6,13 +6,13 @@ namespace RMS.Dto
 {
     public class ReservationDetailsDto : Auditable
     {
-        public DateTime CheckIn { get; set; }
-        public DateTime AcceptedCheckIn { get; set; }
-        public DateTime CheckOut { get; set; }
-        public DateTime AcceptedCheckOut { get; set; }
+        public DateTime CheckIn { get; set; } = DateTime.Now;
+        public DateTime ExpectedCheckIn { get; set; } = DateTime.Now;
+        public DateTime CheckOut { get; set; } = DateTime.Now;
+        public DateTime ExpectedCheckOut { get; set; } = DateTime.Now;
         public string RoomNos { get; set; } = string.Empty;
         public string ArrivalFrom { get; set; } = string.Empty;
-        public BookingReferenceType BookingType { get; set; }
+        public BookingReferenceType ? BookingType { get; set; }
         public string BookingReferenceNo { get; set; } = string.Empty;
         public string PurposeOfVisit { get; set; } = string.Empty;
         public string Remarks { get; set; } = string.Empty;
@@ -29,6 +29,7 @@ namespace RMS.Dto
 
         public int? RoomId { get; set; }
         public string RoomNo { get; set; } = string.Empty;
+        public Decimal RoomPrice { get; set; }
         public int Adults { get; set; }
         public int Children { get; set; }
     }
@@ -43,7 +44,9 @@ namespace RMS.Dto
 
     public class PaymentDetailsDto : BaseEntity
     {
-        public string DiscountReason { get; set; } = string.Empty;
+        public DiscountReason ? DiscountReason { get; set; }
+        public bool isDiscountInPercentage { get; set; } = true;
+        public bool isCommissionInPercentage { get; set; } = true;
 
         private decimal discountRate;
         public decimal DiscountRate

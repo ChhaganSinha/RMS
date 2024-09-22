@@ -2625,8 +2625,8 @@ namespace RMS.Repositories
                     return result;
                 }
 
-                DateTime acceptedCheckIn = data.AcceptedCheckIn;
-                DateTime acceptedCheckOut = data.AcceptedCheckOut;
+                DateTime acceptedCheckIn = data.ExpectedCheckIn;
+                DateTime acceptedCheckOut = data.ExpectedCheckOut;
 
                 if (data.Id > 0)
                 {

@@ -6,12 +6,14 @@ using System.Threading.Tasks;
 
 namespace RMS.Dto.Enum
 {
-    public enum IdentityType
+    public enum DiscountReason
     {
-        Passport,
-        DrivingLicense,
-        Aadhaar,
-        VoterID
+        Promotional,
+        Seasonal,
+        Referral,
+        Volume,
+        Employee,
+        Other
     }
 
 }

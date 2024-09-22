@@ -6,18 +6,17 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
 using Microsoft.AspNetCore.OData.Query;
 using RMS.Server.Intrastructure.ActionFilters;
-using RMS.Client.Pages.App_Pages.Housekeeping;
 
 namespace RMS.Server.Controllers.Api.OData
 {
     [Authorize]
-    public class AllRecordsController : ODataController
+    public class AllRecordController : ODataController
     {
-        public ILogger<AllRecordsController> Logger { get; }
+        public ILogger<AllRecordController> Logger { get; }
         public AppDbContext DbContext { get; }
-        public AllRecordsController(ILogger<AllRecordsController> logger, AppDbContext dbContext)
+        public AllRecordController(ILogger<AllRecordController> logger, AppDbContext dbContext)
         {
-            Logger = logger;
+            Logger = logger;  
             DbContext = dbContext;
         }
 
